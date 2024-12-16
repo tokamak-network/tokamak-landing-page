@@ -1,0 +1,14 @@
+@keyframes rise {
+  from {
+    transform: rotateX(-19deg) rotateY(45deg) translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: rotateX(-19deg) rotateY(45deg) translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-rise {
+  animation: rise 1s ease-out forwards;
+}

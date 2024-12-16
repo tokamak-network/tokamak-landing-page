@@ -21,22 +21,24 @@ const navItems = [
 
 export const NavigationBar: React.FC = () => {
   return (
-    <div
-      className="w-full flex justify-center max-w-[1360px] h-[72px] flex-col pr-11 pl-8 text-base font-medium text-center text-black whitespace-nowrap rounded-2xl border border-solid bg-white bg-opacity-90 border-neutral-200 max-md:px-5
-    sticky top-[24px] z-50
-    "
-    >
-      <div className="flex flex-wrap gap-10 justify-between items-center w-full max-md:max-w-full">
-        <figure className="flex items-center gap-2">
-          <Image loading="lazy" src={TokamakLogo} alt="Tokamak Network Logo" />
-          <Image loading="lazy" src={TokamakLogoText} alt="Tokamak Network" />
-        </figure>
-        <div className="flex gap-10 items-center self-stretch my-auto min-w-[240px]">
-          {navItems.map((item, index) => (
-            <div key={index} className={item.className}>
-              <NavItem label={item.label} icon={item.icon} />
-            </div>
-          ))}
+    <div className="fixed top-[24px] z-50 w-full flex justify-center">
+      <div className="max-w-[1360px] w-full h-[72px] flex flex-col justify-center pr-11 pl-8 text-base font-medium text-center text-black whitespace-nowrap rounded-2xl border border-solid bg-white bg-opacity-90 border-neutral-200 max-md:px-5">
+        <div className="flex flex-wrap gap-10 justify-between items-center w-full max-md:max-w-full">
+          <figure className="flex items-center gap-2">
+            <Image
+              loading="lazy"
+              src={TokamakLogo}
+              alt="Tokamak Network Logo"
+            />
+            <Image loading="lazy" src={TokamakLogoText} alt="Tokamak Network" />
+          </figure>
+          <div className="flex gap-10 items-center self-stretch my-auto min-w-[240px]">
+            {navItems.map((item, index) => (
+              <div key={index} className={item.className}>
+                <NavItem label={item.label} icon={item.icon} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

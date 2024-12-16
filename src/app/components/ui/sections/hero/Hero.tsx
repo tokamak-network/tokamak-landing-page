@@ -1,24 +1,8 @@
-import * as React from "react";
-
-interface HeroSectionProps {
-  imageUrl: string;
-  imageAlt: string;
-}
-
-export const HeroSection: React.FC<HeroSectionProps> = ({
-  imageUrl,
-  imageAlt,
-}) => {
+export const HeroSection = () => {
   return (
-    <div className="flex flex-col">
-      <div className="flex flex-col items-end px-20 pt-48 w-full bg-black pb-[464px] max-md:px-5 max-md:py-24 max-md:max-w-full">
-        <img
-          loading="lazy"
-          src={imageUrl}
-          alt={imageAlt}
-          className="object-contain mb-0 max-w-full aspect-[1.76] w-[367px] max-md:mb-2.5"
-        />
-      </div>
+    <div className="text-[75px] text-[#1c1c1c] text-center leading-[74px] max-md:text-4xl max-md:leading-10 flex flex-col h-[148px] justify-between">
+      <span>L2 ON-DEMAND</span>
+      <span style={{ fontWeight: 100 }}>ETHEREUM PLATFORM</span>
     </div>
   );
 };

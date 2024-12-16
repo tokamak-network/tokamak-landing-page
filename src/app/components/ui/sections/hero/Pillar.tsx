@@ -1,3 +1,5 @@
+import "./pillar.css";
+
 export const Pillar = () => {
   return (
     <div
@@ -11,7 +13,7 @@ export const Pillar = () => {
     >
       {/* Front face */}
       <div
-        className="absolute"
+        className="absolute animate-grow-height-front origin-bottom"
         style={{
           width: "85px",
           height: "142px",
@@ -24,7 +26,7 @@ export const Pillar = () => {
 
       {/* Right face */}
       <div
-        className="absolute"
+        className="absolute animate-grow-height-right origin-bottom"
         style={{
           width: "85px",
           height: "142px",
@@ -38,7 +40,7 @@ export const Pillar = () => {
 
       {/* Top face */}
       <div
-        className="absolute"
+        className="absolute animate-rise-top"
         style={{
           width: "85px",
           height: "85px",

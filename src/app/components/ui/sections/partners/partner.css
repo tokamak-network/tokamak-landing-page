@@ -1,0 +1,13 @@
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite; /* 20초 동안 한 사이클, 필요에 따라 조정 가능 */
+  white-space: nowrap;
+}

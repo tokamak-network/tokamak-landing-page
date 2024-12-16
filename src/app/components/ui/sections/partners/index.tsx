@@ -1,6 +1,8 @@
 import * as React from "react";
 import { PartnerImage } from "./PartnerImage";
 import { PartnerImageProps } from "./types";
+import "./partner.css";
+import Image from "next/image";
 
 const partnerImages: PartnerImageProps[] = [
   {
@@ -58,19 +60,99 @@ const partnerImages: PartnerImageProps[] = [
     width: "w-[134px]",
     aspectRatio: "aspect-[4.46]",
   },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/5f044c774fa5d8ac5a0487c98bbbba1961fc12c3650c79cfdb43ff690a2921b4?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
+    width: "w-[134px]",
+    aspectRatio: "aspect-[4.46]",
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/5f044c774fa5d8ac5a0487c98bbbba1961fc12c3650c79cfdb43ff690a2921b4?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
+    width: "w-[134px]",
+    aspectRatio: "aspect-[4.46]",
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/5f044c774fa5d8ac5a0487c98bbbba1961fc12c3650c79cfdb43ff690a2921b4?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
+    width: "w-[134px]",
+    aspectRatio: "aspect-[4.46]",
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/5f044c774fa5d8ac5a0487c98bbbba1961fc12c3650c79cfdb43ff690a2921b4?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
+    width: "w-[134px]",
+    aspectRatio: "aspect-[4.46]",
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/5f044c774fa5d8ac5a0487c98bbbba1961fc12c3650c79cfdb43ff690a2921b4?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
+    width: "w-[134px]",
+    aspectRatio: "aspect-[4.46]",
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/5f044c774fa5d8ac5a0487c98bbbba1961fc12c3650c79cfdb43ff690a2921b4?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
+    width: "w-[134px]",
+    aspectRatio: "aspect-[4.46]",
+  },
 ];
+
+const Hourglass = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="120"
+    height="110"
+    viewBox="0 0 120 110"
+    fill="none"
+  >
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M0 0H42H78H120L78 42V68L120 110H78H42H0L42 68V42L0 0Z"
+      fill="white"
+    />
+  </svg>
+);
 
 export const Partners: React.FC = () => {
   return (
-    <div className="flex overflow-hidden flex-wrap gap-10 items-center">
-      {partnerImages.map((image, index) => (
-        <PartnerImage
-          key={index}
-          src={image.src}
-          width={image.width}
-          aspectRatio={image.aspectRatio}
-        />
-      ))}
+    <div
+      className="w-full h-[110px] bg-[#0f141c] overflow-hidden flex align-baseline relative
+    "
+    >
+      <div className="flex gap-10 items-center animate-marquee">
+        {partnerImages.map((image, index) => (
+          <PartnerImage
+            key={index}
+            src={image.src}
+            width={image.width}
+            aspectRatio={image.aspectRatio}
+          />
+        ))}
+        {partnerImages.map((image, index) => (
+          <PartnerImage
+            key={index}
+            src={image.src}
+            width={image.width}
+            aspectRatio={image.aspectRatio}
+          />
+        ))}
+      </div>
+
+      <div
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        style={{ zIndex: 100 }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="120"
+          height="110"
+          viewBox="0 0 120 110"
+          fill="none"
+        >
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M0 0H42H78H120L78 42V68L120 110H78H42H0L42 68V42L0 0Z"
+            fill="white"
+          />
+        </svg>
+      </div>
     </div>
   );
 };

@@ -1,14 +1,38 @@
-@keyframes rise {
+@keyframes growHeightFront {
   from {
-    transform: rotateX(-19deg) rotateY(45deg) translateY(100%);
-    opacity: 0;
+    transform: rotateY(90deg) translateZ(-36px) translateX(5px) scaleY(0);
   }
   to {
-    transform: rotateX(-19deg) rotateY(45deg) translateY(0);
-    opacity: 1;
+    transform: rotateY(90deg) translateZ(-36px) translateX(5px) scaleY(1);
   }
 }
 
-.animate-rise {
-  animation: rise 1s ease-out forwards;
+@keyframes growHeightRight {
+  from {
+    transform: rotateY(180deg) translateZ(-39px) translateX(-5px) scaleY(0);
+  }
+  to {
+    transform: rotateY(180deg) translateZ(-39px) translateX(-5px) scaleY(1);
+  }
+}
+
+@keyframes riseTop {
+  from {
+    transform: rotateX(90deg) translateZ(-95px); /* 시작 위치를 더 아래로 조정 */
+  }
+  to {
+    transform: rotateX(90deg) translateZ(45px);
+  }
+}
+
+.animate-grow-height-front {
+  animation: growHeightFront 1s ease-out forwards;
+}
+
+.animate-grow-height-right {
+  animation: growHeightRight 1s ease-out forwards;
+}
+
+.animate-rise-top {
+  animation: riseTop 1s ease-out forwards;
 }

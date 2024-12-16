@@ -11,7 +11,7 @@ export const PartnerImage: React.FC<PartnerImageProps> = ({
       loading="lazy"
       src={src}
       alt=""
-      className={`object-contain shrink-0 self-stretch my-auto ${aspectRatio} ${width}`}
+      className={`object-contain shrink-0 self-stretch my-auto ${aspectRatio} ${width} `}
     />
   );
 };

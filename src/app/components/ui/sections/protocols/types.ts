@@ -13,5 +13,5 @@ export interface ProtocolCardProps {
 }
 
 export interface ProtocolsGridProps {
-  grants: ProtocolCardProps[];
+  protocols: ProtocolCardProps[];
 }

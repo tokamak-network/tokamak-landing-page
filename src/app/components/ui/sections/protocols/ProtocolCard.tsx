@@ -1,6 +1,7 @@
 import * as React from "react";
 import { ProtocolCardProps } from "./types";
 import { LinkItem } from "./LinkItem";
+import Image from "next/image";
 
 export const ProtocolCard: React.FC<ProtocolCardProps> = ({
   icon,
@@ -11,7 +12,7 @@ export const ProtocolCard: React.FC<ProtocolCardProps> = ({
 }) => {
   return (
     <div className="flex flex-col grow shrink w-72 min-w-[240px]">
-      <img
+      <Image
         loading="lazy"
         src={icon}
         alt={alt}

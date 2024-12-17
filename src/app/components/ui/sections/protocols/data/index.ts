@@ -1,8 +1,9 @@
 import { ProtocolCardProps } from "../types";
+import l2Icon from "@/assets/icons/protocols/1.svg";
 
 export const protocolsData: ProtocolCardProps[] = [
   {
-    icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/b2999fafe9a5c5e64c1b2572105c7d70abb01e8566cc017abfe90197cedc2255?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
+    icon: l2Icon,
     title: "L2 Infrastructure & Scalability",
     description:
       "Protocols related to L2 infrastructure and technical scalability",
@@ -26,7 +27,7 @@ export const protocolsData: ProtocolCardProps[] = [
     ],
   },
   {
-    icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/237119b633f9c14e19b97c26e398dabc648e57e8579f57daa78ce747d67f1c0a?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
+    icon: l2Icon,
     title: "Applications-specific L2",
     description:
       "Creating specialized L2s like super private and gaming networks that can be deployed on Tokamak Rollup Hub.",

@@ -2,6 +2,7 @@ import { NavigationBar } from "./components/ui/header";
 import { Hero } from "./components/ui/sections/hero";
 import { Partners } from "./components/ui/sections/partners";
 import { Protocols } from "./components/ui/sections/protocols";
+import GettingStarted from "./components/ui/sections/getting-started";
 
 export default function Home() {
   return (
@@ -9,6 +10,7 @@ export default function Home() {
       <NavigationBar />
       <Hero />
       <Partners />
+      <GettingStarted />
       <Protocols />
     </div>
   );

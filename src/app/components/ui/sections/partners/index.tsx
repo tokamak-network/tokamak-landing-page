@@ -112,7 +112,7 @@ const Hourglass = (
 export const Partners: React.FC = () => {
   return (
     <div
-      className="w-full h-[110px] bg-[#0f141c] overflow-hidden flex align-baseline relative
+      className="w-full h-[110px] overflow-hidden flex align-baseline relative
     "
     >
       <div className="flex gap-10 items-center animate-marquee">

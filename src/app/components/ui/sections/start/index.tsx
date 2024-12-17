@@ -1,18 +1,18 @@
 import Image from "next/image";
-import GithubIcon from "@/assets/icons/common/github.svg";
-import DocIcon from "@/assets/icons/common/doc.svg";
+import GithubIcon from "@/assets/icons/github.svg";
+import DocIcon from "@/assets/icons/doc.svg";
 
 const baseButtonStyle = "h-[40px] rounded-[20px] text-[14px]";
 
 export default function Start() {
   return (
-    <div className="w-full flex justify-center">
+    <div className="w-full bg-black flex justify-center">
       <div
         className="w-[1200px] h-[445px] bg-white flex justify-center px-[130px] py-[75px]
       "
         style={{
           clipPath:
-            "polygon(40px 0, calc(100% - 40px) 0, 100% 40px, 100% calc(100% - 40px), calc(100% - 40px) 100%, 40px 100%, 0 calc(100% - 40px), 0 40px)",
+            "polygon(20px 0, calc(100% - 40px) 0, 100% 40px, 100% calc(100% - 40px), calc(100% - 40px) 100%, 40px 100%, 0 calc(100% - 40px), 0 40px)",
         }}
       >
         <section className="w-[1020px]h-[295px] flex flex-col">

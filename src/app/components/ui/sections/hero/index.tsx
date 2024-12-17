@@ -4,7 +4,7 @@ import { Pillar } from "./Pillar";
 
 export const Hero: React.FC = () => {
   return (
-    <div className="h-[860px] w-full overflow-hidden relative">
+    <div className="h-[860px] w-full overflow-hidden relative bg-white">
       <div
         className="w-full h-[2000px] bg-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{

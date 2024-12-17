@@ -6,7 +6,7 @@ import GettingStarted from "./components/ui/sections/getting-started";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center w-full font-[Proxima_Nova]">
+    <div className="flex flex-col items-center w-full font-[Proxima_Nova] bg-[#1C1C1C]">
       <NavigationBar />
       <Hero />
       <Partners />

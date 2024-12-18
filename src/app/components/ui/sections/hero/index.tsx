@@ -3,6 +3,18 @@ import { HeroSection } from "./Hero";
 import { Pillar } from "./Pillar";
 import "./pillar.css";
 
+const PATTERN_SIZE = 118; // px
+const VISIBLE_HEIGHT = 860; // px
+const VISIBLE_WIDTH = Math.ceil(2000); // 기본값 1920px
+// 보이는 영역보다 약간 더 크게 그려서 여유를 둠
+const CONTAINER_WIDTH = Math.ceil(VISIBLE_WIDTH * 1.2);
+const CONTAINER_HEIGHT = Math.ceil(VISIBLE_HEIGHT * 2.5);
+
+// 그리드 셀 개수 계산
+const GRID_COLUMNS = Math.ceil(CONTAINER_WIDTH / PATTERN_SIZE);
+const GRID_ROWS = Math.ceil(CONTAINER_HEIGHT / PATTERN_SIZE);
+const GRID_ITEMS_COUNT = GRID_COLUMNS * GRID_ROWS;
+
 export const Hero: React.FC = () => {
   return (
     <div className="h-[860px] w-full overflow-hidden relative bg-white">
@@ -14,22 +26,29 @@ export const Hero: React.FC = () => {
           transformOrigin: "center center",
         }}
       >
-        <div className="grid grid-cols-[repeat(auto-fill,120px)] grid-rows-[repeat(auto-fill,120px)] w-full h-full">
-          {/* 그리드 패턴만 표시 */}
-          {Array.from({ length: Math.ceil((2000 * 800) / (80 * 80)) }).map(
-            (_, i) => (
-              <div
-                key={i}
-                className="relative"
-                style={{
-                  background: `
-                    linear-gradient(135deg, transparent 49.5%, #e0e0e0 49.75%, #e0e0e0 50.25%, transparent 50.5%),
-                    linear-gradient(45deg, transparent 49.5%, #e0e0e0 49.75%, #e0e0e0 50.25%, transparent 50.5%)
-                  `,
-                }}
-              />
-            )
-          )}
+        <div
+          className="w-full h-full"
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${GRID_COLUMNS}, ${PATTERN_SIZE}px)`,
+            gridTemplateRows: `repeat(${GRID_ROWS}, ${PATTERN_SIZE}px)`,
+          }}
+        >
+          {Array.from({ length: GRID_ITEMS_COUNT }).map((_, i) => (
+            <div
+              key={i}
+              className="relative"
+              style={{
+                background: `
+                  linear-gradient(45deg, transparent 49.5%, #e0e0e0 49.5%, #e0e0e0 50.5%, transparent 50.5%),
+                  linear-gradient(135deg, transparent 49.5%, #e0e0e0 49.5%, #e0e0e0 50.5%, transparent 50.5%)
+                `,
+                backgroundSize: `${PATTERN_SIZE}px ${PATTERN_SIZE}px`,
+                width: "100%",
+                height: "100%",
+              }}
+            />
+          ))}
         </div>
       </div>
 

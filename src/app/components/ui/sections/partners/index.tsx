@@ -2,112 +2,139 @@ import * as React from "react";
 import { PartnerImage } from "./PartnerImage";
 import { PartnerImageProps } from "./types";
 import "./partner.css";
-import Image from "next/image";
+import Partner1 from "@/assets/images/partners/1.svg";
+import Partner2 from "@/assets/images/partners/2.svg";
+import Partner3 from "@/assets/images/partners/3.svg";
+import Partner4 from "@/assets/images/partners/4.svg";
+import Partner5 from "@/assets/images/partners/5.svg";
+import Partner6 from "@/assets/images/partners/6.svg";
+import Partner7 from "@/assets/images/partners/7.svg";
+import Partner8 from "@/assets/images/partners/8.svg";
+import Partner9 from "@/assets/images/partners/9.svg";
+import Partner10 from "@/assets/images/partners/10.svg";
+import Partner11 from "@/assets/images/partners/11.svg";
+import Partner12 from "@/assets/images/partners/12.svg";
+import Partner13 from "@/assets/images/partners/13.svg";
+import Partner14 from "@/assets/images/partners/14.svg";
+import Partner15 from "@/assets/images/partners/15.svg";
+import Partner16 from "@/assets/images/partners/16.svg";
+import Partner17 from "@/assets/images/partners/17.svg";
+import Partner18 from "@/assets/images/partners/18.svg";
+import Partner19 from "@/assets/images/partners/19.svg";
+import Partner20 from "@/assets/images/partners/20.svg";
+import Partner21 from "@/assets/images/partners/21.svg";
+import Partner22 from "@/assets/images/partners/22.svg";
 
 const partnerImages: PartnerImageProps[] = [
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/012549db40ee74b152e8a4a7f2bb9616d1330ac8fecfab54a7e31e979b3a5188?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[134px]",
-    aspectRatio: "aspect-[4.46]",
+    src: Partner1,
+    alt: "100&100",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/063e299a767113a4eb3f77a89bf32c00de7dd4d1611f4ec13d314788c27bbd59?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[134px]",
-    aspectRatio: "aspect-[4.46]",
+    src: Partner2,
+    alt: "BLOCOORE",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/39c0e262f4a0da43cf00635aea6e61fea1acd945211e0598e31225a1fb7f55df?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[90px]",
-    aspectRatio: "aspect-[3]",
+    src: Partner3,
+    alt: "Alphain",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/f6fc72f19113296741aa05786635aac4c59747250f21778651f15ae1dd0c2bb7?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[134px]",
-    aspectRatio: "aspect-[4.46]",
+    src: Partner4,
+    alt: "Skytale",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/4cc54aca687d040f410a9b88d3a99ecb5dcd2bb2edff3e7f71a1b518a7628b67?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[134px]",
-    aspectRatio: "aspect-[4.46]",
+    src: Partner5,
+    alt: "Onther",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/d253daa36a8150c586dec93a1354f8e618505e8327c4524a70b5b0787f544c03?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[89px]",
-    aspectRatio: "aspect-[2.97]",
+    src: Partner6,
+    alt: "Ethereum",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/f516574da55d42828f042de231fe46741d17442058287f6f8f53f10947698e0b?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[117px]",
-    aspectRatio: "aspect-[3.91]",
+    src: Partner7,
+    alt: "Maker",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/7c812e7b067d8fd0a4f24d231cbc4ffa1a289f68b71ff4b71c47702f0d040c95?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[134px]",
-    aspectRatio: "aspect-[4.46]",
+    src: Partner8,
+    alt: "Polygon",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/c4be9f26b6fd90bcf483e54913c29b7be928d8aa3ce1699fa7606647df8e8aa6?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[87px]",
-    aspectRatio: "aspect-[2.9]",
+    src: Partner9,
+    alt: "Meter",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/9a5a8459bea44fccc6f9ea360eccefd5bc949f4a853036d15369d17e3e5aac86?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[134px]",
-    aspectRatio: "aspect-[4.46]",
+    src: Partner10,
+    alt: "DSRV",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/5f044c774fa5d8ac5a0487c98bbbba1961fc12c3650c79cfdb43ff690a2921b4?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[134px]",
-    aspectRatio: "aspect-[4.46]",
+    src: Partner11,
+    alt: "Bounce",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/5f044c774fa5d8ac5a0487c98bbbba1961fc12c3650c79cfdb43ff690a2921b4?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[134px]",
-    aspectRatio: "aspect-[4.46]",
+    src: Partner12,
+    alt: "Paycoin",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/5f044c774fa5d8ac5a0487c98bbbba1961fc12c3650c79cfdb43ff690a2921b4?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[134px]",
-    aspectRatio: "aspect-[4.46]",
+    src: Partner13,
+    alt: "Bifrost",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/5f044c774fa5d8ac5a0487c98bbbba1961fc12c3650c79cfdb43ff690a2921b4?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[134px]",
-    aspectRatio: "aspect-[4.46]",
+    src: Partner14,
+    alt: "Korea Digital",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/5f044c774fa5d8ac5a0487c98bbbba1961fc12c3650c79cfdb43ff690a2921b4?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[134px]",
-    aspectRatio: "aspect-[4.46]",
+    src: Partner15,
+    alt: "Dcent",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/5f044c774fa5d8ac5a0487c98bbbba1961fc12c3650c79cfdb43ff690a2921b4?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[134px]",
-    aspectRatio: "aspect-[4.46]",
+    src: Partner16,
+    alt: "Ozys",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/5f044c774fa5d8ac5a0487c98bbbba1961fc12c3650c79cfdb43ff690a2921b4?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
-    width: "w-[134px]",
-    aspectRatio: "aspect-[4.46]",
+    src: Partner17,
+    alt: "Panony",
+  },
+
+  {
+    src: Partner18,
+    alt: "Staked",
+  },
+  {
+    src: Partner19,
+    alt: "Chainlink",
+  },
+  {
+    src: Partner20,
+    alt: "Decipher",
+  },
+  {
+    src: Partner21,
+    alt: "DeSpread",
+  },
+  {
+    src: Partner22,
+    alt: "Ciphers",
   },
 ];
 
-const Hourglass = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="120"
-    height="110"
-    viewBox="0 0 120 110"
-    fill="none"
-  >
-    <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
-      d="M0 0H42H78H120L78 42V68L120 110H78H42H0L42 68V42L0 0Z"
-      fill="white"
-    />
-  </svg>
-);
+const Hourglass = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="120"
+      height="110"
+      viewBox="0 0 120 110"
+      fill="none"
+    >
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M0 0H42H78H120L78 42V68L120 110H78H42H0L42 68V42L0 0Z"
+        fill="white"
+      />
+    </svg>
+  );
+};
 
 export const Partners: React.FC = () => {
   return (
@@ -116,21 +143,17 @@ export const Partners: React.FC = () => {
     "
     >
       <div className="flex gap-10 items-center animate-marquee">
+        {/* First set */}
         {partnerImages.map((image, index) => (
-          <PartnerImage
-            key={index}
-            src={image.src}
-            width={image.width}
-            aspectRatio={image.aspectRatio}
-          />
+          <PartnerImage key={`set1-${index}`} src={image.src} alt={image.alt} />
         ))}
+        {/* Second set */}
         {partnerImages.map((image, index) => (
-          <PartnerImage
-            key={index}
-            src={image.src}
-            width={image.width}
-            aspectRatio={image.aspectRatio}
-          />
+          <PartnerImage key={`set2-${index}`} src={image.src} alt={image.alt} />
+        ))}
+        {/* Third set */}
+        {partnerImages.map((image, index) => (
+          <PartnerImage key={`set3-${index}`} src={image.src} alt={image.alt} />
         ))}
       </div>
 
@@ -138,20 +161,7 @@ export const Partners: React.FC = () => {
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ zIndex: 100 }}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="120"
-          height="110"
-          viewBox="0 0 120 110"
-          fill="none"
-        >
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M0 0H42H78H120L78 42V68L120 110H78H42H0L42 68V42L0 0Z"
-            fill="white"
-          />
-        </svg>
+        <Hourglass />
       </div>
     </div>
   );

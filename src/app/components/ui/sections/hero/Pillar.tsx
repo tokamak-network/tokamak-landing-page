@@ -13,14 +13,13 @@ export const Pillar = () => {
     >
       {/* Front face */}
       <div
-        className="absolute animate-grow-height-front origin-bottom"
+        className="absolute 
+        animate-grow-height-front origin-bottom"
         style={{
-          width: "85px",
+          width: "95px",
           height: "142px",
-          background: "rgba(0, 120, 255, 0.2)",
-          borderRight: "1px solid rgb(0, 120, 255)",
-          borderBottom: "1px solid rgb(0, 120, 255)",
-          transform: "rotateY(90deg) translateZ(-36px) translateX(5px)",
+          background: "linear-gradient(to top, #FFF 0%, #E9F2FD 100%)",
+          border: "1px solid #257EEE",
         }}
       />
 
@@ -28,13 +27,11 @@ export const Pillar = () => {
       <div
         className="absolute animate-grow-height-right origin-bottom"
         style={{
-          width: "85px",
+          width: "95px",
           height: "142px",
-          background: "rgba(0, 120, 255, 0.1)",
-          borderLeft: "1px solid rgb(0, 120, 255)",
-          borderRight: "1px solid rgb(0, 120, 255)",
-          borderBottom: "1px solid rgb(0, 120, 255)",
-          transform: "rotateY(180deg) translateZ(-39px) translateX(-5px)",
+          background: "linear-gradient(to top, #FFF 0%, #E9F2FD 100%)",
+          border: "1px solid #257EEE",
+          opacity: 0.7,
         }}
       />
 
@@ -44,9 +41,9 @@ export const Pillar = () => {
         style={{
           width: "85px",
           height: "85px",
-          background: "rgba(0, 120, 255, 0.3)",
-          border: "1px solid rgb(0, 120, 255)",
-          transform: "rotateX(90deg) translateZ(45px)",
+          background: "linear-gradient(to top, #FFF 0%, #E9F2FD 100%)",
+          border: "1px solid #257EEE",
+          opacity: 0.85,
         }}
       />
     </div>

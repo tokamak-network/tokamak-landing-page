@@ -1,36 +1,65 @@
 @keyframes growHeightFront {
-  from {
-    transform: rotateY(90deg) translateZ(-36px) translateX(5px) scaleY(0);
+  0% {
+    transform: rotateY(83deg) translateZ(-43px) translateX(10px)
+      translateY(150px);
+    height: 0;
+    opacity: 0.3;
   }
-  to {
-    transform: rotateY(90deg) translateZ(-36px) translateX(5px) scaleY(1);
+  50% {
+    transform: rotateY(83deg) translateZ(-43px) translateX(10px) translateY(0);
+    height: 100%;
+    opacity: 1;
+  }
+  90% {
+    transform: rotateY(83deg) translateZ(-43px) translateX(10px)
+      translateY(150px);
+    height: 0;
+  }
+  100% {
+    opacity: 0;
   }
 }
-
 @keyframes growHeightRight {
-  from {
-    transform: rotateY(180deg) translateZ(-39px) translateX(-5px) scaleY(0);
+  0% {
+    transform: rotateY(186deg) translateZ(-45px) translateX(25px)
+      translateY(150px);
+    height: 0;
+    opacity: 0.3;
   }
-  to {
-    transform: rotateY(180deg) translateZ(-39px) translateX(-5px) scaleY(1);
+  50% {
+    transform: rotateY(186deg) translateZ(-45px) translateX(25px) translateY(0);
+    height: 100%;
+    opacity: 1;
+  }
+  90% {
+    transform: rotateY(186deg) translateZ(-45px) translateX(25px)
+      translateY(150px);
+    height: 0;
+  }
+  100% {
+    opacity: 0;
   }
 }
 
 @keyframes riseTop {
-  from {
-    transform: rotateX(90deg) translateZ(-95px); /* 시작 위치를 더 아래로 조정 */
+  0% {
+    transform: rotateX(90deg) translateX(-10px) translateZ(-95px) scaleY(0);
+    opacity: 0.3;
   }
-  to {
-    transform: rotateX(90deg) translateZ(45px);
+  100% {
+    transform: rotateX(90deg) translateX(-10px) translateZ(-95px) scaleY(1);
+    opacity: 1;
   }
 }
 
 .animate-grow-height-front {
-  animation: growHeightFront 1s ease-out forwards;
+  animation: growHeightFront 1.5s ease-out forwards;
+  transform-origin: top;
 }
 
 .animate-grow-height-right {
-  animation: growHeightRight 1s ease-out forwards;
+  animation: growHeightRight 1.5s ease-out forwards;
+  transform-origin: top;
 }
 
 .animate-rise-top {

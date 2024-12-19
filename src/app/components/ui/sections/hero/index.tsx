@@ -91,13 +91,14 @@ export const Hero: React.FC = () => {
                 }}
               >
                 <div
-                  className="absolute left-1/2 top-1/2 z-10 opacity-0 group-hover:opacity-100"
+                  className="absolute left-1/2 top-1/2 z-10"
                   style={{
                     transform: `translate(${translateX}px, -50%)`,
+                    opacity: hoverStates[i] ? 1 : 0,
                   }}
                 >
                   <div
-                    className="group-hover:animate-pillar"
+                    className={hoverStates[i] ? "animate-pillar" : ""}
                     key={hoverStates[i]}
                   >
                     <Pillar />

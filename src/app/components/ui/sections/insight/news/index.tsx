@@ -32,9 +32,6 @@ export default function NewsSection({ posts }: { posts: Post[] }) {
       .slice(0, 3);
   }, [posts, activeFilter]);
 
-  console.log("posts", posts);
-  console.log("filteredPosts", filteredPosts);
-
   return (
     <div className="flex flex-col">
       {/* Header */}

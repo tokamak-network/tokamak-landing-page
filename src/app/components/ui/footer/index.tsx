@@ -13,7 +13,7 @@ export default function Footer() {
     >
       <div className="flex justify-between items-center w-[1220px]">
         {/* Logo Section */}
-        <div>
+        <div className="flex flex-col justify-between h-full">
           <figure className="flex items-center gap-2">
             <Image
               loading="lazy"
@@ -29,9 +29,9 @@ export default function Footer() {
         </div>
 
         {/* Navigation Links */}
-        <div className="flex gap-x-16">
+        <div className="flex text-right">
           {/* Developer Column */}
-          <div>
+          <div className="w-[180px]">
             <h3 className="font-medium mb-4">Developer</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
@@ -47,11 +47,11 @@ export default function Footer() {
           </div>
 
           {/* Features Column */}
-          <div>
+          <div className="w-[180px]">
             <h3 className="font-medium mb-4">Features</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <a href="#">Bridge Hub</a>
+                <a href="#">Rollup Hub</a>
               </li>
               <li>
                 <a href="#">Staking</a>
@@ -63,7 +63,7 @@ export default function Footer() {
           </div>
 
           {/* About Column */}
-          <div>
+          <div className="w-[180px]">
             <h3 className="font-medium mb-4">About</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
@@ -76,7 +76,7 @@ export default function Footer() {
           </div>
 
           {/* Social Column */}
-          <div>
+          <div className="w-[180px]">
             <h3 className="font-medium mb-4">Social</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>

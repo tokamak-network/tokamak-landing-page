@@ -3,7 +3,6 @@ const fetchTONPriceInfo = async () => {
     const response = await fetch(
       "https://api.upbit.com/v1/ticker?markets=KRW-tokamak"
     );
-    console.log("response", response);
     const data = await response.json();
     return JSON.parse(JSON.stringify(data).replace(/]|[[]/g, ""));
   } catch (error) {
@@ -23,7 +22,6 @@ const getStakingVolume = async () => {
     "https://price.api.tokamak.network/staking/current"
   );
   const data = await response.json();
-  console.log("data", data);
   return data;
 };
 

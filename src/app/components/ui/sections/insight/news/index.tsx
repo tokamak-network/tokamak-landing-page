@@ -1,12 +1,40 @@
+"use client";
+
 import { NewsCard } from "./NewsCard";
+import { FilterType, Post } from "../types";
+import { useMemo, useState } from "react";
 
 const styles = {
   button:
     "h-[33px] px-[30px] border border-[#1C1C1C] text-[14px] rounded-[16.5px]",
-  // 다른 스타일들도 추가 가능
 };
 
-export default function NewsSection() {
+export default function NewsSection({ posts }: { posts: Post[] }) {
+  const [activeFilter, setActiveFilter] = useState<FilterType>("All");
+
+  const filteredPosts = useMemo(() => {
+    if (activeFilter === "All") return posts?.slice(0, 3);
+    return posts
+      ?.filter((post) => {
+        const categories = post.categories.filter(
+          (cat) =>
+            cat !== "tokamak-network" ||
+            !post.categories.some(
+              (otherCat) =>
+                otherCat !== "tokamak-network" &&
+                otherCat.toLowerCase() === activeFilter.toLowerCase()
+            )
+        );
+        return categories.some(
+          (category) => category.toLowerCase() === activeFilter.toLowerCase()
+        );
+      })
+      .slice(0, 3);
+  }, [posts, activeFilter]);
+
+  console.log("posts", posts);
+  console.log("filteredPosts", filteredPosts);
+
   return (
     <div className="flex flex-col">
       {/* Header */}
@@ -21,27 +49,25 @@ export default function NewsSection() {
 
       {/* Filter Tabs */}
       <div className="flex gap-4 justify-center mb-[60px]text-[#1C1C1C] mb-[60px]">
-        <button className="bg-black text-white rounded-[16.5px] px-[30px] h-[33px] text-[14px]">
-          All
-        </button>
-        <button className={styles.button}>News</button>
-        <button className={styles.button}>Tokamak Network</button>
-        <button className={styles.button}>Research</button>
-        <button className={styles.button}>More +</button>
+        {["All", "News", "Tokamak Network", "Research"].map((filter) => (
+          <button
+            key={filter}
+            className={`${styles.button} ${
+              activeFilter === filter ? "bg-[#1C1C1C] text-white" : ""
+            }`}
+            value={filter}
+            onClick={() => setActiveFilter(filter as FilterType)}
+          >
+            {filter}
+          </button>
+        ))}
       </div>
 
       {/* News Grid */}
       <div className="grid grid-cols-3 gap-6">
-        <NewsCard
-          image="/images/biweekly.jpg"
-          title="BIWEEKLY REPORT"
-          subtitle="2024 #24"
-          date="Nov 19 - Dec 2"
-          category="Tokamak Network"
-          timeAgo="4 days ago"
-          description="Shifting our focus to building a developer-c..."
-        />
-        {/* Add other NewsCard components similarly */}
+        {filteredPosts?.map((post) => (
+          <NewsCard key={post.guid} post={post} />
+        ))}
       </div>
     </div>
   );

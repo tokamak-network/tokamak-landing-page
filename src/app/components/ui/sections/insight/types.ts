@@ -1,14 +1,23 @@
-export interface NewsCardProps {
-  image: string;
-  title: string;
-  subtitle: string;
-  date: string;
-  category: string;
-  timeAgo: string;
-  description: string;
-}
-
 export interface PriceCardProps {
   value: string;
   label: string;
 }
+
+export interface Post {
+  title: string;
+  pubDate: string;
+  link: string;
+  guid: string;
+  author: string;
+  thumbnail: string;
+  description: string;
+  content: string;
+  enclosure: Record<string, unknown>;
+  categories: string[];
+}
+
+export interface NewsCardProps {
+  post: Post;
+}
+
+export type FilterType = "All" | "News" | "Tokamak Network" | "Research";

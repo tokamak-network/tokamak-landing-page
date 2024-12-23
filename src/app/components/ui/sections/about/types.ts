@@ -1,7 +1,9 @@
+import { StaticImageData } from "next/image";
+
 export interface TeamMemberProps {
   name: string;
   role: string;
-  imageUrl: string;
+  imageUrl: StaticImageData;
   isCEO?: boolean;
 }
 

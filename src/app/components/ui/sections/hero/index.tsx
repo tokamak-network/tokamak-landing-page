@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { HeroSection } from "./Hero";
+// import { HeroSection } from "./Hero";
 import { Pillar } from "./Pillar";
 import "./pillar.css";
 import GridImage from "@/assets/images/bg.svg";
@@ -35,7 +35,7 @@ export const Hero: React.FC = () => {
         <div className="grid grid-cols-[repeat(auto-fill,120px)] grid-rows-[repeat(auto-fill,120px)] w-full h-full">
           {Array.from({ length: GRID_ITEMS_COUNT }).map((_, i) => {
             const columnIndex = i % GRID_COLUMNS;
-            const rowIndex = Math.floor(i / GRID_COLUMNS);
+            // const rowIndex = Math.floor(i / GRID_COLUMNS);
             const translateX =
               columnIndex === 0
                 ? -32

@@ -1,4 +1,3 @@
-import { clipPath } from "motion/react-client";
 import GetInvolve from "./GetInvolve";
 import TeamGrid from "./TeamGrid";
 import { CLIP_PATHS } from "@/app/constants/styles";

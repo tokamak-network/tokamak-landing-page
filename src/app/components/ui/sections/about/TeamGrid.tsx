@@ -181,7 +181,7 @@ const teamMembers = [
 
 const TeamGrid: React.FC = () => {
   return (
-    <div className="w-full h-full flex justify-center pt-[60px]">
+    <div className="w-full h-full flex justify-center ">
       <div className="grid grid-cols-5 max-w-[1000px] gap-[25px] items-start">
         {teamMembers.map((member, index) => (
           <TeamMember

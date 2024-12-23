@@ -40,31 +40,31 @@ const SocialIcons: React.FC<SocialIconsProps> = ({
   </div>
 );
 
-export default function TeamMember ({
+export default function TeamMember({
   name,
   role,
   imageUrl,
   isCEO,
 }: TeamMemberProps) {
-  
   return (
     <div className="flex flex-col grow shrink justify-center w-[180px]">
       <Image loading="lazy" src={imageUrl} alt={`${name} - ${role}`} />
       <div className="flex flex-col mt-2.5 w-full">
-      <div className="flex justify-between items-center w-full">
-        <div className="flex-1 shrink self-stretch my-auto text-[16px] font-semibold basis-0 text-[#1C1C1C]">
-          {name}
+        <div className="flex justify-between items-center w-full">
+          <div className="flex-1 shrink self-stretch my-auto text-[16px] font-semibold basis-0 text-[#1C1C1C]">
+            {name}
+          </div>
+          {isCEO && (
+            <SocialIcons
+              githubUrl="https://github.com/ggs134"
+              linkedInUrl="https://www.linkedin.com/in/philosopher134/"
+            />
+          )}
         </div>
-        {isCEO && (
-          <SocialIcons
-            githubUrl="https://github.com/ggs134"
-            linkedInUrl="https://www.linkedin.com/in/philosopher134/"
-          />
-        )}
-      </div>
-      <div className="text-[13px] font-medium leading-none  text-[#252525]">
-        {role}
+        <div className="text-[13px] font-medium leading-none  text-[#252525]">
+          {role}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+}

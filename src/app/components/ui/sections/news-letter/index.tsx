@@ -1,10 +1,10 @@
 export default function NewsletterSection() {
   return (
     <div className="w-full h-[300px] bg-[#1C1C1C] flex justify-center items-center px-[25px] [@media(max-width:1000px)]:px-[15px]">
-      <div className="w-full max-w-[1200px] flex justify-center items-center gap-x-[150px]">
+      <div className="w-full max-w-[1200px] flex justify-center items-center gap-x-[150px] [@media(max-width:800px)]:flex-col gap-y-[30px]">
         {/* Title */}
-        <div className="text-left w-[390px]">
-          <h2 className="text-white text-[30px] mb-[9px]">
+        <div className="text-left w-full min-w-[330px]">
+          <h2 className="text-white text-[24px] md:text-[30px] mb-[9px]">
             Newsletter <span className="font-bold">SUBSCRIPTION</span>
           </h2>
           <p className="text-[15px] text-gray-400">
@@ -13,7 +13,7 @@ export default function NewsletterSection() {
         </div>
 
         {/* Email Input Form */}
-        <div className="w-full relative">
+        <div className="w-full relative min-w-[330px]">
           <input
             type="email"
             placeholder="Enter your email"

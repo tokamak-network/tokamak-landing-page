@@ -21,9 +21,10 @@ const navItems = [
 
 export default function NavigationBar() {
   return (
-    <div className="fixed top-[24px] z-50 w-full flex justify-center">
-      <div className="max-w-[1360px] w-full h-[72px] flex flex-col justify-center pr-11 pl-8 text-base font-medium text-center text-black whitespace-nowrap rounded-2xl border border-solid bg-white bg-opacity-90 border-neutral-200 max-md:px-5">
-        <div className="flex flex-wrap gap-10 justify-between items-center w-full max-md:max-w-full">
+    <div className="fixed top-[24px] z-50 w-full flex justify-center px-5 md:px-12">
+      <div className="max-w-[1360px] w-full h-[72px] flex flex-col justify-center px-4 md:pr-11 md:pl-8 text-base font-medium text-center text-black whitespace-nowrap rounded-2xl border border-solid bg-white bg-opacity-90 border-neutral-200">
+        <div className="flex justify-between items-center w-full">
+          {/* 로고 */}
           <figure className="flex items-center gap-2">
             <Image
               loading="lazy"
@@ -32,7 +33,25 @@ export default function NavigationBar() {
             />
             <Image loading="lazy" src={TokamakLogoText} alt="Tokamak Network" />
           </figure>
-          <div className="flex gap-10 items-center self-stretch my-auto min-w-[240px]">
+          {/* 햄버거 메뉴 (모바일) */}
+          <button className="sm:hidden">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+          {/* 네비게이션 메뉴 (데스크톱) */}
+          <div className="hidden sm:flex gap-10 items-center">
             {navItems.map((item, index) => (
               <div key={index} className={item.className}>
                 <NavItem label={item.label} icon={item.icon} />

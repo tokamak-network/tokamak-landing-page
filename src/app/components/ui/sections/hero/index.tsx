@@ -41,7 +41,7 @@ export const Hero: React.FC = () => {
                 ? -32
                 : columnIndex < 3
                 ? -36
-                : columnIndex < 6
+              : columnIndex < 6
                 ? -42
                 : columnIndex < 8
                 ? -45

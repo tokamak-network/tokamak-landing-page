@@ -21,8 +21,8 @@ const navItems = [
 
 export default function NavigationBar() {
   return (
-    <div className="fixed top-[24px] z-50 w-full flex justify-center px-5 md:px-12">
-      <div className="max-w-[1360px] w-full h-[72px] flex flex-col justify-center px-4 md:pr-11 md:pl-8 text-base font-medium text-center text-black whitespace-nowrap rounded-2xl border border-solid bg-white bg-opacity-90 border-neutral-200">
+    <div className="fixed top-[24px] z-999 w-full flex justify-center px-5 md:px-12">
+      <div className="max-w-[1360px] z-999 w-full h-[72px] flex flex-col justify-center px-4 md:pr-11 md:pl-8 text-base font-medium text-center text-black whitespace-nowrap rounded-2xl border border-solid bg-white bg-opacity-90 border-neutral-200">
         <div className="flex justify-between items-center w-full">
           {/* 로고 */}
           <figure className="flex items-center gap-2">

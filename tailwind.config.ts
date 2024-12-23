@@ -9,9 +9,13 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        md: "800px",
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        black: "#1C1C1C",
       },
       fontFamily: {
         sans: ["Proxima Nova", ...fontFamily.sans],

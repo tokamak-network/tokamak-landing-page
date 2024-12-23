@@ -1,9 +1,21 @@
 import * as React from "react";
 import { NavItemProps } from "./types";
+import { LINKS } from "@/app/constants/links";
 
-const menuItems = ["Github", "Documents", "Grant"];
+const developerItems = [
+  { name: "Documents", link: LINKS.DOCS },
+  { name: "Github", link: LINKS.GITHUB },
+  { name: "Grant", link: LINKS.GRANT },
+];
+const featureItems = [
+  { name: "Rollup Hub", link: LINKS.ROLLUP_HUB },
+  { name: "Staking", link: LINKS.STAKING },
+  { name: "DAO", link: LINKS.DAO },
+];
 
 export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
+  const items = label === "Developer" ? developerItems : featureItems;
+
   return (
     // NavItem 컴포넌트를 div로 감싸서 수정
     <div className="group relative h-full flex items-center">
@@ -40,14 +52,17 @@ export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
       >
         <div className="relative mt-[35.5px] before:absolute before:w-full before:h-[35.5px] before:top-[-35.5px] before:left-0">
           <div className="p-[18px] flex flex-col items-start rounded-[15px] border border-[#DEDEDE] bg-white gap-[12px]">
-            {menuItems?.map((item, index) => (
-              <div
+            {items?.map((item, index) => (
+              <a
                 key={index}
                 className="overflow-hidden text-ellipsis text-[#1C1C1C] font-['Proxima_Nova'] text-[14px] font-normal leading-normal
             hover:text-[#0078FF] cursor-pointer transition-colors duration-200"
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                {item}
-              </div>
+                {item.name}
+              </a>
             ))}
           </div>
         </div>

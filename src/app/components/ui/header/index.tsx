@@ -19,7 +19,7 @@ const navItems = [
   },
 ];
 
-export const NavigationBar: React.FC = () => {
+export default function NavigationBar() {
   return (
     <div className="fixed top-[24px] z-50 w-full flex justify-center">
       <div className="max-w-[1360px] w-full h-[72px] flex flex-col justify-center pr-11 pl-8 text-base font-medium text-center text-black whitespace-nowrap rounded-2xl border border-solid bg-white bg-opacity-90 border-neutral-200 max-md:px-5">
@@ -43,4 +43,4 @@ export const NavigationBar: React.FC = () => {
       </div>
     </div>
   );
-};
+}

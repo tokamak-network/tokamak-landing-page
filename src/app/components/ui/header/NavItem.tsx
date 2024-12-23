@@ -1,6 +1,7 @@
 import * as React from "react";
 import { NavItemProps } from "./types";
 import { LINKS } from "@/app/constants/links";
+import Link from "next/link";
 
 const developerItems = [
   { name: "Documents", link: LINKS.DOCS },
@@ -14,6 +15,16 @@ const featureItems = [
 ];
 
 export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
+  if (label === "About") {
+    return (
+      <Link href="/about" className="h-full flex items-center">
+        <span className="text-[#1C1C1C] font-['Proxima_Nova'] text-base font-medium leading-normal hover:text-[#0078FF] transition-colors duration-200">
+          {label}
+        </span>
+      </Link>
+    );
+  }
+
   const items = label === "Developer" ? developerItems : featureItems;
 
   return (

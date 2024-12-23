@@ -61,10 +61,12 @@ export default function NewsSection({ posts }: { posts: Post[] }) {
       </div>
 
       {/* News Grid */}
-      <div className="grid grid-cols-3 gap-6">
-        {filteredPosts?.map((post) => (
-          <NewsCard key={post.guid} post={post} />
-        ))}
+      <div className="h-[280px] overflow-hidden">
+        <div className="flex flex-wrap [@media(min-width:800px)_and_(max-width:1279px)]:grid [@media(min-width:800px)_and_(max-width:1279px)]:grid-cols-2 [@media(min-width:1280px)]:grid [@media(min-width:1280px)]:grid-cols-3 gap-[60px]">
+          {filteredPosts?.map((post) => (
+            <NewsCard key={post.guid} post={post} />
+          ))}
+        </div>
       </div>
     </div>
   );

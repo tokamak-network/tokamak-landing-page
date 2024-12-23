@@ -10,12 +10,12 @@ export default async function PriceSection() {
   const { tonPrice, tradingVolumeUSD, stakingVolume } = await fetchPriceInfo();
 
   return (
-    <div className="flex justify-between">
-      <div className="flex flex-col w-[360px]">
+    <div className="flex  flex-col [@media(min-width:1000px)]:flex-row  justify-between [@media(max-width:1000px)]:gap-y-[45px] [@media(max-width:800px)]:items-center">
+      <div className="flex flex-col w-full max-w-[360px] [@media(max-width:800px)]:items-center [@media(max-width:800px)]:text-center">
         <h2 className="text-[30px] mb-[9px]">
           Price <span className="font-bold">TODAY</span>
         </h2>
-        <p className="text-[15px] text-gray-600 mb-[30px]">
+        <p className="text-[15px] text-gray-600 mb-[30px] [@media(max-width:800px)]:mb-[18px]">
           Current status of TON, an important token in the Tokamak Network
           ecosystem
         </p>
@@ -28,7 +28,7 @@ export default async function PriceSection() {
           Detail View <Image src={Arrow} alt="arrow" />
         </a>
       </div>
-      <div className="flex justify-end gap-x-[120px]">
+      <div className="flex flex-col md:flex-row justify-center [@media(min-width:1000px)]:justify-end gap-x-[120px]">
         <PriceCard value={`$${tonPrice.toFixed(2)}`} label="TON Price" />
         <PriceCard
           value={`${tradingVolumeUSD.toFixed(2)}M`}

@@ -5,16 +5,16 @@ import TokamakLogoText from "@/assets/images/Tokamak_LogoText.svg";
 export default function Footer() {
   return (
     <footer
-      className="w-full py-[60px] bg-white flex justify-center"
+      className="w-full py-[60px] bg-white flex   justify-center px-[25px] [@media(max-width:1000px)]:px-[15px]"
       style={{
         clipPath:
           "polygon(40px 0, calc(100% - 40px) 0, 100% 40px, 100% 100%, 100% 100%, 0 100%, 0 100%, 0 40px)",
       }}
     >
-      <div className="flex justify-between items-center w-[1220px]">
+      <div className="flex justify-between items-center w-full max-w-[1220px] [@media(max-width:1000px)]:flex-col-reverse gap-y-[30px]">
         {/* Logo Section */}
-        <div className="flex flex-col justify-between h-full">
-          <figure className="flex items-center gap-2">
+        <div className="flex [@media(min-width:1001px)]:flex-col justify-between [@media(max-width:1000px)]:items-center w-full  h-full [@media(max-width:800px)]:justify-center">
+          <figure className="flex items-center gap-2 [@media(max-width:800px)]:hidden">
             <Image
               loading="lazy"
               src={TokamakLogo}
@@ -23,15 +23,18 @@ export default function Footer() {
             <Image loading="lazy" src={TokamakLogoText} alt="Tokamak Network" />
           </figure>
           {/* Copyright */}
-          <div className="mt-8 text-sm text-gray-500">
-            © 2024 Tokamak Network | All Rights Reserved.
+          <div className="mt-8 [@media(max-width:1000px)]:mt-0 text-[11px] text-gray-500 [@media(max-width:800px)]:text-[#1c1c1c] font-bold">
+            © 2025 Tokamak Network{" "}
+            <span className="[@media(max-width:800px)]:hidden">
+              | All Rights Reserved.
+            </span>
           </div>
         </div>
 
         {/* Navigation Links */}
-        <div className="flex text-right">
+        <div className="flex text-right [@media(max-width:800px)]:hidden">
           {/* Developer Column */}
-          <div className="w-[180px]">
+          <div className="w-[180px] [@media(max-width:1000px)]:w-[175px]">
             <h3 className="font-medium mb-4">Developer</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
@@ -47,7 +50,7 @@ export default function Footer() {
           </div>
 
           {/* Features Column */}
-          <div className="w-[180px]">
+          <div className="w-[180px] [@media(max-width:1000px)]:w-[175px]">
             <h3 className="font-medium mb-4">Features</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
@@ -63,7 +66,7 @@ export default function Footer() {
           </div>
 
           {/* About Column */}
-          <div className="w-[180px]">
+          <div className="w-[180px] [@media(max-width:1000px)]:w-[175px]">
             <h3 className="font-medium mb-4">About</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
@@ -76,7 +79,7 @@ export default function Footer() {
           </div>
 
           {/* Social Column */}
-          <div className="w-[180px]">
+          <div className="w-[180px] [@media(max-width:1000px)]:w-[175px]">
             <h3 className="font-medium mb-4">Social</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>

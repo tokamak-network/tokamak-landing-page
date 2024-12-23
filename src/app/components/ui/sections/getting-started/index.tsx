@@ -1,6 +1,7 @@
 import Image from "next/image";
 import GithubIcon from "@/assets/icons/common/github.svg";
 import DocIcon from "@/assets/icons/common/doc.svg";
+import { LINKS } from "@/app/constants/links";
 
 const baseButtonStyle = "h-[40px] rounded-[20px] text-[14px]";
 
@@ -33,30 +34,40 @@ export default function Start() {
             </h2>
           </header>
           <nav className="flex justify-center gap-[18px]">
-            <button
-              className={`${baseButtonStyle} w-[147px]  bg-black text-white`}
+            <a
+              href={LINKS.ONBOARDING} // 온보딩 페이지 URL
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${baseButtonStyle} w-[147px] bg-black text-white text-center leading-[38px]`}
             >
               Onboarding
-            </button>
-            <button
-              className={`${baseButtonStyle} w-[100px]  bg-black text-white`}
+            </a>
+            <a
+              href={LINKS.GRANT} // 그랜트 페이지 URL
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${baseButtonStyle} w-[100px] bg-black text-white text-center leading-[38px]`}
             >
               Grant
-            </button>
-            <button
-              className={`${baseButtonStyle} w-[134px]  bg-white text-black border border-[#1C1C1C] flex items-center justify-center gap-[9px]`}
+            </a>
+            <a
+              href={LINKS.GITHUB} // GitHub URL
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${baseButtonStyle} w-[134px] bg-white text-black border border-[#1C1C1C] flex items-center justify-center gap-[9px]`}
             >
               <Image src={GithubIcon} alt={"GithubIcon"} />
               Github
-            </button>
-            <button
-              className={`${baseButtonStyle} w-[167px]  bg-white text-black border border-[#1C1C1C]
-              flex items-center justify-center gap-[9px]
-              `}
+            </a>
+            <a
+              href={LINKS.DOCS} // 문서 페이지 URL
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${baseButtonStyle} w-[167px] bg-white text-black border border-[#1C1C1C] flex items-center justify-center gap-[9px]`}
             >
               <Image src={DocIcon} alt={"DocIcon"} />
               Documents
-            </button>
+            </a>
           </nav>
         </section>
       </div>

@@ -4,6 +4,8 @@ import * as React from "react";
 import { HeroSection } from "./Hero";
 import { Pillar } from "./Pillar";
 import "./pillar.css";
+import GridImage from "@/assets/images/bg.svg";
+import Image from "next/image";
 
 const PATTERN_SIZE = 118; // px
 const VISIBLE_HEIGHT = 860; // px
@@ -24,41 +26,11 @@ export const Hero: React.FC = () => {
 
   return (
     <div className="h-[860px] w-full overflow-hidden relative bg-white">
-      <div
-        className="w-full h-[2000px] bg-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{
-          perspective: "1000px",
-          transform: `translate(-50%, -50%) rotateX(65deg)`, // 그리드 레이어 회전 활성화
-          transformOrigin: "center center",
-        }}
-      >
-        <div
-          className="w-full h-full"
-          style={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${GRID_COLUMNS}, ${PATTERN_SIZE}px)`,
-            gridTemplateRows: `repeat(${GRID_ROWS}, ${PATTERN_SIZE}px)`,
-          }}
-        >
-          {Array.from({ length: GRID_ITEMS_COUNT }).map((_, i) => (
-            <div
-              key={i}
-              className="relative"
-              style={{
-                background: `
-                  linear-gradient(45deg, transparent 49.5%, #e0e0e0 49.5%, #e0e0e0 50.5%, transparent 50.5%),
-                  linear-gradient(135deg, transparent 49.5%, #e0e0e0 49.5%, #e0e0e0 50.5%, transparent 50.5%)
-                `,
-                backgroundSize: `${PATTERN_SIZE}px ${PATTERN_SIZE}px`,
-                width: "100%",
-                height: "100%",
-              }}
-            />
-          ))}
-        </div>
+      {/* Grid Image Layer */}
+      <div className="w-full h-full">
+        <Image src={GridImage} alt="grid" />
       </div>
 
-      {/* Pillar 애니메이션을 위한 별도 레이어 */}
       <div className="absolute left-0 top-0 w-full h-full">
         <div className="grid grid-cols-[repeat(auto-fill,120px)] grid-rows-[repeat(auto-fill,120px)] w-full h-full">
           {Array.from({ length: GRID_ITEMS_COUNT }).map((_, i) => {

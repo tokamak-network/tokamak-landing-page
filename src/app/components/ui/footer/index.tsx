@@ -1,6 +1,8 @@
 import Image from "next/image";
 import TokamakLogo from "@/assets/images/Tokamak_Symbol.svg";
 import TokamakLogoText from "@/assets/images/Tokamak_LogoText.svg";
+import { LINKS } from "@/app/constants/links";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -38,13 +40,34 @@ export default function Footer() {
             <h3 className="font-medium mb-4">Developer</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <a href="#">Github</a>
+                <a
+                  href={LINKS.GITHUB}
+                  className="hover:text-tokamak-blue transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Github
+                </a>
               </li>
               <li>
-                <a href="#">Documents</a>
+                <a
+                  href={LINKS.DOCS}
+                  className="hover:text-tokamak-blue transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Documents
+                </a>
               </li>
               <li>
-                <a href="#">Grant</a>
+                <a
+                  href={LINKS.GRANT}
+                  className="hover:text-tokamak-blue transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Grant
+                </a>
               </li>
             </ul>
           </div>
@@ -54,13 +77,34 @@ export default function Footer() {
             <h3 className="font-medium mb-4">Features</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <a href="#">Rollup Hub</a>
+                <a
+                  href={LINKS.ROLLUP_HUB}
+                  className="hover:text-tokamak-blue transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Rollup Hub
+                </a>
               </li>
               <li>
-                <a href="#">Staking</a>
+                <a
+                  href={LINKS.STAKING}
+                  className="hover:text-tokamak-blue transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Staking
+                </a>
               </li>
               <li>
-                <a href="#">DAO</a>
+                <a
+                  href={LINKS.DAO}
+                  className="hover:text-tokamak-blue transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  DAO
+                </a>
               </li>
             </ul>
           </div>
@@ -70,10 +114,22 @@ export default function Footer() {
             <h3 className="font-medium mb-4">About</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <a href="#">Team</a>
+                <Link
+                  href="/about"
+                  className="hover:text-tokamak-blue transition-colors"
+                >
+                  Team
+                </Link>
               </li>
               <li>
-                <a href="#">Onboarding</a>
+                <a
+                  href={LINKS.ONBOARDING}
+                  className="hover:text-tokamak-blue transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Onboarding
+                </a>
               </li>
             </ul>
           </div>
@@ -83,19 +139,54 @@ export default function Footer() {
             <h3 className="font-medium mb-4">Social</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <a href="#">Medium</a>
+                <a
+                  href={LINKS.MEDIUM}
+                  className="hover:text-tokamak-blue transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Medium
+                </a>
               </li>
               <li>
-                <a href="#">X (Twitter)</a>
+                <a
+                  href={LINKS.X}
+                  className="hover:text-tokamak-blue transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  X (Twitter)
+                </a>
               </li>
               <li>
-                <a href="#">Discord</a>
+                <a
+                  href={LINKS.DISCORD}
+                  className="hover:text-tokamak-blue transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Discord
+                </a>
               </li>
               <li>
-                <a href="#">Telegram (EN)</a>
+                <a
+                  href={LINKS.TELEGRAM}
+                  className="hover:text-tokamak-blue transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Telegram (EN)
+                </a>
               </li>
               <li>
-                <a href="#">LinkedIn</a>
+                <a
+                  href={LINKS.LINKEDIN}
+                  className="hover:text-tokamak-blue transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  LinkedIn
+                </a>
               </li>
             </ul>
           </div>

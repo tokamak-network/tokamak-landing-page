@@ -8,4 +8,9 @@ export const LINKS = {
   ROLLUP_HUB: "https://rolluphub.tokamak.network/",
   DAO: "https://dao.tokamak.network/",
   STAKING: "https://simple.staking.tokamak.network/",
+  MEDIUM: "https://medium.com/tokamak-network",
+  X: "https://twitter.com/tokamak_network",
+  DISCORD: "https://discord.com/invite/J4chV2zuAK",
+  TELEGRAM: "https://t.me/tokamak_network",
+  LINKEDIN: "https://www.linkedin.com/company/tokamaknetwork/",
 };

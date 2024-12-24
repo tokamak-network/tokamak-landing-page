@@ -16,6 +16,7 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
         black: "#1C1C1C",
+        "tokamak-blue": "#0078FF",
       },
       fontFamily: {
         sans: ["Proxima Nova", ...fontFamily.sans],

@@ -24,7 +24,7 @@ export const ProtocolCard: React.FC<ProtocolCardProps> = ({
           {description}
         </div>
         <div className="flex gap-4 items-center w-full h-[16px] mt-auto opacity-[0.8]">
-          {links.map((link, index) => (
+          {links?.map((link, index) => (
             <LinkItem key={index} {...link} />
           ))}
         </div>

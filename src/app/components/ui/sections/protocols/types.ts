@@ -1,14 +1,14 @@
 export interface LinkProps {
-  icon: string;
-  label: string;
+  icon: "Website" | "Github" | "Notion";
   alt: string;
+  link: `https://${string}`;
 }
 
 export interface ProtocolCardProps {
   icon: string;
   title: string;
   description: string;
-  links: LinkProps[];
+  links?: LinkProps[];
   alt: string;
 }
 

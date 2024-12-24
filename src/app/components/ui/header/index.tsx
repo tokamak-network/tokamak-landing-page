@@ -3,6 +3,7 @@ import { NavItem } from "./NavItem";
 import TokamakLogo from "@/assets/images/Tokamak_Symbol.svg";
 import TokamakLogoText from "@/assets/images/Tokamak_LogoText.svg";
 import Image from "next/image";
+import Link from "next/link";
 
 const navItems = [
   {
@@ -25,14 +26,20 @@ export default function NavigationBar() {
       <div className="max-w-[1360px] w-full h-[72px] flex flex-col justify-center px-4 md:pr-11 md:pl-8 text-base font-medium text-center text-black whitespace-nowrap rounded-2xl border border-solid bg-white bg-opacity-90 border-neutral-200">
         <div className="flex justify-between items-center w-full">
           {/* 로고 */}
-          <figure className="flex items-center gap-2">
-            <Image
-              loading="lazy"
-              src={TokamakLogo}
-              alt="Tokamak Network Logo"
-            />
-            <Image loading="lazy" src={TokamakLogoText} alt="Tokamak Network" />
-          </figure>
+          <Link href="/">
+            <figure className="flex items-center gap-2">
+              <Image
+                loading="lazy"
+                src={TokamakLogo}
+                alt="Tokamak Network Logo"
+              />
+              <Image
+                loading="lazy"
+                src={TokamakLogoText}
+                alt="Tokamak Network"
+              />
+            </figure>
+          </Link>
           {/* 햄버거 메뉴 (모바일) */}
           <button className="sm:hidden">
             <svg

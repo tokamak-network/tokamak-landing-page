@@ -36,13 +36,12 @@ export default function Start() {
             </h2>
           </header>
           <nav className="flex flex-wrap justify-center gap-[18px]">
-            <div className="flex gap-x-[18px] [@media(max-width:420px)]:flex-row [@media(max-width:420px)]:w-full [@media(max-width:420px)]:justify-center [@media(max-width:420px)]:gap-[18px]">
+            <div className="flex gap-x-[18px] [@media(max-width:780px)]:flex-row [@media(max-width:780px)]:w-full [@media(max-width:420px)]:justify-center [@media(max-width:780px)]:gap-[18px]">
               <a
                 href={LINKS.ONBOARDING}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${baseButtonStyle} w-[147px] bg-black text-white text-center leading-[38px]
-               [@media(max-width:420px)]:w-[165px]
+                className={`${baseButtonStyle} w-[147px] bg-black text-white text-center leading-[38px] [@media(max-width:780px)]:w-full
                `}
               >
                 Onboarding
@@ -51,9 +50,7 @@ export default function Start() {
                 href={LINKS.GRANT}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${baseButtonStyle} w-[100px] bg-black text-white text-center leading-[38px]
-               [@media(max-width:420px)]:w-[165px]
-               `}
+                className={`${baseButtonStyle} w-[100px] bg-black text-white text-center leading-[38px] [@media(max-width:780px)]:w-full`}
               >
                 Grant
               </a>
@@ -63,7 +60,7 @@ export default function Start() {
               target="_blank"
               rel="noopener noreferrer"
               className={`${baseButtonStyle} w-[134px] bg-white text-black border border-[#1C1C1C] flex items-center justify-center gap-[9px]
-              [@media(max-width:420px)]:w-full
+              [@media(max-width:780px)]:w-full
               `}
             >
               <Image src={GithubIcon} alt={"GithubIcon"} />
@@ -74,7 +71,7 @@ export default function Start() {
               target="_blank"
               rel="noopener noreferrer"
               className={`${baseButtonStyle} w-[167px] bg-white text-black border border-[#1C1C1C] flex items-center justify-center gap-[9px]
-              [@media(max-width:420px)]:w-full
+              [@media(max-width:780px)]:w-full
               `}
             >
               <Image src={DocIcon} alt={"DocIcon"} />

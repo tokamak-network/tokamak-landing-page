@@ -47,7 +47,7 @@ export default function TeamMember({
   isCEO,
 }: TeamMemberProps) {
   return (
-    <div className="flex flex-col grow shrink justify-center w-[180px]">
+    <div className="flex flex-col grow shrink justify-center w-[155px] h-[221px] md:w-[180px] md:h-[257px]">
       <Image loading="lazy" src={imageUrl} alt={`${name} - ${role}`} />
       <div className="flex flex-col mt-2.5 w-full">
         <div className="flex justify-between items-center w-full">

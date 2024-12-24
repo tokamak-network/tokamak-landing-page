@@ -142,7 +142,7 @@ export const Partners: React.FC = () => {
       className="w-full h-[110px] overflow-hidden flex align-baseline relative
     "
     >
-      <div className="flex gap-10 items-center animate-marquee">
+      <div className="flex gap-10 items-center animate-marquee [&:has(img:hover)]:[animation-play-state:paused]">
         {/* First set */}
         {partnerImages.map((image, index) => (
           <PartnerImage key={`set1-${index}`} src={image.src} alt={image.alt} />

@@ -13,7 +13,7 @@ export default async function Insights() {
           "polygon(40px 0, calc(100% - 40px) 0, 100% 40px, 100% calc(100% - 40px), calc(100% - 40px) 100%, 40px 100%, 0 calc(100% - 40px), 0 40px)",
       }}
     >
-      <div className="w-full max-w-[1200px] flex flex-col gap-y-[90px]">
+      <div className="w-full max-w-[1200px] flex flex-col gap-y-[90px] [@media(max-width:830px)]:gap-y-[60px]">
         <NewsSection posts={posts} />
         <PriceSection />
       </div>

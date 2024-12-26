@@ -1,4 +1,6 @@
 import "./pillar.css";
+import pillar from "@/assets/test.svg";
+import Image from "next/image";
 
 export const Pillar = () => {
   return (
@@ -28,7 +30,7 @@ export const Pillar = () => {
       <div
         className="absolute animate-grow-height-right origin-bottom"
         style={{
-          width: "280px",
+          width: "310px",
           height: "400px",
           background: "linear-gradient(to top, #FFF 0%, #E9F2FD 100%)",
           borderRight: "1px solid #257EEE",
@@ -42,12 +44,14 @@ export const Pillar = () => {
       <div
         className="absolute animate-rise-top"
         style={{
-          width: "80px",
-          height: "100px",
+          width: "105px",
+          height: "115px",
           background: "linear-gradient(to top, #FFF 0%, #E9F2FD 100%)",
-          border: "1px solid #257EEE",
+          borderLeft: "1px solid #257EEE",
+          borderBottom: "1px solid #257EEE",
+          borderTop: "1px solid #257EEE",
+          borderRight: "1px solid #257EEE",
           zIndex: 2,
-          // transform: "rotateX(85deg) rotateY(-5deg) ",
         }}
       />
     </div>

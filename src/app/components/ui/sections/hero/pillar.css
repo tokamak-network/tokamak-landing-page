@@ -10,84 +10,112 @@
 @keyframes growHeightFront {
   0% {
     transform: rotateY(55deg) translateZ(-80px) translateX(200px)
-      translateY(450px);
+      translateY(400px);
     height: 0;
     opacity: 0.3;
   }
   50% {
-    transform: rotateY(55deg) translateZ(-80px) translateX(200px)
-      translateY(125px);
+    transform: rotateY(55deg) translateZ(-83px) translateX(197px)
+      translateY(115px);
     height: 100%;
     opacity: 1;
   }
   90% {
     transform: rotateY(55deg) translateZ(-80px) translateX(200px)
-      translateY(450px);
+      translateY(400px);
     height: 0;
   }
   100% {
     transform: rotateY(55deg) translateZ(-80px) translateX(200px)
-      translateY(450px);
+      translateY(400px);
     opacity: 0;
   }
+  /* 0%,
+  100% {
+    transform: rotateY(55deg) translateZ(-83px) translateX(197px)
+      translateY(115px);
+    height: 100%;
+    opacity: 1;
+  } */
 }
 @keyframes growHeightRight {
   0% {
-    transform: rotateY(214deg) translateZ(-32px) translateX(400px)
-      translateY(230px);
+    transform: rotateY(214deg) translateZ(-32px) translateX(460px)
+      translateY(190px);
     height: 0;
     opacity: 0.3;
   }
   50% {
-    transform: rotateY(214deg) translateZ(-32px) translateX(400px)
-      translateY(-80px);
+    transform: rotateY(214deg) translateZ(-32px) translateX(460px)
+      translateY(-112px);
     height: 100%;
     opacity: 1;
   }
   90% {
-    transform: rotateY(214deg) translateZ(-32px) translateX(400px)
-      translateY(230px);
+    transform: rotateY(214deg) translateZ(-32px) translateX(460px)
+      translateY(190px);
     height: 0;
   }
   100% {
-    transform: rotateY(214deg) translateZ(-32px) translateX(400px)
-      translateY(230px);
+    transform: rotateY(214deg) translateZ(-32px) translateX(460px)
+      translateY(190px);
     opacity: 0;
   }
+
+  /* 0%,
+  100% {
+    transform: rotateY(214deg) translateZ(-32px) translateX(460px)
+      translateY(-112px);
+    height: 100%;
+    opacity: 1;
+  } */
 }
 
 @keyframes riseTop {
   0% {
-    transform: rotateX(66deg) rotateY(-66deg) rotateZ(190deg) translateZ(12px)
-      translateY(-8px);
-    opacity: 1;
+    transform: translateZ(16px) translateY(-86px) rotateX(62deg) rotateY(-60deg)
+      rotateZ(190deg) translateX(7px) translateY(0px) skew(-2deg, -20deg);
+    opacity: 0;
   }
   50% {
-    transform: rotateX(66deg) rotateY(-66deg) rotateZ(190deg) translateZ(12px)
-      translateY(-8px);
+    transform: translateY(-86px) rotateX(62deg) rotateY(-60deg) rotateZ(190deg)
+      translateX(7px) translateZ(16px) translateY(0px) skew(-2deg, -20deg);
     opacity: 1;
   }
-  85% {
-    transform: rotateX(66deg) rotateY(-66deg) rotateZ(190deg) translateZ(12px)
-      translateY(-8px);
+  90% {
+    transform: translateY(-86px) rotateX(62deg) rotateY(-60deg) rotateZ(190deg)
+      translateX(7px) translateZ(16px) translateY(0px) skew(-2deg, -20deg);
     opacity: 0.3;
   }
   100% {
-    transform: rotateX(66deg) rotateY(-66deg) rotateZ(190deg) translateZ(12px)
-      translateY(-8px);
+    transform: translateY(-86px) rotateX(62deg) rotateY(-60deg) rotateZ(190deg)
+      translateX(7px) translateZ(16px) translateY(0px) skew(-2deg, -20deg);
     opacity: 0;
   }
+
+  /* 0%,
+  100% {
+    transform: translateY(-86px) rotateX(62deg) rotateY(-60deg) rotateZ(190deg)
+      translateX(7px) translateZ(16px) translateY(0px) skew(-2deg, -20deg);
+    opacity: 1;
+  } */
 }
 
 .animate-grow-height-front {
-  animation: growHeightFront 1.5s ease-out forwards infinite;
+  animation: growHeightFront 2s ease-out forwards infinite;
   transform-origin: top;
 }
 
 .animate-grow-height-right {
-  animation: growHeightRight 1.5s ease-out forwards infinite;
+  animation: growHeightRight 2s ease-out forwards infinite;
   transform-origin: top;
 }
 .animate-rise-top {
-  animation: riseTop 1.5s ease-out forwards infinite;
+  animation: riseTop 2s ease-out forwards infinite;
 }
+
+/* 부모 요소에 추가할 스타일 */
+/* .pillar-container {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+} */

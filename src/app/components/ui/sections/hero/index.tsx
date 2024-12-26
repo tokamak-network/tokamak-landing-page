@@ -21,94 +21,153 @@ const GRID_ROWS = Math.ceil(CONTAINER_HEIGHT / PATTERN_SIZE);
 const GRID_ITEMS_COUNT = GRID_COLUMNS * GRID_ROWS;
 
 export const Hero: React.FC = () => {
-  const [activeCell, setActiveCell] = React.useState<number | null>(null);
+  // Set 대신 Map을 사용하여 조회/삭제 성능 향상
+  const [animatingCells, setAnimatingCells] = React.useState<
+    Map<number, boolean>
+  >(new Map());
   const [debug, setDebug] = React.useState({ x: 0, y: 0, cell: -1 });
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleCellHover = (e: React.MouseEvent, index: number) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  // 자동 애니메이션 설정
+  // React.useEffect(() => {
+  //   const centerIndex = 579; // 중심 셀
+  //   const row = Math.floor(centerIndex / 40);
+  //   const col = centerIndex % 40;
 
-    setActiveCell(index);
-    setDebug({ x, y, cell: index });
-  };
+  //   const animate = () => {
+  //     const nearbyIndices = [];
+  //     // 20x20 범위 계산
+  //     for (let i = Math.max(0, row - 10); i < Math.min(40, row + 10); i++) {
+  //       for (let j = Math.max(0, col - 10); j < Math.min(40, col + 10); j++) {
+  //         nearbyIndices.push(i * 40 + j);
+  //       }
+  //     }
+
+  //     // 랜덤하게 3개의 셀 선택
+  //     const selectedIndices = nearbyIndices
+  //       .sort(() => Math.random() - 0.5)
+  //       .slice(0, 3);
+
+  //     setAnimatingCells((prev) => {
+  //       const next = new Map(prev);
+  //       selectedIndices.forEach((idx) => next.set(idx, true));
+  //       return next;
+  //     });
+  //   };
+
+  //   // 0.1초마다 애니메이션 실행
+  //   intervalRef.current = setInterval(animate, 1500);
+
+  //   return () => {
+  //     if (intervalRef.current) {
+  //       clearInterval(intervalRef.current);
+  //     }
+  //   };
+  // }, []);
+
+  // // 메모이제이션된 핸들러
+  const handleCellHover = React.useCallback(
+    (e: React.MouseEvent, index: number) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setAnimatingCells((prev) => {
+        const next = new Map(prev);
+        next.set(index, true);
+        return next;
+      });
+      setDebug({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+        cell: index,
+      });
+    },
+    []
+  );
+
+  const handleAnimationEnd = React.useCallback((index: number) => {
+    setAnimatingCells((prev) => {
+      const next = new Map(prev);
+      next.delete(index);
+      return next;
+    });
+  }, []);
+
+  // 메모이제이션된 그리드 셀 렌더링
+  const renderGridCells = React.useMemo(
+    () =>
+      Array.from({ length: 40 * 40 }).map((_, i) => (
+        <div
+          key={i}
+          className="relative w-full h-full border border-gray-500/20"
+          style={{
+            transform: "scale(1)",
+            transformOrigin: "center center",
+          }}
+          onMouseEnter={(e) => handleCellHover(e, i)}
+        >
+          {animatingCells.has(i) && (
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{
+                transform: "rotateZ(45deg) rotateX(-55deg) translateY(-100px)",
+                transformOrigin: "center center",
+              }}
+            >
+              <div
+                className="animate-pillar"
+                onAnimationEnd={() => handleAnimationEnd(i)}
+              >
+                <Pillar />
+              </div>
+            </div>
+          )}
+          {i === 579 && (
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{
+                transform: "rotateZ(45deg) rotateX(-55deg) translateY(-100px)",
+                transformOrigin: "center center",
+              }}
+            >
+              <div
+                className="animate-pillar"
+                onAnimationEnd={() => handleAnimationEnd(i)}
+              >
+                <Pillar />
+              </div>
+            </div>
+          )}
+        </div>
+      )),
+    [animatingCells]
+  );
 
   return (
     <div className="h-[860px] w-full overflow-hidden relative bg-white">
-      {/* Grid Image Layer */}
-      <div className="w-full h-full absolute top-0 left-0">
+      {/* <div className="w-full h-full absolute top-0 left-0">
         <Image
           src={GridImage}
           alt="grid"
           className="w-full h-full object-cover"
         />
-      </div>
+      </div> */}
 
-      {/* Pillar Grid Layer */}
       <div className="absolute left-0 top-0 w-[200%] h-[200%]">
-        {" "}
-        {/* 컨테이너 크기 더 증가 */}
         <div
           className="grid w-full h-full"
           style={{
-            gridTemplateColumns: "repeat(40, 82.6px)", // 열 수 증가
-            gridTemplateRows: "repeat(40, 82.6px)", // 행 수 증가
-            transform: "rotateX(55deg) rotateZ(-45deg) translateY(-90%)", // translateY 추가
+            gridTemplateColumns: "repeat(40, 82.6px)",
+            gridTemplateRows: "repeat(40, 82.6px)",
+            transform: "rotateX(55deg) rotateZ(-45deg) translateY(-90%)",
             transformStyle: "preserve-3d",
             perspective: "2000px",
             transformOrigin: "center center",
             position: "relative",
-            top: "-29px", // top 값 조정
+            top: "-29px",
             left: "calc(5% - 90px)",
             gap: 0,
           }}
         >
-          {Array.from({ length: 40 * 40 }).map(
-            (
-              _,
-              i // 그리드 셀 수 증가
-            ) => (
-              <div
-                key={i}
-                className="relative w-full h-full border border-red-500/20"
-                style={{
-                  transform: "scale(1)",
-                  transformOrigin: "center center",
-                }}
-                onMouseEnter={(e) => handleCellHover(e, i)}
-                onMouseLeave={() => setActiveCell(null)}
-              >
-                {/* {activeCell === i && (
-                  <div
-                    className="absolute inset-0 flex items-center justify-center"
-                    style={{
-                      transform:
-                        "rotateZ(45deg) rotateX(-55deg) translateY(-100px)",
-                      transformOrigin: "center center",
-                    }}
-                  >
-                    <div className="animate-pillar">
-                      <Pillar />
-                    </div>
-                  </div>
-                )} */}
-                {i === 501 && ( // 첫 번째 셀에만 Pillar 표시
-                  <div
-                    className="absolute inset-0 flex items-center justify-center"
-                    style={{
-                      transform:
-                        "rotateZ(45deg) rotateX(-55deg) translateY(-100px)",
-                      transformOrigin: "center center",
-                    }}
-                  >
-                    <div className="animate-pillar">
-                      <Pillar />
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          )}
+          {renderGridCells}
         </div>
       </div>
 

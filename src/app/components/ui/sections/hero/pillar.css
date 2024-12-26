@@ -45,9 +45,9 @@
     height: 0;
     opacity: 0.3;
   }
-  50% {
+  48% {
     transform: rotateY(214deg) translateZ(-32px) translateX(460px)
-      translateY(-112px);
+      translateY(-113px);
     height: 100%;
     opacity: 1;
   }
@@ -65,7 +65,7 @@
   /* 0%,
   100% {
     transform: rotateY(214deg) translateZ(-32px) translateX(460px)
-      translateY(-112px);
+      translateY(-113px);
     height: 100%;
     opacity: 1;
   } */
@@ -73,45 +73,45 @@
 
 @keyframes riseTop {
   0% {
-    transform: translateZ(16px) translateY(-86px) rotateX(62deg) rotateY(-60deg)
-      rotateZ(190deg) translateX(7px) translateY(0px) skew(-2deg, -20deg);
-    opacity: 0;
+    transform: translateY(230px) rotateX(62deg) rotateY(-60deg) rotateZ(190deg)
+      translateX(7px) translateZ(15px) translateY(0px) skew(-2deg, -20deg);
+    opacity: 1;
   }
   50% {
     transform: translateY(-86px) rotateX(62deg) rotateY(-60deg) rotateZ(190deg)
-      translateX(7px) translateZ(16px) translateY(0px) skew(-2deg, -20deg);
+      translateX(7px) translateZ(15px) translateY(0px) skew(-2deg, -20deg);
     opacity: 1;
   }
-  90% {
-    transform: translateY(-86px) rotateX(62deg) rotateY(-60deg) rotateZ(190deg)
-      translateX(7px) translateZ(16px) translateY(0px) skew(-2deg, -20deg);
-    opacity: 0.3;
+  95% {
+    transform: translateY(230px) rotateX(62deg) rotateY(-60deg) rotateZ(190deg)
+      translateX(7px) translateZ(15px) translateY(0px) skew(-2deg, -20deg);
+    opacity: 0;
   }
   100% {
-    transform: translateY(-86px) rotateX(62deg) rotateY(-60deg) rotateZ(190deg)
-      translateX(7px) translateZ(16px) translateY(0px) skew(-2deg, -20deg);
+    transform: translateY(230px) rotateX(62deg) rotateY(-60deg) rotateZ(190deg)
+      translateX(7px) translateZ(15px) translateY(0px) skew(-2deg, -20deg);
     opacity: 0;
   }
 
   /* 0%,
   100% {
     transform: translateY(-86px) rotateX(62deg) rotateY(-60deg) rotateZ(190deg)
-      translateX(7px) translateZ(16px) translateY(0px) skew(-2deg, -20deg);
+      translateX(7px) translateZ(15px) translateY(0px) skew(-2deg, -20deg);
     opacity: 1;
   } */
 }
 
 .animate-grow-height-front {
-  animation: growHeightFront 2s ease-out forwards infinite;
+  animation: growHeightFront 2s ease-out forwards;
   transform-origin: top;
 }
 
 .animate-grow-height-right {
-  animation: growHeightRight 2s ease-out forwards infinite;
+  animation: growHeightRight 2s ease-out forwards;
   transform-origin: top;
 }
 .animate-rise-top {
-  animation: riseTop 2s ease-out forwards infinite;
+  animation: riseTop 2s ease-out forwards;
 }
 
 /* 부모 요소에 추가할 스타일 */

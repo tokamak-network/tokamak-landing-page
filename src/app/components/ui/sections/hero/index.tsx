@@ -27,43 +27,58 @@ export const Hero: React.FC = () => {
   >(new Map());
   const [debug, setDebug] = React.useState({ x: 0, y: 0, cell: -1 });
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isHovering, setIsHovering] = React.useState(false);
 
   // 자동 애니메이션 설정
-  // React.useEffect(() => {
-  //   const centerIndex = 579; // 중심 셀
-  //   const row = Math.floor(centerIndex / 40);
-  //   const col = centerIndex % 40;
+  React.useEffect(() => {
+    if (isHovering) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
+    }
+    const centerIndex = 579; // 중심 셀
+    const row = Math.floor(centerIndex / 40);
+    const col = centerIndex % 40;
 
-  //   const animate = () => {
-  //     const nearbyIndices = [];
-  //     // 20x20 범위 계산
-  //     for (let i = Math.max(0, row - 10); i < Math.min(40, row + 10); i++) {
-  //       for (let j = Math.max(0, col - 10); j < Math.min(40, col + 10); j++) {
-  //         nearbyIndices.push(i * 40 + j);
-  //       }
-  //     }
+    const animate = () => {
+      const nearbyIndices = [];
+      // 20x20 범위 계산
+      for (let i = Math.max(0, row - 10); i < Math.min(40, row + 10); i++) {
+        for (let j = Math.max(0, col - 10); j < Math.min(40, col + 10); j++) {
+          nearbyIndices.push(i * 40 + j);
+        }
+      }
 
-  //     // 랜덤하게 3개의 셀 선택
-  //     const selectedIndices = nearbyIndices
-  //       .sort(() => Math.random() - 0.5)
-  //       .slice(0, 3);
+      // 랜덤하게 3개의 셀 선택
+      const selectedIndices = nearbyIndices
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
 
-  //     setAnimatingCells((prev) => {
-  //       const next = new Map(prev);
-  //       selectedIndices.forEach((idx) => next.set(idx, true));
-  //       return next;
-  //     });
-  //   };
+      // 각 셀마다 1.5초 내의 랜덤한 시간에 애니메이션 시작
+      selectedIndices.forEach((idx) => {
+        const randomDelay = Math.random() * 1500; // 0~1500ms 사이의 랜덤 시간
+        setTimeout(() => {
+          setAnimatingCells((prev) => {
+            const next = new Map(prev);
+            next.set(idx, true);
+            return next;
+          });
+        }, randomDelay);
+      });
+    };
 
-  //   // 0.1초마다 애니메이션 실행
-  //   intervalRef.current = setInterval(animate, 1500);
+    // 2.5초마다 새로운 세트의 애니메이션 시작
+    // (1.5초 애니메이션 시간 + 1초 여유)
+    intervalRef.current = setInterval(animate, 1500);
 
-  //   return () => {
-  //     if (intervalRef.current) {
-  //       clearInterval(intervalRef.current);
-  //     }
-  //   };
-  // }, []);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [isHovering]);
 
   // // 메모이제이션된 핸들러
   const handleCellHover = React.useCallback(
@@ -120,7 +135,7 @@ export const Hero: React.FC = () => {
               </div>
             </div>
           )}
-          {i === 579 && (
+          {/* {i === 579 && (
             <div
               className="absolute inset-0 flex items-center justify-center"
               style={{
@@ -135,7 +150,7 @@ export const Hero: React.FC = () => {
                 <Pillar />
               </div>
             </div>
-          )}
+          )} */}
         </div>
       )),
     [animatingCells]
@@ -151,7 +166,11 @@ export const Hero: React.FC = () => {
         />
       </div> */}
 
-      <div className="absolute left-0 top-0 w-[200%] h-[200%]">
+      <div
+        className="absolute left-0 top-0 w-[200%] h-[200%]"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+      >
         <div
           className="grid w-full h-full"
           style={{

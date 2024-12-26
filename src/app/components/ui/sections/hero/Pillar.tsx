@@ -1,6 +1,4 @@
 import "./pillar.css";
-import pillar from "@/assets/test.svg";
-import Image from "next/image";
 
 export const Pillar = () => {
   return (
@@ -35,6 +33,7 @@ export const Pillar = () => {
           background: "linear-gradient(to top, #FFF 0%, #E9F2FD 100%)",
           borderRight: "1px solid #257EEE",
           borderBottom: "1px solid #257EEE",
+          borderTop: "1px solid #257EEE",
           borderLeft: "1px solid #257EEE",
           zIndex: 1,
         }}

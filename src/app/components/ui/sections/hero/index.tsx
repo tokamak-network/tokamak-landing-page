@@ -4,28 +4,17 @@ import * as React from "react";
 // import { HeroSection } from "./Hero";
 import { Pillar } from "./Pillar";
 import "./pillar.css";
-import GridImage from "@/assets/images/bg.svg";
-import Image from "next/image";
+// import GridImage from "@/assets/images/bg.svg";
+// import Image from "next/image";
 import { useRef } from "react";
-
-const PATTERN_SIZE = 118; // px
-const VISIBLE_HEIGHT = 860; // px
-const VISIBLE_WIDTH = Math.ceil(1400); // 기본값 1920px
-// 보이는 영역보다 약간 더 크게 그려서 여유를 둠
-const CONTAINER_WIDTH = Math.ceil(VISIBLE_WIDTH * 1.2);
-const CONTAINER_HEIGHT = Math.ceil(VISIBLE_HEIGHT * 2.5);
-
-// 그리드 셀 개수 계산
-const GRID_COLUMNS = Math.ceil(CONTAINER_WIDTH / PATTERN_SIZE);
-const GRID_ROWS = Math.ceil(CONTAINER_HEIGHT / PATTERN_SIZE);
-const GRID_ITEMS_COUNT = GRID_COLUMNS * GRID_ROWS;
+import { HeroSection } from "./Hero";
 
 export const Hero: React.FC = () => {
   // Set 대신 Map을 사용하여 조회/삭제 성능 향상
   const [animatingCells, setAnimatingCells] = React.useState<
     Map<number, boolean>
   >(new Map());
-  const [debug, setDebug] = React.useState({ x: 0, y: 0, cell: -1 });
+  // const [debug, setDebug] = React.useState({ x: 0, y: 0, cell: -1 });
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isHovering, setIsHovering] = React.useState(false);
 
@@ -83,17 +72,17 @@ export const Hero: React.FC = () => {
   // // 메모이제이션된 핸들러
   const handleCellHover = React.useCallback(
     (e: React.MouseEvent, index: number) => {
-      const rect = e.currentTarget.getBoundingClientRect();
       setAnimatingCells((prev) => {
         const next = new Map(prev);
         next.set(index, true);
         return next;
       });
-      setDebug({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-        cell: index,
-      });
+      // const rect = e.currentTarget.getBoundingClientRect();
+      // setDebug({
+      //   x: e.clientX - rect.left,
+      //   y: e.clientY - rect.top,
+      //   cell: index,
+      // });
     },
     []
   );
@@ -158,13 +147,9 @@ export const Hero: React.FC = () => {
 
   return (
     <div className="h-[860px] w-full overflow-hidden relative bg-white">
-      {/* <div className="w-full h-full absolute top-0 left-0">
-        <Image
-          src={GridImage}
-          alt="grid"
-          className="w-full h-full object-cover"
-        />
-      </div> */}
+      <div className="flex items-center justify-center pt-[115px] w-full h-full absolute top-0 left-0 z-[40]">
+        <HeroSection />
+      </div>
 
       <div
         className="absolute left-0 top-0 w-[200%] h-[200%]"
@@ -188,15 +173,6 @@ export const Hero: React.FC = () => {
         >
           {renderGridCells}
         </div>
-      </div>
-
-      {/* Debug Info */}
-      <div className="fixed top-4 left-4 bg-black/80 text-white p-2 rounded z-50">
-        <div>X: {debug.x.toFixed(2)}</div>
-        <div>Y: {debug.y.toFixed(2)}</div>
-        <div>Cell: {debug.cell}</div>
-        <div>Grid Columns: {GRID_COLUMNS}</div>
-        <div>Grid Rows: {GRID_ROWS}</div>
       </div>
     </div>
   );

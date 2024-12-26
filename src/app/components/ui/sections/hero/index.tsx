@@ -58,8 +58,8 @@ export const Hero: React.FC = () => {
             perspective: "2000px",
             transformOrigin: "center center",
             position: "relative",
-            top: "-20px", // top 값 조정
-            left: "calc(5% - 76px)",
+            top: "-29px", // top 값 조정
+            left: "calc(5% - 90px)",
             gap: 0,
           }}
         >
@@ -78,11 +78,26 @@ export const Hero: React.FC = () => {
                 onMouseEnter={(e) => handleCellHover(e, i)}
                 onMouseLeave={() => setActiveCell(null)}
               >
-                {activeCell === i && (
+                {/* {activeCell === i && (
                   <div
                     className="absolute inset-0 flex items-center justify-center"
                     style={{
-                      transform: "rotateZ(45deg) rotateX(-55deg)",
+                      transform:
+                        "rotateZ(45deg) rotateX(-55deg) translateY(-100px)",
+                      transformOrigin: "center center",
+                    }}
+                  >
+                    <div className="animate-pillar">
+                      <Pillar />
+                    </div>
+                  </div>
+                )} */}
+                {i === 501 && ( // 첫 번째 셀에만 Pillar 표시
+                  <div
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{
+                      transform:
+                        "rotateZ(45deg) rotateX(-55deg) translateY(-100px)",
                       transformOrigin: "center center",
                     }}
                   >

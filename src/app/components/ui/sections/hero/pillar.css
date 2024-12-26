@@ -1,84 +1,93 @@
+:root {
+  --pillar-rotate-x: 100deg;
+  --pillar-rotate-y: -105deg;
+  --pillar-rotate-y-offset: -5deg;
+  --pillar-rotate-vector-x: 0.8;
+  --pillar-rotate-vector-y: 0.5;
+  --pillar-rotate-vector-z: 0;
+  --pillar-rotate-angle: 55deg;
+}
 @keyframes growHeightFront {
   0% {
-    transform: rotateY(83deg) translateZ(-40px) translateX(10px)
-      translateY(150px);
+    transform: rotateY(55deg) translateZ(-80px) translateX(200px)
+      translateY(450px);
     height: 0;
     opacity: 0.3;
   }
   50% {
-    transform: rotateY(83deg) translateZ(-40px) translateX(10px) translateY(0);
+    transform: rotateY(55deg) translateZ(-80px) translateX(200px)
+      translateY(125px);
     height: 100%;
     opacity: 1;
   }
   90% {
-    transform: rotateY(83deg) translateZ(-40px) translateX(10px)
-      translateY(150px);
+    transform: rotateY(55deg) translateZ(-80px) translateX(200px)
+      translateY(450px);
     height: 0;
   }
   100% {
-    transform: rotateY(83deg) translateZ(-40px) translateX(10px)
-      translateY(150px);
+    transform: rotateY(55deg) translateZ(-80px) translateX(200px)
+      translateY(450px);
     opacity: 0;
   }
 }
 @keyframes growHeightRight {
   0% {
-    transform: rotateY(185deg) translateZ(-32px) translateX(5px)
-      translateY(150px);
+    transform: rotateY(214deg) translateZ(-32px) translateX(400px)
+      translateY(230px);
     height: 0;
     opacity: 0.3;
   }
   50% {
-    transform: rotateY(185deg) translateZ(-32px) translateX(5px)
-      translateY(-2px);
+    transform: rotateY(214deg) translateZ(-32px) translateX(400px)
+      translateY(-80px);
     height: 100%;
     opacity: 1;
   }
   90% {
-    transform: rotateY(185deg) translateZ(-32px) translateX(5px)
-      translateY(150px);
+    transform: rotateY(214deg) translateZ(-32px) translateX(400px)
+      translateY(230px);
     height: 0;
   }
   100% {
-    transform: rotateY(185deg) translateZ(-32px) translateX(5px)
-      translateY(150px);
+    transform: rotateY(214deg) translateZ(-32px) translateX(400px)
+      translateY(230px);
     opacity: 0;
   }
 }
 
 @keyframes riseTop {
   0% {
-    transform: rotateX(85deg) rotateY(-5deg) translateX(0px) translateZ(-105px)
+    transform: rotateX(66deg) rotateY(-66deg) rotateZ(190deg) translateZ(12px)
       translateY(-8px);
     opacity: 1;
   }
   50% {
-    transform: rotateX(85deg) rotateY(-5deg) translateX(0px) translateZ(48px)
+    transform: rotateX(66deg) rotateY(-66deg) rotateZ(190deg) translateZ(12px)
       translateY(-8px);
     opacity: 1;
   }
   85% {
-    transform: rotateX(85deg) rotateY(-5deg) translateX(0px) translateZ(-95px)
+    transform: rotateX(66deg) rotateY(-66deg) rotateZ(190deg) translateZ(12px)
       translateY(-8px);
     opacity: 0.3;
   }
   100% {
-    transform: rotateX(85deg) rotateY(-5deg) translateX(0px) translateZ(-95px)
+    transform: rotateX(66deg) rotateY(-66deg) rotateZ(190deg) translateZ(12px)
       translateY(-8px);
     opacity: 0;
   }
 }
 
 .animate-grow-height-front {
-  animation: growHeightFront 1.5s ease-out forwards;
+  animation: growHeightFront 1.5s ease-out forwards infinite;
   transform-origin: top;
 }
 
 .animate-grow-height-right {
-  animation: growHeightRight 1.5s ease-out forwards;
+  animation: growHeightRight 1.5s ease-out forwards infinite;
   transform-origin: top;
 }
-
 .animate-rise-top {
-  animation: riseTop 1.5s ease-out forwards;
+  animation: riseTop 1.5s ease-out forwards infinite;
 }

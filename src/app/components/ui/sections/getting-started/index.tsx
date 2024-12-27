@@ -18,7 +18,7 @@ export default function Start() {
         <section className="w-full max-w-[1020px] flex flex-col">
           <header className="flex flex-col items-center mb-[45px]">
             <h1 className="mb-[60px] text-[30px] text-center">
-              <span className="block [@media(min-width:820px)]:inline">
+              <span className="block [@media(min-width:820px)]:inline [@media(max-width:820px)]:leading-[33px]">
                 Getting Started with
               </span>{" "}
               <span className="font-bold">Tokamak Network</span>

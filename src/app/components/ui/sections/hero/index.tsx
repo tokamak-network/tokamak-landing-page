@@ -21,13 +21,13 @@ export const Hero: React.FC = () => {
 
   // 자동 애니메이션 설정
   React.useEffect(() => {
-    // if (isHovering) {
-    //   if (intervalRef.current) {
-    //     clearInterval(intervalRef.current);
-    //     intervalRef.current = null;
-    //   }
-    //   return;
-    // }
+    if (isHovering) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
+    }
     const centerIndex = 579; // 중심 셀
     const row = Math.floor(centerIndex / 40);
     const col = centerIndex % 40;

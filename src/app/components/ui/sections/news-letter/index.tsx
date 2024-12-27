@@ -1,8 +1,27 @@
 "use client";
 import { useFocus } from "@/context/FocusContext";
+import { handleSubscribe } from "@/app/api/news-letter";
+import { useCallback, useState } from "react";
 
 export default function NewsletterSection() {
   const { isFocused, setIsFocused } = useFocus();
+  const [email, setEmail] = useState("");
+
+  const onSubscribe = useCallback(async () => {
+    if (!email) return;
+
+    try {
+      const result = await handleSubscribe(email);
+      console.log("result", result);
+      if (result.success) {
+        alert("Successfully subscribed!");
+      } else {
+        alert("Subscriptio    n failed. Please try again.");
+      }
+    } catch {
+      alert("An error occurred. Please try again.");
+    }
+  }, [email]);
 
   return (
     <div
@@ -32,10 +51,12 @@ export default function NewsletterSection() {
             className="w-full px-6 py-3 h-[65px] rounded-full bg-white text-black outline-none
           placeholder:text-[#1C1C1C]
           "
+            onChange={(e) => setEmail(e.target.value)}
           />
           <button
             className="absolute right-[6px] top-[6px] w-[157px] h-[53px]  
           bg-black text-white font-bold rounded-full transition-colors text-[14px]"
+            onClick={onSubscribe}
           >
             SUBSCRIBE
           </button>

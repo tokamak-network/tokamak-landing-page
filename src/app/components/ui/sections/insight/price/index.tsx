@@ -12,10 +12,10 @@ export default async function PriceSection() {
   return (
     <div className="flex  flex-col [@media(min-width:1000px)]:flex-row  justify-between [@media(max-width:1000px)]:gap-y-[45px] [@media(max-width:800px)]:items-center">
       <div className="flex flex-col w-full max-w-[360px] [@media(max-width:800px)]:items-center [@media(max-width:800px)]:text-center">
-        <h2 className="text-[30px] mb-[9px]">
+        <h2 className="text-[30px] mb-[9px] text-tokamak-black">
           Price <span className="font-bold">TODAY</span>
         </h2>
-        <p className="text-[15px] text-gray-600 mb-[30px] [@media(max-width:800px)]:mb-[18px]">
+        <p className="text-[15px] text-[#252525] mb-[30px] [@media(max-width:800px)]:mb-[18px]">
           Current status of TON, an important token in the Tokamak Network
           ecosystem
         </p>
@@ -23,7 +23,7 @@ export default async function PriceSection() {
           href="https://price.tokamak.network/"
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-[20px] bg-[#1C1C1C] text-white px-[30px] text-[14px] flex justify-center items-center gap-[9px] w-[168px] h-[40px]"
+          className="rounded-[20px] bg-[#1C1C1C] text-white px-[30px] text-[14px] flex justify-center items-center gap-[9px] w-[168px] h-[40px] hover:bg-tokamak-blue"
         >
           Detail View <Image src={Arrow} alt="arrow" />
         </a>

@@ -9,6 +9,8 @@ export default function NewsletterSection() {
       className={`w-full h-[300px] ${
         isFocused ? "bg-tokamak-blue" : "bg-[#1C1C1C]"
       } flex justify-center items-center px-[25px] [@media(max-width:1000px)]:px-[15px]`}
+      onMouseEnter={() => setIsFocused(true)}
+      onMouseLeave={() => setIsFocused(false)}
     >
       <div className="w-full max-w-[1200px] flex justify-center items-center [@media(max-width:800px)]:flex-col gap-y-[30px]">
         {/* Title */}
@@ -30,8 +32,6 @@ export default function NewsletterSection() {
             className="w-full px-6 py-3 h-[65px] rounded-full bg-white text-black outline-none
           placeholder:text-[#1C1C1C]
           "
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
           />
           <button
             className="absolute right-[6px] top-[6px] w-[157px] h-[53px]  

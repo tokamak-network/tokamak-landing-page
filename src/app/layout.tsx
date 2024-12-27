@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/tokamak-symbol.svg",
-        type: "image/svg+xml",
+        url: "/tokamak_favicon.ico",
+        type: "image/x-icon",
       },
     ],
   },

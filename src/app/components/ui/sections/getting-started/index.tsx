@@ -41,7 +41,7 @@ export default function Start() {
                 href={LINKS.ONBOARDING}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${baseButtonStyle} w-[147px] bg-black text-white text-center leading-[38px] [@media(max-width:780px)]:w-full
+                className={`${baseButtonStyle} w-[147px] bg-black text-white text-center leading-[38px] [@media(max-width:780px)]:w-full hover:bg-tokamak-blue
                `}
               >
                 Onboarding
@@ -50,7 +50,8 @@ export default function Start() {
                 href={LINKS.GRANT}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${baseButtonStyle} w-[100px] bg-black text-white text-center leading-[38px] [@media(max-width:780px)]:w-full`}
+                className={`${baseButtonStyle} w-[100px] bg-black text-white text-center leading-[38px] [@media(max-width:780px)]:w-full hover:bg-tokamak-blue
+               `}
               >
                 Grant
               </a>

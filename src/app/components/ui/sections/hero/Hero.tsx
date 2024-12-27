@@ -15,7 +15,7 @@ export const HeroSection = () => {
         href={LINKS.ROLLUP_HUB}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-[205px] h-[53px] bg-tokamak-blue text-white text-[14px] [@media(max-width:650px)]:text-[13px] font-bold rounded-[26px] vertical-center leading-[53px]"
+        className="w-[205px] h-[53px] bg-tokamak-black hover:bg-tokamak-blue text-white text-[14px] [@media(max-width:650px)]:text-[13px] font-bold rounded-[26px] vertical-center leading-[53px]"
       >
         START BUILDING
       </a>

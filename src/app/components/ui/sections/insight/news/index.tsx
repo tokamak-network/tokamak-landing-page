@@ -46,7 +46,7 @@ export default function NewsSection({ posts }: { posts: Post[] }) {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap gap-4 justify-center mb-[60px]text-[#1C1C1C] mb-[60px] ">
+      <div className="flex flex-wrap gap-[12px] justify-center mb-[60px]text-[#1C1C1C] mb-[60px]">
         {["All", "News", "Tokamak Network", "Research", "More"].map(
           (filter) => {
             if (filter.includes("More")) {
@@ -55,7 +55,11 @@ export default function NewsSection({ posts }: { posts: Post[] }) {
                   href={LINKS.MEDIUM}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${styles.button} hover:bg-tokamak-blue hover:border-none hover:text-white font-bold leading-[31px]`}
+                  className={`${
+                    styles.button
+                  } hover:bg-tokamak-blue hover:border-none hover:text-white font-bold leading-[31px]  ${
+                    filter === "More" ? "[@media(max-width:700px)]:order-5" : ""
+                  }`}
                   key={"more"}
                 >
                   More +
@@ -67,7 +71,21 @@ export default function NewsSection({ posts }: { posts: Post[] }) {
                 key={filter}
                 className={`${styles.button} ${
                   activeFilter === filter ? "bg-[#1C1C1C] text-white" : ""
-                } hover:bg-tokamak-blue hover:border-none hover:text-white font-bold`}
+                } hover:bg-tokamak-blue hover:border-none hover:text-white font-bold
+                   ${
+                     filter === "All" ? "[@media(max-width:700px)]:order-1" : ""
+                   }
+              ${filter === "News" ? "[@media(max-width:700px)]:order-2" : ""}
+              ${
+                filter === "Research" ? "[@media(max-width:700px)]:order-3" : ""
+              }
+              ${
+                filter === "Tokamak Network"
+                  ? "[@media(max-width:700px)]:order-4"
+                  : ""
+              }
+             
+                `}
                 value={filter}
                 onClick={() => {
                   return setActiveFilter(filter as FilterType);

@@ -81,12 +81,11 @@ export default function NewsSection({ posts }: { posts: Post[] }) {
       </div>
 
       {/* News Grid */}
-      <div className="h-[280px] [@media(max-width:830px)]:h-[570px] overflow-hidden">
+      <div className="h-[280px] [@media(max-width:797px)]:h-[570px] overflow-hidden">
         <div
           className="flex flex-wrap w-full[@media(min-width:800px)_and_(max-width:1279px)]:grid [@media(min-width:800px)_and_(max-width:1279px)]:grid-cols-2 [@media(min-width:1280px)]:grid [@media(min-width:1280px)]:grid-cols-3 gap-[60px] [@media(max-width:830px)]:gap-[30px]
-          [@media(max-width:1200px)]:justify-between
-          [@media(max-width:830px)]:justify-center
-        "
+          [@media(max-width:1280px)]:justify-between
+          [@media(max-width:830px)]:justify-center"
         >
           {filteredPosts?.map((post) => (
             <NewsCard key={post.guid} post={post} />

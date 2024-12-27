@@ -19,18 +19,6 @@ export const protocolsData: ProtocolCardProps[] = [
     description:
       "Protocols related to L2 infrastructure and technical scalability",
     alt: "L2 Infrastructure icon",
-    links: [
-      {
-        icon: "Website",
-        alt: "L2 Infrastructure & Scalability website",
-        link: "https://www.tokamak.network",
-      },
-      {
-        icon: "Github",
-        alt: "L2 Infrastructure & Scalability github",
-        link: "https://github.com/tokamak-network",
-      },
-    ],
   },
   {
     icon: applicationL2Icon,

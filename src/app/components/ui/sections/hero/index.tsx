@@ -8,6 +8,7 @@ import "./pillar.css";
 // import Image from "next/image";
 import { useRef } from "react";
 import { HeroSection } from "./Hero";
+import { CLIP_PATHS } from "@/app/constants/styles";
 
 export const Hero: React.FC = () => {
   // Set 대신 Map을 사용하여 조회/삭제 성능 향상
@@ -146,7 +147,12 @@ export const Hero: React.FC = () => {
   );
 
   return (
-    <div className="h-[860px] w-full overflow-hidden relative bg-white">
+    <div
+      className="h-[860px] w-full overflow-hidden relative bg-white"
+      style={{
+        clipPath: CLIP_PATHS.bottomCutCorners,
+      }}
+    >
       <div className="flex items-center justify-center pt-[115px] w-full h-full absolute top-0 left-0">
         <HeroSection />
       </div>

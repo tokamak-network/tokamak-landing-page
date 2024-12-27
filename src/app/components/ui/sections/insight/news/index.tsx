@@ -3,6 +3,7 @@
 import { NewsCard } from "./NewsCard";
 import { FilterType, Post } from "../types";
 import { useMemo, useState } from "react";
+import { LINKS } from "@/app/constants/links";
 
 const styles = {
   button:
@@ -36,8 +37,8 @@ export default function NewsSection({ posts }: { posts: Post[] }) {
     <div className="flex flex-col">
       {/* Header */}
       <div className="text-center mb-[36px]">
-        <h1 className="text-[30px] font-bold">
-          Exploring <span className="text-black">INSIGHTS</span>
+        <h1 className="text-[30px]">
+          Exploring <span className="text-black font-bold">INSIGHTS</span>
         </h1>
         <p className="text-[15px] text-gray-600 mt-[9px]">
           Follow the news, research and updates from Tokamak Network.
@@ -45,19 +46,38 @@ export default function NewsSection({ posts }: { posts: Post[] }) {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex gap-4 justify-center mb-[60px]text-[#1C1C1C] mb-[60px]">
-        {["All", "News", "Tokamak Network", "Research"].map((filter) => (
-          <button
-            key={filter}
-            className={`${styles.button} ${
-              activeFilter === filter ? "bg-[#1C1C1C] text-white" : ""
-            }`}
-            value={filter}
-            onClick={() => setActiveFilter(filter as FilterType)}
-          >
-            {filter}
-          </button>
-        ))}
+      <div className="flex flex-wrap gap-4 justify-center mb-[60px]text-[#1C1C1C] mb-[60px] ">
+        {["All", "News", "Tokamak Network", "Research", "More"].map(
+          (filter) => {
+            if (filter.includes("More")) {
+              return (
+                <a
+                  href={LINKS.MEDIUM}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${styles.button} hover:bg-tokamak-blue hover:border-none hover:text-white font-bold leading-[31px]`}
+                  key={"more"}
+                >
+                  More +
+                </a>
+              );
+            }
+            return (
+              <button
+                key={filter}
+                className={`${styles.button} ${
+                  activeFilter === filter ? "bg-[#1C1C1C] text-white" : ""
+                } hover:bg-tokamak-blue hover:border-none hover:text-white font-bold`}
+                value={filter}
+                onClick={() => {
+                  return setActiveFilter(filter as FilterType);
+                }}
+              >
+                {filter}
+              </button>
+            );
+          }
+        )}
       </div>
 
       {/* News Grid */}

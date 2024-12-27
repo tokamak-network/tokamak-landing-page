@@ -18,7 +18,7 @@ export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
   if (label === "About") {
     return (
       <Link href="/about" className="h-full flex items-center">
-        <span className="text-[#1C1C1C] font-['Proxima_Nova'] text-base font-medium leading-normal hover:text-[#0078FF] transition-colors duration-200">
+        <span className="text-[#1C1C1C] font-['Proxima_Nova'] text-base font-medium leading-normal hover:text-tokamak-blue transition-colors duration-200">
           {label}
         </span>
       </Link>
@@ -31,7 +31,7 @@ export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
     // NavItem 컴포넌트를 div로 감싸서 수정
     <div className="group relative h-full flex items-center">
       <div className="flex items-center gap-[6px] cursor-pointer">
-        <span className="text-[#1C1C1C] font-['Proxima_Nova'] text-base font-medium leading-normal">
+        <span className="text-[#1C1C1C] font-['Proxima_Nova'] text-base font-medium leading-normal hover:text-tokamak-blue">
           {label}
         </span>
         {icon && (

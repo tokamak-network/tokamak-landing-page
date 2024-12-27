@@ -58,7 +58,7 @@ export default function NavigationBar() {
             </svg>
           </button>
           {/* 네비게이션 메뉴 (데스크톱) */}
-          <div className="hidden sm:flex gap-10 items-center">
+          <div className="hidden sm:flex gap-x-[60px] items-center">
             {navItems.map((item, index) => (
               <div key={index} className={item.className}>
                 <NavItem label={item.label} icon={item.icon} />

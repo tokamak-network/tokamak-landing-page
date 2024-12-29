@@ -1,8 +1,12 @@
+"use client";
+
+import { useFocus } from "@/context/FocusContext";
 import GetInvolve from "./GetInvolve";
 import TeamGrid from "./TeamGrid";
 import { CLIP_PATHS } from "@/app/constants/styles";
 
 export default function About() {
+  const { isFocused } = useFocus();
   return (
     <div className="w-full h-full text-[#1C1C1C]">
       {/* TOP AREA FOR CLIP PATH */}
@@ -30,7 +34,14 @@ export default function About() {
           </span>
         </div>
       </div>
-      <div className="relative bg-[#1c1c1c]">
+      <div
+        className="relative bg-[#1c1c1c]"
+        style={{
+          background: isFocused
+            ? "linear-gradient(to bottom, transparent 50%, #0078ff 50%)"
+            : "",
+        }}
+      >
         <div
           className="flex flex-col items-center pt-[60px] pb-[120px] gap-y-[90px] relative bg-white"
           style={{

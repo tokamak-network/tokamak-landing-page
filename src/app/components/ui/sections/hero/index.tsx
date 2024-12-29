@@ -9,6 +9,7 @@ import "./pillar.css";
 import { useRef } from "react";
 import { HeroSection } from "./Hero";
 import { CLIP_PATHS } from "@/app/constants/styles";
+import { useVisibilityChange } from "@/app/hooks/hero/useVisibilityChange";
 
 export const Hero: React.FC = () => {
   // Set 대신 Map을 사용하여 조회/삭제 성능 향상
@@ -18,10 +19,11 @@ export const Hero: React.FC = () => {
   // const [debug, setDebug] = React.useState({ x: 0, y: 0, cell: -1 });
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isHovering, setIsHovering] = React.useState(false);
+  const isVisible = useVisibilityChange();
 
   // 자동 애니메이션 설정
   React.useEffect(() => {
-    if (isHovering) {
+    if (!isVisible || isHovering) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -68,7 +70,7 @@ export const Hero: React.FC = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isHovering]);
+  }, [isHovering, isVisible]);
 
   // // 메모이제이션된 핸들러
   const handleCellHover = React.useCallback(

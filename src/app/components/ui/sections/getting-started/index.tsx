@@ -2,6 +2,7 @@ import Image from "next/image";
 import GithubIcon from "@/assets/icons/common/github.svg";
 import GithubIconHover from "@/assets/icons/common/github-black.svg";
 import DocIcon from "@/assets/icons/common/doc.svg";
+import DocIconHover from "@/assets/icons/common/doc-white.svg";
 import { LINKS } from "@/app/constants/links";
 
 const baseButtonStyle = "h-[40px] rounded-[20px] text-[14px]";
@@ -63,18 +64,20 @@ export default function Start() {
               rel="noopener noreferrer"
               className={`${baseButtonStyle} w-[134px] bg-white text-black border border-[#1C1C1C] flex items-center justify-center gap-[9px]
               [@media(max-width:780px)]:w-full hover:bg-tokamak-black hover:text-white
-              group`}
+              group relative`}
             >
-              <Image
-                src={GithubIcon}
-                alt={"GithubIcon"}
-                className="group-hover:opacity-0 transition-opacity"
-              />
-              <Image
-                src={GithubIconHover}
-                alt="GithubIcon"
-                className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity"
-              />
+              <div className="relative">
+                <Image
+                  src={GithubIcon}
+                  alt="GithubIcon"
+                  className="group-hover:opacity-0 transition-all duration-200"
+                />
+                <Image
+                  src={GithubIconHover}
+                  alt="GithubIcon"
+                  className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                />
+              </div>
               Github
             </a>
             <a
@@ -82,10 +85,21 @@ export default function Start() {
               target="_blank"
               rel="noopener noreferrer"
               className={`${baseButtonStyle} w-[167px] bg-white text-black border border-[#1C1C1C] flex items-center justify-center gap-[9px]
-              [@media(max-width:780px)]:w-full
-              `}
+              [@media(max-width:780px)]:w-full hover:bg-tokamak-black hover:text-white
+              group relative`}
             >
-              <Image src={DocIcon} alt={"DocIcon"} />
+              <div className="relative">
+                <Image
+                  src={DocIcon}
+                  alt="DocIcon"
+                  className="group-hover:opacity-0 transition-all duration-200"
+                />
+                <Image
+                  src={DocIconHover}
+                  alt="DocIcon"
+                  className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                />
+              </div>
               Documents
             </a>
           </nav>

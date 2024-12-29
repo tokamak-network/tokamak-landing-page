@@ -1,5 +1,5 @@
 import * as React from "react";
-import { PartnerImage } from "./PartnerImage";
+// import { PartnerImage } from "./PartnerImage";
 import { PartnerImageProps } from "./types";
 import "./partner.css";
 import Partner1 from "@/assets/images/partners/1.svg";
@@ -142,9 +142,7 @@ export const Partners: React.FC = () => {
       className="w-full h-[110px] overflow-hidden flex align-baseline relative
     "
     >
-      <div className="flex gap-10 items-center animate-marquee [&:has(img:hover)]:[animation-play-state:paused]">
-        
-      </div>
+      <div className="flex gap-10 items-center animate-marquee [&:has(img:hover)]:[animation-play-state:paused]"></div>
 
       <div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"

@@ -1,13 +1,18 @@
-@keyframes marquee {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
+.slider {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
 }
 
-.animate-marquee {
-  animation: marquee 25s linear infinite;
-  white-space: nowrap;
+.slideTrack {
+  animation: scroll 100s linear infinite;
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - 60px)); /* gap의 절반을 고려 */
+  }
 }

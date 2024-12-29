@@ -1,6 +1,5 @@
 import * as React from "react";
-import "./carousel.css";
-import CarouselList from "./CarouselList";
+import CarouselWrapper from "./CarouselWapper";
 
 const Hourglass = () => {
   return (
@@ -27,10 +26,7 @@ export const Carousel: React.FC = () => {
       className="w-full h-[110px] overflow-hidden flex align-baseline relative
     "
     >
-      <div className="flex w-full items-center animate-marquee [&:has(img:hover)]:[animation-play-state:paused]">
-        <CarouselList />
-      </div>
-
+      <CarouselWrapper />
       <div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ zIndex: 100 }}

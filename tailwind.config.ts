@@ -22,6 +22,15 @@ export default {
       fontFamily: {
         sans: ["Proxima Nova", ...fontFamily.sans],
       },
+      animation: {
+        "infinite-scroll": "infinite-scroll 15s linear infinite",
+      },
+      keyframes: {
+        "infinite-scroll": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+      },
     },
   },
   plugins: [],

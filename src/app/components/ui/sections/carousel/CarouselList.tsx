@@ -19,12 +19,12 @@ function CarouselItem({ category, datas }: CarouselDisplayProps) {
           return (
             <div className="flex items-center gap-x-[24px]" key={data.label}>
               <h2 className="opacity-[0.75] text-[13px] ">{data.label}</h2>
-              <div className="flex flex-col w-full">
-                <div className="flex w-full gap-x-[6px] items-center">
-                  <strong className="text-[21px]">
+              <div className="flex flex-col">
+                <div className="flex gap-x-[6px] items-center">
+                  <strong className="text-[21px] leading-[26px]">
                     {formatNumber(data.info)}
                   </strong>
-                  <p className="text-[12px] self-end pb-[4px]">
+                  <p className="text-[12px] self-end leading-[15px] max-h-[15px] font-bold">
                     {formatNumber(data.currency)}
                     {data.conversion
                       ? ` / ${formatCurrencyString(data.conversion)}`

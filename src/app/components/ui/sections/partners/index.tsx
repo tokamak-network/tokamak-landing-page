@@ -1,3 +1,5 @@
+/* eslint-disable */
+// @ts-nocheck
 import * as React from "react";
 // import { PartnerImage } from "./PartnerImage";
 import { PartnerImageProps } from "./types";

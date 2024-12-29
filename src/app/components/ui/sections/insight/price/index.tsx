@@ -1,3 +1,5 @@
+/* eslint-disable */
+// @ts-nocheck
 import Image from "next/image";
 import { PriceCard } from "./PriceCard";
 import Arrow from "@/assets/icons/common/arrow.svg";

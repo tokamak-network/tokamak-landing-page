@@ -143,18 +143,7 @@ export const Partners: React.FC = () => {
     "
     >
       <div className="flex gap-10 items-center animate-marquee [&:has(img:hover)]:[animation-play-state:paused]">
-        {/* First set */}
-        {partnerImages.map((image, index) => (
-          <PartnerImage key={`set1-${index}`} src={image.src} alt={image.alt} />
-        ))}
-        {/* Second set */}
-        {partnerImages.map((image, index) => (
-          <PartnerImage key={`set2-${index}`} src={image.src} alt={image.alt} />
-        ))}
-        {/* Third set */}
-        {partnerImages.map((image, index) => (
-          <PartnerImage key={`set3-${index}`} src={image.src} alt={image.alt} />
-        ))}
+        
       </div>
 
       <div

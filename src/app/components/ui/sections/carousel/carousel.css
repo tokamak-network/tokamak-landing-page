@@ -8,6 +8,10 @@
   animation: scroll 100s linear infinite;
 }
 
+.slideTrack:hover {
+  animation-play-state: paused;
+}
+
 @keyframes scroll {
   from {
     transform: translateX(0);

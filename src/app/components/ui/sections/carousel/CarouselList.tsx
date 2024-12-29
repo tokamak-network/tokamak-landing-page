@@ -7,7 +7,7 @@ function CarouselItem({ category, datas }: CarouselDisplayProps) {
   const categoryTitel =
     category === "Price"
       ? "Price TODAY"
-      : "Supply"
+      : category === "Supply"
       ? "TON SUPPLY"
       : "TON LOCKED";
 

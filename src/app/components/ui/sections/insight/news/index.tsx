@@ -17,17 +17,13 @@ export default function NewsSection({ posts }: { posts: Post[] }) {
     if (activeFilter === "All") return posts?.slice(0, 3);
     return posts
       ?.filter((post) => {
-        const categories = post.categories.filter(
-          (cat) =>
-            cat !== "tokamak-network" ||
-            !post.categories.some(
-              (otherCat) =>
-                otherCat !== "tokamak-network" &&
-                otherCat.toLowerCase() === activeFilter.toLowerCase()
-            )
-        );
+        const categories = post.categories;
+        const activeFilterLowerCase =
+          activeFilter === "Tokamak Network"
+            ? "tokamak-network"
+            : activeFilter.toLowerCase();
         return categories.some(
-          (category) => category.toLowerCase() === activeFilter.toLowerCase()
+          (category) => category.toLowerCase() === activeFilterLowerCase
         );
       })
       .slice(0, 3);

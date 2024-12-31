@@ -199,7 +199,7 @@ export const Hero: React.FC = () => {
   return (
     <div
       className="h-[860px] w-full overflow-hidden relative bg-white
-        // 오른쪽 그라데이션
+        // 오른쪽 그라데이션 (800px 이상에서만)
         after:content-['']
         after:absolute
         after:top-0
@@ -209,7 +209,9 @@ export const Hero: React.FC = () => {
         after:bg-[linear-gradient(to_right,transparent,white_60px,white_90px)]
         after:pointer-events-none
         after:z-10
-        // 왼쪽 그라데이션
+        after:hidden
+        after:md:block
+        // 왼쪽 그라데이션 (800px 이상에서만)
         before:content-['']
         before:absolute
         before:top-0
@@ -219,7 +221,8 @@ export const Hero: React.FC = () => {
         before:bg-[linear-gradient(to_left,transparent,white_60px,white_90px)]
         before:pointer-events-none
         before:z-10
-      "
+        before:hidden
+        before:md:block"
       style={{
         clipPath: CLIP_PATHS.bottomCutCorners,
       }}

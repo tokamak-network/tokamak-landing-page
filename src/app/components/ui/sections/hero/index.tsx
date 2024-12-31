@@ -159,7 +159,6 @@ export const Hero: React.FC = () => {
           }}
           onMouseEnter={(e) => handleCellHover(e, i)}
         >
-          {i}
           {animatingCells.has(i) && (
             <div
               className="absolute inset-0 flex items-center justify-center"
@@ -199,12 +198,45 @@ export const Hero: React.FC = () => {
 
   return (
     <div
-      className="h-[860px] w-full overflow-hidden relative bg-white"
+      className="h-[860px] w-full overflow-hidden relative bg-white
+        // 오른쪽 그라데이션
+        after:content-['']
+        after:absolute
+        after:top-0
+        after:right-0
+        after:w-[90px]
+        after:h-full
+        after:bg-[linear-gradient(to_right,transparent,white_60px,white_90px)]
+        after:pointer-events-none
+        after:z-10
+        // 왼쪽 그라데이션
+        before:content-['']
+        before:absolute
+        before:top-0
+        before:left-0
+        before:w-[90px]
+        before:h-full
+        before:bg-[linear-gradient(to_left,transparent,white_60px,white_90px)]
+        before:pointer-events-none
+        before:z-10
+      "
       style={{
         clipPath: CLIP_PATHS.bottomCutCorners,
       }}
       ref={containerRef}
     >
+      {/* 상단 그라데이션 */}
+      <div
+        className="absolute top-0 left-0 w-full h-[90px] 
+          bg-[linear-gradient(to_top,transparent,white_60px,white_90px)]
+          pointer-events-none z-10"
+      />
+      {/* 하단 그라데이션 */}
+      <div
+        className="absolute bottom-0 left-0 w-full h-[90px]
+          bg-[linear-gradient(to_bottom,transparent,white_60px,white_90px)]
+          pointer-events-none z-10"
+      />
       <div className="flex items-center justify-center pt-[115px] w-full h-full absolute top-0 left-0">
         <HeroSection />
       </div>

@@ -29,6 +29,7 @@ import GeorgeImage from "@/assets/members/member=Negru George.png";
 import VictorImage from "@/assets/members/member=Victor Hazard.png";
 import KaidenImage from "@/assets/members/member=Kaiden Araki.png";
 import NguyenImage from "@/assets/members/member=Nguyen Zung.png";
+import JamesImage from "@/assets/members/member=James Bello.png";
 
 const teamMembers = [
   {
@@ -176,6 +177,11 @@ const teamMembers = [
     name: "Kaiden Araki",
     role: "Blockchain Engineer",
     imageUrl: KaidenImage,
+  },
+  {
+    name: "James Bello",
+    role: "Software Engineer",
+    imageUrl: JamesImage,
   },
 ];
 

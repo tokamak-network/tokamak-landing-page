@@ -4,8 +4,6 @@ import * as React from "react";
 // import { HeroSection } from "./Hero";
 import { Pillar } from "./Pillar";
 import "./pillar.css";
-// import GridImage from "@/assets/images/bg.svg";
-// import Image from "next/image";
 import { useRef } from "react";
 import { HeroSection } from "./Hero";
 import { CLIP_PATHS } from "@/app/constants/styles";
@@ -21,6 +19,56 @@ export const Hero: React.FC = () => {
   const [isHovering, setIsHovering] = React.useState(false);
   const isVisible = useVisibilityChange();
 
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [centerCell, setCenterCell] = React.useState(579);
+
+  React.useEffect(() => {
+    const updateCenterCell = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth;
+
+        const breakpoints = [
+          { width: 1920, cell: 775, condition: (w: number) => w > 1920 },
+          {
+            width: 1500,
+            cell: 656,
+            condition: (w: number) => w > 1000 && w <= 1500,
+          },
+          {
+            width: 1000,
+            cell: 773,
+            condition: (w: number) => w > 700 && w <= 1000,
+          },
+          {
+            width: 700,
+            cell: 850,
+            condition: (w: number) => w > 500 && w <= 700,
+          },
+          { width: 500, cell: 928, condition: (w: number) => w <= 500 },
+        ];
+
+        const matchedBreakpoint = breakpoints.find((bp) => bp.condition(width));
+        setCenterCell(matchedBreakpoint?.cell ?? 579);
+      }
+    };
+
+    // 초기 설정
+    updateCenterCell();
+
+    // 리사이즈 이벤트에 대한 디바운스 처리
+    let timeoutId: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(updateCenterCell, 100);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   // 자동 애니메이션 설정
   React.useEffect(() => {
     if (!isVisible || isHovering) {
@@ -30,7 +78,7 @@ export const Hero: React.FC = () => {
       }
       return;
     }
-    const centerIndex = 579; // 중심 셀
+    const centerIndex = centerCell; // 중심 셀
     const row = Math.floor(centerIndex / 40);
     const col = centerIndex % 40;
 
@@ -70,7 +118,7 @@ export const Hero: React.FC = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isHovering, isVisible]);
+  }, [isHovering, isVisible, centerCell]);
 
   // // 메모이제이션된 핸들러
   const handleCellHover = React.useCallback(
@@ -111,6 +159,7 @@ export const Hero: React.FC = () => {
           }}
           onMouseEnter={(e) => handleCellHover(e, i)}
         >
+          {i}
           {animatingCells.has(i) && (
             <div
               className="absolute inset-0 flex items-center justify-center"
@@ -154,6 +203,7 @@ export const Hero: React.FC = () => {
       style={{
         clipPath: CLIP_PATHS.bottomCutCorners,
       }}
+      ref={containerRef}
     >
       <div className="flex items-center justify-center pt-[115px] w-full h-full absolute top-0 left-0">
         <HeroSection />
@@ -165,7 +215,8 @@ export const Hero: React.FC = () => {
         onMouseLeave={() => setIsHovering(false)}
       >
         <div
-          className="grid w-full h-full"
+          className="grid w-full h-full [@media(min-width:1921px)]:[top:-550px] [@media(max-width:1920px)]:[top:-45px]
+          "
           style={{
             gridTemplateColumns: "repeat(40, 82.6px)",
             gridTemplateRows: "repeat(40, 82.6px)",
@@ -174,7 +225,6 @@ export const Hero: React.FC = () => {
             perspective: "2000px",
             transformOrigin: "center center",
             position: "relative",
-            top: "-29px",
             left: "calc(5% - 90px)",
             gap: 0,
           }}

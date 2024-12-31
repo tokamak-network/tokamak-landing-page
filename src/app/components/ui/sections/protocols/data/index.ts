@@ -72,11 +72,11 @@ export const protocolsData: ProtocolCardProps[] = [
       "Developing a cross-chain swap system that relies solely on L1 & L2 security, rather than whitelisting or third-party consensus.",
     alt: "Cross chain swap icon",
     links: [
-      {
-        icon: "Website",
-        alt: "Cross chain swap website",
-        link: "https://tokamak.notion.site/BEE-Tokamak-Bridge-Project-17657e9e9ec44f9dbdb3ef3304724aeb",
-      },
+      // {
+      //   icon: "Website",
+      //   alt: "Cross chain swap website",
+      //   link: "https://tokamak.notion.site/BEE-Tokamak-Bridge-Project-17657e9e9ec44f9dbdb3ef3304724aeb",
+      // },
       {
         icon: "Github",
         alt: "Cross chain swap github",

@@ -55,22 +55,22 @@ export default function Footer() {
               <ul className="space-y-2 text-sm text-gray-600">
                 <li>
                   <a
-                    href={LINKS.GITHUB}
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Github
-                  </a>
-                </li>
-                <li>
-                  <a
                     href={LINKS.DOCS}
                     className="hover:text-tokamak-blue transition-colors text-[#252525]"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     Documents
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={LINKS.GITHUB}
+                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Github
                   </a>
                 </li>
                 <li>

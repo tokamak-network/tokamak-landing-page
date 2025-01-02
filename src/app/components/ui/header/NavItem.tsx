@@ -1,7 +1,9 @@
+"use client";
 import * as React from "react";
 import { NavItemProps } from "./types";
 import { LINKS } from "@/app/constants/links";
 import Link from "next/link";
+import { useIsMobile } from "@/app/hooks/layout/useIsMobile";
 
 const developerItems = [
   { name: "Documents", link: LINKS.DOCS },
@@ -15,7 +17,22 @@ const featureItems = [
 ];
 
 export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const { isMobile } = useIsMobile(640);
+
   if (label === "About") {
+    if (isMobile) {
+      return (
+        <Link
+          href="/about"
+          className="flex items-center text-[24px] font-bold h-[70px]"
+        >
+          <span className="text-[#1C1C1C] transition-colors duration-200">
+            {label}
+          </span>
+        </Link>
+      );
+    }
     return (
       <Link href="/about" className="h-full flex items-center">
         <span className="text-[#1C1C1C] font-['Proxima_Nova'] text-base font-medium leading-normal hover:text-tokamak-blue transition-colors duration-200">
@@ -27,13 +44,63 @@ export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
 
   const items = label === "Developer" ? developerItems : featureItems;
 
+  if (isMobile) {
+    return (
+      <div className="w-full">
+        <div
+          className="flex items-center justify-between w-full cursor-pointer group h-[70px]"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span className="text-[#1C1C1C] text-[24px] font-bold transition-colors duration-200">
+            {label}
+          </span>
+          {icon && (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              className={`transition-all duration-200 ${
+                isOpen ? "rotate-180 text-tokamak-blue" : "text-[#666666]"
+              } group-hover:text-tokamak-blue`}
+            >
+              <path
+                d="M2 5.36455L6.11616 9.48071C6.60227 9.96682 7.39773 9.96682 7.88384 9.48071L12 5.36455"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeMiterlimit="10"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+        </div>
+
+        {/* 모바일 드롭다운 메뉴 */}
+        {isOpen && (
+          <div className="flex flex-col ">
+            {items?.map((item, index) => (
+              <a
+                key={index}
+                className="text-[#1C1C1C] text-[16px] hover:text-[#0078FF] transition-colors duration-200 h-[43px] flex items-center"
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {item.name}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
-    // NavItem 컴포넌트를 div로 감싸서 수정
     <div className="group relative h-full flex items-center">
       <div className="flex items-center gap-[6px] cursor-pointer">
-        <span className="text-[#1C1C1C] font-['Proxima_Nova'] text-base font-medium leading-normal hover:text-tokamak-blue">
-          {label}
-        </span>
+        <span className="text-[#1C1C1C] hover:text-tokamak-blue">{label}</span>
         {icon && (
           <svg
             xmlns="http://www.w3.org/2000/svg"

@@ -1,9 +1,12 @@
+"use client";
 import * as React from "react";
 import { NavItem } from "./NavItem";
 import TokamakLogo from "@/assets/images/Tokamak_Symbol.svg";
 import TokamakLogoText from "@/assets/images/Tokamak_LogoText.svg";
 import Image from "next/image";
 import Link from "next/link";
+import { useIsMobile } from "@/app/hooks/layout/useIsMobile";
+import Mobile from "./Mobile";
 
 const navItems = [
   {
@@ -21,6 +24,10 @@ const navItems = [
 ];
 
 export default function NavigationBar() {
+  const { isMobile } = useIsMobile(640);
+
+  if (isMobile) return <Mobile />;
+
   return (
     <div className="fixed top-[24px] w-full flex justify-center px-5 md:px-12 z-50">
       <div className="max-w-[1360px] w-full h-[72px] flex flex-col justify-center px-4 md:pr-11 md:pl-8 text-base font-medium text-center text-black whitespace-nowrap rounded-2xl border border-solid bg-white bg-opacity-90 border-neutral-200">
@@ -40,23 +47,7 @@ export default function NavigationBar() {
               />
             </figure>
           </Link>
-          {/* 햄버거 메뉴 (모바일) */}
-          <button className="sm:hidden">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
+
           {/* 네비게이션 메뉴 (데스크톱) */}
           <div className="hidden sm:flex gap-x-[60px] items-center">
             {navItems.map((item, index) => (

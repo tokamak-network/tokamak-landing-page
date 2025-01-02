@@ -30,10 +30,10 @@ export default function NewsSection({ posts }: { posts: Post[] }) {
   }, [posts, activeFilter]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col text-tokamak-black">
       {/* Header */}
       <div className="text-center mb-[36px]">
-        <h1 className="text-[30px]">
+        <h1 className="text-[30px] ">
           Exploring <span className="text-black font-bold">INSIGHTS</span>
         </h1>
         <p className="text-[15px] text-gray-600 mt-[9px]">

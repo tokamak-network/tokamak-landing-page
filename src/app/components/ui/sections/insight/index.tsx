@@ -9,8 +9,7 @@ export default async function Insights() {
   return (
     <InsightBackground>
       <div
-        className="w-full flex flex-col items-center pt-[90px] pb-[120px]
-      [@media(max-width:800px)]:pb-[90px] [@media(max-width:640px)]:pb-[45px] bg-white px-[25px] [@media(max-width:1000px)]:px-[15px]"
+        className="w-full flex flex-col items-center pt-[90px] pb-[120px] [@media(max-width:800px)]:pb-[90px] [@media(max-width:640px)]:pb-[45px] bg-white px-[25px] [@media(max-width:1000px)]:px-[15px]"
         style={{
           clipPath:
             "polygon(40px 0, calc(100% - 40px) 0, 100% 40px, 100% calc(100% - 40px), calc(100% - 40px) 100%, 40px 100%, 0 calc(100% - 40px), 0 40px)",

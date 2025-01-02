@@ -1,12 +1,13 @@
 "use client";
 
-import * as React from "react";
 import { NavItem } from "./NavItem";
 import TokamakLogo from "@/assets/images/Tokamak_Symbol.svg";
 import TokamakLogoText from "@/assets/images/Tokamak_LogoText.svg";
 import Image from "next/image";
 import Link from "next/link";
 import CloseGray from "@/assets/icons/header/close-gray.svg";
+import { useState } from "react";
+import HamburgerMenu from "@/assets/icons/header/hamburger-menu.svg";
 
 const navItems = [
   {
@@ -24,7 +25,7 @@ const navItems = [
 ];
 
 export default function NavigationBar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <>
@@ -47,22 +48,13 @@ export default function NavigationBar() {
             </Link>
             <button
               className="sm:hidden"
-              onClick={() => setIsMobileMenuOpen(true)}
+              onClick={(e) => {
+                e.stopPropagation(); // 이벤트 버블링 방지
+                setIsMobileMenuOpen(true);
+              }}
+              onTouchEnd={() => setIsMobileMenuOpen(true)}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
+              <Image src={HamburgerMenu} alt="Hamburger Menu" />
             </button>
             <div className="hidden sm:flex gap-x-[60px] items-center">
               {navItems.map((item, index) => (

@@ -49,10 +49,10 @@ export default function NavigationBar() {
             <button
               className="sm:hidden"
               onClick={(e) => {
+                e.preventDefault(); // 기본 동작 방지
                 e.stopPropagation(); // 이벤트 버블링 방지
                 setIsMobileMenuOpen(true);
               }}
-              onTouchEnd={() => setIsMobileMenuOpen(true)}
             >
               <Image src={HamburgerMenu} alt="Hamburger Menu" />
             </button>

@@ -5,7 +5,6 @@ import KevinImage from "@/assets/members/member=Kevin.png";
 import ZenaImage from "@/assets/members/member=Zena.png";
 import AleImage from "@/assets/members/member=Ale.png";
 import JamieImage from "@/assets/members/member=Jamie.png";
-import SuahImage from "@/assets/members/member=Suah.png";
 import LucasImage from "@/assets/members/member=Lucas Jung.png";
 import JadenImage from "@/assets/members/member=Jaden Kong.png";
 import PraveenImage from "@/assets/members/member=Praveen Surendran.png";
@@ -20,7 +19,6 @@ import JakeImage from "@/assets/members/member=Jake Jang.png";
 import ShrutiImage from "@/assets/members/member=Shruti Shrivastava.png";
 import MuhammedImage from "@/assets/members/member=Muhammed Ali Bingol.png";
 import TheoImage from "@/assets/members/member=Theo Lee.png";
-import AmanImage from "@/assets/members/member=Aman Ullah.png";
 import MehdiImage from "@/assets/members/member=Mehdi Beriane.png";
 import MohammadImage from "@/assets/members/member=Mohammad Rahm.png";
 import IreneImage from "@/assets/members/member=Irene Bae.png";
@@ -52,11 +50,6 @@ const teamMembers = [
     name: "Jamie Judd",
     role: "Core Researcher",
     imageUrl: JamieImage,
-  },
-  {
-    name: "Suah Kim",
-    role: "Core Researcher",
-    imageUrl: SuahImage,
   },
   {
     name: "Lucas Jung",
@@ -134,11 +127,6 @@ const teamMembers = [
     imageUrl: TheoImage,
   },
   {
-    name: "Aman Ullah",
-    role: "Blockchain Engineer",
-    imageUrl: AmanImage,
-  },
-  {
     name: "Mehdi Beriane",
     role: "Blockchain Engineer",
     imageUrl: MehdiImage,
@@ -188,7 +176,7 @@ const teamMembers = [
 const TeamGrid: React.FC = () => {
   return (
     <div className="w-full h-full flex justify-center [@media(max-width:650px)]:px-[10px]">
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-[1000px] gap-[25px] items-start overflow-x-hidden">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-[1000px] gap-[25px] items-start overflow-x-hidden [-ms-overflow-style:none] [scrollbar-width:non]">
         {teamMembers.map((member, index) => (
           <TeamMember
             key={index}

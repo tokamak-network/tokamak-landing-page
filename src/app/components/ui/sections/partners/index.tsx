@@ -1,157 +1,68 @@
-/* eslint-disable */
-// @ts-nocheck
-import * as React from "react";
-// import { PartnerImage } from "./PartnerImage";
-import { PartnerImageProps } from "./types";
-import "./partner.css";
-import Partner1 from "@/assets/images/partners/1.svg";
-import Partner2 from "@/assets/images/partners/2.svg";
-import Partner3 from "@/assets/images/partners/3.svg";
-import Partner4 from "@/assets/images/partners/4.svg";
-import Partner5 from "@/assets/images/partners/5.svg";
-import Partner6 from "@/assets/images/partners/6.svg";
-import Partner7 from "@/assets/images/partners/7.svg";
-import Partner8 from "@/assets/images/partners/8.svg";
-import Partner9 from "@/assets/images/partners/9.svg";
-import Partner10 from "@/assets/images/partners/10.svg";
-import Partner11 from "@/assets/images/partners/11.svg";
-import Partner12 from "@/assets/images/partners/12.svg";
-import Partner13 from "@/assets/images/partners/13.svg";
-import Partner14 from "@/assets/images/partners/14.svg";
-import Partner15 from "@/assets/images/partners/15.svg";
-import Partner16 from "@/assets/images/partners/16.svg";
-import Partner17 from "@/assets/images/partners/17.svg";
-import Partner18 from "@/assets/images/partners/18.svg";
-import Partner19 from "@/assets/images/partners/19.svg";
-import Partner20 from "@/assets/images/partners/20.svg";
-import Partner21 from "@/assets/images/partners/21.svg";
-import Partner22 from "@/assets/images/partners/22.svg";
+"use client";
 
-const partnerImages: PartnerImageProps[] = [
-  {
-    src: Partner1,
-    alt: "100&100",
-  },
-  {
-    src: Partner2,
-    alt: "BLOCOORE",
-  },
-  {
-    src: Partner3,
-    alt: "Alphain",
-  },
-  {
-    src: Partner4,
-    alt: "Skytale",
-  },
-  {
-    src: Partner5,
-    alt: "Onther",
-  },
-  {
-    src: Partner6,
-    alt: "Ethereum",
-  },
-  {
-    src: Partner7,
-    alt: "Maker",
-  },
-  {
-    src: Partner8,
-    alt: "Polygon",
-  },
-  {
-    src: Partner9,
-    alt: "Meter",
-  },
-  {
-    src: Partner10,
-    alt: "DSRV",
-  },
-  {
-    src: Partner11,
-    alt: "Bounce",
-  },
-  {
-    src: Partner12,
-    alt: "Paycoin",
-  },
-  {
-    src: Partner13,
-    alt: "Bifrost",
-  },
-  {
-    src: Partner14,
-    alt: "Korea Digital",
-  },
-  {
-    src: Partner15,
-    alt: "Dcent",
-  },
-  {
-    src: Partner16,
-    alt: "Ozys",
-  },
-  {
-    src: Partner17,
-    alt: "Panony",
-  },
+import { useFocus } from "@/context/FocusContext";
 
-  {
-    src: Partner18,
-    alt: "Staked",
-  },
-  {
-    src: Partner19,
-    alt: "Chainlink",
-  },
-  {
-    src: Partner20,
-    alt: "Decipher",
-  },
-  {
-    src: Partner21,
-    alt: "DeSpread",
-  },
-  {
-    src: Partner22,
-    alt: "Ciphers",
-  },
-];
+import { CLIP_PATHS } from "@/app/constants/styles";
+import PartnersGrid from "./PartnersGrid";
+import { useIsMobile } from "@/app/hooks/layout/useIsMobile";
 
-const Hourglass = () => {
+export default function Partners() {
+  const { isFocused } = useFocus();
+  const { isMobile } = useIsMobile(550);
+
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="120"
-      height="110"
-      viewBox="0 0 120 110"
-      fill="none"
-    >
-      <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-        d="M0 0H42H78H120L78 42V68L120 110H78H42H0L42 68V42L0 0Z"
-        fill="white"
-      />
-    </svg>
-  );
-};
-
-export const Partners: React.FC = () => {
-  return (
-    <div
-      className="w-full h-[110px] overflow-hidden flex align-baseline relative
-    "
-    >
-      <div className="flex gap-10 items-center animate-marquee [&:has(img:hover)]:[animation-play-state:paused]"></div>
-
+    <div className="w-full h-full text-[#1C1C1C]">
+      {/* TOP AREA FOR CLIP PATH */}
+      <div className="relative w-full h-[134px] bg-[#1c1c1c]">
+        <div
+          style={{
+            clipPath: CLIP_PATHS.bottomCutCorners,
+            backgroundColor: "white",
+          }}
+          className="absolute inset-0 bg-white"
+        ></div>
+      </div>
       <div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{ zIndex: 100 }}
+        className="flex justify-center items-center w-full py-[60px]  [@media(max-width:650px)]:py-[30px] px-[24px] bg-[#1C1C1C]
+        [@media(max-width:650px)]:h-[157px]
+      "
       >
-        <Hourglass />
+        <div className="flex flex-col justify-between items-center h-full text-white text-center gap-y-[9px]">
+          <span className="text-[30px] leading-[30px] [@media(max-width:650px)]:text-[24px] [@media(max-width:650px)]:leading-[24px]">
+            Partners
+          </span>
+          {isMobile ? (
+            <span className="text-[12px] w-full max-w-[312px]">
+              Tokamak Network works with a variety of partners to make Ethereum
+              more scalable and provide users with a better decentralized
+              application experience.
+            </span>
+          ) : (
+            <span className="text-[15px] [@media(max-width:650px)]:text-[12px]">
+              Tokamak Network works with a variety of partners to make Ethereum
+              more scalable <br /> and provide users with a better decentralized
+              application experience.
+            </span>
+          )}
+        </div>
+      </div>
+      <div
+        className="relative bg-[#1c1c1c]"
+        style={{
+          background: isFocused
+            ? "linear-gradient(to bottom, transparent 50%, #0078ff 50%)"
+            : "",
+        }}
+      >
+        <div
+          className="flex flex-col items-center pt-[60px] pb-[120px] gap-y-[90px] relative bg-white"
+          style={{
+            clipPath: CLIP_PATHS.polygon,
+          }}
+        >
+          <PartnersGrid />
+        </div>
       </div>
     </div>
   );
-};
+}

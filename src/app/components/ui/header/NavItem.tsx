@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { NavItemProps } from "./types";
+import { NavItemProps, NavItemType } from "./types";
 import { LINKS } from "@/app/constants/links";
 import Link from "next/link";
 import { useIsMobile } from "@/app/hooks/layout/useIsMobile";
@@ -15,34 +15,51 @@ const featureItems = [
   { name: "Staking", link: LINKS.STAKING },
   { name: "DAO", link: LINKS.DAO },
 ];
+const aboutItems = [
+  {
+    name: "Team",
+    link: "/about/team",
+    isExternal: false,
+  },
+  {
+    name: "Partners",
+    link: "/about/partners",
+    isExternal: false,
+  },
+];
 
 export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { isMobile } = useIsMobile(640);
 
-  if (label === "About") {
-    if (isMobile) {
-      return (
-        <Link
-          href="/about"
-          className="flex items-center text-[24px] font-bold h-[70px]"
-        >
-          <span className="text-[#1C1C1C] transition-colors duration-200">
-            {label}
-          </span>
-        </Link>
-      );
-    }
-    return (
-      <Link href="/about" className="h-full flex items-center">
-        <span className="text-[#1C1C1C] font-['Proxima_Nova'] text-base font-medium leading-normal hover:text-tokamak-blue transition-colors duration-200">
-          {label}
-        </span>
-      </Link>
-    );
-  }
+  // if (label === "About") {
+  //   if (isMobile) {
+  //     return (
+  //       <Link
+  //         href="/about"
+  //         className="flex items-center text-[24px] font-bold h-[70px]"
+  //       >
+  //         <span className="text-[#1C1C1C] transition-colors duration-200">
+  //           {label}
+  //         </span>
+  //       </Link>
+  //     );
+  //   }
+  //   return (
+  //     <Link href="/about" className="h-full flex items-center">
+  //       <span className="text-[#1C1C1C] font-['Proxima_Nova'] text-base font-medium leading-normal hover:text-tokamak-blue transition-colors duration-200">
+  //         {label}
+  //       </span>
+  //     </Link>
+  //   );
+  // }
 
-  const items = label === "Developer" ? developerItems : featureItems;
+  const items: NavItemType[] =
+    label === "Developer"
+      ? developerItems
+      : label === "Features"
+      ? featureItems
+      : aboutItems;
 
   if (isMobile) {
     return (
@@ -130,18 +147,27 @@ export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
       >
         <div className="relative mt-[35.5px] before:absolute before:w-full before:h-[35.5px] before:top-[-35.5px] before:left-0">
           <div className="p-[18px] flex flex-col items-start rounded-[15px] border border-[#DEDEDE] bg-white gap-[12px]">
-            {items?.map((item, index) => (
-              <a
-                key={index}
-                className="overflow-hidden text-ellipsis text-[#1C1C1C] font-['Proxima_Nova'] text-[14px] font-normal leading-normal
-            hover:text-[#0078FF] cursor-pointer transition-colors duration-200"
-                href={item.link}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {item.name}
-              </a>
-            ))}
+            {items?.map((item, index) =>
+              item.isExternal ? (
+                <a
+                  key={index}
+                  className="overflow-hidden text-ellipsis text-[#1C1C1C] font-['Proxima_Nova'] text-[14px] font-normal leading-normal hover:text-[#0078FF] cursor-pointer transition-colors duration-200"
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {item.name}
+                </a>
+              ) : (
+                <Link
+                  key={index}
+                  href={item.link}
+                  className="overflow-hidden text-ellipsis text-[#1C1C1C] font-['Proxima_Nova'] text-[14px] font-normal leading-normal hover:text-[#0078FF] cursor-pointer transition-colors duration-200"
+                >
+                  {item.name}
+                </Link>
+              )
+            )}
           </div>
         </div>
       </div>

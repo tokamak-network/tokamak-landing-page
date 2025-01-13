@@ -49,30 +49,30 @@ import StakedHover from "@/assets/partners/name=Staked, Hover=on.svg";
 import SkytaleCapitalHover from "@/assets/partners/name=Skytale Capital, Hover=on.svg";
 import { useState } from "react";
 
-const backedPartners = [
+const backedPartners: PartnerItem[] = [
   {
     name: "100n100",
     logo: OneHundred,
     hoverLogo: OneHundredHover,
-    link: "https://100n100.vc",
+    link: "http://100and100capital.com",
   },
   {
     name: "BLOCORE",
     logo: BLOCORE,
     hoverLogo: BLOCOREHover,
-    link: "https://blocore.com",
+    link: "https://www.blocore.com",
   },
   {
     name: "Alphain Ventures",
     logo: AlphainVentures,
     hoverLogo: AlphainVenturesHover,
-    link: "https://alphain.ventures",
+    link: "",
   },
   {
     name: "Skytale Capital",
     logo: SkytaleCapital,
     hoverLogo: SkytaleCapitalHover,
-    link: "https://skytalecapital.com",
+    link: "",
   },
 ];
 
@@ -81,13 +81,13 @@ const partners: PartnerItem[] = [
     name: "EFG",
     logo: Efg,
     hoverLogo: EfgHover,
-    link: "https://efg.capital",
+    link: "https://medium.com/tokamak-network/vitalik-buterins-big-announcements-about-plasma-evm-tokamak-network-636dc11ea257",
   },
   {
     name: "SKY",
     logo: SKY,
     hoverLogo: SKYHover,
-    link: "https://sky.io",
+    link: "https://sky.money",
   },
   {
     name: "Polygon",
@@ -105,7 +105,7 @@ const partners: PartnerItem[] = [
     name: "DSRV",
     logo: DSRV,
     hoverLogo: DSRVHover,
-    link: "https://dsrv.io",
+    link: "https://www.dsrvlabs.com",
   },
   {
     name: "Bounce",
@@ -117,19 +117,19 @@ const partners: PartnerItem[] = [
     name: "Paycoin",
     logo: Paycoin,
     hoverLogo: PaycoinHover,
-    link: "https://paycoin.com",
+    link: "https://payprotocol.io",
   },
   {
     name: "BifROST",
     logo: BifROST,
     hoverLogo: BifROSTHover,
-    link: "https://bifrost.finance",
+    link: "https://thebifrost.io",
   },
   {
     name: "KDAC",
     logo: Kdac,
     hoverLogo: KdacHover,
-    link: "https://kdac.io",
+    link: "https://www.kdac.io/",
   },
   {
     name: "D'CENT",
@@ -141,13 +141,13 @@ const partners: PartnerItem[] = [
     name: "Ozys",
     logo: Ozys,
     hoverLogo: OzysHover,
-    link: "https://ozys.io",
+    link: "https://orbitchain.io",
   },
   {
     name: "Panony",
     logo: Panony,
     hoverLogo: PanonyHover,
-    link: "https://panony.com",
+    link: "https://www.panony.com",
   },
   {
     name: "Staked",
@@ -165,7 +165,7 @@ const partners: PartnerItem[] = [
     name: "Despread",
     logo: Despread,
     hoverLogo: DespreadHover,
-    link: "https://despread.io",
+    link: "https://www.despread.io",
   },
   {
     name: "Onther",
@@ -177,13 +177,13 @@ const partners: PartnerItem[] = [
     name: "Decipher",
     logo: Decipher,
     hoverLogo: DecipherHover,
-    link: "https:/jh/decipher.io",
+    link: "https://medium.com/decipher-media",
   },
   {
     name: "Ciphers",
     logo: Ciphers,
     hoverLogo: CiphersHover,
-    link: "https://ciphers.xyz",
+    link: "",
   },
 ];
 

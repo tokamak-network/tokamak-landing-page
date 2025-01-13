@@ -10,6 +10,7 @@ export default {
   theme: {
     extend: {
       screens: {
+        "550px": "550px",
         md: "800px",
       },
       colors: {

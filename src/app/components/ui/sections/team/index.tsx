@@ -5,7 +5,7 @@ import GetInvolve from "./GetInvolve";
 import TeamGrid from "./TeamGrid";
 import { CLIP_PATHS } from "@/app/constants/styles";
 
-export default function About() {
+export default function Team() {
   const { isFocused } = useFocus();
   return (
     <div className="w-full h-full text-[#1C1C1C]">

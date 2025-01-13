@@ -3,3 +3,9 @@ export interface NavItemProps {
   icon?: string;
   href?: string;
 }
+
+export type NavItemType = {
+  name: string;
+  link: string;
+  isExternal?: boolean;
+};

@@ -33,13 +33,14 @@ export default function NewsletterSection() {
     >
       <div className="w-full max-w-[1200px] flex justify-center items-center [@media(max-width:800px)]:flex-col gap-y-[30px]">
         {/* Title */}
-        <div className="text-left w-full min-w-[390px]">
+        <div className="text-left w-full min-w-[390px] [@media(max-width:429px)]:min-w-[310px]">
           <h2 className="text-white text-[24px] md:text-[30px] mb-[9px]">
             Newsletter <span className="font-bold">SUBSCRIPTION</span>
           </h2>
           <p className="text-[15px] text-white">
-            The quickest way to stay up-to-date with news about <br /> Tokamak
-            Network
+            The quickest way to stay up-to-date with news{" "}
+            <br className="min-[429px]:hidden block" /> about
+            <br className="min-[430px]:block hidden" /> Tokamak Network
           </p>
         </div>
 

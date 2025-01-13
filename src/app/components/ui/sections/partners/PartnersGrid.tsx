@@ -251,9 +251,15 @@ export default function PartnersGrid() {
             className="flex items-center justify-center border border-[#DEDEDE]
             w-[160px] h-[70px]
             550px:w-[230px] 550px:h-[100px]"
+            onMouseEnter={() => setHoveredPartner(partner.name)}
+            onMouseLeave={() => setHoveredPartner(null)}
           >
             <Image
-              src={partner.logo}
+              src={
+                hoveredPartner === partner.name
+                  ? partner.hoverLogo
+                  : partner.logo
+              }
               alt={partner.name}
               width={200}
               height={80}

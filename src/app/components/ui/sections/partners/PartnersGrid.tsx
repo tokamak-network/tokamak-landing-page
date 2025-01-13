@@ -66,13 +66,11 @@ const backedPartners: PartnerItem[] = [
     name: "Alphain Ventures",
     logo: AlphainVentures,
     hoverLogo: AlphainVenturesHover,
-    link: "",
   },
   {
     name: "Skytale Capital",
     logo: SkytaleCapital,
     hoverLogo: SkytaleCapitalHover,
-    link: "",
   },
 ];
 
@@ -183,7 +181,6 @@ const partners: PartnerItem[] = [
     name: "Ciphers",
     logo: Ciphers,
     hoverLogo: CiphersHover,
-    link: "",
   },
 ];
 
@@ -214,29 +211,44 @@ export default function PartnersGrid() {
   return (
     <div className="flex flex-col gap-y-[90px]">
       <GridWrapper title="Partners & Grants">
-        {partners.map((partner, index) => (
-          <a
-            key={index}
-            href={partner.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center border border-[#DEDEDE]
-            w-[160px] h-[70px]
-            550px:w-[230px] 550px:h-[100px]"
-            onMouseEnter={() => setHoveredPartner(partner.name)}
-            onMouseLeave={() => setHoveredPartner(null)}
-          >
-            <Image
-              src={
-                hoveredPartner === partner.name
-                  ? partner.hoverLogo
-                  : partner.logo
-              }
-              alt={partner.name}
-              className="object-contain"
-            />
-          </a>
-        ))}
+        {partners.map((partner, index) =>
+          partner.link ? (
+            <a
+              key={index}
+              href={partner.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center border border-[#DEDEDE]
+              w-[160px] h-[70px]
+              550px:w-[230px] 550px:h-[100px]"
+              onMouseEnter={() => setHoveredPartner(partner.name)}
+              onMouseLeave={() => setHoveredPartner(null)}
+            >
+              <Image
+                src={
+                  hoveredPartner === partner.name
+                    ? partner.hoverLogo
+                    : partner.logo
+                }
+                alt={partner.name}
+                className="object-contain"
+              />
+            </a>
+          ) : (
+            <div
+              key={index}
+              className="flex items-center justify-center border border-[#DEDEDE]
+              w-[160px] h-[70px]
+              550px:w-[230px] 550px:h-[100px]"
+            >
+              <Image
+                src={partner.logo}
+                alt={partner.name}
+                className="object-contain"
+              />
+            </div>
+          )
+        )}
       </GridWrapper>
       <GridWrapper title="Backed by">
         {backedPartners.map((partner, index) => (

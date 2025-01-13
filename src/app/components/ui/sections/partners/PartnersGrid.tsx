@@ -78,65 +78,22 @@ const backedPartners = [
 
 const partners: PartnerItem[] = [
   {
-    name: "BifROST",
-    logo: BifROST,
-    hoverLogo: BifROSTHover,
-    link: "https://bifrost.finance",
-  },
-
-  {
-    name: "Bounce",
-    logo: Bounce,
-    hoverLogo: BounceHover,
-    link: "https://bounce.finance",
-  },
-  {
-    name: "Chainlink",
-    logo: Chainlink,
-    hoverLogo: ChainlinkHover,
-    link: "https://chain.link",
-  },
-  {
-    name: "Ciphers",
-    logo: Ciphers,
-    hoverLogo: CiphersHover,
-    link: "https://ciphers.xyz",
-  },
-  {
-    name: "D'CENT",
-    logo: Dcent,
-    hoverLogo: DcentHover,
-    link: "https://dcentwallet.com",
-  },
-  {
-    name: "Decipher",
-    logo: Decipher,
-    hoverLogo: DecipherHover,
-    link: "https:/jh/decipher.io",
-  },
-  {
-    name: "Despread",
-    logo: Despread,
-    hoverLogo: DespreadHover,
-    link: "https://despread.io",
-  },
-  {
-    name: "DSRV",
-    logo: DSRV,
-    hoverLogo: DSRVHover,
-    link: "https://dsrv.io",
-  },
-  {
     name: "EFG",
     logo: Efg,
     hoverLogo: EfgHover,
     link: "https://efg.capital",
   },
   {
-    name: "KDAC",
-    logo: Kdac,
-    hoverLogo: KdacHover,
-    link: "https://kdac.io",
+    name: "SKY",
+    logo: SKY,
+    hoverLogo: SKYHover,
+    link: "https://sky.io",
+  },
+  {
+    name: "Polygon",
+    logo: Polygon,
+    hoverLogo: PolygonHover,
+    link: "https://polygon.technology",
   },
   {
     name: "METER",
@@ -145,10 +102,40 @@ const partners: PartnerItem[] = [
     link: "https://meter.io",
   },
   {
-    name: "Onther",
-    logo: Onther,
-    hoverLogo: OntherHover,
-    link: "https://onther.io",
+    name: "DSRV",
+    logo: DSRV,
+    hoverLogo: DSRVHover,
+    link: "https://dsrv.io",
+  },
+  {
+    name: "Bounce",
+    logo: Bounce,
+    hoverLogo: BounceHover,
+    link: "https://bounce.finance",
+  },
+  {
+    name: "Paycoin",
+    logo: Paycoin,
+    hoverLogo: PaycoinHover,
+    link: "https://paycoin.com",
+  },
+  {
+    name: "BifROST",
+    logo: BifROST,
+    hoverLogo: BifROSTHover,
+    link: "https://bifrost.finance",
+  },
+  {
+    name: "KDAC",
+    logo: Kdac,
+    hoverLogo: KdacHover,
+    link: "https://kdac.io",
+  },
+  {
+    name: "D'CENT",
+    logo: Dcent,
+    hoverLogo: DcentHover,
+    link: "https://dcentwallet.com",
   },
   {
     name: "Ozys",
@@ -163,28 +150,40 @@ const partners: PartnerItem[] = [
     link: "https://panony.com",
   },
   {
-    name: "Paycoin",
-    logo: Paycoin,
-    hoverLogo: PaycoinHover,
-    link: "https://paycoin.com",
-  },
-  {
-    name: "Polygon",
-    logo: Polygon,
-    hoverLogo: PolygonHover,
-    link: "https://polygon.technology",
-  },
-  {
-    name: "SKY",
-    logo: SKY,
-    hoverLogo: SKYHover,
-    link: "https://sky.io",
-  },
-  {
     name: "Staked",
     logo: Staked,
     hoverLogo: StakedHover,
     link: "https://staked.us",
+  },
+  {
+    name: "Chainlink",
+    logo: Chainlink,
+    hoverLogo: ChainlinkHover,
+    link: "https://chain.link",
+  },
+  {
+    name: "Despread",
+    logo: Despread,
+    hoverLogo: DespreadHover,
+    link: "https://despread.io",
+  },
+  {
+    name: "Onther",
+    logo: Onther,
+    hoverLogo: OntherHover,
+    link: "https://onther.io",
+  },
+  {
+    name: "Decipher",
+    logo: Decipher,
+    hoverLogo: DecipherHover,
+    link: "https:/jh/decipher.io",
+  },
+  {
+    name: "Ciphers",
+    logo: Ciphers,
+    hoverLogo: CiphersHover,
+    link: "https://ciphers.xyz",
   },
 ];
 
@@ -234,8 +233,6 @@ export default function PartnersGrid() {
                   : partner.logo
               }
               alt={partner.name}
-              width={200}
-              height={80}
               className="object-contain"
             />
           </a>
@@ -261,8 +258,6 @@ export default function PartnersGrid() {
                   : partner.logo
               }
               alt={partner.name}
-              width={200}
-              height={80}
               className="object-contain"
             />
           </a>

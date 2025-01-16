@@ -6,14 +6,14 @@ import Link from "next/link";
 import { useIsMobile } from "@/app/hooks/layout/useIsMobile";
 
 const developerItems = [
-  { name: "Documents", link: LINKS.DOCS },
-  { name: "Github", link: LINKS.GITHUB },
-  { name: "Grant", link: LINKS.GRANT },
+  { name: "Documents", link: LINKS.DOCS, isExternal: true },
+  { name: "Github", link: LINKS.GITHUB, isExternal: true },
+  { name: "Grant", link: LINKS.GRANT, isExternal: true },
 ];
 const featureItems = [
-  { name: "Rollup Hub", link: LINKS.ROLLUP_HUB },
-  { name: "Staking", link: LINKS.STAKING },
-  { name: "DAO", link: LINKS.DAO },
+  { name: "Rollup Hub", link: LINKS.ROLLUP_HUB, isExternal: true },
+  { name: "Staking", link: LINKS.STAKING, isExternal: true },
+  { name: "DAO", link: LINKS.DAO, isExternal: true },
 ];
 const aboutItems = [
   {

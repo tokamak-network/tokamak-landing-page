@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Send from "@/assets/icons/common/send.svg";
 import { LINKS } from "@/app/constants/links";
+import CircleAnimation from "./CircleAnimation";
 
 const DashboardItemList: {
   Icon: React.ComponentType;
@@ -71,7 +72,7 @@ export default function DashboardHeader() {
             </button>
           </div>
         </section>
-        <div className="w-[500px]">Animation</div>
+        <CircleAnimation />
       </div>
       <div className="flex gap-x-[60px]">
         {DashboardItemList.map((item) => (

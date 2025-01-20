@@ -5,7 +5,7 @@ export type DashboardItem = {
     value: string;
     unit: string;
     subText: string;
-    tooltip?: string;
+    tooltip?: React.ReactNode;
     link?: string;
   }[];
 };

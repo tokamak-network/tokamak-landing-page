@@ -28,13 +28,22 @@ const DashboardItemList: DashboardItem[] = [
         value: "115,628,590",
         unit: "USD",
         subText: "Market Cap",
-        tooltip: "go",
+        tooltip: (
+          <span>
+            Market Cap = Circulating <br /> Supply * Price Per TON
+          </span>
+        ),
       },
       {
         value: "204,309,913",
         unit: "USD",
         subText: "Fully Diluted Valuation",
-        tooltip: "go",
+        tooltip: (
+          <span>
+            Fully Diluted Valuation = Total <br />
+            Supply * Price per TON
+          </span>
+        ),
       },
     ],
   },

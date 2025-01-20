@@ -16,14 +16,19 @@ const CircleComponent = () => {
         // 회전 애니메이션 병렬 실행
         await Promise.all([
           leftControls.start({
-            rotate: 540, // 180 + 360
+            rotate: [180, 360], // 180 + 360
             transition: { duration: 4, ease: "linear" },
           }),
           rightControls.start({
-            rotate: 360, // 0 + 360
+            rotate: -360, // 반시계 방향
             transition: { duration: 4, ease: "linear" },
           }),
         ]);
+
+        // 이동 전에 오른쪽 반원 즉시 180도 회전
+        await rightControls.set({
+          rotate: 180,
+        });
 
         // 이동 애니메이션 병렬 실행
         await Promise.all([
@@ -59,7 +64,7 @@ const CircleComponent = () => {
   }, []);
 
   return (
-    <div className="relative flex animate-[spin_10s_linear_infinite]">
+    <div className="relative flex animate-[spin_20s_linear_infinite]">
       {/* 왼쪽 원 */}
       <div className="relative left-0 w-[225px] h-[225px]">
         <div className="absolute inset-0">
@@ -68,8 +73,10 @@ const CircleComponent = () => {
         <motion.div
           className="absolute inset-0"
           animate={leftControls}
-          initial={{ rotate: 180 }}
-          style={{ zIndex: 100, transformOrigin: "center" }}
+          style={{
+            zIndex: 100,
+            transformOrigin: "center",
+          }}
         >
           <Image src={HalfCircleImage} alt="circle animation" />
         </motion.div>
@@ -83,7 +90,6 @@ const CircleComponent = () => {
         <motion.div
           className="absolute inset-0"
           animate={rightControls}
-          initial={{ rotate: 0 }} // 아래에서 시작
           style={{ zIndex: 100, transformOrigin: "center" }}
         >
           <Image src={HalfCircleImage} alt="circle animation" />

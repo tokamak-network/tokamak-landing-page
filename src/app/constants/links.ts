@@ -13,4 +13,7 @@ export const LINKS = {
   DISCORD: "https://discord.com/invite/J4chV2zuAK",
   TELEGRAM: "https://t.me/tokamak_network",
   LINKEDIN: "https://www.linkedin.com/company/tokamaknetwork/",
+  GET_TON: "https://docs.tokamak.network/home/information/get-ton",
+  DUNE_DASHBOARD:
+    "https://dune.com/tokamak-network/tokamak-network-tokenomics-dashboard",
 };

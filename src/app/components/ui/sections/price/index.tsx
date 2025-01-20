@@ -3,7 +3,7 @@
 import { useFocus } from "@/context/FocusContext";
 
 import { CLIP_PATHS } from "@/app/constants/styles";
-import PriceGrid from "./PriceGrid";
+import PriceDashboard from "./PriceDashboard";
 import { useIsMobile } from "@/app/hooks/layout/useIsMobile";
 
 export default function Price() {
@@ -58,7 +58,7 @@ export default function Price() {
             clipPath: CLIP_PATHS.polygon,
           }}
         >
-          <PriceGrid />
+          <PriceDashboard />
         </div>
       </div>
     </div>

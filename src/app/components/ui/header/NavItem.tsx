@@ -22,6 +22,11 @@ const aboutItems = [
     isExternal: false,
   },
   {
+    name: "Price Dashboard",
+    link: "/about/price",
+    isExternal: false,
+  },
+  {
     name: "Partners",
     link: "/about/partners",
     isExternal: false,

@@ -1,14 +1,25 @@
+"use client";
+
 import CircleImage from "@/assets/images/price/circle.svg";
 import HalfCircleImage from "@/assets/images/price/half_circle.svg";
+
 import Image from "next/image";
 import { motion, useAnimationControls } from "framer-motion";
-import { useEffect } from "react";
-// import styles from "./CircleAnimation.module.css";
-// animate - [spin_10s_linear_infinite];
-// animate - [spin_5s_linear_infinite];
+import { useEffect, useMemo } from "react";
+import { useIsMobile } from "@/app/hooks/layout/useIsMobile";
+
 const CircleComponent = () => {
   const leftControls = useAnimationControls();
   const rightControls = useAnimationControls();
+
+  const { isMobile: isMd } = useIsMobile(995);
+  const { isMobile: isSm } = useIsMobile(500);
+
+  const traslateXPoint = useMemo(() => {
+    if (isSm) return 160;
+    if (isMd) return 180;
+    return 235;
+  }, [isMd, isSm]);
 
   useEffect(() => {
     const animate = async () => {
@@ -33,11 +44,11 @@ const CircleComponent = () => {
         // 이동 애니메이션 병렬 실행
         await Promise.all([
           leftControls.start({
-            translateX: 235,
+            translateX: traslateXPoint,
             transition: { duration: 1, ease: "linear" },
           }),
           rightControls.start({
-            translateX: -235,
+            translateX: -traslateXPoint,
             transition: { duration: 1, ease: "linear" },
           }),
         ]);
@@ -61,12 +72,17 @@ const CircleComponent = () => {
       leftControls.stop();
       rightControls.stop();
     };
-  }, []);
+  }, [traslateXPoint]);
 
   return (
     <div className="relative flex animate-[spin_20s_linear_infinite]">
       {/* 왼쪽 원 */}
-      <div className="relative left-0 w-[225px] h-[225px]">
+      <div
+        className="relative left-0  price-md:w-[225px]
+      max-[995px]:min-[500px]:w-[180px]
+      max-[499px]:w-[160px] price-md:h-[225px] max-[995px]:min-[500px]:h-[180px]
+      max-[499px]:h-[160px]"
+      >
         <div className="absolute inset-0">
           <Image src={CircleImage} alt="circle animation" />
         </div>
@@ -83,7 +99,13 @@ const CircleComponent = () => {
       </div>
 
       {/* 오른쪽 원 */}
-      <div className="relative w-[225px] h-[225px]">
+      <div
+        className="relative
+        price-md:w-[225px]
+      max-[995px]:min-[500px]:w-[180px]
+      max-[499px]:w-[160px] price-md:h-[225px] max-[995px]:min-[500px]:h-[180px]
+      max-[499px]:h-[160px]"
+      >
         <div className="absolute">
           <Image src={CircleImage} alt="circle animation" />
         </div>
@@ -101,7 +123,12 @@ const CircleComponent = () => {
 
 export default function CircleAnimation() {
   return (
-    <div className="w-full max-w-[500px] h-[240px] border-red">
+    <div
+      className="w-full price-md:max-w-[500px] max-[995px]:min-[500px]:max-w-[360px]
+      max-[499px]:max-w-[320px] 
+     max-[995px]:min-[500px]:mt-[114px] max-[499px]:mt-[104px]
+      "
+    >
       <CircleComponent />
     </div>
   );

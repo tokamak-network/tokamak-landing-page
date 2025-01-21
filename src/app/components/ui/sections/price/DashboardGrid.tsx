@@ -57,7 +57,7 @@ const DashboardItemList: DashboardItem[] = [
         value: "89,878,281",
         unit: "TON",
         subText: "Total Supply",
-        link: "gogo",
+        link: "https://etherscan.io/address/0x0b55a0f463b6defb81c6063973763951712d0e5f#readProxyContract#F64",
         tooltip: (
           <div className="text-center">
             The cumulative TON generated until the present <br />
@@ -273,7 +273,18 @@ const DashboardGridItem = (props: DashboardItem) => {
               )}
             </div>
             <div className="flex gap-x-[3px] h-[16px] leading-[16px]">
-              <span className="text-[13px]">{item.subText}</span>
+              <span className="text-[13px]">
+                {" "}
+                {item.subText.split("").map((char, index) =>
+                  char === "*" ? (
+                    <span key={index} className="text-tokamak-blue">
+                      *
+                    </span>
+                  ) : (
+                    char
+                  )
+                )}
+              </span>
               {item.tooltip && (
                 <Tooltip content={item.tooltip}>
                   <Image src={questionIcon} alt={"tooltip icon"} />

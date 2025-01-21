@@ -12,6 +12,8 @@ export default {
       screens: {
         "550px": "550px",
         md: "800px",
+        "price-md": "995px",
+        "price-sm": "500px",
       },
       colors: {
         background: "var(--background)",

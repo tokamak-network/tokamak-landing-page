@@ -41,7 +41,11 @@ const DashboardItem = (props: {
 export default function DashboardHeader() {
   return (
     <div className="flex flex-col gap-y-[120px]">
-      <div className="flex items-center justify-center gap-x-[25px]">
+      <div
+        className="flex items-center justify-center gap-x-[25px]
+      max-[995px]:flex-col max-[995px]:min-[500px]:mt-[114px] max-[499px]:mt-[104px]
+      "
+      >
         <section className="flex flex-col items-center justify-center gap-y-[30px] max-w-[495px]">
           <div className="flex flex-col gap-y-[24px] text-left">
             <h1 className="text-[30px]">

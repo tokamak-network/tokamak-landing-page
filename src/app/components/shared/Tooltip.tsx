@@ -27,7 +27,7 @@ export default function Tooltip({ children, content }: TooltipProps) {
   };
 
   return (
-    <div className="relative inline-block">
+    <div className="relative inline-block mt-[1px]">
       <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
         {children}
       </div>

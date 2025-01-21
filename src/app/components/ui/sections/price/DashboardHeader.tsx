@@ -8,17 +8,17 @@ const DashboardItemList: {
   content: string;
 }[] = [
   {
-    Icon: () => <Image src={Send} alt="send" />,
+    Icon: () => <Image src={Send} alt="send" className="translate-y-[3px]" />,
     content:
       "Verify this value on Etherscan. In case of discrepancies, Etherscan's value is considered accurate.",
   },
   {
-    Icon: () => <span className="text-tokamak-blue">*</span>,
+    Icon: () => <span className="text-tokamak-blue translate-y-[2px]">*</span>,
     content:
       "Contract values need to be divided by 10^27 to get correct decimal place.",
   },
   {
-    Icon: () => <span className="text-tokamak-blue">*</span>,
+    Icon: () => <span className="text-tokamak-blue translate-y-[2px]">*</span>,
     content:
       "Contract values need to be divided by 10^18 to get correct decimal place.",
   },
@@ -30,7 +30,7 @@ const DashboardItem = (props: {
   const { Icon, content } = props;
   return (
     <div
-      className={`flex gap-x-[6px] text-[12px] text-[#252525] h-[30px] align-baseline`}
+      className={`flex gap-x-[6px] text-[12px] text-[#252525] items-baseline`}
     >
       <Icon />
       <p>{content}</p>

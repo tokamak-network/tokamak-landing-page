@@ -3,6 +3,8 @@ import Image from "next/image";
 import sendIcon from "@/assets/icons/common/send.svg";
 import questionIcon from "@/assets/icons/common/question.svg";
 import Tooltip from "@/app/components/shared/Tooltip";
+import refreshIcon from "@/assets/icons/price/refresh.svg";
+import refreshIconHover from "@/assets/icons/price/refresh_hover.svg";
 
 const DashboardItemList: DashboardItem[] = [
   {
@@ -212,17 +214,39 @@ const DashboardItemList: DashboardItem[] = [
 
 const DashboardGridItem = (props: DashboardItem) => {
   const { title, subItems, gridCols } = props;
+
+  const isPrice = title === "Price";
+
   return (
     <div>
-      <h1>{title}</h1>
+      {isPrice ? (
+        <div className="flex justify-between">
+          <h1>{title}</h1>
+          <button className="w-[136px] h-[33px] border border-tokamak-black rounded-[16.5px] flex items-center px-[12px] gap-x-[9px] text-[14px] hover:bg-tokamak-black hover:text-white transition-colors group">
+            <Image
+              src={refreshIcon}
+              alt={"refresh icon"}
+              className="group-hover:hidden"
+            />
+            <Image
+              src={refreshIconHover}
+              alt={"refresh icon hover"}
+              className="hidden group-hover:block"
+            />
+            Live Update
+          </button>
+        </div>
+      ) : (
+        <h1>{title}</h1>
+      )}
       <div
         className={`w-full grid ${
           gridCols === 4 ? "grid-cols-4" : "grid-cols-3"
-        } gap-y-[60px]`}
+        } gpax-x-[auto] gap-y-[60px] justify-between`}
       >
         {subItems.map((item, index) => (
-          <div className="flex flex-col leading-normal" key={index}>
-            <div className="flex items-baseline">
+          <div className="flex flex-col leading-normal gap-y-[3px]" key={index}>
+            <div className="flex items-baseline h-[51px] leading-[51px]">
               <h1
                 className={`${
                   title !== "Supply" ? "text-[42px]" : "text-[33px]"
@@ -230,7 +254,7 @@ const DashboardGridItem = (props: DashboardItem) => {
               >
                 {item.value}
               </h1>
-              <span className="text-[15px]">{item.unit}</span>
+              <span className="text-[15px] ml-[3px]">{item.unit}</span>
               {item.link && (
                 <a
                   href={item.link}
@@ -248,7 +272,7 @@ const DashboardGridItem = (props: DashboardItem) => {
                 </a>
               )}
             </div>
-            <div className="flex gap-x-[3px] items-end">
+            <div className="flex gap-x-[3px] h-[16px] leading-[16px]">
               <span className="text-[13px]">{item.subText}</span>
               {item.tooltip && (
                 <Tooltip content={item.tooltip}>

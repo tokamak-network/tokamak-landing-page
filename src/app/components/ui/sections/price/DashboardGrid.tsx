@@ -29,9 +29,9 @@ const DashboardItemList: DashboardItem[] = [
         unit: "USD",
         subText: "Market Cap",
         tooltip: (
-          <span>
+          <div className="text-center">
             Market Cap = Circulating <br /> Supply * Price Per TON
-          </span>
+          </div>
         ),
       },
       {
@@ -39,10 +39,10 @@ const DashboardItemList: DashboardItem[] = [
         unit: "USD",
         subText: "Fully Diluted Valuation",
         tooltip: (
-          <span>
+          <div className="text-center">
             Fully Diluted Valuation = Total <br />
             Supply * Price per TON
-          </span>
+          </div>
         ),
       },
     ],
@@ -56,26 +56,64 @@ const DashboardItemList: DashboardItem[] = [
         unit: "TON",
         subText: "Total Supply",
         link: "gogo",
-        tooltip: "go",
+        tooltip: (
+          <div className="text-center">
+            The cumulative TON generated until the present <br />
+            Ethereum block, factoring in both burnt TON and <br />
+            unminted TON due to a seigniorage adjustment. <br /> Each block
+            produces 3.92 TON as seigniorage.
+            <br /> The number shown represents the upper limit.
+            <br /> To obtain the real-time precise total supply, you
+            <br /> may refer to the code available on this{" "}
+            <a
+              href="https://github.com/tokamak-network/ton-contracts"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-tokamak-blue"
+            >
+              repository.
+            </a>
+          </div>
+        ),
       },
       {
         value: "50,655,231",
         unit: "TON",
         subText: "Circulating Supply",
-        tooltip: "go",
+        tooltip: (
+          <div className="text-center">
+            Circulating Supply = Total <br />
+            Supply - DAO Vault - Staked - Vested
+            <br />
+            <br /> The amount of circulating TON in the market
+          </div>
+        ),
       },
       {
         value: "72,420,369",
         unit: "TON",
         subText: "Circulating Supply (Upbit)",
-        tooltip: "go",
+        tooltip: (
+          <div className="text-center">
+            Circulating Supply (Upbit Standard) = <br />
+            Total Supply - DAO Vault - Vested <br />
+            <br />
+            The circulating supply, calculated by following <br />
+            Upbit’s criteria, factors in staked WTON, <br />
+            considering it available rather than locked.
+          </div>
+        ),
       },
       {
         value: "2,078,036",
         unit: "TON",
         subText: "Burned",
         link: "",
-        tooltip: "go",
+        tooltip: (
+          <div className="text-center">
+            The total TON that has been <br /> burned to date.
+          </div>
+        ),
       },
     ],
   },
@@ -88,21 +126,38 @@ const DashboardItemList: DashboardItem[] = [
         unit: "TON",
         subText: "DAO Vault **",
         link: "",
-        tooltip: "go",
+        tooltip: (
+          <div className="text-center">
+            TON securely held within the DAO <br /> vault for an indefinite
+            period.
+          </div>
+        ),
       },
       {
         value: "21,748,568",
         unit: "TON",
         subText: "Staked *",
         link: "",
-        tooltip: "go",
+        tooltip: (
+          <div className="text-center">
+            The total TON currently staked <br /> in staking contracts.
+          </div>
+        ),
       },
       {
         value: "0",
         unit: "TON",
         subText: "Vested **",
         link: "",
-        tooltip: "go",
+        tooltip: (
+          <div className="text-center">
+            The number indicates the amount of TON <br /> undergoing vesting.
+            For more specifics on <br />
+            allocations among different entities, refer to the <br /> raw data
+            sheet. All vesting concluded on
+            <br /> December 26, 2023, at 5:00:00 AM GMT+09:00.
+          </div>
+        ),
       },
     ],
   },
@@ -113,20 +168,43 @@ const DashboardItemList: DashboardItem[] = [
       {
         value: "50,640,664",
         unit: "TON",
-        tooltip: "go",
         subText: "113,841,295 USD",
+        tooltip: (
+          <div className="text-center">
+            C1 = Total Supply - DAO Vault - Staked - Vested <br />
+            <br />A supply metric representing the TON that is <br />
+            immediately available for conversion to cash. <br />
+            Please note that TON from TONStarter mining
+            <br /> (which has ended), TON in vesting (now complete),
+            <br /> and TON locked indefinitely in the DAO Vault are
+            <br /> excluded from the C1 calculation.
+          </div>
+        ),
       },
       {
         value: "70,710,265",
         unit: "TON",
-        tooltip: "go",
         subText: "159,299,620 USD",
+        tooltip: (
+          <div className="text-center">
+            C2 = C1 + Staked TON <br />
+            <br /> A supply metric focused on TON locked <br />
+            for the short term (less than 3 months),
+            <br /> which considers staked TON.
+          </div>
+        ),
       },
       {
         value: "70,710,265",
         unit: "TON",
-        tooltip: "go",
         subText: "159,299,620 USD",
+        tooltip: (
+          <div className="text-center">
+            C3 = C2 <br />
+            <br />A supply measure considering a relatively <br />
+            long term (greater than 1 year) locked TON.
+          </div>
+        ),
       },
     ],
   },

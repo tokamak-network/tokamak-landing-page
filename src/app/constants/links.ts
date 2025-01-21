@@ -17,3 +17,7 @@ export const LINKS = {
   DUNE_DASHBOARD:
     "https://dune.com/tokamak-network/tokamak-network-tokenomics-dashboard",
 };
+
+export const PRICE_LINKS = {
+  
+}

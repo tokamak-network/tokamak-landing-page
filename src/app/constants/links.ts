@@ -19,5 +19,6 @@ export const LINKS = {
 };
 
 export const PRICE_LINKS = {
-  
-}
+  spreadSheet:
+    "https://docs.google.com/spreadsheets/d/1-4dT3nS4q7RwLgGI6rQ7M1hPx9XHI-Ryw1rkBCvTdcs/edit#gid=681869004",
+};

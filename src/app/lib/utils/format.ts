@@ -14,3 +14,14 @@ export const formatCurrencyString = (value: number | string): string => {
 
   return value.replace(number, formatNumber(parseFloat(number)));
 };
+
+export const formatInteger = (num: number): string => {
+  // 소수점 둘째자리까지 반올림
+  const roundedNum = Number(num.toFixed(2));
+
+  const [integerPart, decimalPart] = roundedNum.toString().split(".");
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  // 소수부가 있으면 .xx 형태로, 없으면 정수부만
+  return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+};

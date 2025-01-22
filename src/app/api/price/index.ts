@@ -60,7 +60,7 @@ const getSuuplyInfo = async (): Promise<{
   }
 };
 
-export const fetchCarouselDatas = async () => {
+export const fetchPriceDatas = async () => {
   const [priceInfo, krwToUsdRate, stakingVolume, suuplyInfo] =
     await Promise.all([
       fetchTONPriceInfo(),
@@ -69,32 +69,58 @@ export const fetchCarouselDatas = async () => {
       getSuuplyInfo(),
     ]);
 
-  const usdPrice = Math.round(priceInfo.trade_price * krwToUsdRate * 100) / 100;
+  const usdCurrentPrice =
+    Math.round(priceInfo.trade_price * krwToUsdRate * 100) / 100;
 
   const tradingVolumeUSD = Math.floor(
-    priceInfo.acc_trade_volume_24h * usdPrice
+    priceInfo.acc_trade_volume_24h * usdCurrentPrice
   );
-  const marketCap = Math.floor(usdPrice * suuplyInfo.C1);
-  const fullyDilutedValuation = Math.floor(usdPrice * suuplyInfo.totalSupply);
+  const marketCap = Math.floor(usdCurrentPrice * suuplyInfo.C1);
+  const fullyDilutedValuation = Math.floor(
+    usdCurrentPrice * suuplyInfo.totalSupply
+  );
 
   return {
     tonPrice: {
-      usd: usdPrice,
-      krw: priceInfo.trade_price,
+      current: {
+        usd: usdCurrentPrice,
+        krw: priceInfo.trade_price,
+      },
+      opening: {
+        usd: priceInfo.opening_price,
+        krw: priceInfo.opening_price * krwToUsdRate,
+      },
+      closing: {
+        usd: priceInfo.prev_closing_price,
+        krw: priceInfo.prev_closing_price * krwToUsdRate,
+      },
     },
     marketCap,
     tradingVolumeUSD,
     fullyDilutedValuation,
     totalSupply: suuplyInfo.totalSupply,
-    totalSupplyUSD: Math.floor(suuplyInfo.totalSupply * usdPrice),
+    totalSupplyUSD: Math.floor(suuplyInfo.totalSupply * usdCurrentPrice),
     circulatingSupply: suuplyInfo.C1,
-    circulatingSupplyUSD: Math.floor(suuplyInfo.C1 * usdPrice),
-    circulatingSuupplyUpbitStandard: suuplyInfo.C2,
+    circulatingSupplyUSD: Math.floor(suuplyInfo.C1 * usdCurrentPrice),
+    circulatingSuupplyUpbitStandard:
+      suuplyInfo.totalSupply - stakingVolume.DAOStaked,
     burnedSupply: suuplyInfo.burned,
-    burnedSupplyUSD: Math.floor(suuplyInfo.burned * usdPrice),
+    burnedSupplyUSD: Math.floor(suuplyInfo.burned * usdCurrentPrice),
     stakedVolume: stakingVolume.currentStaked,
-    stakedVolumeUSD: Math.floor(stakingVolume.currentStaked * usdPrice),
+    stakedVolumeUSD: Math.floor(stakingVolume.currentStaked * usdCurrentPrice),
     DAOStakedVolume: stakingVolume.DAOStaked,
-    DAOStakedVolumeUSD: Math.floor(stakingVolume.DAOStaked * usdPrice),
+    DAOStakedVolumeUSD: Math.floor(stakingVolume.DAOStaked * usdCurrentPrice),
+    liquidity: {
+      c1: suuplyInfo.C1,
+      c2: suuplyInfo.C1 + suuplyInfo.C2,
+      c3: suuplyInfo.C1 + suuplyInfo.C2 + suuplyInfo.C3,
+    },
+    liquidityUSD: {
+      c1: Math.floor(suuplyInfo.C1 * usdCurrentPrice),
+      c2: Math.floor((suuplyInfo.C1 + suuplyInfo.C2) * usdCurrentPrice),
+      c3: Math.floor(
+        (suuplyInfo.C1 + suuplyInfo.C2 + suuplyInfo.C3) * usdCurrentPrice
+      ),
+    },
   };
 };

@@ -1,4 +1,4 @@
-import { fetchCarouselDatas } from "@/app/api/carousel";
+import { fetchPriceDatas } from "@/app/api/price";
 import CarouselList from "./CarouselList";
 import { CarouselDisplayProps } from "./types";
 
@@ -18,7 +18,7 @@ export default async function CarouselWrapper() {
     stakedVolumeUSD,
     DAOStakedVolume,
     DAOStakedVolumeUSD,
-  } = await fetchCarouselDatas();
+  } = await fetchPriceDatas();
 
   const carouselDatas: CarouselDisplayProps[] = [
     {

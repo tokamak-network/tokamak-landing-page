@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { PriceCard } from "./PriceCard";
 import Arrow from "@/assets/icons/common/arrow.svg";
-import { fetchPriceInfo } from "@/app/api/carousel";
+import { fetchPriceInfo } from "@/app/api/price";
 
 {
   /* Price Section */

@@ -1,3 +1,4 @@
+let currentUsdPrice = 1000; // 초기값 설정
 const fetchTONPriceInfo = async () => {
   try {
     const response = await fetch(
@@ -80,11 +81,15 @@ export const fetchPriceDatas = async () => {
     usdCurrentPrice * suuplyInfo.totalSupply
   );
 
+  currentUsdPrice += 1;
+
   return {
     tonPrice: {
       current: {
-        usd: usdCurrentPrice,
-        krw: priceInfo.trade_price,
+        // usd: usdCurrentPrice,
+        usd: currentUsdPrice,
+        // krw: priceInfo.trade_price,
+        krw: Math.floor(Math.random() * 9000) + 1000,
       },
       opening: {
         usd: priceInfo.opening_price,

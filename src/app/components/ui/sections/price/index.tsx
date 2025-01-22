@@ -1,7 +1,7 @@
 import { CLIP_PATHS } from "@/app/constants/styles";
 import PriceDashboard from "./PriceDashboard";
-import SectionHeader from "./SectionHeader";
-import { FocusedBackground } from "./FocusedBackground";
+import SectionHeader from "./client/SectionHeader";
+import { FocusedBackground } from "./client/FocusedBackground";
 
 export default function Price() {
   return (

@@ -3,11 +3,11 @@ import Image from "next/image";
 import sendIcon from "@/assets/icons/common/send.svg";
 import questionIcon from "@/assets/icons/common/question.svg";
 import Tooltip from "@/app/components/shared/Tooltip";
-import refreshIcon from "@/assets/icons/price/refresh.svg";
-import refreshIconHover from "@/assets/icons/price/refresh_hover.svg";
 import { PRICE_LINKS } from "@/app/constants/links";
 import { fetchPriceDatas } from "@/app/api/price";
-import { formatCurrencyString, formatInteger } from "@/app/lib/utils/format";
+import { formatInteger } from "@/app/lib/utils/format";
+import { RefreshButton } from "./client/RefreshButton";
+import { AnimatedValue } from "./client/AnimatedValue";
 
 const getGridColsClass = (
   isPrice: boolean,
@@ -72,21 +72,7 @@ const DashboardGridItem = async (props: DashboardItem) => {
     <div>
       <div className="flex justify-between">
         <h1>{title}</h1>
-        {isPrice && (
-          <button className="w-[136px] h-[33px] border border-tokamak-black rounded-[16.5px] flex items-center px-[12px] gap-x-[9px] text-[14px] hover:bg-tokamak-black hover:text-white transition-colors group">
-            <Image
-              src={refreshIcon}
-              alt={"refresh icon"}
-              className="group-hover:hidden"
-            />
-            <Image
-              src={refreshIconHover}
-              alt={"refresh icon hover"}
-              className="hidden group-hover:block"
-            />
-            Live Update
-          </button>
-        )}
+        {isPrice && <RefreshButton />}
         {isSupply && (
           <span className="text-[11px]">
             <a
@@ -103,13 +89,13 @@ const DashboardGridItem = async (props: DashboardItem) => {
       </div>
 
       <div
-        className={`w-full grid ${gridColsClass} gpax-x-[auto] gap-y-[60px] justify-between`}
+        className={`w-full grid ${gridColsClass} gpax-x-[auto] gap-y-[60px]`}
       >
         {subItems.map((item, index) => (
           <div className="flex flex-col leading-normal gap-y-[3px]" key={index}>
             <div className="flex items-baseline h-[51px] leading-[51px]">
               <h1 className={`${isPrice ? "text-[42px]" : "text-[33px]"}`}>
-                {item.value}
+                <AnimatedValue value={item.value} />
               </h1>
               <span className="text-[15px] ml-[3px]">{item.unit}</span>
               {item.link && (
@@ -265,7 +251,7 @@ export default async function DashboardGrid() {
               Total Supply - DAO Vault - Vested <br />
               <br />
               The circulating supply, calculated by following <br />
-              Upbit’s criteria, factors in staked WTON, <br />
+              Upbit's criteria, factors in staked WTON, <br />
               considering it available rather than locked.
             </div>
           ),

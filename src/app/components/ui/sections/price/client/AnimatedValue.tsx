@@ -26,8 +26,6 @@ export function AnimatedValue({ value }: AnimatedValueProps) {
     }, 1800);
   }, [value]);
 
-  console.log("ready", ready);
-
   // 변경된 자릿수 확인
   const shouldRoll = (index: number, curr: string, prev: string) => {
     if (!prev) return false;

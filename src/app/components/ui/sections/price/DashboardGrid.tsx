@@ -70,8 +70,8 @@ const DashboardGridItem = async (props: DashboardItem) => {
 
   return (
     <div>
-      <div className="flex justify-between">
-        <h1>{title}</h1>
+      <div className="flex justify-between items-end">
+        <h1 className="font-[600]">{title}</h1>
         {isPrice && <RefreshButton />}
         {isSupply && (
           <span className="text-[11px]">
@@ -207,7 +207,7 @@ export default async function DashboardGrid() {
           value: `${formatInteger(totalSupply)}`,
           unit: "TON",
           subText: "Total Supply",
-          link: "https://etherscan.io/address/0x0b55a0f463b6defb81c6063973763951712d0e5f#readProxyContract#F64",
+          link: PRICE_LINKS.totalSupply,
           tooltip: (
             <div className="text-center">
               The cumulative TON generated until the present <br />
@@ -251,7 +251,7 @@ export default async function DashboardGrid() {
               Total Supply - DAO Vault - Vested <br />
               <br />
               The circulating supply, calculated by following <br />
-              Upbit's criteria, factors in staked WTON, <br />
+              Upbit&apos;s criteria, factors in staked WTON, <br />
               considering it available rather than locked.
             </div>
           ),
@@ -260,7 +260,7 @@ export default async function DashboardGrid() {
           value: `${formatInteger(burnedSupply)}`,
           unit: "TON",
           subText: "Burned",
-          link: "",
+          link: PRICE_LINKS.burnedSupply,
           tooltip: (
             <div className="text-center">
               The total TON that has been <br /> burned to date.

@@ -26,9 +26,9 @@ export default async function CarouselWrapper() {
       datas: [
         {
           label: "TON Price",
-          info: tonPrice.usd,
+          info: tonPrice.current.usd,
           currency: "USD",
-          conversion: `₩ ${tonPrice.krw}`,
+          conversion: `₩ ${tonPrice.current.krw}`,
         },
         {
           label: "Market Cap",

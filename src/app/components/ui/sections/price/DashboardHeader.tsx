@@ -40,11 +40,10 @@ const DashboardItem = (props: {
 
 export default function DashboardHeader() {
   return (
-    <div className="flex flex-col gap-y-[120px]">
+    <div className="flex flex-col gap-y-[120px] mt-[120px] max-[1000px]:mt-[60px]">
       <div
         className="flex items-center justify-center gap-x-[25px]
-      max-[995px]:flex-col max-[995px]:min-[500px]:mt-[114px] max-[499px]:mt-[104px]
-      "
+      max-[995px]:flex-col"
       >
         <section className="flex flex-col items-center justify-center gap-y-[30px] max-w-[495px]">
           <div className="flex flex-col gap-y-[24px] text-left">
@@ -59,7 +58,7 @@ export default function DashboardHeader() {
               Network&apos;s ecosystem and performance.
             </p>
           </div>
-          <div className="flex w-full gap-x-[15px]">
+          <div className="flex w-full gap-x-[15px] max-[500px]:flex-col max-[500px]:gap-y-[15px] max-[500px]:items-center">
             <button className="w-[200px] h-[40px] rounded-[20px] bg-tokamak-black text-white text-[14px] font-normal">
               <a href={LINKS.GET_TON} target="_blank" rel="noopener noreferrer">
                 Buy TON(Tokamak)

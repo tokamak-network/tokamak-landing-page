@@ -14,7 +14,7 @@ export function FocusedBackground({ children }: { children: React.ReactNode }) {
       }}
     >
       <div
-        className="flex flex-col items-center pt-[60px] pb-[120px] gap-y-[90px] relative bg-white"
+        className="flex flex-col items-center pb-[120px] gap-y-[90px] relative bg-white"
         style={{
           clipPath: CLIP_PATHS.polygon,
         }}

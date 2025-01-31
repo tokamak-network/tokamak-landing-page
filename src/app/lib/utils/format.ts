@@ -1,8 +1,10 @@
-export const formatNumber = (num: number | string): string => {
+export const formatNumber = (num?: number | string): string => {
+  if (!num) return "";
   return num.toLocaleString("en-US");
 };
 
-export const formatCurrencyString = (value: number | string): string => {
+export const formatCurrencyString = (value?: number | string): string => {
+  if (!value) return "";
   // 숫자 타입인 경우 바로 포맷팅
   if (typeof value === "number") {
     return formatNumber(value);

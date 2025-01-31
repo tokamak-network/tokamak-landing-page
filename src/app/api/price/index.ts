@@ -1,7 +1,3 @@
-let currentUsdPrice = 1000; // 초기값 설정
-
-
-
 const fetchTONPriceInfo = async () => {
   try {
     const response = await fetch(
@@ -83,8 +79,6 @@ export const fetchPriceDatas = async () => {
   const fullyDilutedValuation = Math.floor(
     usdCurrentPrice * suuplyInfo.totalSupply
   );
-
-  currentUsdPrice += 1;
 
   return {
     tonPrice: {

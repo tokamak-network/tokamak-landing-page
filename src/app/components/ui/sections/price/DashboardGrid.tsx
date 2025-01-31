@@ -71,7 +71,7 @@ const DashboardGridItem = async (props: DashboardItem) => {
   return (
     <div>
       <div className="flex justify-between items-end">
-        <h1 className="font-[600]">{title}</h1>
+        <h1 className="font-[600] text-[21px]">{title}</h1>
         {isPrice && <RefreshButton />}
         {isSupply && (
           <span className="text-[11px]">
@@ -365,7 +365,7 @@ export default async function DashboardGrid() {
   ];
 
   return (
-    <div className="flex flex-col gap-y-[120px]">
+    <div className="flex flex-col gap-y-[120px] max-[760px]:gap-y-[90px]">
       {dashboardItemList.map((item, index) => (
         <DashboardGridItem key={index} {...item} />
       ))}

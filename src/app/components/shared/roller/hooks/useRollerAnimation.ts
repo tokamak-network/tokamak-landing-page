@@ -40,23 +40,23 @@ export function useRollerAnimation(
   const prevTokenAmount = useRef(0);
 
   const getValueDiffIndexes = () => {
-    const diffIndexes = [];
     const prevString = prevValue.current.toString().replace(".", "");
     const curString = value.toString().replace(".", "");
 
-    for (let i = 0; i < Math.min(prevString.length, curString.length); i++) {
-      if (prevString[i] !== curString[i]) {
-        diffIndexes.push(i);
-      }
-    }
+    // 첫 번째로 다른 숫자가 나오는 위치 찾기
+    const firstDiffIndex = [...curString].findIndex(
+      (num, i) => num !== prevString[i]
+    );
 
-    if (curString.length > prevString.length) {
-      for (let i = prevString.length; i < curString.length; i++) {
-        diffIndexes.push(i);
-      }
-    }
+    if (firstDiffIndex === -1) return [];
 
-    return diffIndexes;
+    // 첫 번째 다른 숫자부터 끝까지의 모든 인덱스 반환
+    return Array.from(
+      {
+        length: Math.max(prevString.length, curString.length) - firstDiffIndex,
+      },
+      (_, i) => firstDiffIndex + i
+    );
   };
 
   useGSAP(

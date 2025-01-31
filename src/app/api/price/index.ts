@@ -60,6 +60,8 @@ const getSuuplyInfo = async (): Promise<{
   }
 };
 
+let currentUsdPrice = 1000;
+
 export const fetchPriceDatas = async () => {
   const [priceInfo, krwToUsdRate, stakingVolume, suuplyInfo] =
     await Promise.all([
@@ -80,13 +82,15 @@ export const fetchPriceDatas = async () => {
     usdCurrentPrice * suuplyInfo.totalSupply
   );
 
+  currentUsdPrice += 5;
+
   return {
     tonPrice: {
       current: {
-        usd: usdCurrentPrice,
-        // usd: currentUsdPrice,
-        krw: priceInfo.trade_price,
-        // krw: Math.floor(Math.random() * 9000) + 1000,
+        // usd: usdCurrentPrice,
+        usd: currentUsdPrice,
+        // krw: priceInfo.trade_price,
+        krw: Math.floor(Math.random() * 9000) + 1000,
       },
       opening: {
         usd: priceInfo.opening_price,

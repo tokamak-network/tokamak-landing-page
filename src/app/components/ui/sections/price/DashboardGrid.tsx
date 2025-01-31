@@ -93,27 +93,29 @@ const DashboardGridItem = async (props: DashboardItem) => {
       >
         {subItems.map((item, index) => (
           <div className="flex flex-col leading-normal gap-y-[3px]" key={index}>
-            <div className="flex items-baseline h-[51px] leading-[51px]">
+            <div className="flex h-[51px] leading-[51px] items-center">
               <h1 className={`${isPrice ? "text-[42px]" : "text-[33px]"}`}>
                 <AnimatedValue value={item.value} />
               </h1>
-              <span className="text-[15px] ml-[3px]">{item.unit}</span>
-              {item.link && (
-                <a
-                  href={item.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ml-[3px]"
-                >
-                  <Image
-                    src={sendIcon}
-                    alt={"link limage"}
-                    style={{
-                      cursor: "pointer",
-                    }}
-                  />
-                </a>
-              )}
+              <div className="flex pt-[12px] items-baseline">
+                <span className="text-[15px] ml-[3px]">{item.unit}</span>
+                {item.link && (
+                  <a
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-[3px] pt-[12px]"
+                  >
+                    <Image
+                      src={sendIcon}
+                      alt={"link limage"}
+                      style={{
+                        cursor: "pointer",
+                      }}
+                    />
+                  </a>
+                )}
+              </div>
             </div>
             <div className="flex gap-x-[3px] h-[16px] leading-[16px]">
               <span className="text-[13px]">

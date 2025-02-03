@@ -80,6 +80,9 @@ const DashboardGridItem = async (props: DashboardItem) => {
               target="_blank"
               rel="noopener noreferrer"
               className="text-tokamak-blue"
+              style={{
+                textDecoration: "underline",
+              }}
             >
               Raw data
             </a>{" "}

@@ -22,26 +22,42 @@ const CircleComponent = () => {
   }, [isMd, isSm]);
 
   useEffect(() => {
+    let isAnimating = true;
+
+    const resetAnimation = () => {
+      leftControls.stop();
+      rightControls.stop();
+      leftControls.set({
+        rotate: 180,
+        translateX: 0,
+      });
+      rightControls.set({
+        rotate: 0,
+        translateX: 0,
+      });
+    };
+
     const animate = async () => {
-      while (true) {
-        // 회전 애니메이션 병렬 실행
+      resetAnimation();
+
+      while (isAnimating) {
         await Promise.all([
           leftControls.start({
-            rotate: [180, 360], // 180 + 360
+            rotate: [180, 360],
             transition: { duration: 4, ease: "linear" },
           }),
           rightControls.start({
-            rotate: -360, // 반시계 방향
+            rotate: -360,
             transition: { duration: 4, ease: "linear" },
           }),
         ]);
 
-        // 이동 전에 오른쪽 반원 즉시 180도 회전
+        if (!isAnimating) break;
+
         await rightControls.set({
           rotate: 180,
         });
 
-        // 이동 애니메이션 병렬 실행
         await Promise.all([
           leftControls.start({
             translateX: traslateXPoint,
@@ -53,26 +69,19 @@ const CircleComponent = () => {
           }),
         ]);
 
-        // 초기화 병렬 실행
-        await Promise.all([
-          leftControls.set({
-            rotate: 180,
-            translateX: 0,
-          }),
-          rightControls.set({
-            rotate: 0,
-            translateX: 0,
-          }),
-        ]);
+        if (!isAnimating) break;
+
+        resetAnimation();
       }
     };
 
     animate();
+
     return () => {
-      leftControls.stop();
-      rightControls.stop();
+      isAnimating = false;
+      resetAnimation();
     };
-  }, [traslateXPoint]);
+  }, [leftControls, rightControls, traslateXPoint]);
 
   return (
     <div className="relative flex animate-[spin_20s_linear_infinite]">

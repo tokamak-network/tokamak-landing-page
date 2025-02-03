@@ -33,31 +33,13 @@ const aboutItems = [
   },
 ];
 
-export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
+export const NavItem: React.FC<NavItemProps> = ({
+  label,
+  icon,
+  setIsMobileMenuOpen,
+}) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { isMobile } = useIsMobile(640);
-
-  // if (label === "About") {
-  //   if (isMobile) {
-  //     return (
-  //       <Link
-  //         href="/about"
-  //         className="flex items-center text-[24px] font-bold h-[70px]"
-  //       >
-  //         <span className="text-[#1C1C1C] transition-colors duration-200">
-  //           {label}
-  //         </span>
-  //       </Link>
-  //     );
-  //   }
-  //   return (
-  //     <Link href="/about" className="h-full flex items-center">
-  //       <span className="text-[#1C1C1C] font-['Proxima_Nova'] text-base font-medium leading-normal hover:text-tokamak-blue transition-colors duration-200">
-  //         {label}
-  //       </span>
-  //     </Link>
-  //   );
-  // }
 
   const items: NavItemType[] =
     label === "Developer"
@@ -71,7 +53,9 @@ export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
       <div className="w-full">
         <div
           className="flex items-center justify-between w-full cursor-pointer group h-[70px]"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            setIsOpen(!isOpen);
+          }}
         >
           <span className="text-[#1C1C1C] text-[24px] font-bold transition-colors duration-200">
             {label}
@@ -102,17 +86,30 @@ export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
         {/* 모바일 드롭다운 메뉴 */}
         {isOpen && (
           <div className="flex flex-col ">
-            {items?.map((item, index) => (
-              <a
-                key={index}
-                className="text-[#1C1C1C] text-[16px] hover:text-[#0078FF] transition-colors duration-200 h-[43px] flex items-center"
-                href={item.link}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {item.name}
-              </a>
-            ))}
+            {items?.map((item, index) =>
+              item.isExternal ? (
+                <a
+                  key={index}
+                  className="text-[#1C1C1C] text-[16px] hover:text-[#0078FF] transition-colors duration-200 h-[43px] flex items-center"
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {item.name}
+                </a>
+              ) : (
+                <Link
+                  key={index}
+                  href={item.link}
+                  className="text-[#1C1C1C] text-[16px] hover:text-[#0078FF] transition-colors duration-200 h-[43px] flex items-center"
+                  onClick={() =>
+                    setIsMobileMenuOpen && setIsMobileMenuOpen(false)
+                  }
+                >
+                  {item.name}
+                </Link>
+              )
+            )}
           </div>
         )}
       </div>

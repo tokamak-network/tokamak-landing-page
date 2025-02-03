@@ -94,7 +94,11 @@ export default function NavigationBar() {
             <ul>
               {navItems.map((item, index) => (
                 <li key={index} className={`${item.className}`}>
-                  <NavItem label={item.label} icon={item.icon} />
+                  <NavItem
+                    label={item.label}
+                    icon={item.icon}
+                    setIsMobileMenuOpen={setIsMobileMenuOpen}
+                  />
                 </li>
               ))}
             </ul>

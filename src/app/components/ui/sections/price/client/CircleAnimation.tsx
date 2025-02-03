@@ -22,60 +22,78 @@ const CircleComponent = () => {
   }, [isMd, isSm]);
 
   useEffect(() => {
+    let isSubscribed = true;
+
     const animate = async () => {
-      // First rotation animation
-      await Promise.all([
-        leftControls.start({
-          rotate: [180, 360],
-          transition: { duration: 4, ease: "linear" },
-        }),
-        rightControls.start({
-          rotate: -360,
-          transition: { duration: 4, ease: "linear" },
-        }),
-      ]);
+      if (!isSubscribed) return;
 
-      // Set right circle position
-      await rightControls.start({
-        rotate: 180,
-        transition: { duration: 0 },
-      });
+      try {
+        // First rotation animation
+        await Promise.all([
+          leftControls.start({
+            rotate: [180, 360],
+            transition: { duration: 4, ease: "linear" },
+          }),
+          rightControls.start({
+            rotate: -360,
+            transition: { duration: 4, ease: "linear" },
+          }),
+        ]);
 
-      // Translation animation
-      await Promise.all([
-        leftControls.start({
-          translateX: traslateXPoint,
-          transition: { duration: 1, ease: "linear" },
-        }),
-        rightControls.start({
-          translateX: -traslateXPoint,
-          transition: { duration: 1, ease: "linear" },
-        }),
-      ]);
+        if (!isSubscribed) return;
 
-      // Reset positions
-      await Promise.all([
-        leftControls.start({
+        // Set right circle position
+        await rightControls.start({
           rotate: 180,
-          translateX: 0,
           transition: { duration: 0 },
-        }),
-        rightControls.start({
-          rotate: 0,
-          translateX: 0,
-          transition: { duration: 0 },
-        }),
-      ]);
+        });
 
-      // Continue the animation
-      animate();
+        if (!isSubscribed) return;
+
+        // Translation animation
+        await Promise.all([
+          leftControls.start({
+            translateX: traslateXPoint,
+            transition: { duration: 1, ease: "linear" },
+          }),
+          rightControls.start({
+            translateX: -traslateXPoint,
+            transition: { duration: 1, ease: "linear" },
+          }),
+        ]);
+
+        if (!isSubscribed) return;
+
+        // Reset positions
+        await Promise.all([
+          leftControls.start({
+            rotate: 180,
+            translateX: 0,
+            transition: { duration: 0 },
+          }),
+          rightControls.start({
+            rotate: 0,
+            translateX: 0,
+            transition: { duration: 0 },
+          }),
+        ]);
+
+        if (!isSubscribed) return;
+
+        // Continue the animation with requestAnimationFrame
+        requestAnimationFrame(animate);
+      } catch (error) {
+        console.error("Animation error:", error);
+      }
     };
 
     const timeoutId = setTimeout(animate, 500);
 
     return () => {
+      isSubscribed = false;
       clearTimeout(timeoutId);
       leftControls.stop();
+      rightControls.stop();
     };
   }, [leftControls, rightControls, traslateXPoint]);
 

@@ -75,7 +75,7 @@ export default function DashboardHeader() {
             </button>
           </div>
         </section>
-        <CircleAnimation />
+        {/* <CircleAnimation /> */}
       </div>
       <div className="flex gap-x-[60px] max-[760px]:flex-col max-[760px]:gap-y-[18px]">
         {DashboardItemList.map((item) => (

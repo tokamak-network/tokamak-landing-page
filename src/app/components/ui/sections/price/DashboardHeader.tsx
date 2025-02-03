@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Send from "@/assets/icons/common/send.svg";
 import { LINKS } from "@/app/constants/links";
-import CircleAnimation from "./client/CircleAnimation";
+// import CircleAnimation from "./client/CircleAnimation";
 
 const DashboardItemList: {
   Icon: React.ComponentType;

@@ -5,10 +5,10 @@ import { useRef } from "react";
 import { useEffect } from "react";
 interface AnimatedValueProps {
   value: string;
+  isPrice: boolean;
 }
 
-export function AnimatedValue({ value }: AnimatedValueProps) {
-
+export function AnimatedValue({ value, isPrice }: AnimatedValueProps) {
   const prevValueRef = useRef<number>(0);
   const currentValue = Number(value.replace(/,/g, ""));
 
@@ -19,10 +19,10 @@ export function AnimatedValue({ value }: AnimatedValueProps) {
   return (
     <div className="h-full">
       <Roller
-        value={Number(value.replace(/,/g, ""))}
+        value={parseInt(value.replace(/,/g, ""))}
         rollDuration={2}
         diff={true}
-        fontSize={33}
+        fontSize={isPrice ? 42 : 33}
         rollWay={currentValue > prevValueRef.current ? "up" : "down"}
       />
     </div>

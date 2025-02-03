@@ -68,6 +68,8 @@ const DashboardGridItem = async (props: DashboardItem) => {
     gridCols
   );
 
+  console.log("isPrice", isPrice);
+
   return (
     <div>
       <div className="flex justify-between items-end">
@@ -95,7 +97,7 @@ const DashboardGridItem = async (props: DashboardItem) => {
           <div className="flex flex-col leading-normal gap-y-[3px]" key={index}>
             <div className="flex h-[51px] leading-[51px] items-center">
               <h1 className={`${isPrice ? "text-[42px]" : "text-[33px]"}`}>
-                <AnimatedValue value={item.value} />
+                <AnimatedValue value={item.value} isPrice={isPrice} />
               </h1>
               <div className="flex pt-[12px] items-baseline">
                 <span className="text-[15px] ml-[3px]">{item.unit}</span>
@@ -208,7 +210,7 @@ export default async function DashboardGrid() {
         {
           value: `${formatInteger(totalSupply)}`,
           unit: "TON",
-          subText: "Total Supply",
+          subText: "Total Supply *",
           link: PRICE_LINKS.totalSupply,
           tooltip: (
             <div className="text-center">

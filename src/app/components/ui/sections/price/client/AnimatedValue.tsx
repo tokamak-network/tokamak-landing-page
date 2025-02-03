@@ -26,9 +26,6 @@ export function AnimatedValue({ value, isPrice }: AnimatedValueProps) {
         diff={true}
         fontSize={isPrice ? 42 : 33}
         rollWay={currentValue > prevValueRef.current ? "up" : "down"}
-        style={{
-          fontFamily: "proxima-nova, sans-serif", // 폰트 이름 수정
-        }}
       />
     </div>
   );

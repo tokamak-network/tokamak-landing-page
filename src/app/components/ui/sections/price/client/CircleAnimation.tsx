@@ -22,63 +22,60 @@ const CircleComponent = () => {
   }, [isMd, isSm]);
 
   useEffect(() => {
-    let isAnimating = true;
-
-    // const resetAnimation = () => {
-    //   leftControls.stop();
-    //   rightControls.stop();
-    //   leftControls.set({
-    //     rotate: 180,
-    //     translateX: 0,
-    //   });
-    //   rightControls.set({
-    //     rotate: 0,
-    //     translateX: 0,
-    //   });
-    // };
-
     const animate = async () => {
-      while (isAnimating) {
-        if (!isAnimating) break;
-        await Promise.all([
-          leftControls.start({
-            rotate: [180, 360],
-            transition: { duration: 4, ease: "linear" },
-          }),
-          rightControls.start({
-            rotate: -360,
-            transition: { duration: 4, ease: "linear" },
-          }),
-        ]);
+      // First rotation animation
+      await Promise.all([
+        leftControls.start({
+          rotate: [180, 360],
+          transition: { duration: 4, ease: "linear" },
+        }),
+        rightControls.start({
+          rotate: -360,
+          transition: { duration: 4, ease: "linear" },
+        }),
+      ]);
 
-        await rightControls.set({
+      // Set right circle position
+      await rightControls.start({
+        rotate: 180,
+        transition: { duration: 0 },
+      });
+
+      // Translation animation
+      await Promise.all([
+        leftControls.start({
+          translateX: traslateXPoint,
+          transition: { duration: 1, ease: "linear" },
+        }),
+        rightControls.start({
+          translateX: -traslateXPoint,
+          transition: { duration: 1, ease: "linear" },
+        }),
+      ]);
+
+      // Reset positions
+      await Promise.all([
+        leftControls.start({
           rotate: 180,
-        });
+          translateX: 0,
+          transition: { duration: 0 },
+        }),
+        rightControls.start({
+          rotate: 0,
+          translateX: 0,
+          transition: { duration: 0 },
+        }),
+      ]);
 
-        await Promise.all([
-          leftControls.start({
-            translateX: traslateXPoint,
-            transition: { duration: 1, ease: "linear" },
-          }),
-          rightControls.start({
-            translateX: -traslateXPoint,
-            transition: { duration: 1, ease: "linear" },
-          }),
-        ]);
-
-        if (!isAnimating) break;
-
-        // resetAnimation();
-      }
+      // Continue the animation
+      animate();
     };
 
     const timeoutId = setTimeout(animate, 500);
 
     return () => {
-      isAnimating = false;
       clearTimeout(timeoutId);
       leftControls.stop();
-      rightControls.stop();
     };
   }, [leftControls, rightControls, traslateXPoint]);
 

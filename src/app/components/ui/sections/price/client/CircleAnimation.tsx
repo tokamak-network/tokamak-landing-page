@@ -5,7 +5,7 @@ import HalfCircleImage from "@/assets/images/price/half_circle.svg";
 
 import Image from "next/image";
 import { motion, useAnimationControls } from "framer-motion";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useIsMobile } from "@/app/hooks/layout/useIsMobile";
 
 const CircleComponent = () => {
@@ -20,6 +20,23 @@ const CircleComponent = () => {
     if (isMd) return 180;
     return 235;
   }, [isMd, isSm]);
+
+  const resetAnimation = useCallback(() => {
+    leftControls.stop();
+    rightControls.stop();
+    leftControls.set({
+      rotate: 180,
+      translateX: 0,
+    });
+    rightControls.set({
+      rotate: 0,
+      translateX: 0,
+    });
+  }, [leftControls, rightControls]);
+
+  useEffect(() => {
+    resetAnimation();
+  }, [traslateXPoint, resetAnimation]);
 
   useEffect(() => {
     let isSubscribed = true;

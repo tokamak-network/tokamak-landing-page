@@ -68,8 +68,6 @@ const DashboardGridItem = async (props: DashboardItem) => {
     gridCols
   );
 
-  console.log("isPrice", isPrice);
-
   return (
     <div>
       <div className="flex justify-between items-end">
@@ -99,7 +97,11 @@ const DashboardGridItem = async (props: DashboardItem) => {
               <h1 className={`${isPrice ? "text-[42px]" : "text-[33px]"}`}>
                 <AnimatedValue value={item.value} isPrice={isPrice} />
               </h1>
-              <div className="flex pt-[12px] items-baseline">
+              <div
+                className={`flex ${
+                  isPrice ? "pt-[20px]" : "pt-[12px]"
+                } items-baseline`}
+              >
                 <span className="text-[15px] ml-[3px]">{item.unit}</span>
                 {item.link && (
                   <a

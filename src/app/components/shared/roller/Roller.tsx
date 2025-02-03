@@ -16,6 +16,7 @@ interface RollerProps {
   diff?: boolean;
   rollWay?: "up" | "down";
   showAfterFontNameLoaded?: string[];
+  style?: React.CSSProperties;
 }
 
 export default function Roller({
@@ -30,6 +31,7 @@ export default function Roller({
   diff = false,
   rollWay = "down",
   showAfterFontNameLoaded = [],
+  style,
 }: RollerProps) {
   const id = useId();
   const tokens = useRollerTokens(id, value, rollWay);
@@ -66,6 +68,7 @@ export default function Roller({
       className={`${styles.roller} ${styles[align]}`}
       style={{
         fontSize: `${fontSize}px`,
+        ...style,
       }}
     >
       {suffix != "" && suffixPosition === "front" && (

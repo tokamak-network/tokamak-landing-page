@@ -41,6 +41,7 @@ const CircleComponent = () => {
       resetAnimation();
 
       while (isAnimating) {
+        if (!isAnimating) break;
         await Promise.all([
           leftControls.start({
             rotate: [180, 360],
@@ -51,8 +52,6 @@ const CircleComponent = () => {
             transition: { duration: 4, ease: "linear" },
           }),
         ]);
-
-        if (!isAnimating) break;
 
         await rightControls.set({
           rotate: 180,

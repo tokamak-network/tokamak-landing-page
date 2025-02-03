@@ -59,12 +59,12 @@ export default function DashboardHeader() {
             </p>
           </div>
           <div className="flex w-full gap-x-[15px] max-[500px]:flex-col max-[500px]:gap-y-[15px] max-[500px]:items-center">
-            <button className="w-[200px] h-[40px] rounded-[20px] bg-tokamak-black text-white text-[14px] font-normal">
+            <button className="w-[200px] h-[40px] rounded-[20px] bg-tokamak-black text-white text-[14px] font-normal hover:bg-tokamak-blue hover:text-white transition-all duration-300">
               <a href={LINKS.GET_TON} target="_blank" rel="noopener noreferrer">
                 Buy TON(Tokamak)
               </a>
             </button>
-            <button className="w-[200px] h-[40px] rounded-[20px] bg-white text-tokamak-black text-[14px] font-normal border border-tokamak-black">
+            <button className="w-[200px] h-[40px] rounded-[20px] bg-white text-tokamak-black text-[14px] font-normal border border-tokamak-black hover:bg-tokamak-black hover:text-white transition-all duration-300">
               <a
                 href={LINKS.DUNE_DASHBOARD}
                 target="_blank"

@@ -79,6 +79,8 @@ const CircleComponent = () => {
 
     return () => {
       isAnimating = false;
+      leftControls.stop();
+      rightControls.stop();
     };
   }, [leftControls, rightControls, traslateXPoint]);
 

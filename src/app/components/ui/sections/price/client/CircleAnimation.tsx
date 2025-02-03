@@ -24,18 +24,18 @@ const CircleComponent = () => {
   useEffect(() => {
     let isAnimating = true;
 
-    const resetAnimation = () => {
-      leftControls.stop();
-      rightControls.stop();
-      leftControls.set({
-        rotate: 180,
-        translateX: 0,
-      });
-      rightControls.set({
-        rotate: 0,
-        translateX: 0,
-      });
-    };
+    // const resetAnimation = () => {
+    //   leftControls.stop();
+    //   rightControls.stop();
+    //   leftControls.set({
+    //     rotate: 180,
+    //     translateX: 0,
+    //   });
+    //   rightControls.set({
+    //     rotate: 0,
+    //     translateX: 0,
+    //   });
+    // };
 
     const animate = async () => {
       while (isAnimating) {
@@ -68,7 +68,7 @@ const CircleComponent = () => {
 
         if (!isAnimating) break;
 
-        resetAnimation();
+        // resetAnimation();
       }
     };
 

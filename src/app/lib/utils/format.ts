@@ -17,7 +17,8 @@ export const formatCurrencyString = (value?: number | string): string => {
   return value.replace(number, formatNumber(parseFloat(number)));
 };
 
-export const formatInteger = (num: number): string => {
+export const formatInteger = (num?: number): string => {
+  if (num === undefined) return "-";
   // 소수점 둘째자리까지 반올림
   const roundedNum = Number(num.toFixed(2));
 

@@ -32,8 +32,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="font-proxima">
+    <html lang="en" suppressHydrationWarning className="font-proxima">
       <body
+        suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <FocusProvider>{children}</FocusProvider>

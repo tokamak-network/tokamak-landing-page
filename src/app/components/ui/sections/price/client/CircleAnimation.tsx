@@ -72,10 +72,11 @@ const CircleComponent = () => {
       }
     };
 
-    animate();
+    const timeoutId = setTimeout(animate, 500);
 
     return () => {
       isAnimating = false;
+      clearTimeout(timeoutId);
       leftControls.stop();
       rightControls.stop();
     };

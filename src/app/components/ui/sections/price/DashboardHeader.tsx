@@ -79,7 +79,7 @@ export default function DashboardHeader() {
       </div>
       <div className="flex gap-x-[60px] max-[760px]:flex-col max-[760px]:gap-y-[18px]">
         {DashboardItemList.map((item) => (
-          <DashboardItem {...item} key={item.Icon.displayName} />
+          <DashboardItem {...item} key={item.content} />
         ))}
       </div>
     </div>

@@ -75,7 +75,13 @@ export default function Roller({
         <div className={styles.suffix}>{suffix}</div>
       )}
       <div className={`${styles.values} values`} data-roller-id={id}>
-        <div className={`${styles["token-container"]} ${styles[rollWay]}`}>
+        <div
+          className={`${styles["token-container"]} ${styles[rollWay]}`}
+          style={{
+            letterSpacing: "-0.02em",
+            fontFeatureSettings: '"tnum" on, "lnum" on',
+          }}
+        >
           {tokens}
         </div>
       </div>

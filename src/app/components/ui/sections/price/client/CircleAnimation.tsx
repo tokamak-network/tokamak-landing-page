@@ -24,60 +24,63 @@ const CircleComponent = () => {
   useEffect(() => {
     let isAnimating = true;
 
-    const resetAnimation = () => {
-      leftControls.stop();
-      rightControls.stop();
-      leftControls.set({
-        rotate: 180,
-        translateX: 0,
-      });
-      rightControls.set({
-        rotate: 0,
-        translateX: 0,
-      });
-    };
-
     const animate = async () => {
-      resetAnimation();
+      try {
+        // 초기 상태를 motion 컴포넌트의 initial prop으로 이동
+        while (isAnimating) {
+          // 회전 애니메이션
+          await Promise.all([
+            leftControls.start({
+              rotate: 360,
+              transition: { duration: 4, ease: "linear" },
+            }),
+            rightControls.start({
+              rotate: -360,
+              transition: { duration: 4, ease: "linear" },
+            }),
+          ]);
 
-      while (isAnimating) {
-        if (!isAnimating) break;
-        await Promise.all([
-          leftControls.start({
-            rotate: [180, 360],
-            transition: { duration: 4, ease: "linear" },
-          }),
-          rightControls.start({
-            rotate: -360,
-            transition: { duration: 4, ease: "linear" },
-          }),
-        ]);
+          if (!isAnimating) break;
 
-        await rightControls.set({
-          rotate: 180,
-        });
+          // 이동 애니메이션
+          await Promise.all([
+            leftControls.start({
+              translateX: traslateXPoint,
+              transition: { duration: 1, ease: "linear" },
+            }),
+            rightControls.start({
+              translateX: -traslateXPoint,
+              transition: { duration: 1, ease: "linear" },
+            }),
+          ]);
 
-        await Promise.all([
-          leftControls.start({
-            translateX: traslateXPoint,
-            transition: { duration: 1, ease: "linear" },
-          }),
-          rightControls.start({
-            translateX: -traslateXPoint,
-            transition: { duration: 1, ease: "linear" },
-          }),
-        ]);
+          if (!isAnimating) break;
 
-        if (!isAnimating) break;
-
-        resetAnimation();
+          // 초기 상태로 리셋 (start를 사용하여 즉시 변경)
+          await Promise.all([
+            leftControls.start({
+              rotate: 180,
+              translateX: 0,
+              transition: { duration: 0 },
+            }),
+            rightControls.start({
+              rotate: 0,
+              translateX: 0,
+              transition: { duration: 0 },
+            }),
+          ]);
+        }
+      } catch (error) {
+        console.error("Animation error:", error);
       }
     };
 
-    animate();
+    // 컴포넌트가 마운트된 후 애니메이션 시작
+    const timeoutId = setTimeout(animate, 100);
 
     return () => {
       isAnimating = false;
+      clearTimeout(timeoutId);
       leftControls.stop();
       rightControls.stop();
     };
@@ -86,17 +89,13 @@ const CircleComponent = () => {
   return (
     <div className="relative flex animate-[spin_20s_linear_infinite]">
       {/* 왼쪽 원 */}
-      <div
-        className="relative left-0  price-md:w-[225px]
-      max-[995px]:min-[500px]:w-[180px]
-      max-[499px]:w-[160px] price-md:h-[225px] max-[995px]:min-[500px]:h-[180px]
-      max-[499px]:h-[160px]"
-      >
+      <div className="relative left-0 price-md:w-[225px] max-[995px]:min-[500px]:w-[180px] max-[499px]:w-[160px] price-md:h-[225px] max-[995px]:min-[500px]:h-[180px] max-[499px]:h-[160px]">
         <div className="absolute inset-0">
           <Image src={CircleImage} alt="circle animation" />
         </div>
         <motion.div
           className="absolute inset-0"
+          initial={{ rotate: 180, translateX: 0 }}
           animate={leftControls}
           style={{
             zIndex: 100,
@@ -108,18 +107,13 @@ const CircleComponent = () => {
       </div>
 
       {/* 오른쪽 원 */}
-      <div
-        className="relative
-        price-md:w-[225px]
-      max-[995px]:min-[500px]:w-[180px]
-      max-[499px]:w-[160px] price-md:h-[225px] max-[995px]:min-[500px]:h-[180px]
-      max-[499px]:h-[160px]"
-      >
+      <div className="relative price-md:w-[225px] max-[995px]:min-[500px]:w-[180px] max-[499px]:w-[160px] price-md:h-[225px] max-[995px]:min-[500px]:h-[180px] max-[499px]:h-[160px]">
         <div className="absolute">
           <Image src={CircleImage} alt="circle animation" />
         </div>
         <motion.div
           className="absolute inset-0"
+          initial={{ rotate: 0, translateX: 0 }}
           animate={rightControls}
           style={{ zIndex: 100, transformOrigin: "center" }}
         >

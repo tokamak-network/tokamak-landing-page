@@ -125,14 +125,16 @@ export const fetchPriceDatas = async () => {
     liquidity: {
       c1: suuplyInfo.C1,
       c2: suuplyInfo.C1 + suuplyInfo.C2,
-      c3: suuplyInfo.C1 + suuplyInfo.C2 + suuplyInfo.C3,
+      c3: suuplyInfo.C1 + suuplyInfo.C2,
+      // c3: suuplyInfo.C1 + suuplyInfo.C2 + suuplyInfo.C3,
     },
     liquidityUSD: {
       c1: Math.floor(suuplyInfo.C1 * usdCurrentPrice),
       c2: Math.floor((suuplyInfo.C1 + suuplyInfo.C2) * usdCurrentPrice),
-      c3: Math.floor(
-        (suuplyInfo.C1 + suuplyInfo.C2 + suuplyInfo.C3) * usdCurrentPrice
-      ),
+      c3: Math.floor((suuplyInfo.C1 + suuplyInfo.C2) * usdCurrentPrice),
+      // c3: Math.floor(
+      //   (suuplyInfo.C1 + suuplyInfo.C2 + suuplyInfo.C3) * usdCurrentPrice
+      // ),
     },
   };
 };

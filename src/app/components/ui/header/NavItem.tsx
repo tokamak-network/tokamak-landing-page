@@ -22,13 +22,22 @@ const aboutItems = [
     isExternal: false,
   },
   {
+    name: "Price Dashboard",
+    link: "/about/price",
+    isExternal: false,
+  },
+  {
     name: "Partners",
     link: "/about/partners",
     isExternal: false,
   },
 ];
 
-export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
+export const NavItem: React.FC<NavItemProps> = ({
+  label,
+  icon,
+  setIsMobileMenuOpen,
+}) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { isMobile } = useIsMobile(640);
 
@@ -44,7 +53,9 @@ export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
       <div className="w-full">
         <div
           className="flex items-center justify-between w-full cursor-pointer group h-[70px]"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            setIsOpen(!isOpen);
+          }}
         >
           <span className="text-[#1C1C1C] text-[24px] font-bold transition-colors duration-200">
             {label}
@@ -91,6 +102,9 @@ export const NavItem: React.FC<NavItemProps> = ({ label, icon }) => {
                   key={index}
                   href={item.link}
                   className="text-[#1C1C1C] text-[16px] hover:text-[#0078FF] transition-colors duration-200 h-[43px] flex items-center"
+                  onClick={() =>
+                    setIsMobileMenuOpen && setIsMobileMenuOpen(false)
+                  }
                 >
                   {item.name}
                 </Link>

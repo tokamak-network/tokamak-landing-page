@@ -30,7 +30,7 @@ import NguyenImage from "@/assets/members/member=Nguyen Zung.png";
 import JamesImage from "@/assets/members/member=James Bello.png";
 import ParthImage from "@/assets/members/member=Parth Patel.png";
 import JasonImage from "@/assets/members/member=Jason Hwang.png";
-// import IntizarImage from "@/assets/members/member=Intizar Tashov.jpg";
+import IntizarImage from "@/assets/members/member=Intizar Tashov.png";
 
 const teamMembers = [
   {
@@ -179,11 +179,11 @@ const teamMembers = [
     role: "Software Engineer",
     imageUrl: JamesImage,
   },
-  // {
-  //   name: "Intizar Tashov",
-  //   role: "Software Engineer",
-  //   imageUrl: IntizarImage,
-  // },
+  {
+    name: "Intizar Tashov",
+    role: "Software Engineer",
+    imageUrl: IntizarImage,
+  },
 ];
 
 const TeamGrid: React.FC = () => {

@@ -13,7 +13,6 @@ import RyanImage from "@/assets/members/member=Ryan Murray.png";
 import EugeneImage from "@/assets/members/member=Eugene Cho.png";
 import HarveyImage from "@/assets/members/member=Harvey Jo.png";
 import SuhyeonImage from "@/assets/members/member=Suhyeon Lee.png";
-import DylanImage from "@/assets/members/member=Dylan Zhu.png";
 import NamImage from "@/assets/members/member=Pham Tien Nam.png";
 import JakeImage from "@/assets/members/member=Jake Jang.png";
 import ShrutiImage from "@/assets/members/member=Shruti Shrivastava.png";
@@ -103,11 +102,6 @@ const teamMembers = [
     name: "Nguyen Zung",
     role: "Blockchain Engineer",
     imageUrl: NguyenImage,
-  },
-  {
-    name: "Dylan Zhu",
-    role: "Software Engineer",
-    imageUrl: DylanImage,
   },
   {
     name: "Pham Tien Nam",

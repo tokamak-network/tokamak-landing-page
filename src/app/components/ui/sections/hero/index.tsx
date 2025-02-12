@@ -198,7 +198,7 @@ export const Hero: React.FC = () => {
 
   return (
     <div
-      className="h-[860px] w-full overflow-hidden relative bg-white
+      className="h-[860px] [@media(max-width:700px)]:!h-[700px] w-full overflow-hidden relative bg-white
         // 오른쪽 그라데이션 (800px 이상에서만)
         after:content-['']
         after:absolute
@@ -240,7 +240,7 @@ export const Hero: React.FC = () => {
           bg-[linear-gradient(to_bottom,transparent,white_60px,white_90px)]
           pointer-events-none z-10"
       />
-      <div className="flex items-center justify-center pt-[115px] w-full h-full absolute top-0 left-0">
+      <div className="flex items-center justify-center pt-[115px]  w-full h-full absolute top-0 left-0">
         <HeroSection />
       </div>
 

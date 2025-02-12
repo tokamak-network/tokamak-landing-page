@@ -1,7 +1,12 @@
+const FETCH_OPTIONS = {
+  next: { revalidate: 60 },
+} as const;
+
 const fetchTONPriceInfo = async () => {
   try {
     const response = await fetch(
-      "https://api.upbit.com/v1/ticker?markets=KRW-tokamak"
+      "https://api.upbit.com/v1/ticker?markets=KRW-tokamak",
+      FETCH_OPTIONS
     );
     const data = await response.json();
     return JSON.parse(JSON.stringify(data).replace(/]|[[]/g, ""));
@@ -12,17 +17,23 @@ const fetchTONPriceInfo = async () => {
 };
 
 const getUSDPrice = async () => {
-  const response = await fetch("https://open.er-api.com/v6/latest/KRW");
+  const response = await fetch(
+    "https://open.er-api.com/v6/latest/KRW",
+    FETCH_OPTIONS
+  );
   const data = await response.json();
   return data.rates.USD;
 };
 
 const getStakingVolume = async () => {
   const [currentStaked, DAOStaked] = await Promise.all([
-    fetch("https://price.api.tokamak.network/staking/current").then((res) =>
-      res.json()
+    fetch(
+      "https://price.api.tokamak.network/staking/current",
+      FETCH_OPTIONS
+    ).then((res) => res.json()),
+    fetch("https://price.api.tokamak.network/supply", FETCH_OPTIONS).then(
+      (res) => res.json()
     ),
-    fetch("https://price.api.tokamak.network/supply").then((res) => res.json()),
   ]);
 
   return {
@@ -41,11 +52,12 @@ const getSuuplyInfo = async (): Promise<{
 }> => {
   try {
     const [circulationSupply, totalSupplyData] = await Promise.all([
-      fetch("https://price.api.tokamak.network/circulationSupply").then((res) =>
-        res.json()
-      ),
-      fetch("https://price.api.tokamak.network/supply").then((res) =>
-        res.json()
+      fetch(
+        "https://price.api.tokamak.network/circulationSupply",
+        FETCH_OPTIONS
+      ).then((res) => res.json()),
+      fetch("https://price.api.tokamak.network/supply", FETCH_OPTIONS).then(
+        (res) => res.json()
       ),
     ]);
 
@@ -113,14 +125,16 @@ export const fetchPriceDatas = async () => {
     liquidity: {
       c1: suuplyInfo.C1,
       c2: suuplyInfo.C1 + suuplyInfo.C2,
-      c3: suuplyInfo.C1 + suuplyInfo.C2 + suuplyInfo.C3,
+      c3: suuplyInfo.C1 + suuplyInfo.C2,
+      // c3: suuplyInfo.C1 + suuplyInfo.C2 + suuplyInfo.C3,
     },
     liquidityUSD: {
       c1: Math.floor(suuplyInfo.C1 * usdCurrentPrice),
       c2: Math.floor((suuplyInfo.C1 + suuplyInfo.C2) * usdCurrentPrice),
-      c3: Math.floor(
-        (suuplyInfo.C1 + suuplyInfo.C2 + suuplyInfo.C3) * usdCurrentPrice
-      ),
+      c3: Math.floor((suuplyInfo.C1 + suuplyInfo.C2) * usdCurrentPrice),
+      // c3: Math.floor(
+      //   (suuplyInfo.C1 + suuplyInfo.C2 + suuplyInfo.C3) * usdCurrentPrice
+      // ),
     },
   };
 };

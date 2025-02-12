@@ -13,7 +13,6 @@ import RyanImage from "@/assets/members/member=Ryan Murray.png";
 import EugeneImage from "@/assets/members/member=Eugene Cho.png";
 import HarveyImage from "@/assets/members/member=Harvey Jo.png";
 import SuhyeonImage from "@/assets/members/member=Suhyeon Lee.png";
-import DylanImage from "@/assets/members/member=Dylan Zhu.png";
 import NamImage from "@/assets/members/member=Pham Tien Nam.png";
 import JakeImage from "@/assets/members/member=Jake Jang.png";
 import ShrutiImage from "@/assets/members/member=Shruti Shrivastava.png";
@@ -30,7 +29,7 @@ import NguyenImage from "@/assets/members/member=Nguyen Zung.png";
 import JamesImage from "@/assets/members/member=James Bello.png";
 import ParthImage from "@/assets/members/member=Parth Patel.png";
 import JasonImage from "@/assets/members/member=Jason Hwang.png";
-import IntizarImage from "@/assets/members/member=Intizar Tashov.jpg";
+import IntizarImage from "@/assets/members/member=Intizar Tashov.png";
 
 const teamMembers = [
   {
@@ -105,11 +104,6 @@ const teamMembers = [
     imageUrl: NguyenImage,
   },
   {
-    name: "Dylan Zhu",
-    role: "Software Engineer",
-    imageUrl: DylanImage,
-  },
-  {
     name: "Pham Tien Nam",
     role: "L2 Engineer",
     imageUrl: NamImage,
@@ -179,11 +173,11 @@ const teamMembers = [
     role: "Software Engineer",
     imageUrl: JamesImage,
   },
-  // {
-  //   name: "Intizar Tashov",
-  //   role: "Software Engineer",
-  //   imageUrl: IntizarImage,
-  // },
+  {
+    name: "Intizar Tashov",
+    role: "Software Engineer",
+    imageUrl: IntizarImage,
+  },
 ];
 
 const TeamGrid: React.FC = () => {

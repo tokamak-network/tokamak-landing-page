@@ -50,10 +50,10 @@ export default function NavigationBar() {
             <button
               className="sm:hidden"
               onClick={(e) => {
+                e.preventDefault(); // 기본 동작 방지
                 e.stopPropagation(); // 이벤트 버블링 방지
                 setIsMobileMenuOpen(true);
               }}
-              onTouchEnd={() => setIsMobileMenuOpen(true)}
             >
               <Image src={HamburgerMenu} alt="Hamburger Menu" />
             </button>
@@ -71,8 +71,8 @@ export default function NavigationBar() {
       {/* 모바일 메뉴 */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-white z-[60] sm:hidden">
-          <div className="flex justify-between items-center p-6">
-            <Link href="/">
+          <div className="flex justify-end items-center p-6">
+            {/* <Link href="/">
               <figure className="flex items-center gap-2">
                 <Image
                   loading="lazy"
@@ -85,13 +85,23 @@ export default function NavigationBar() {
                   alt="Tokamak Network"
                 />
               </figure>
-            </Link>
+            </Link> */}
             <button onClick={() => setIsMobileMenuOpen(false)} className="p-2">
               <Image src={CloseGray} alt="Close" />
             </button>
           </div>
           <nav className="px-[36px] py-[20px]">
             <ul>
+              <li>
+                <Link
+                  href="/"
+                  className="flex items-center text-[24px] font-bold h-[70px]"
+                >
+                  <span className="text-[#1C1C1C] transition-colors duration-200">
+                    Home
+                  </span>
+                </Link>
+              </li>
               {navItems.map((item, index) => (
                 <li key={index} className={`${item.className}`}>
                   <NavItem

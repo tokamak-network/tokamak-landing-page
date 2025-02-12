@@ -23,7 +23,7 @@ export default function NewsSection({ posts }: { posts: Post[] }) {
             ? "tokamak-network"
             : activeFilter.toLowerCase();
         return categories.some(
-          (category) => category.toLowerCase() === activeFilterLowerCase
+          (category: string) => category.toLowerCase() === activeFilterLowerCase
         );
       })
       .slice(0, 3);
@@ -102,7 +102,7 @@ export default function NewsSection({ posts }: { posts: Post[] }) {
           [@media(max-width:830px)]:justify-center"
         >
           {filteredPosts?.map((post) => (
-            <NewsCard key={post.guid} post={post} />
+            <NewsCard key={post.title} post={post} category={activeFilter} />
           ))}
         </div>
       </div>

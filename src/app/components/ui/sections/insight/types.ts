@@ -3,21 +3,18 @@ export interface PriceCardProps {
   label: string;
 }
 
-export interface Post {
+export interface MediumPost {
   title: string;
   pubDate: string;
   link: string;
-  guid: string;
   author: string;
-  thumbnail: string;
-  description: string;
-  content: string;
-  enclosure: Record<string, unknown>;
+  thumbnail: string | undefined;
+  content: string | undefined;
   categories: string[];
 }
 
 export interface NewsCardProps {
-  post: Post;
+  post: MediumPost;
 }
 
 export type FilterType = "All" | "News" | "Tokamak Network" | "Research";

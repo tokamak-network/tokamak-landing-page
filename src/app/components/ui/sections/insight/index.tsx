@@ -1,6 +1,5 @@
 import InsightBackground from "./Background";
 import NewsSection from "./news";
-// import PriceSection from "./price";
 import { fetchMediumPosts } from "@/app/api/medium";
 
 export default async function Insights() {
@@ -18,7 +17,6 @@ export default async function Insights() {
       >
         <div className="w-full max-w-[1200px] flex flex-col gap-y-[90px] [@media(max-width:830px)]:gap-y-[60px]">
           <NewsSection posts={posts} />
-          {/* <PriceSection /> */}
         </div>
       </div>
     </InsightBackground>

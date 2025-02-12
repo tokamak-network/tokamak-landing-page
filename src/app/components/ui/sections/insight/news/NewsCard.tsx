@@ -18,7 +18,9 @@ export function NewsCard({
       post.categories.find((category) =>
         validCategories.includes(category.toLowerCase())
       ) || post.categories[0];
-    return displayCategory;
+    if (displayCategory === "tokamak-network") return "Tokamak Network";
+    if (displayCategory === "research") return "Research";
+    if (displayCategory === "news") return "News";
   }, [category, post.categories]);
 
   return (

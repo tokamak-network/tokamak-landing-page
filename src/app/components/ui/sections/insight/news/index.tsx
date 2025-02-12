@@ -1,7 +1,7 @@
 "use client";
 
 import { NewsCard } from "./NewsCard";
-import { FilterType, Post } from "../types";
+import { FilterType, MediumPost } from "../types";
 import { useMemo, useState } from "react";
 import { LINKS } from "@/app/constants/links";
 
@@ -10,7 +10,7 @@ const styles = {
     "h-[33px] px-[30px] border border-[#1C1C1C] text-[14px] rounded-[16.5px]",
 };
 
-export default function NewsSection({ posts }: { posts: Post[] }) {
+export default function NewsSection({ posts }: { posts: MediumPost[] }) {
   const [activeFilter, setActiveFilter] = useState<FilterType>("All");
 
   const filteredPosts = useMemo(() => {

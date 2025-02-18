@@ -12,6 +12,7 @@
     "@gsap/react": "^2.1.2",
     "axios": "^1.7.9",
     "cheerio": "^1.0.0",
+    "date-fns": "^4.1.0",
     "font-proxima-nova": "^1.0.1",
     "fontfaceobserver": "^2.3.0",
     "framer-motion": "^11.18.1",

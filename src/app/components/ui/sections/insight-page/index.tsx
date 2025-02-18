@@ -7,7 +7,6 @@ import InsightGrid from "./InsightGrid";
 
 export default function ExploringInsight({ posts }: { posts: MediumPost[] }) {
   const { isFocused } = useFocus();
-  console.log("posts", posts);
   return (
     <div className="w-full h-full text-[#1C1C1C]">
       {/* TOP AREA FOR CLIP PATH */}
@@ -47,7 +46,7 @@ export default function ExploringInsight({ posts }: { posts: MediumPost[] }) {
         }}
       >
         <div
-          className="flex flex-col items-center pt-[60px] pb-[120px] gap-y-[90px] relative bg-white"
+          className="flex flex-col items-center pt-[60px] pb-[90px] gap-y-[90px] relative bg-white"
           style={{
             clipPath: CLIP_PATHS.polygon,
           }}

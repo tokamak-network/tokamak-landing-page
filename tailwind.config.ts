@@ -10,6 +10,8 @@ export default {
   theme: {
     extend: {
       screens: {
+        "max-400": { max: "400px" },
+        "400px": "400px",
         "550px": "550px",
         md: "800px",
         "price-md": "995px",

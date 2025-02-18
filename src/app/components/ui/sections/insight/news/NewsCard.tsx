@@ -28,9 +28,12 @@ export function NewsCard({
       href={post.link}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex flex-col w-full max-w-[360px] text-[#1C1C1C] cursor-pointer group"
+      className="flex flex-col w-full max-w-[360px] max-400:max-w-[330px] text-[#1C1C1C] cursor-pointer group"
     >
-      <div className="relative w-full h-[198px] rounded-lg overflow-hidden mb-4">
+      <div
+        className="relative w-full h-[198px] max-400:h-[181px]  overflow-hidden mb-4 rounded-[14px]
+      "
+      >
         <Image
           src={post.thumbnail || DefaultThumbnail}
           alt={post.title}

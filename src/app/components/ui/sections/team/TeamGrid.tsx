@@ -30,6 +30,7 @@ import JamesImage from "@/assets/members/member=James Bello.png";
 import ParthImage from "@/assets/members/member=Parth Patel.png";
 import JasonImage from "@/assets/members/member=Jason Hwang.png";
 import IntizarImage from "@/assets/members/member=Intizar Tashov.png";
+import AryanImage from "@/assets/members/member=Aryan Soni.png";
 
 const teamMembers = [
   {
@@ -177,6 +178,11 @@ const teamMembers = [
     name: "Intizar Tashov",
     role: "Software Engineer",
     imageUrl: IntizarImage,
+  },
+  {
+    name: "Aryan Soni",
+    role: "Blockchain Engineer",
+    imageUrl: AryanImage,
   },
 ];
 

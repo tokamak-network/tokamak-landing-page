@@ -84,24 +84,24 @@ export function InsightMainCard({
   );
 }
 
-export function InsightCard({
-  post,
-  category,
-}: {
-  post: MediumPost;
-  category: string;
-}) {
-  const categoryName = useMemo(() => {
-    if (category !== "All") return category;
-    const validCategories = ["news", "tokamak-network", "research"];
-    const displayCategory =
-      post.categories.find((category) =>
-        validCategories.includes(category.toLowerCase())
-      ) || post.categories[0];
-    if (displayCategory === "tokamak-network") return "Tokamak Network";
-    if (displayCategory === "research") return "Research";
-    if (displayCategory === "news") return "News";
-  }, [category, post.categories]);
+// export function InsightCard({
+//   post,
+//   category,
+// }: {
+//   post: MediumPost;
+//   category: string;
+// }) {
+//   const categoryName = useMemo(() => {
+//     if (category !== "All") return category;
+//     const validCategories = ["news", "tokamak-network", "research"];
+//     const displayCategory =
+//       post.categories.find((category) =>
+//         validCategories.includes(category.toLowerCase())
+//       ) || post.categories[0];
+//     if (displayCategory === "tokamak-network") return "Tokamak Network";
+//     if (displayCategory === "research") return "Research";
+//     if (displayCategory === "news") return "News";
+//   }, [category, post.categories]);
 
-  return <div className="flex flex-col gap-y-[60px] text-tokamak-black"></div>;
-}
+//   return <div className="flex flex-col gap-y-[60px] text-tokamak-black"></div>;
+// }

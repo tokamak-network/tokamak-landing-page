@@ -137,7 +137,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/about/team"
+                    href="/about/price"
                     className="hover:text-tokamak-blue transition-colors text-[#252525]"
                   >
                     Price Dashboard
@@ -145,7 +145,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/about/team"
+                    href="/about/partners"
                     className="hover:text-tokamak-blue transition-colors text-[#252525]"
                   >
                     Partners
@@ -153,7 +153,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/about/team"
+                    href="/about/insight"
                     className="hover:text-tokamak-blue transition-colors text-[#252525]"
                   >
                     Insight

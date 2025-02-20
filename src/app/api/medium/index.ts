@@ -18,6 +18,23 @@ interface CustomItem {
   categories: string[];
 }
 
+function processCategories(categories: string[]): string[] {
+  const validCategories = ["news", "tokamak-network", "research"];
+
+  // 유효한 카테고리가 하나라도 있는지 확인
+  const hasValidCategory = categories.some((category) =>
+    validCategories.includes(category.toLowerCase())
+  );
+
+  // 유효한 카테고리가 없으면 tokamak-network 추가
+  if (!hasValidCategory) {
+    return [...categories, "tokamak-network"];
+  }
+
+  // 유효한 카테고리가 있으면 원래 배열 반환
+  return categories;
+}
+
 class MediumFeedParser {
   private parser: Parser<CustomFeed, CustomItem>;
   private baseUrl: string;
@@ -89,7 +106,7 @@ class MediumFeedParser {
             author: item.author || "",
             thumbnail: thumbnail,
             content: item["content:encoded"],
-            categories: item.categories,
+            categories: processCategories(item.categories),
           };
         })
       );

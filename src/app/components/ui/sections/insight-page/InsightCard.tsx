@@ -30,6 +30,7 @@ export function InsightMainCard({
     if (displayCategory === "tokamak-network") return "Tokamak Network";
     if (displayCategory === "research") return "Research";
     if (displayCategory === "news") return "News";
+    return "Tokamak Network";
   }, [category, post.categories]);
 
   const relativeTime = formatRelativeTime(post.pubDate);

@@ -27,7 +27,7 @@ export default function InsightGrid({ posts }: { posts: MediumPost[] }) {
           (category: string) => category.toLowerCase() === activeFilterLowerCase
         );
       })
-      .slice(0, 3);
+      .slice(0, 10);
   }, [posts, activeFilter]);
 
   return (

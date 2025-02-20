@@ -78,10 +78,9 @@ export function InsightMainCard({
       />
       <div
         className="flex flex-col pt-[30px]
-      group-hover:text-tokamak-blue transition-colors
       "
       >
-        <h1 className="text-[30px] font-bold  h->[37px] max-w-[530px]">
+        <h1 className="text-[30px] font-bold  h->[37px] max-w-[530px] group-hover:text-tokamak-blue transition-colors">
           {post.title}
         </h1>
         <div className="flex gap-x-[15px]">

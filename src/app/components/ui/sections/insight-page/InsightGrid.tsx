@@ -108,7 +108,7 @@ export default function InsightGrid({ posts }: { posts: MediumPost[] }) {
           href={LINKS.MEDIUM}
           target="_blank"
           rel="noopener noreferrer"
-          className={`${styles.button} w-[150px] h-[40px] hover:bg-tokamak-blue  hover:border-tokamak-blue  hover:text-white font-bold leading-[36px] text-center `}
+          className={`${styles.button} w-[150px] h-[40px] hover:bg-tokamak-blue  hover:border-tokamak-blue  hover:text-white font-bold leading-[36px] text-center rounded-[20px]`}
           key={"more"}
         >
           More +

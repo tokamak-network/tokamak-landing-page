@@ -47,7 +47,10 @@ export function InsightMainCard({
               alt={post.title}
               width={570}
               height={320}
-              className="object-cover rounded-[14px]"
+              className="object-cover rounded-[14px]
+              border
+          border-[#DEDEDE]
+              "
             />
           </div>
           <div className="flex justify-between items-center text-sm mb-2 w-full max-w-[570px]">
@@ -74,7 +77,10 @@ export function InsightMainCard({
         alt={post.title}
         width={600}
         height={337}
-        className="object-cover rounded-[14px]"
+        className="object-cover rounded-[14px]
+        border
+          border-[#DEDEDE]
+        "
       />
       <div
         className="flex flex-col pt-[30px]

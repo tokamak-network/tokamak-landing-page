@@ -31,7 +31,7 @@ export function NewsCard({
       className="flex flex-col w-full max-w-[360px] max-400:max-w-[330px] text-[#1C1C1C] cursor-pointer group"
     >
       <div
-        className="relative w-full h-[198px] max-400:h-[181px]  overflow-hidden mb-4 rounded-[14px]
+        className="relative w-full h-[198px] max-400:h-[181px]  overflow-hidden mb-4 rounded-[14px] border border-[#DEDEDE]
       "
       >
         <Image

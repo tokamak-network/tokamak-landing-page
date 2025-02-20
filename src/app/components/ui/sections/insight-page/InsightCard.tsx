@@ -47,7 +47,7 @@ export function InsightMainCard({
               alt={post.title}
               width={570}
               height={320}
-              className="object-cover"
+              className="object-cover rounded-[14px]"
             />
           </div>
           <div className="flex justify-between items-center text-sm mb-2 w-full max-w-[570px]">
@@ -65,16 +65,25 @@ export function InsightMainCard({
   }
 
   return (
-    <div className="flex gap-x-[60px] text-tokamak-black">
+    <div
+      className="flex gap-x-[60px] text-tokamak-black cursor-pointer group"
+      onClick={() => window.open(post.link)}
+    >
       <Image
         src={post.thumbnail || DefaultThumbnail}
         alt={post.title}
         width={600}
         height={337}
-        className="object-cover"
+        className="object-cover rounded-[14px]"
       />
-      <div className="flex flex-col pt-[30px]">
-        <h1 className="text-[30px] font-bold  h->[37px]">{post.title}</h1>
+      <div
+        className="flex flex-col pt-[30px]
+      group-hover:text-tokamak-blue transition-colors
+      "
+      >
+        <h1 className="text-[30px] font-bold  h->[37px] max-w-[530px]">
+          {post.title}
+        </h1>
         <div className="flex gap-x-[15px]">
           <span className="text-[13px] font-bold">{categoryName}</span>
           <span className="text-[13px]">{relativeTime}</span>

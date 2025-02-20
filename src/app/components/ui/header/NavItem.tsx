@@ -31,6 +31,11 @@ const aboutItems = [
     link: "/about/partners",
     isExternal: false,
   },
+  {
+    name: "Insight",
+    link: "/about/insight",
+    isExternal: false,
+  },
 ];
 
 export const NavItem: React.FC<NavItemProps> = ({

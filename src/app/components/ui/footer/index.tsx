@@ -136,6 +136,30 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
+                  <Link
+                    href="/about/team"
+                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                  >
+                    Price Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/about/team"
+                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                  >
+                    Partners
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/about/team"
+                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                  >
+                    Insight
+                  </Link>
+                </li>
+                {/* <li>
                   <a
                     href={LINKS.ONBOARDING}
                     className="hover:text-tokamak-blue transition-colors text-[#252525]"
@@ -144,7 +168,7 @@ export default function Footer() {
                   >
                     Onboarding
                   </a>
-                </li>
+                </li> */}
               </ul>
             </div>
 

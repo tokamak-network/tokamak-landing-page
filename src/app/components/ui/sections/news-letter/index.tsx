@@ -27,7 +27,10 @@ export default function NewsletterSection() {
     <div
       className={`w-full h-[300px] ${
         isFocused ? "bg-tokamak-blue" : "bg-[#1C1C1C]"
-      } flex justify-center items-center px-[25px] [@media(max-width:1000px)]:px-[15px]`}
+      } flex justify-center items-center px-[70px]
+      min-[500px]:max-[700px]:px-[50px]
+      min-[451px]:max-[500px]:px-[30px]
+      [@media(max-width:450px)]:px-[15px]`}
       onMouseEnter={() => setIsFocused(true)}
       onMouseLeave={() => setIsFocused(false)}
     >

@@ -25,7 +25,6 @@ import ShailendraImage from "@/assets/members/member=Singh Shailendra.png";
 import GeorgeImage from "@/assets/members/member=Negru George.png";
 import VictorImage from "@/assets/members/member=Victor Hazard.png";
 import KaidenImage from "@/assets/members/member=Kaiden Araki.png";
-import NguyenImage from "@/assets/members/member=Nguyen Zung.png";
 import JamesImage from "@/assets/members/member=James Bello.png";
 import ParthImage from "@/assets/members/member=Parth Patel.png";
 import JasonImage from "@/assets/members/member=Jason Hwang.png";
@@ -98,11 +97,6 @@ const teamMembers = [
     name: "Suhyeon Lee",
     role: "Researcher",
     imageUrl: SuhyeonImage,
-  },
-  {
-    name: "Nguyen Zung",
-    role: "Blockchain Engineer",
-    imageUrl: NguyenImage,
   },
   {
     name: "Pham Tien Nam",

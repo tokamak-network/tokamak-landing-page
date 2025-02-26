@@ -1,5 +1,6 @@
 const FETCH_OPTIONS = {
   next: { revalidate: 60 },
+  cache: "no-store",
 } as const;
 
 const fetchTONPriceInfo = async () => {

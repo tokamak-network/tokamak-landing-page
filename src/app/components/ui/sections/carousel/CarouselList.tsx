@@ -1,7 +1,10 @@
 "use client";
+
 import { formatCurrencyString, formatNumber } from "@/app/lib/utils/format";
 import "./carousel.css";
 import { CarouselDisplayProps } from "./types";
+import { useEffect } from "react";
+import { refreshPriceData } from "@/app/lib/price/fetchPriceData";
 
 function CarouselItem({ category, datas }: CarouselDisplayProps) {
   const categoryTitel =
@@ -62,6 +65,10 @@ export default function CarouselList({
 }: {
   carouselDatas: CarouselDisplayProps[];
 }) {
+  useEffect(() => {
+    refreshPriceData();
+  }, []);
+
   return (
     <div className="flex w-full items-center slider">
       <div className="flex items-center gap-x-[120px] text-white font-bold slideTrack">

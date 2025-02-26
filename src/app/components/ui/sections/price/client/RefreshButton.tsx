@@ -2,7 +2,7 @@
 
 import { refreshPriceData } from "@/app/lib/price/fetchPriceData";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import refreshIcon from "@/assets/icons/price/refresh.svg";
 import refreshIconHover from "@/assets/icons/price/refresh_hover.svg";
 
@@ -19,6 +19,10 @@ export function RefreshButton() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    refreshPriceData();
+  }, []);
 
   return (
     <div className="w-[136px] h-[33px] relative">

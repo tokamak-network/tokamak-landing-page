@@ -3,7 +3,7 @@
 import { formatCurrencyString, formatNumber } from "@/app/lib/utils/format";
 import "./carousel.css";
 import { CarouselDisplayProps } from "./types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { refreshPriceData } from "@/app/lib/price/fetchPriceData";
 
 function CarouselItem({ category, datas }: CarouselDisplayProps) {
@@ -65,9 +65,13 @@ export default function CarouselList({
 }: {
   carouselDatas: CarouselDisplayProps[];
 }) {
+  const [isRefreshing, setIsRefreshing] = useState(false);
   useEffect(() => {
     refreshPriceData();
+    setIsRefreshing(true);
   }, []);
+
+  if (!isRefreshing) return null;
 
   return (
     <div className="flex w-full items-center slider">

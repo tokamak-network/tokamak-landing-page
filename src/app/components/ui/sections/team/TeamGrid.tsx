@@ -9,8 +9,6 @@ import LucasImage from "@/assets/members/member=Lucas Jung.png";
 import JadenImage from "@/assets/members/member=Jaden Kong.png";
 import PraveenImage from "@/assets/members/member=Praveen Surendran.png";
 import MonicaImage from "@/assets/members/member=Monica Kim.png";
-import RyanImage from "@/assets/members/member=Ryan Murray.png";
-import EugeneImage from "@/assets/members/member=Eugene Cho.png";
 import HarveyImage from "@/assets/members/member=Harvey Jo.png";
 import SuhyeonImage from "@/assets/members/member=Suhyeon Lee.png";
 import NamImage from "@/assets/members/member=Pham Tien Nam.png";
@@ -19,16 +17,13 @@ import ShrutiImage from "@/assets/members/member=Shruti Shrivastava.png";
 import MuhammedImage from "@/assets/members/member=Muhammed Ali Bingol.png";
 import TheoImage from "@/assets/members/member=Theo Lee.png";
 import MehdiImage from "@/assets/members/member=Mehdi Beriane.png";
-import MohammadImage from "@/assets/members/member=Mohammad Rahm.png";
 import IreneImage from "@/assets/members/member=Irene Bae.png";
 import ShailendraImage from "@/assets/members/member=Singh Shailendra.png";
 import GeorgeImage from "@/assets/members/member=Negru George.png";
 import VictorImage from "@/assets/members/member=Victor Hazard.png";
 import KaidenImage from "@/assets/members/member=Kaiden Araki.png";
 import JamesImage from "@/assets/members/member=James Bello.png";
-import ParthImage from "@/assets/members/member=Parth Patel.png";
 import JasonImage from "@/assets/members/member=Jason Hwang.png";
-import IntizarImage from "@/assets/members/member=Intizar Tashov.png";
 import AryanImage from "@/assets/members/member=Aryan Soni.png";
 
 const teamMembers = [
@@ -79,16 +74,6 @@ const teamMembers = [
     imageUrl: MonicaImage,
   },
   {
-    name: "Ryan Murray",
-    role: "UX/UI Designer & Planner",
-    imageUrl: RyanImage,
-  },
-  {
-    name: "Eugene Cho",
-    role: "UXUI Planner & PM",
-    imageUrl: EugeneImage,
-  },
-  {
     name: "Harvey Jo",
     role: "Blockchain Engineer",
     imageUrl: HarveyImage,
@@ -129,16 +114,6 @@ const teamMembers = [
     imageUrl: MehdiImage,
   },
   {
-    name: "Mohammad Rahm",
-    role: "Blockchain Engineer",
-    imageUrl: MohammadImage,
-  },
-  {
-    name: "Parth Patel",
-    role: "Blockchain Engineer",
-    imageUrl: ParthImage,
-  },
-  {
     name: "Irene Bae",
     role: "HR Manager",
     imageUrl: IreneImage,
@@ -167,11 +142,6 @@ const teamMembers = [
     name: "James Bello",
     role: "Software Engineer",
     imageUrl: JamesImage,
-  },
-  {
-    name: "Intizar Tashov",
-    role: "Software Engineer",
-    imageUrl: IntizarImage,
   },
   {
     name: "Aryan Soni",

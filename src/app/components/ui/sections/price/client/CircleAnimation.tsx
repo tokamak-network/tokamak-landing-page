@@ -118,10 +118,10 @@ const CircleComponent = () => {
     <div className="relative flex animate-[spin_20s_linear_infinite]">
       {/* 왼쪽 원 */}
       <div
-        className="relative left-0  price-md:w-[225px]
-      max-[995px]:min-[500px]:w-[180px]
-      max-[499px]:w-[160px] price-md:h-[225px] max-[995px]:min-[500px]:h-[180px]
-      max-[499px]:h-[160px]"
+        className="relative left-0 
+                    [@media(min-width:996px)]:w-[225px] [@media(min-width:996px)]:h-[225px]
+                    [@media(max-width:995px)]:[@media(min-width:500px)]:w-[180px] [@media(max-width:995px)]:[@media(min-width:500px)]:h-[180px]
+                    [@media(max-width:499px)]:w-[160px] [@media(max-width:499px)]:h-[160px]"
       >
         <div className="absolute inset-0">
           <Image src={CircleImage} alt="circle animation" />
@@ -140,11 +140,10 @@ const CircleComponent = () => {
 
       {/* 오른쪽 원 */}
       <div
-        className="relative
-        price-md:w-[225px]
-      max-[995px]:min-[500px]:w-[180px]
-      max-[499px]:w-[160px] price-md:h-[225px] max-[995px]:min-[500px]:h-[180px]
-      max-[499px]:h-[160px]"
+        className="relative 
+                    [@media(min-width:996px)]:w-[225px] [@media(min-width:996px)]:h-[225px]
+                    [@media(max-width:995px)]:[@media(min-width:500px)]:w-[180px] [@media(max-width:995px)]:[@media(min-width:500px)]:h-[180px]
+                    [@media(max-width:499px)]:w-[160px] [@media(max-width:499px)]:h-[160px]"
       >
         <div className="absolute">
           <Image src={CircleImage} alt="circle animation" />
@@ -164,10 +163,10 @@ const CircleComponent = () => {
 export default function CircleAnimation() {
   return (
     <div
-      className="w-full price-md:max-w-[500px] max-[995px]:min-[500px]:max-w-[360px]
-      max-[499px]:max-w-[320px] 
-     max-[995px]:min-[500px]:mt-[114px] max-[499px]:mt-[104px]
-      "
+      className="w-full 
+                    [@media(min-width:996px)]:max-w-[500px]
+                    [@media(max-width:995px)]:[@media(min-width:500px)]:max-w-[360px] [@media(max-width:995px)]:[@media(min-width:500px)]:mt-[114px]
+                    [@media(max-width:499px)]:max-w-[320px] [@media(max-width:499px)]:mt-[104px]"
     >
       <CircleComponent />
     </div>

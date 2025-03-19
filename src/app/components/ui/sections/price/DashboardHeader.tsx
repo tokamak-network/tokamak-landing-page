@@ -40,10 +40,10 @@ const DashboardItem = (props: {
 
 export default function DashboardHeader() {
   return (
-    <div className="flex flex-col gap-y-[120px] mt-[120px] max-[1000px]:mt-[60px]">
+    <div className="flex flex-col gap-y-[120px] mt-[120px] [@media(max-width:1000px)]:mt-[60px]">
       <div
-        className="flex items-center justify-center gap-x-[25px]
-      max-[995px]:flex-col"
+        className="flex items-center justify-center gap-x-[25px] [@media(max-width:995px)]:flex-col
+      "
       >
         <section className="flex flex-col items-center justify-center gap-y-[30px] max-w-[495px]">
           <div className="flex flex-col gap-y-[24px] text-left">
@@ -58,7 +58,7 @@ export default function DashboardHeader() {
               Network&apos;s ecosystem and performance.
             </p>
           </div>
-          <div className="flex w-full gap-x-[15px] max-[500px]:flex-col max-[500px]:gap-y-[15px] max-[500px]:items-center">
+          <div className="flex w-full gap-x-[15px] [@media(max-width:500px)]:flex-col [@media(max-width:500px)]:gap-y-[15px] [@media(max-width:500px)]:items-center">
             <button className="w-[200px] h-[40px] rounded-[20px] bg-tokamak-black text-white text-[14px] font-normal hover:bg-tokamak-blue hover:text-white transition-all duration-300">
               <a href={LINKS.GET_TON} target="_blank" rel="noopener noreferrer">
                 Buy TON(Tokamak)
@@ -77,7 +77,7 @@ export default function DashboardHeader() {
         </section>
         <CircleAnimation />
       </div>
-      <div className="flex gap-x-[60px] max-[760px]:flex-col max-[760px]:gap-y-[18px]">
+      <div className="flex gap-x-[60px] [@media(max-width:760px)]:flex-col [@media(max-width:760px)]:gap-y-[18px]">
         {DashboardItemList.map((item) => (
           <DashboardItem {...item} key={item.content} />
         ))}

@@ -19,32 +19,32 @@ const getGridColsClass = (
   if (isPrice) {
     return [
       "grid-cols-3",
-      "max-[995px]:min-[601px]:grid-cols-2",
-      "max-[600px]:grid-cols-1",
+      "[@media(max-width:995px)]:[@media(min-width:601px)]:grid-cols-2",
+      "[@media(max-width:600px)]:grid-cols-1",
     ].join(" ");
   }
 
   if (isSupply) {
     return [
       "grid-cols-4",
-      "max-[995px]:min-[601px]:grid-cols-2",
-      "max-[600px]:grid-cols-1",
+      "[@media(max-width:995px)]:[@media(min-width:601px)]:grid-cols-2",
+      "[@media(max-width:600px)]:grid-cols-1",
     ].join(" ");
   }
 
   if (isLocked) {
     return [
       "grid-cols-3",
-      "max-[995px]:min-[601px]:grid-cols-2",
-      "max-[600px]:grid-cols-1",
+      "[@media(max-width:995px)]:[@media(min-width:601px)]:grid-cols-2",
+      "[@media(max-width:600px)]:grid-cols-1",
     ].join(" ");
   }
 
   if (isLiquidity) {
     return [
       "grid-cols-3",
-      "max-[995px]:min-[601px]:grid-cols-2",
-      "max-[600px]:grid-cols-1",
+      "[@media(max-width:995px)]:[@media(min-width:601px)]:grid-cols-2",
+      "[@media(max-width:600px)]:grid-cols-1",
     ].join(" ");
   }
 
@@ -372,7 +372,7 @@ export default async function DashboardGrid() {
   ];
 
   return (
-    <div className="flex flex-col gap-y-[120px] max-[760px]:gap-y-[90px]">
+    <div className="flex flex-col gap-y-[120px] [@media(max-width:760px)]:gap-y-[90px]">
       {dashboardItemList.map((item, index) => (
         <DashboardGridItem key={index} {...item} />
       ))}

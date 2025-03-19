@@ -13,7 +13,6 @@ import HarveyImage from "@/assets/members/member=Harvey Jo.png";
 import SuhyeonImage from "@/assets/members/member=Suhyeon Lee.png";
 import NamImage from "@/assets/members/member=Pham Tien Nam.png";
 import JakeImage from "@/assets/members/member=Jake Jang.png";
-import ShrutiImage from "@/assets/members/member=Shruti Shrivastava.png";
 import MuhammedImage from "@/assets/members/member=Muhammed Ali Bingol.png";
 import TheoImage from "@/assets/members/member=Theo Lee.png";
 import MehdiImage from "@/assets/members/member=Mehdi Beriane.png";
@@ -92,11 +91,6 @@ const teamMembers = [
     name: "Jake Jang",
     role: "ZKP Researcher",
     imageUrl: JakeImage,
-  },
-  {
-    name: "Shruti Shrivastava",
-    role: "Business Developer",
-    imageUrl: ShrutiImage,
   },
   {
     name: "Muhammed Ali Bingol",

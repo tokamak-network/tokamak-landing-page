@@ -17,7 +17,7 @@ import DSRV from "@/assets/partners/name=DSRV, Hover=off.svg";
 import Efg from "@/assets/partners/name=efg, Hover=off.svg";
 import Kdac from "@/assets/partners/name=kdac, Hover=off.svg";
 import METER from "@/assets/partners/name=METER, Hover=off.svg";
-import Onther from "@/assets/partners/name=Onther, Hover=off.svg";
+// import Onther from "@/assets/partners/name=Onther, Hover=off.svg";
 import Ozys from "@/assets/partners/name=ozys, Hover=off.svg";
 import Panony from "@/assets/partners/name=panony, Hover=off.svg";
 import Paycoin from "@/assets/partners/name=paycoin, Hover=off.svg";
@@ -39,7 +39,7 @@ import DSRVHover from "@/assets/partners/name=DSRV, Hover=on.svg";
 import EfgHover from "@/assets/partners/name=efg, Hover=on.svg";
 import KdacHover from "@/assets/partners/name=kdac, Hover=on.svg";
 import METERHover from "@/assets/partners/name=METER, Hover=on.svg";
-import OntherHover from "@/assets/partners/name=Onther, Hover=on.svg";
+
 import OzysHover from "@/assets/partners/name=ozys, Hover=on.svg";
 import PanonyHover from "@/assets/partners/name=panony, Hover=on.svg";
 import PaycoinHover from "@/assets/partners/name=paycoin, Hover=on.svg";
@@ -164,12 +164,6 @@ const partners: PartnerItem[] = [
     logo: Despread,
     hoverLogo: DespreadHover,
     link: "https://www.despread.io",
-  },
-  {
-    name: "Onther",
-    logo: Onther,
-    hoverLogo: OntherHover,
-    link: "https://onther.io",
   },
   {
     name: "Decipher",

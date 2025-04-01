@@ -17,7 +17,7 @@ import DSRV from "@/assets/partners/name=DSRV, Hover=off.svg";
 import Efg from "@/assets/partners/name=efg, Hover=off.svg";
 import Kdac from "@/assets/partners/name=kdac, Hover=off.svg";
 import METER from "@/assets/partners/name=METER, Hover=off.svg";
-import Onther from "@/assets/partners/name=Onther, Hover=off.svg";
+// import Onther from "@/assets/partners/name=Onther, Hover=off.svg";
 import Ozys from "@/assets/partners/name=ozys, Hover=off.svg";
 import Panony from "@/assets/partners/name=panony, Hover=off.svg";
 import Paycoin from "@/assets/partners/name=paycoin, Hover=off.svg";
@@ -164,12 +164,6 @@ const partners: PartnerItem[] = [
     logo: Despread,
     hoverLogo: DespreadHover,
     link: "https://www.despread.io",
-  },
-  {
-    name: "Onther",
-    logo: Onther,
-    hoverLogo: OntherHover,
-    link: "https://onther.io",
   },
   {
     name: "Decipher",

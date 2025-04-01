@@ -39,7 +39,7 @@ import DSRVHover from "@/assets/partners/name=DSRV, Hover=on.svg";
 import EfgHover from "@/assets/partners/name=efg, Hover=on.svg";
 import KdacHover from "@/assets/partners/name=kdac, Hover=on.svg";
 import METERHover from "@/assets/partners/name=METER, Hover=on.svg";
-import OntherHover from "@/assets/partners/name=Onther, Hover=on.svg";
+
 import OzysHover from "@/assets/partners/name=ozys, Hover=on.svg";
 import PanonyHover from "@/assets/partners/name=panony, Hover=on.svg";
 import PaycoinHover from "@/assets/partners/name=paycoin, Hover=on.svg";

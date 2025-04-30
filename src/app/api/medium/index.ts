@@ -55,21 +55,7 @@ class MediumFeedParser {
 
   private async scrapeMorePosts(): Promise<MediumPost[]> {
     try {
-      // User-Agent 헤더 추가
-      const headers = {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-        Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
-      };
-
-      const response = await axios.get(`https://medium.com/${this.username}`, {
-        headers,
-        timeout: 10000, // 10초 타임아웃 설정
-      });
+      const response = await axios.get(`https://medium.com/${this.username}`);
       const $ = cheerio.load(response.data);
       const posts: MediumPost[] = [];
 
@@ -102,26 +88,7 @@ class MediumFeedParser {
 
   async getPosts(): Promise<MediumPost[]> {
     try {
-      // RSS 피드에서 가져오기 - 헤더 추가
-      const headers = {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-        Accept: "application/rss+xml,application/xml;q=0.9",
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
-      };
-
-      // rss-parser에 커스텀 axios 인스턴스 사용
-      const customAxios = axios.create({
-        headers,
-        timeout: 10000,
-      });
-
-      this.parser.parseURL = async (url) => {
-        const response = await customAxios.get(url);
-        return this.parser.parseString(response.data);
-      };
-
+      // RSS 피드에서 가져오기
       const rssPosts = await this.parser.parseURL(this.baseUrl).then((feed) =>
         feed.items.map((item) => {
           // 썸네일 추출 로직
@@ -145,44 +112,27 @@ class MediumFeedParser {
       );
 
       // 스크래핑으로 추가 포스트 가져오기
-      const scrapedPosts = await this.scrapeMorePosts();
+      // const scrapedPosts = await this.scrapeMorePosts();
 
       // 중복 제거를 위해 URL을 기준으로 합치기
       const allPosts = [...rssPosts];
-      scrapedPosts.forEach((post) => {
-        if (!allPosts.some((p) => p.link === post.link)) {
-          allPosts.push(post);
-        }
-      });
+      // scrapedPosts.forEach((post) => {
+      //   if (!allPosts.some((p) => p.link === post.link)) {
+      //     allPosts.push(post);
+      //   }
+      // });
 
       return allPosts;
     } catch (error) {
       console.error("Error fetching Medium posts:", error);
-
-      // 에러 상세 정보 로깅
-      if (axios.isAxiosError(error)) {
-        console.error("Axios error details:", {
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data,
-          headers: error.response?.headers,
-        });
-      }
-
-      // 에러가 발생해도 빈 배열 반환하여 사이트 작동 유지
-      return [];
+      throw error;
     }
   }
 }
 
 // 외부에서 사용할 함수
 export async function fetchMediumPosts(): Promise<MediumPost[]> {
-  try {
-    const mediumParser = new MediumFeedParser();
-    const result = await mediumParser.getPosts();
-    return result;
-  } catch (error) {
-    console.error("Failed to fetch Medium posts:", error);
-    return []; // 에러 발생 시 빈 배열 반환
-  }
+  const mediumParser = new MediumFeedParser();
+  const result = await mediumParser.getPosts();
+  return result;
 }

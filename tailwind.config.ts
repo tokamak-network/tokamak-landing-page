@@ -25,7 +25,7 @@ export default {
         "tokamak-black": "#1C1C1C",
       },
       fontFamily: {
-        sans: ["Proxima Nova", ...fontFamily.sans],
+        sans: ["Proxima Nova"],
       },
       animation: {
         "infinite-scroll": "infinite-scroll 15s linear infinite",

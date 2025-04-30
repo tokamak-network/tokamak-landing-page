@@ -112,15 +112,15 @@ class MediumFeedParser {
       );
 
       // 스크래핑으로 추가 포스트 가져오기
-      const scrapedPosts = await this.scrapeMorePosts();
+      // const scrapedPosts = await this.scrapeMorePosts();
 
       // 중복 제거를 위해 URL을 기준으로 합치기
       const allPosts = [...rssPosts];
-      scrapedPosts.forEach((post) => {
-        if (!allPosts.some((p) => p.link === post.link)) {
-          allPosts.push(post);
-        }
-      });
+      // scrapedPosts.forEach((post) => {
+      //   if (!allPosts.some((p) => p.link === post.link)) {
+      //     allPosts.push(post);
+      //   }
+      // });
 
       return allPosts;
     } catch (error) {

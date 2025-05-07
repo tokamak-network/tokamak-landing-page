@@ -55,8 +55,6 @@ const getGridColsClass = (
 const DashboardGridItem = async (props: DashboardItem) => {
   const { title, subItems, gridCols } = props;
 
-  console.log("subItems", subItems);
-
   const isPrice = title === "Price";
   const isSupply = title === "Supply";
   const isLocked = title === "Locked";

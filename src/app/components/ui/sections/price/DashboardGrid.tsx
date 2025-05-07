@@ -96,15 +96,19 @@ const DashboardGridItem = async (props: DashboardItem) => {
       >
         {subItems.map((item, index) => (
           <div
-            className="flex flex-col leading-normal gap-y-[3px] font-[300]"
+            className="flex flex-col leading-normal gap-y-[3px] font-[400]"
             key={index}
           >
-            <div className="flex h-[51px] leading-[51px] items-center ">
-              <h1 className={`${isPrice ? "text-[42px]" : "text-[33px]"} `}>
+            <div className="flex h-[51px] leading-[51px] items-center overflow-hidden">
+              <h1
+                className={`${
+                  isPrice ? "text-[42px]" : "text-[33px]"
+                } whitespace-nowrap overflow-hidden text-ellipsis`}
+              >
                 <AnimatedValue value={item.value} isPrice={isPrice} />
               </h1>
               <div
-                className={`flex ${
+                className={`flex-shrink-0 flex ${
                   isPrice ? "pt-[20px]" : "pt-[12px]"
                 } items-baseline`}
               >

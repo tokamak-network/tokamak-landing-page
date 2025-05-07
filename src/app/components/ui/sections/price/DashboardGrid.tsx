@@ -95,9 +95,12 @@ const DashboardGridItem = async (props: DashboardItem) => {
         className={`w-full grid ${gridColsClass} gpax-x-[auto] gap-y-[60px]`}
       >
         {subItems.map((item, index) => (
-          <div className="flex flex-col leading-normal gap-y-[3px]" key={index}>
-            <div className="flex h-[51px] leading-[51px] items-center">
-              <h1 className={`${isPrice ? "text-[42px]" : "text-[33px]"}`}>
+          <div
+            className="flex flex-col leading-normal gap-y-[3px] font-[300]"
+            key={index}
+          >
+            <div className="flex h-[51px] leading-[51px] items-center ">
+              <h1 className={`${isPrice ? "text-[42px]" : "text-[33px]"} `}>
                 <AnimatedValue value={item.value} isPrice={isPrice} />
               </h1>
               <div
@@ -224,7 +227,7 @@ export default async function DashboardGrid() {
               unminted TON due to a seigniorage adjustment. <br /> Each block
               produces 3.92 TON as seigniorage.
               <br /> The number shown represents the upper limit.
-              <br /> To obtain the real-time precise total supply, you
+              <br /> To obtain the real-time precise total supply, youF
               <br /> may refer to the code available on this{" "}
               <a
                 href="https://github.com/tokamak-network/ton-contracts"

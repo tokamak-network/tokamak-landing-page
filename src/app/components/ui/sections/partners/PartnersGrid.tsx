@@ -178,7 +178,7 @@ const partners: PartnerItem[] = [
     link: "https://medium.com/decipher-media",
   },
   {
-    name: "Ciphers",
+  name: "Ciphers",
     logo: Ciphers,
     hoverLogo: CiphersHover,
   },

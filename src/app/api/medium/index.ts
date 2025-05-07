@@ -132,7 +132,13 @@ class MediumFeedParser {
 
 // 외부에서 사용할 함수
 export async function fetchMediumPosts(): Promise<MediumPost[]> {
-  const mediumParser = new MediumFeedParser();
-  const result = await mediumParser.getPosts();
-  return result;
+  try {
+    const mediumParser = new MediumFeedParser();
+    const result = await mediumParser.getPosts();
+    return result;
+  } catch (error) {
+    console.error("Error fetching Medium posts:", error);
+    // 오류 발생 시 빈 배열 반환
+    return [];
+  }
 }

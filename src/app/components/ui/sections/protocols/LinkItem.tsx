@@ -20,7 +20,7 @@ export const LinkItem: React.FC<LinkProps> = ({ icon, alt, link }) => {
       href={link}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex gap-1.5 items-center self-stretch my-auto cursor-pointer opacity-[0.6] hover:opacity-100"
+      className="flex gap-1.5 items-center self-stretch my-auto cursor-pointer opacity-[0.6] hover:opacity-100 "
     >
       <div className="flex flex-col self-stretch my-auto w-4 min-h-[16px]">
         <Image
@@ -30,7 +30,7 @@ export const LinkItem: React.FC<LinkProps> = ({ icon, alt, link }) => {
           className="object-contain w-4 aspect-square"
         />
       </div>
-      <div className="self-stretch my-auto text-[13px] font-light text-white">
+      <div className="self-stretch my-auto text-[13px] font-[300] text-white">
         {label}
       </div>
     </a>

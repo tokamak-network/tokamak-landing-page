@@ -20,15 +20,15 @@ export default function Start() {
         <section className="w-full max-w-[1020px] flex flex-col">
           <header className="flex flex-col items-center mb-[45px]">
             <h1 className="mb-[60px] text-[30px] text-center">
-              <span className="block [@media(min-width:820px)]:inline [@media(max-width:820px)]:leading-[33px]">
+              <span className="block [@media(min-width:820px)]:inline [@media(max-width:820px)]:leading-[33px] font-[100]">
                 Getting Started with
               </span>{" "}
-              <span className="font-bold">Tokamak Network</span>
+              <span className="font-[400]">Tokamak Network</span>
             </h1>
-            <h1 className="mb-[21px] text-[24px] text-center">
+            <h1 className="mb-[21px] text-[24px] text-center font-[400]">
               Developer-centric community
             </h1>
-            <h2 className="text-center text-[15px] leading-relaxed w-full max-w-[1020px]">
+            <h2 className="text-center text-[15px] leading-relaxed w-full max-w-[1020px] font-[300]">
               A community where developers are empowered and incentivized to
               create innovative products using our core protocol, contributing
               to Tokamak Network&apos;s self-sustainability and community
@@ -43,7 +43,7 @@ export default function Start() {
                 href={LINKS.ONBOARDING}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${baseButtonStyle} w-[147px] bg-black text-white text-center leading-[38px] [@media(max-width:780px)]:w-full hover:bg-tokamak-blue
+                className={`${baseButtonStyle} w-[147px] bg-black text-white text-center leading-[38px] [@media(max-width:780px)]:w-full hover:bg-tokamak-blue font-[500]
                `}
               >
                 Onboarding
@@ -52,7 +52,7 @@ export default function Start() {
                 href={LINKS.GRANT}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${baseButtonStyle} w-[100px] bg-black text-white text-center leading-[38px] [@media(max-width:780px)]:w-full hover:bg-tokamak-blue
+                className={`${baseButtonStyle} w-[100px] bg-black text-white text-center leading-[38px] [@media(max-width:780px)]:w-full hover:bg-tokamak-blue font-[500]
                `}
               >
                 Grant
@@ -64,7 +64,7 @@ export default function Start() {
               rel="noopener noreferrer"
               className={`${baseButtonStyle} w-[134px] bg-white text-black border border-[#1C1C1C] flex items-center justify-center gap-[9px]
               [@media(max-width:780px)]:w-full hover:bg-tokamak-black hover:text-white
-              group relative`}
+              group relative font-[500]`}
             >
               <div className="relative">
                 <Image
@@ -86,7 +86,7 @@ export default function Start() {
               rel="noopener noreferrer"
               className={`${baseButtonStyle} w-[167px] bg-white text-black border border-[#1C1C1C] flex items-center justify-center gap-[9px]
               [@media(max-width:780px)]:w-full hover:bg-tokamak-black hover:text-white
-              group relative`}
+              group relative font-[500]`}
             >
               <div className="relative">
                 <Image

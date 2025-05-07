@@ -23,6 +23,8 @@ export function NewsDate({ dateString }: { dateString: string }) {
   // };
 
   return (
-    <span className="text-gray-500">{formatRelativeTime(dateString)}</span>
+    <span className="text-gray-500 font-[400]">
+      {formatRelativeTime(dateString)}
+    </span>
   );
 }

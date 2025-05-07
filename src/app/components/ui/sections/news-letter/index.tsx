@@ -37,10 +37,10 @@ export default function NewsletterSection() {
       <div className="w-full max-w-[1200px] flex justify-center items-center [@media(max-width:800px)]:flex-col gap-y-[30px]">
         {/* Title */}
         <div className="text-left w-full min-w-[390px] [@media(max-width:429px)]:min-w-[310px]">
-          <h2 className="text-white text-[24px] md:text-[30px] mb-[9px]">
-            Newsletter <span className="font-bold">SUBSCRIPTION</span>
+          <h2 className="text-white text-[24px] md:text-[30px] mb-[9px] font-[100]">
+            Newsletter <span className="font-[600]">SUBSCRIPTION</span>
           </h2>
-          <p className="text-[15px] text-white">
+          <p className="text-[15px] text-white font-[100]">
             The quickest way to stay up-to-date with news{" "}
             <br className="min-[429px]:hidden block" /> about
             <br className="min-[430px]:block hidden" /> Tokamak Network
@@ -53,13 +53,13 @@ export default function NewsletterSection() {
             type="email"
             placeholder="Enter your email"
             className="w-full px-6 py-3 h-[65px] rounded-full bg-white text-black outline-none
-          placeholder:text-[#1C1C1C]
+          placeholder:text-[#1C1C1C] font-[400]
           "
             onChange={(e) => setEmail(e.target.value)}
           />
           <button
             className="absolute right-[6px] top-[6px] w-[157px] h-[53px]  
-          bg-black text-white font-bold rounded-full transition-colors text-[14px]"
+          bg-black text-white font-[500] rounded-full transition-colors text-[14px]"
             onClick={onSubscribe}
           >
             SUBSCRIBE

@@ -33,10 +33,10 @@ export default function NewsSection({ posts }: { posts: MediumPost[] }) {
     <div className="flex flex-col text-tokamak-black">
       {/* Header */}
       <div className="text-center mb-[36px]">
-        <h1 className="text-[30px] ">
-          Exploring <span className="text-black font-bold">INSIGHTS</span>
+        <h1 className="text-[30px] font-[100]">
+          Exploring <span className="text-black font-[600]">INSIGHTS</span>
         </h1>
-        <p className="text-[15px] text-gray-600 mt-[9px]">
+        <p className="text-[15px] text-gray-600 mt-[9px] font-[100]">
           Follow the news, research and updates from Tokamak Network.
         </p>
       </div>
@@ -53,7 +53,7 @@ export default function NewsSection({ posts }: { posts: MediumPost[] }) {
                   rel="noopener noreferrer"
                   className={`${
                     styles.button
-                  } hover:bg-tokamak-blue hover:border-tokamak-blue  hover:text-white font-bold leading-[31px]  ${
+                  } hover:bg-tokamak-blue hover:border-tokamak-blue  hover:text-white font-[500] leading-[31px]  ${
                     filter === "More" ? "[@media(max-width:700px)]:order-5" : ""
                   }`}
                   key={"more"}
@@ -67,7 +67,7 @@ export default function NewsSection({ posts }: { posts: MediumPost[] }) {
                 key={filter}
                 className={`${styles.button} ${
                   activeFilter === filter ? "bg-[#1C1C1C] text-white" : ""
-                } hover:bg-tokamak-black hover:border hover:border-tokamak-black hover:text-white font-bold
+                } hover:bg-tokamak-black hover:border hover:border-tokamak-black hover:text-white font-[500]
                    ${
                      filter === "All" ? "[@media(max-width:700px)]:order-1" : ""
                    }

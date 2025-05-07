@@ -51,7 +51,7 @@ export default function TeamMember({
       <Image loading="lazy" src={imageUrl} alt={`${name} - ${role}`} />
       <div className="flex flex-col mt-2.5 w-full">
         <div className="flex justify-between items-center w-full">
-          <div className="flex-1 shrink self-stretch my-auto text-[16px] font-semibold basis-0 text-[#1C1C1C]">
+          <div className="flex-1 shrink self-stretch my-auto text-[16px] font-[600] basis-0 text-[#1C1C1C] ">
             {name}
           </div>
           {isCEO && (
@@ -61,7 +61,7 @@ export default function TeamMember({
             />
           )}
         </div>
-        <div className="text-[13px] font-medium leading-none  text-[#252525]">
+        <div className="text-[13px] font-[500] leading-none  text-[#252525]">
           {role}
         </div>
       </div>

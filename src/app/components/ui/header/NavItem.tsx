@@ -62,7 +62,7 @@ export const NavItem: React.FC<NavItemProps> = ({
             setIsOpen(!isOpen);
           }}
         >
-          <span className="text-[#1C1C1C] text-[24px] font-bold transition-colors duration-200">
+          <span className="text-[#1C1C1C] text-[24px] font-[500] transition-colors duration-200">
             {label}
           </span>
           {icon && (
@@ -158,7 +158,7 @@ export const NavItem: React.FC<NavItemProps> = ({
               item.isExternal ? (
                 <a
                   key={index}
-                  className="overflow-hidden text-ellipsis text-[#1C1C1C] font-['Proxima_Nova'] text-[14px] font-normal leading-normal hover:text-[#0078FF] cursor-pointer transition-colors duration-200"
+                  className="overflow-hidden text-ellipsis text-[#1C1C1C] font-['Proxima_Nova'] text-[14px] font-[400] leading-normal hover:text-[#0078FF] cursor-pointer transition-colors duration-200"
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"

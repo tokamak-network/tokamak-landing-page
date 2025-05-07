@@ -172,7 +172,7 @@ const partners: PartnerItem[] = [
     link: "https://medium.com/decipher-media",
   },
   {
-    name: "Ciphers",
+  name: "Ciphers",
     logo: Ciphers,
     hoverLogo: CiphersHover,
   },
@@ -187,7 +187,7 @@ const GridWrapper = ({
 }) => {
   return (
     <div className="flex flex-col gap-y-[30px] px-[15px]">
-      <h1 className="text-tokamak-black text-[21px] leading-[22px] text-center 550px:text-left">
+      <h1 className="text-tokamak-black text-[21px] leading-[22px] text-center 550px:text-left font-[400]">
         {title}
       </h1>
       <div className="w-full max-w-[995px] mx-auto">

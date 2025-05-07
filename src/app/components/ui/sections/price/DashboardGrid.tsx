@@ -95,13 +95,20 @@ const DashboardGridItem = async (props: DashboardItem) => {
         className={`w-full grid ${gridColsClass} gpax-x-[auto] gap-y-[60px]`}
       >
         {subItems.map((item, index) => (
-          <div className="flex flex-col leading-normal gap-y-[3px]" key={index}>
-            <div className="flex h-[51px] leading-[51px] items-center">
-              <h1 className={`${isPrice ? "text-[42px]" : "text-[33px]"}`}>
+          <div
+            className="flex flex-col leading-normal gap-y-[3px] font-[400]"
+            key={index}
+          >
+            <div className="flex h-[51px] leading-[51px] items-center overflow-hidden">
+              <h1
+                className={`${
+                  isPrice ? "text-[42px]" : "text-[33px]"
+                } whitespace-nowrap overflow-hidden text-ellipsis`}
+              >
                 <AnimatedValue value={item.value} isPrice={isPrice} />
               </h1>
               <div
-                className={`flex ${
+                className={`flex-shrink-0 flex ${
                   isPrice ? "pt-[20px]" : "pt-[12px]"
                 } items-baseline`}
               >
@@ -137,12 +144,20 @@ const DashboardGridItem = async (props: DashboardItem) => {
                   )
                 )}
               </span>
-              {item.tooltip && (
+              {item.tooltip && !isLiquidity && (
                 <Tooltip content={item.tooltip}>
                   <Image src={questionIcon} alt={"tooltip icon"} />
                 </Tooltip>
               )}
             </div>
+            {isLiquidity && (
+              <div className="flex gap-x-[3px] h-[16px] leading-[16px] font-[700] text-[13px]">
+                <span>{index === 0 ? "C1" : index === 1 ? "C2" : "C3"}</span>{" "}
+                <Tooltip content={item.tooltip}>
+                  <Image src={questionIcon} alt={"tooltip icon"} />
+                </Tooltip>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -224,7 +239,7 @@ export default async function DashboardGrid() {
               unminted TON due to a seigniorage adjustment. <br /> Each block
               produces 3.92 TON as seigniorage.
               <br /> The number shown represents the upper limit.
-              <br /> To obtain the real-time precise total supply, you
+              <br /> To obtain the real-time precise total supply, youF
               <br /> may refer to the code available on this{" "}
               <a
                 href="https://github.com/tokamak-network/ton-contracts"

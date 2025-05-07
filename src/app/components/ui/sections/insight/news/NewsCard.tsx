@@ -43,10 +43,10 @@ export function NewsCard({
         />
       </div>
       <div className="flex justify-between items-center text-sm mb-2">
-        <span className="text-[13px] font-bold">{categoryName}</span>
+        <span className="text-[13px] font-[700]">{categoryName}</span>
         <NewsDate dateString={post.pubDate} />
       </div>
-      <span className="text-[18px] font-bold line-clamp-1 group-hover:text-tokamak-blue transition-colors">
+      <span className="text-[18px] font-[500] line-clamp-1 group-hover:text-tokamak-blue transition-colors">
         {post.title}
       </span>
     </a>

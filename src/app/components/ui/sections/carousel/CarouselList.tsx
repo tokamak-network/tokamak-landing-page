@@ -20,21 +20,24 @@ function CarouselItem({ category, datas }: CarouselDisplayProps) {
       {datas.map((data) => {
         if (data.usdValue) {
           return (
-            <div className="flex items-center gap-x-[24px]" key={data.label}>
+            <div
+              className="flex items-center gap-x-[24px] font-[500]"
+              key={data.label}
+            >
               <h2 className="opacity-[0.75] text-[13px] ">{data.label}</h2>
-              <div className="flex flex-col">
-                <div className="flex gap-x-[6px] items-center">
-                  <strong className="text-[21px] leading-[26px]">
+              <div className="flex flex-col ">
+                <div className="flex gap-x-[6px] items-center font-[600]">
+                  <span className="text-[21px] leading-[26px] ">
                     {formatNumber(data.info)}
-                  </strong>
-                  <p className="text-[12px] self-end leading-[15px] max-h-[15px] font-bold">
+                  </span>
+                  <p className="text-[12px] self-end leading-[15px] max-h-[15px]">
                     {formatNumber(data.currency)}
                     {data.conversion
                       ? ` / ${formatCurrencyString(data.conversion)}`
                       : ""}
                   </p>
                 </div>
-                <span className="text-[12px] opacity-[0.35]">
+                <span className="text-[12px] opacity-[0.35] font-[500]">
                   $ {formatNumber(data.usdValue)}
                 </span>
               </div>
@@ -43,9 +46,13 @@ function CarouselItem({ category, datas }: CarouselDisplayProps) {
         }
         return (
           <div className="flex items-center gap-x-[24px]" key={data.label}>
-            <h2 className="opacity-[0.75] text-[13px]">{data.label}</h2>
-            <div className="flex gap-x-[6px] items-center">
-              <strong className="text-[21px]">{formatNumber(data.info)}</strong>
+            <h2 className="opacity-[0.75] text-[13px] font-[500]">
+              {data.label}
+            </h2>
+            <div className="flex gap-x-[6px] items-center font-[600]">
+              <span className="text-[21px] font-[600]">
+                {formatNumber(data.info)}
+              </span>
               <p className="text-[12px] self-end pb-[4px]">
                 {formatNumber(data.currency)}
                 {data.conversion
@@ -75,7 +82,7 @@ export default function CarouselList({
 
   return (
     <div className="flex w-full items-center slider">
-      <div className="flex items-center gap-x-[120px] text-white font-bold slideTrack">
+      <div className="flex items-center gap-x-[120px] text-white slideTrack font-[700]">
         {[
           ...carouselDatas,
           ...carouselDatas,

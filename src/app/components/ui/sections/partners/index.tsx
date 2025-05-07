@@ -28,17 +28,17 @@ export default function Partners() {
       "
       >
         <div className="flex flex-col justify-between items-center h-full text-white text-center gap-y-[9px]">
-          <span className="text-[30px] leading-[30px] [@media(max-width:650px)]:text-[24px] [@media(max-width:650px)]:leading-[24px]">
+          <span className="text-[30px] leading-[30px] [@media(max-width:650px)]:text-[24px] [@media(max-width:650px)]:leading-[24px] font-[400]">
             Partners
           </span>
           {isMobile ? (
-            <span className="text-[12px] w-full max-w-[312px]">
+            <span className="text-[12px] w-full max-w-[312px] font-[100]">
               Tokamak Network works with a variety of partners to make Ethereum
               more scalable and provide users with a better decentralized
               application experience.
             </span>
           ) : (
-            <span className="text-[15px] [@media(max-width:650px)]:text-[12px]">
+            <span className="text-[15px] [@media(max-width:650px)]:text-[12px] font-[100]">
               Tokamak Network works with a variety of partners to make Ethereum
               more scalable <br /> and provide users with a better decentralized
               application experience.

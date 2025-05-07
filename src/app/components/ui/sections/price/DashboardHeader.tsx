@@ -30,7 +30,7 @@ const DashboardItem = (props: {
   const { Icon, content } = props;
   return (
     <div
-      className={`flex gap-x-[6px] text-[12px] text-[#252525] items-baseline`}
+      className={`flex gap-x-[6px] text-[12px] text-[#252525] items-baseline font-[300]`}
     >
       <Icon />
       <p>{content}</p>
@@ -47,10 +47,10 @@ export default function DashboardHeader() {
       >
         <section className="flex flex-col items-center justify-center gap-y-[30px] max-w-[495px]">
           <div className="flex flex-col gap-y-[24px] text-left">
-            <h1 className="text-[30px]">
+            <h1 className="text-[30px] font-[100]">
               Real-Time TON(Tokamak) <br /> Market Insights
             </h1>
-            <p className="text-[15px]">
+            <p className="text-[15px] font-[300]">
               This dashboard integrates multiple data sources to provide
               reliable information. Price data is updated in real-time and is
               linked to market data from major exchanges to ensure accuracy. Use
@@ -59,12 +59,16 @@ export default function DashboardHeader() {
             </p>
           </div>
           <div className="flex w-full gap-x-[15px] [@media(max-width:500px)]:flex-col [@media(max-width:500px)]:gap-y-[15px] [@media(max-width:500px)]:items-center">
-            <button className="w-[200px] h-[40px] rounded-[20px] bg-tokamak-black text-white text-[14px] font-normal hover:bg-tokamak-blue hover:text-white transition-all duration-300">
-              <a href={LINKS.GET_TON} target="_blank" rel="noopener noreferrer">
+            <button className="w-[200px] h-[40px] rounded-[20px] bg-tokamak-black text-white text-[14px] font-normal hover:bg-tokamak-blue hover:text-white transition-all duration-300 font-[500]">
+              <a
+                href={LINKS.GET_TON}
+                target="_blank"
+                rel="noopener noreferrer "
+              >
                 Buy TON(Tokamak)
               </a>
             </button>
-            <button className="w-[200px] h-[40px] rounded-[20px] bg-white text-tokamak-black text-[14px] font-normal border border-tokamak-black hover:bg-tokamak-black hover:text-white transition-all duration-300">
+            <button className="w-[200px] h-[40px] rounded-[20px] bg-white text-tokamak-black text-[14px] border border-tokamak-black hover:bg-tokamak-black hover:text-white transition-all duration-300 font-[500]">
               <a
                 href={LINKS.DUNE_DASHBOARD}
                 target="_blank"

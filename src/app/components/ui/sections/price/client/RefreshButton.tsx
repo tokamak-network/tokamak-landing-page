@@ -30,7 +30,7 @@ export function RefreshButton() {
         onClick={handleRefresh}
         disabled={isLoading}
         onMouseLeave={() => setIsClicked(false)}
-        className={`w-full h-full border border-tokamak-black rounded-[16.5px] flex items-center px-[12px] gap-x-[9px] text-[14px] transition-colors group
+        className={`w-full h-full border border-tokamak-black rounded-[16.5px] flex items-center px-[12px] gap-x-[9px] text-[14px] transition-colors group font-[500]
           ${
             !isClicked
               ? "hover:bg-tokamak-black hover:text-white hover:border-tokamak-black"

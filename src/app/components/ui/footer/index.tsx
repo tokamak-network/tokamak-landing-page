@@ -51,12 +51,12 @@ export default function Footer() {
           <div className="flex text-right [@media(max-width:800px)]:hidden">
             {/* Developer Column */}
             <div className="w-[180px] [@media(max-width:1000px)]:w-[175px]">
-              <h3 className="font-medium mb-4 text-tokamak-black">Developer</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <h3 className="font-[600] mb-4 text-tokamak-black">Developer</h3>
+              <ul className="space-y-2 text-sm text-gray-600 font-[400]">
                 <li>
                   <a
                     href={LINKS.DOCS}
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -66,7 +66,7 @@ export default function Footer() {
                 <li>
                   <a
                     href={LINKS.GITHUB}
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -76,7 +76,7 @@ export default function Footer() {
                 <li>
                   <a
                     href={LINKS.GRANT}
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -88,12 +88,12 @@ export default function Footer() {
 
             {/* Features Column */}
             <div className="w-[180px] [@media(max-width:1000px)]:w-[175px]">
-              <h3 className="font-medium mb-4 text-tokamak-black">Features</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <h3 className="font-[600] mb-4 text-tokamak-black">Features</h3>
+              <ul className="space-y-2 text-sm text-gray-600 font-[400]">
                 <li>
                   <a
                     href={LINKS.ROLLUP_HUB}
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -103,7 +103,7 @@ export default function Footer() {
                 <li>
                   <a
                     href={LINKS.STAKING}
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -113,7 +113,7 @@ export default function Footer() {
                 <li>
                   <a
                     href={LINKS.DAO}
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -125,12 +125,12 @@ export default function Footer() {
 
             {/* About Column */}
             <div className="w-[180px] [@media(max-width:1000px)]:w-[175px]">
-              <h3 className="font-medium mb-4 text-tokamak-black">About</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <h3 className="font-[600] mb-4 text-tokamak-black">About</h3>
+              <ul className="space-y-2 text-sm text-gray-600 font-[400]">
                 <li>
                   <Link
                     href="/about/team"
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                   >
                     Team
                   </Link>
@@ -138,7 +138,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="/about/price"
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                   >
                     Price Dashboard
                   </Link>
@@ -146,7 +146,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="/about/partners"
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                   >
                     Partners
                   </Link>
@@ -154,7 +154,7 @@ export default function Footer() {
                 <li>
                   <Link
                     href="/about/insight"
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                   >
                     Insight
                   </Link>
@@ -174,12 +174,12 @@ export default function Footer() {
 
             {/* Social Column */}
             <div className="w-[180px] [@media(max-width:1000px)]:w-[175px]">
-              <h3 className="font-medium mb-4 text-tokamak-black">Social</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <h3 className="font-[600] mb-4 text-tokamak-black">Social</h3>
+              <ul className="space-y-2 text-sm text-gray-600 font-[400]">
                 <li>
                   <a
                     href={LINKS.MEDIUM}
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -189,7 +189,7 @@ export default function Footer() {
                 <li>
                   <a
                     href={LINKS.X}
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -199,7 +199,7 @@ export default function Footer() {
                 <li>
                   <a
                     href={LINKS.DISCORD}
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -209,7 +209,7 @@ export default function Footer() {
                 <li>
                   <a
                     href={LINKS.TELEGRAM}
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -219,7 +219,7 @@ export default function Footer() {
                 <li>
                   <a
                     href={LINKS.LINKEDIN}
-                    className="hover:text-tokamak-blue transition-colors text-[#252525]"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                     target="_blank"
                     rel="noopener noreferrer"
                   >

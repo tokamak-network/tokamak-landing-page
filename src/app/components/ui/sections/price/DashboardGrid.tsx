@@ -55,6 +55,8 @@ const getGridColsClass = (
 const DashboardGridItem = async (props: DashboardItem) => {
   const { title, subItems, gridCols } = props;
 
+  console.log("subItems", subItems);
+
   const isPrice = title === "Price";
   const isSupply = title === "Supply";
   const isLocked = title === "Locked";
@@ -140,12 +142,20 @@ const DashboardGridItem = async (props: DashboardItem) => {
                   )
                 )}
               </span>
-              {item.tooltip && (
+              {item.tooltip && !isLiquidity && (
                 <Tooltip content={item.tooltip}>
                   <Image src={questionIcon} alt={"tooltip icon"} />
                 </Tooltip>
               )}
             </div>
+            {isLiquidity && (
+              <div className="flex gap-x-[3px] h-[16px] leading-[16px] font-[700] text-[13px]">
+                <span>{index === 0 ? "C1" : index === 1 ? "C2" : "C3"}</span>{" "}
+                <Tooltip content={item.tooltip}>
+                  <Image src={questionIcon} alt={"tooltip icon"} />
+                </Tooltip>
+              </div>
+            )}
           </div>
         ))}
       </div>

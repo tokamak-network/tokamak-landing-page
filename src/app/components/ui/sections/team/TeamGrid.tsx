@@ -25,6 +25,7 @@ import JamesImage from "@/assets/members/member=James Bello.png";
 import JasonImage from "@/assets/members/member=Jason Hwang.png";
 import AryanImage from "@/assets/members/member=Aryan Soni.png";
 import KyleImage from "@/assets/members/member=Kyle.png";
+import JustinImage from "@/assets/members/member=Justin.png";
 
 const teamMembers = [
   {
@@ -147,6 +148,11 @@ const teamMembers = [
     name: "Kaibin Huang",
     role: "ZKP researcher",
     imageUrl: KyleImage,
+  },
+  {
+    name: "Justin Gee",
+    role: "Blockchain Developer",
+    imageUrl: JustinImage,
   },
 ];
 

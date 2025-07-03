@@ -1,6 +1,5 @@
 "use client";
 import { useFocus } from "@/context/FocusContext";
-import { handleSubscribe } from "@/app/api/news-letter";
 import { useCallback, useState } from "react";
 
 export default function NewsletterSection() {
@@ -11,12 +10,17 @@ export default function NewsletterSection() {
     if (!email) return;
 
     try {
-      const result = await handleSubscribe(email);
+      const response = await fetch("/api/news-letter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const result = await response.json();
       console.log("result", result);
       if (result.success) {
         alert("Successfully subscribed!");
       } else {
-        alert("Subscriptio    n failed. Please try again.");
+        alert("Subscription failed. Please try again.");
       }
     } catch {
       alert("An error occurred. Please try again.");

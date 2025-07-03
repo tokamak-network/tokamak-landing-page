@@ -13,6 +13,7 @@
     "axios": "^1.7.9",
     "cheerio": "^1.0.0",
     "date-fns": "^4.1.0",
+    "firebase": "^11.8.1",
     "font-proxima-nova": "^1.0.1",
     "fontfaceobserver": "^2.3.0",
     "framer-motion": "^11.18.1",
@@ -21,7 +22,6 @@
     "puppeteer": "^24.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "resend": "^4.0.1",
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {

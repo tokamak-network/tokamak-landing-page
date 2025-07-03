@@ -1,6 +1,5 @@
 "use client";
 import { useFocus } from "@/context/FocusContext";
-import { handleSubscribe } from "@/app/api/news-letter";
 import { useCallback, useState } from "react";
 
 export default function NewsletterSection() {
@@ -10,13 +9,26 @@ export default function NewsletterSection() {
   const onSubscribe = useCallback(async () => {
     if (!email) return;
 
+    // 이메일 유효성 검사
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
     try {
-      const result = await handleSubscribe(email);
+      const response = await fetch("/api/news-letter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const result = await response.json();
       console.log("result", result);
       if (result.success) {
         alert("Successfully subscribed!");
+        setEmail(""); // 성공 시 입력창 초기화
       } else {
-        alert("Subscriptio    n failed. Please try again.");
+        alert("Subscription failed. Please try again.");
       }
     } catch {
       alert("An error occurred. Please try again.");
@@ -52,6 +64,7 @@ export default function NewsletterSection() {
           <input
             type="email"
             placeholder="Enter your email"
+            value={email}
             className="w-full px-6 py-3 h-[65px] rounded-full bg-white text-black outline-none
           placeholder:text-[#1C1C1C] font-[400]
           "

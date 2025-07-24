@@ -5,7 +5,7 @@ import KevinImage from "@/assets/members/member=Kevin.png";
 import ZenaImage from "@/assets/members/member=Zena.png";
 import AleImage from "@/assets/members/member=Ale.png";
 import JamieImage from "@/assets/members/member=Jamie.png";
-import LucasImage from "@/assets/members/member=Lucas Jung.png";
+
 import JadenImage from "@/assets/members/member=Jaden Kong.png";
 import PraveenImage from "@/assets/members/member=Praveen Surendran.png";
 import MonicaImage from "@/assets/members/member=Monica Kim.png";
@@ -24,7 +24,7 @@ import KaidenImage from "@/assets/members/member=Kaiden Araki.png";
 import JamesImage from "@/assets/members/member=James Bello.png";
 import JasonImage from "@/assets/members/member=Jason Hwang.png";
 import AryanImage from "@/assets/members/member=Aryan Soni.png";
-import KyleImage from "@/assets/members/member=Kyle.png";
+
 import JustinImage from "@/assets/members/member=Justin.png";
 
 const teamMembers = [
@@ -54,11 +54,11 @@ const teamMembers = [
     role: "Core Researcher",
     imageUrl: JamieImage,
   },
-  {
-    name: "Lucas Jung",
-    role: "Product Designer",
-    imageUrl: LucasImage,
-  },
+  // {
+  //   name: "Lucas Jung",
+  //   role: "Product Designer",
+  //   imageUrl: LucasImage,
+  // },
   {
     name: "Jaden Kong",
     role: "Managing Director",
@@ -144,11 +144,11 @@ const teamMembers = [
     role: "Blockchain Engineer",
     imageUrl: AryanImage,
   },
-  {
-    name: "Kaibin Huang",
-    role: "ZKP researcher",
-    imageUrl: KyleImage,
-  },
+  // {
+  //   name: "Kaibin Huang",
+  //   role: "ZKP researcher",
+  //   imageUrl: KyleImage,
+  // },
   {
     name: "Justin Gee",
     role: "Blockchain Developer",

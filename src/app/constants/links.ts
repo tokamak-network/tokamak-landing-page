@@ -7,7 +7,7 @@ export const LINKS = {
   DOCS: "https://docs.tokamak.network",
   ROLLUP_HUB: "https://rolluphub.tokamak.network/",
   DAO: "https://dao.tokamak.network/",
-  STAKING: "https://simple.staking.tokamak.network/",
+  STAKING: "https://github.com/tokamak-network/staking-community-version",
   MEDIUM: "https://medium.com/tokamak-network",
   X: "https://twitter.com/tokamak_network",
   DISCORD: "https://discord.com/invite/J4chV2zuAK",

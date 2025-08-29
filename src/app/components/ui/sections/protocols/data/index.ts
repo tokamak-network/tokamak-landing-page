@@ -105,7 +105,7 @@ export const protocolsData: ProtocolCardProps[] = [
       {
         icon: "Github",
         alt: "L2 Watchtower github",
-        link: "https://github.com/tokamak-network/simple-staking-v2",
+        link: "https://github.com/tokamak-network/TokamakStaking",
       },
     ],
   },

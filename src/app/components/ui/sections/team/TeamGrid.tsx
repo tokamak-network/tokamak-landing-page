@@ -24,8 +24,6 @@ import KaidenImage from "@/assets/members/member=Kaiden Araki.png";
 import JamesImage from "@/assets/members/member=James Bello.png";
 import JasonImage from "@/assets/members/member=Jason Hwang.png";
 import AryanImage from "@/assets/members/member=Aryan Soni.png";
-
-import JustinImage from "@/assets/members/member=Justin.png";
 import NilImage from "@/assets/members/member=Nil.png";
 import LucaImage from "@/assets/members/member=Luca.png";
 import JeffImage from "@/assets/members/member=Jeff.png";

@@ -152,11 +152,11 @@ const teamMembers = [
   //   role: "ZKP researcher",
   //   imageUrl: KyleImage,
   // },
-  {
-    name: "Justin Gee",
-    role: "Blockchain Developer",
-    imageUrl: JustinImage,
-  },
+  // {
+  //   name: "Justin Gee",
+  //   role: "Blockchain Developer",
+  //   imageUrl: JustinImage,
+  // },
   {
     name: "Najmeh Soroush",
     role: "ZKP Researcher",

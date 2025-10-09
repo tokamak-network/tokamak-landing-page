@@ -6,7 +6,7 @@ export const LINKS = {
   GITHUB: "https://github.com/tokamak-network",
   DOCS: "https://docs.tokamak.network",
   ROLLUP_HUB: "https://rolluphub.tokamak.network/",
-  DAO: "https://dao.tokamak.network/",
+  DAO: "https://github.com/tokamak-network/TokamakDAO",
   STAKING: "https://github.com/tokamak-network/TokamakStaking",
   MEDIUM: "https://medium.com/tokamak-network",
   X: "https://twitter.com/tokamak_network",

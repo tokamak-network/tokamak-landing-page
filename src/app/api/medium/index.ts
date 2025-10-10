@@ -2,6 +2,9 @@ import Parser from "rss-parser";
 import * as cheerio from "cheerio";
 import axios from "axios";
 import { MediumPost } from "@/app/components/ui/sections/insight/types";
+import { NextResponse } from "next/server";
+
+export const revalidate = 1200;
 
 interface CustomFeed {
   title: string;
@@ -140,5 +143,16 @@ export async function fetchMediumPosts(): Promise<MediumPost[]> {
     console.error("Error fetching Medium posts:", error);
     // 오류 발생 시 빈 배열 반환
     return [];
+  }
+}
+
+// API Route 핸들러
+export async function GET() {
+  try {
+    const posts = await fetchMediumPosts();
+    return NextResponse.json(posts);
+  } catch (error) {
+    console.error("Error in API route:", error);
+    return NextResponse.json([], { status: 500 });
   }
 }

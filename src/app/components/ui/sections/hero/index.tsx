@@ -193,7 +193,7 @@ export const Hero: React.FC = () => {
           )} */}
         </div>
       )),
-    [animatingCells]
+    [animatingCells, handleCellHover, handleAnimationEnd]
   );
 
   return (

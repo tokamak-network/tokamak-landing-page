@@ -133,8 +133,8 @@ class MediumFeedParser {
   }
 }
 
-// Function for external use
-export async function fetchMediumPosts(): Promise<MediumPost[]> {
+// Internal function for fetching Medium posts
+async function fetchMediumPosts(): Promise<MediumPost[]> {
   try {
     const mediumParser = new MediumFeedParser();
     const result = await mediumParser.getPosts();

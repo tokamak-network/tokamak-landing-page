@@ -28,6 +28,7 @@ import NilImage from "@/assets/members/member=Nil.png";
 import LucaImage from "@/assets/members/member=Luca.png";
 import JeffImage from "@/assets/members/member=Jeff.png";
 import AmirImage from "@/assets/members/member=Amir.png";
+import ManishImage from "@/assets/members/member=Manish.png";
 
 const teamMembers = [
   {
@@ -175,6 +176,11 @@ const teamMembers = [
     name: "Amir Muhammad",
     role: "Blockchain Engineer",
     imageUrl: AmirImage,
+  },
+  {
+    name: "Manish Kumar",
+    role: "Blockchain Engineer",
+    imageUrl: ManishImage,
   },
 ];
 

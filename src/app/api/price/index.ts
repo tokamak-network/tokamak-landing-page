@@ -1,13 +1,9 @@
-const FETCH_OPTIONS = {
-  next: { revalidate: 60 },
-} as const;
-
 const fetchTONPriceInfo = async () => {
   try {
     console.log("[fetchTONPriceInfo] Fetching from Upbit...");
     const response = await fetch(
       "https://api.upbit.com/v1/ticker?markets=KRW-tokamak",
-      FETCH_OPTIONS
+      { cache: "no-store" }
     );
     console.log("[fetchTONPriceInfo] Response status:", response.status);
     const data = await response.json();
@@ -24,10 +20,9 @@ const fetchTONPriceInfo = async () => {
 const getUSDPrice = async () => {
   try {
     console.log("[getUSDPrice] Fetching exchange rate...");
-    const response = await fetch(
-      "https://open.er-api.com/v6/latest/KRW",
-      FETCH_OPTIONS
-    );
+    const response = await fetch("https://open.er-api.com/v6/latest/KRW", {
+      cache: "no-store",
+    });
     console.log("[getUSDPrice] Response status:", response.status);
     const data = await response.json();
     const rate = data.rates.USD;
@@ -43,19 +38,18 @@ const getStakingVolume = async () => {
   try {
     console.log("[getStakingVolume] Fetching staking data...");
     const [currentStaked, DAOStaked] = await Promise.all([
-      fetch(
-        "https://price.api.tokamak.network/staking/current",
-        FETCH_OPTIONS
-      ).then((res) => {
+      fetch("https://price.api.tokamak.network/staking/current", {
+        cache: "no-store",
+      }).then((res) => {
         console.log("[getStakingVolume] staking/current status:", res.status);
         return res.json();
       }),
-      fetch("https://price.api.tokamak.network/supply", FETCH_OPTIONS).then(
-        (res) => {
-          console.log("[getStakingVolume] supply status:", res.status);
-          return res.json();
-        }
-      ),
+      fetch("https://price.api.tokamak.network/supply", {
+        cache: "no-store",
+      }).then((res) => {
+        console.log("[getStakingVolume] supply status:", res.status);
+        return res.json();
+      }),
     ]);
 
     const result = {
@@ -81,19 +75,18 @@ const getSuuplyInfo = async (): Promise<{
   try {
     console.log("[getSuuplyInfo] Fetching supply data...");
     const [circulationSupply, totalSupplyData] = await Promise.all([
-      fetch(
-        "https://price.api.tokamak.network/circulationSupply",
-        FETCH_OPTIONS
-      ).then((res) => {
+      fetch("https://price.api.tokamak.network/circulationSupply", {
+        cache: "no-store",
+      }).then((res) => {
         console.log("[getSuuplyInfo] circulationSupply status:", res.status);
         return res.json();
       }),
-      fetch("https://price.api.tokamak.network/supply", FETCH_OPTIONS).then(
-        (res) => {
-          console.log("[getSuuplyInfo] supply status:", res.status);
-          return res.json();
-        }
-      ),
+      fetch("https://price.api.tokamak.network/supply", {
+        cache: "no-store",
+      }).then((res) => {
+        console.log("[getSuuplyInfo] supply status:", res.status);
+        return res.json();
+      }),
     ]);
 
     const result = {

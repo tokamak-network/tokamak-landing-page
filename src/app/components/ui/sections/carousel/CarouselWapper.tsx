@@ -7,21 +7,17 @@ import { CarouselDisplayProps } from "./types";
 export default function CarouselWrapper() {
   const [carouselDatas, setCarouselDatas] = useState<CarouselDisplayProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        console.log("CarouselWrapper: Fetching price data...");
         const response = await fetch("/api/price");
-        console.log("CarouselWrapper: Response status:", response.status);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log("CarouselWrapper: Data received");
 
         const {
           tonPrice,
@@ -110,10 +106,9 @@ export default function CarouselWrapper() {
         ];
 
         setCarouselDatas(datas);
-        console.log("CarouselWrapper: Data set successfully");
       } catch (error) {
         console.error("Error fetching carousel data:", error);
-        setError(error instanceof Error ? error.message : "Unknown error");
+        setCarouselDatas([]);
       } finally {
         setIsLoading(false);
       }
@@ -123,16 +118,7 @@ export default function CarouselWrapper() {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="h-[60px] flex items-center justify-center text-white">
-        <span className="opacity-50">Loading...</span>
-      </div>
-    );
-  }
-
-  if (error) {
-    console.error("CarouselWrapper render error:", error);
-    return null; // Silent fail for carousel
+    return <div className="h-[60px]" />;
   }
 
   if (carouselDatas.length === 0) {

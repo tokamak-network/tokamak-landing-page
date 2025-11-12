@@ -1,7 +1,7 @@
 import Price from "@/app/components/ui/sections/price";
 
-// Revalidate this page every 60 seconds (ISR - Incremental Static Regeneration)
-export const revalidate = 60;
+// Use dynamic rendering (server-side on each request)
+export const dynamic = 'force-dynamic';
 
 export default function PricePage() {
   return <Price />;

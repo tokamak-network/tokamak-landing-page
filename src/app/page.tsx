@@ -7,6 +7,9 @@ import NewsLetter from "./components/ui/sections/news-letter";
 import Footer from "./components/ui/footer";
 import { Carousel } from "./components/ui/sections/carousel";
 
+// Revalidate this page every 60 seconds (ISR - Incremental Static Regeneration)
+export const revalidate = 60;
+
 export default function Home() {
   return (
     <div className="flex flex-col items-center w-full font-[Proxima_Nova] bg-[#1C1C1C]">

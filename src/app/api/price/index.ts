@@ -4,51 +4,68 @@ const FETCH_OPTIONS = {
 
 const fetchTONPriceInfo = async () => {
   try {
+    console.log("[fetchTONPriceInfo] Fetching from Upbit...");
     const response = await fetch(
       "https://api.upbit.com/v1/ticker?markets=KRW-tokamak",
       FETCH_OPTIONS
     );
+    console.log("[fetchTONPriceInfo] Response status:", response.status);
     const data = await response.json();
     // Upbit API returns an array, extract first element
-    return Array.isArray(data) ? data[0] : data;
+    const result = Array.isArray(data) ? data[0] : data;
+    console.log("[fetchTONPriceInfo] Success:", result ? "✓" : "✗");
+    return result;
   } catch (error) {
-    console.error("Error fetching TON price from Upbit:", error);
+    console.error("[fetchTONPriceInfo] Error:", error);
     return null;
   }
 };
 
 const getUSDPrice = async () => {
   try {
+    console.log("[getUSDPrice] Fetching exchange rate...");
     const response = await fetch(
       "https://open.er-api.com/v6/latest/KRW",
       FETCH_OPTIONS
     );
+    console.log("[getUSDPrice] Response status:", response.status);
     const data = await response.json();
-    return data.rates.USD;
+    const rate = data.rates.USD;
+    console.log("[getUSDPrice] Success:", rate ? "✓" : "✗");
+    return rate;
   } catch (error) {
-    console.error("Error fetching USD exchange rate:", error);
+    console.error("[getUSDPrice] Error:", error);
     return null;
   }
 };
 
 const getStakingVolume = async () => {
   try {
+    console.log("[getStakingVolume] Fetching staking data...");
     const [currentStaked, DAOStaked] = await Promise.all([
       fetch(
         "https://price.api.tokamak.network/staking/current",
         FETCH_OPTIONS
-      ).then((res) => res.json()),
+      ).then((res) => {
+        console.log("[getStakingVolume] staking/current status:", res.status);
+        return res.json();
+      }),
       fetch("https://price.api.tokamak.network/supply", FETCH_OPTIONS).then(
-        (res) => res.json()
+        (res) => {
+          console.log("[getStakingVolume] supply status:", res.status);
+          return res.json();
+        }
       ),
     ]);
 
-    return {
+    const result = {
       currentStaked,
       DAOStaked: DAOStaked.daoValue,
     };
+    console.log("[getStakingVolume] Success:", result ? "✓" : "✗");
+    return result;
   } catch (error) {
-    console.error("Error fetching staking volume:", error);
+    console.error("[getStakingVolume] Error:", error);
     return null;
   }
 };
@@ -62,28 +79,39 @@ const getSuuplyInfo = async (): Promise<{
   burned: number;
 } | null> => {
   try {
+    console.log("[getSuuplyInfo] Fetching supply data...");
     const [circulationSupply, totalSupplyData] = await Promise.all([
       fetch(
         "https://price.api.tokamak.network/circulationSupply",
         FETCH_OPTIONS
-      ).then((res) => res.json()),
+      ).then((res) => {
+        console.log("[getSuuplyInfo] circulationSupply status:", res.status);
+        return res.json();
+      }),
       fetch("https://price.api.tokamak.network/supply", FETCH_OPTIONS).then(
-        (res) => res.json()
+        (res) => {
+          console.log("[getSuuplyInfo] supply status:", res.status);
+          return res.json();
+        }
       ),
     ]);
 
-    return {
+    const result = {
       ...circulationSupply,
       totalSupply: totalSupplyData.totalSupply,
       burned: totalSupplyData.burnedValue,
     };
+    console.log("[getSuuplyInfo] Success:", result ? "✓" : "✗");
+    return result;
   } catch (error) {
-    console.error("Error fetching supply data:", error);
+    console.error("[getSuuplyInfo] Error:", error);
     return null;
   }
 };
 
 export const fetchPriceDatas = async () => {
+  console.log("[fetchPriceDatas] Starting to fetch all price data sources...");
+
   const [priceInfo, krwToUsdRate, stakingVolume, suuplyInfo] =
     await Promise.all([
       fetchTONPriceInfo(),
@@ -92,10 +120,25 @@ export const fetchPriceDatas = async () => {
       getSuuplyInfo(),
     ]);
 
+  console.log("[fetchPriceDatas] Results:", {
+    priceInfo: priceInfo ? "✓" : "✗",
+    krwToUsdRate: krwToUsdRate ? "✓" : "✗",
+    stakingVolume: stakingVolume ? "✓" : "✗",
+    suuplyInfo: suuplyInfo ? "✓" : "✗",
+  });
+
   // Check if any API call failed
   if (!priceInfo || !krwToUsdRate || !stakingVolume || !suuplyInfo) {
-    throw new Error("Failed to fetch one or more price data sources");
+    const missing = [];
+    if (!priceInfo) missing.push("priceInfo");
+    if (!krwToUsdRate) missing.push("krwToUsdRate");
+    if (!stakingVolume) missing.push("stakingVolume");
+    if (!suuplyInfo) missing.push("suuplyInfo");
+
+    throw new Error(`Failed to fetch: ${missing.join(", ")}`);
   }
+
+  console.log("[fetchPriceDatas] All data sources fetched successfully");
 
   const usdCurrentPrice =
     Math.round(priceInfo.trade_price * krwToUsdRate * 100) / 100;

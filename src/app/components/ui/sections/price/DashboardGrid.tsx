@@ -1,13 +1,15 @@
+"use client";
+
 import { DashboardItem } from "./types";
 import Image from "next/image";
 import sendIcon from "@/assets/icons/common/send.svg";
 import questionIcon from "@/assets/icons/common/question.svg";
 import Tooltip from "@/app/components/shared/Tooltip";
 import { PRICE_LINKS } from "@/app/constants/links";
-import { fetchPriceDatas } from "@/app/api/price";
 import { formatInteger } from "@/app/lib/utils/format";
 import { RefreshButton } from "./client/RefreshButton";
 import { AnimatedValue } from "./client/AnimatedValue";
+import { useEffect, useState } from "react";
 
 const getGridColsClass = (
   isPrice: boolean,
@@ -52,7 +54,7 @@ const getGridColsClass = (
   return gridCols;
 };
 
-const DashboardGridItem = async (props: DashboardItem) => {
+const DashboardGridItem = (props: DashboardItem) => {
   const { title, subItems, gridCols } = props;
 
   const isPrice = title === "Price";
@@ -165,25 +167,39 @@ const DashboardGridItem = async (props: DashboardItem) => {
   );
 };
 
-export default async function DashboardGrid() {
-  const {
-    tonPrice,
-    marketCap,
-    fullyDilutedValuation,
-    totalSupply,
-    circulatingSupply,
-    circulatingSuupplyUpbitStandard,
-    burnedSupply,
-    DAOStakedVolume,
-    stakedVolume,
-    liquidity,
-    liquidityUSD,
-  } = await fetchPriceDatas();
+export default function DashboardGrid() {
+  const [dashboardItemList, setDashboardItemList] = useState<DashboardItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const dashboardItemList: DashboardItem[] = [
-    {
-      title: "Price",
-      gridCols: 3,
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch("/api/price");
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch price data`);
+        }
+        
+        const data = await response.json();
+        
+        const {
+          tonPrice,
+          marketCap,
+          fullyDilutedValuation,
+          totalSupply,
+          circulatingSupply,
+          circulatingSuupplyUpbitStandard,
+          burnedSupply,
+          DAOStakedVolume,
+          stakedVolume,
+          liquidity,
+          liquidityUSD,
+        } = data;
+
+        const itemList: DashboardItem[] = [
+          {
+            title: "Price",
+            gridCols: 3,
       subItems: [
         {
           value: `${formatInteger(tonPrice.current.usd)}`,
@@ -382,9 +398,29 @@ export default async function DashboardGrid() {
             </div>
           ),
         },
-      ],
-    },
-  ];
+        ],
+      },
+    ];
+
+        setDashboardItemList(itemList);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        setDashboardItemList([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return <div className="flex flex-col gap-y-[120px] h-[200px]" />;
+  }
+
+  if (dashboardItemList.length === 0) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col gap-y-[120px] [@media(max-width:760px)]:gap-y-[90px]">

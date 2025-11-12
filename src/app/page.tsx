@@ -7,6 +7,9 @@ import NewsLetter from "./components/ui/sections/news-letter";
 import Footer from "./components/ui/footer";
 import { Carousel } from "./components/ui/sections/carousel";
 
+// Render dynamically to avoid API calls during build
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <div className="flex flex-col items-center w-full font-[Proxima_Nova] bg-[#1C1C1C]">

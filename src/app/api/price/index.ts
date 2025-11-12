@@ -9,37 +9,48 @@ const fetchTONPriceInfo = async () => {
       FETCH_OPTIONS
     );
     const data = await response.json();
-    return JSON.parse(JSON.stringify(data).replace(/]|[[]/g, ""));
+    // Upbit API returns an array, extract first element
+    return Array.isArray(data) ? data[0] : data;
   } catch (error) {
-    console.error("setPosts error");
-    console.log(error);
+    console.error("Error fetching TON price from Upbit:", error);
+    return null;
   }
 };
 
 const getUSDPrice = async () => {
-  const response = await fetch(
-    "https://open.er-api.com/v6/latest/KRW",
-    FETCH_OPTIONS
-  );
-  const data = await response.json();
-  return data.rates.USD;
+  try {
+    const response = await fetch(
+      "https://open.er-api.com/v6/latest/KRW",
+      FETCH_OPTIONS
+    );
+    const data = await response.json();
+    return data.rates.USD;
+  } catch (error) {
+    console.error("Error fetching USD exchange rate:", error);
+    return null;
+  }
 };
 
 const getStakingVolume = async () => {
-  const [currentStaked, DAOStaked] = await Promise.all([
-    fetch(
-      "https://price.api.tokamak.network/staking/current",
-      FETCH_OPTIONS
-    ).then((res) => res.json()),
-    fetch("https://price.api.tokamak.network/supply", FETCH_OPTIONS).then(
-      (res) => res.json()
-    ),
-  ]);
+  try {
+    const [currentStaked, DAOStaked] = await Promise.all([
+      fetch(
+        "https://price.api.tokamak.network/staking/current",
+        FETCH_OPTIONS
+      ).then((res) => res.json()),
+      fetch("https://price.api.tokamak.network/supply", FETCH_OPTIONS).then(
+        (res) => res.json()
+      ),
+    ]);
 
-  return {
-    currentStaked,
-    DAOStaked: DAOStaked.daoValue,
-  };
+    return {
+      currentStaked,
+      DAOStaked: DAOStaked.daoValue,
+    };
+  } catch (error) {
+    console.error("Error fetching staking volume:", error);
+    return null;
+  }
 };
 
 const getSuuplyInfo = async (): Promise<{
@@ -49,7 +60,7 @@ const getSuuplyInfo = async (): Promise<{
   C3: number;
   totalSupply: number;
   burned: number;
-}> => {
+} | null> => {
   try {
     const [circulationSupply, totalSupplyData] = await Promise.all([
       fetch(
@@ -68,7 +79,7 @@ const getSuuplyInfo = async (): Promise<{
     };
   } catch (error) {
     console.error("Error fetching supply data:", error);
-    throw error;
+    return null;
   }
 };
 
@@ -80,6 +91,11 @@ export const fetchPriceDatas = async () => {
       getStakingVolume(),
       getSuuplyInfo(),
     ]);
+
+  // Check if any API call failed
+  if (!priceInfo || !krwToUsdRate || !stakingVolume || !suuplyInfo) {
+    throw new Error("Failed to fetch one or more price data sources");
+  }
 
   const usdCurrentPrice =
     Math.round(priceInfo.trade_price * krwToUsdRate * 100) / 100;

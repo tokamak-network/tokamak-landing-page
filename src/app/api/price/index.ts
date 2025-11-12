@@ -8,38 +8,76 @@ const fetchTONPriceInfo = async () => {
       "https://api.upbit.com/v1/ticker?markets=KRW-tokamak",
       FETCH_OPTIONS
     );
+
+    if (!response.ok) {
+      throw new Error(
+        `Upbit API error: ${response.status} ${response.statusText}`
+      );
+    }
+
     const data = await response.json();
-    return JSON.parse(JSON.stringify(data).replace(/]|[[]/g, ""));
+
+    // Upbit API returns an array, so get the first element
+    return Array.isArray(data) ? data[0] : data;
   } catch (error) {
-    console.error("setPosts error");
-    console.log(error);
+    console.error("Error fetching TON price info:", error);
+    throw error;
   }
 };
 
 const getUSDPrice = async () => {
-  const response = await fetch(
-    "https://open.er-api.com/v6/latest/KRW",
-    FETCH_OPTIONS
-  );
-  const data = await response.json();
-  return data.rates.USD;
+  try {
+    const response = await fetch(
+      "https://open.er-api.com/v6/latest/KRW",
+      FETCH_OPTIONS
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Exchange rate API error: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+    return data.rates.USD;
+  } catch (error) {
+    console.error("Error fetching USD exchange rate:", error);
+    throw error;
+  }
 };
 
 const getStakingVolume = async () => {
-  const [currentStaked, DAOStaked] = await Promise.all([
-    fetch(
-      "https://price.api.tokamak.network/staking/current",
-      FETCH_OPTIONS
-    ).then((res) => res.json()),
-    fetch("https://price.api.tokamak.network/supply", FETCH_OPTIONS).then(
-      (res) => res.json()
-    ),
-  ]);
+  try {
+    const [currentStaked, DAOStaked] = await Promise.all([
+      fetch(
+        "https://price.api.tokamak.network/staking/current",
+        FETCH_OPTIONS
+      ).then(async (res) => {
+        if (!res.ok) {
+          throw new Error(`Staking API error: ${res.status} ${res.statusText}`);
+        }
+        return res.json();
+      }),
+      fetch("https://price.api.tokamak.network/supply", FETCH_OPTIONS).then(
+        async (res) => {
+          if (!res.ok) {
+            throw new Error(
+              `Supply API error: ${res.status} ${res.statusText}`
+            );
+          }
+          return res.json();
+        }
+      ),
+    ]);
 
-  return {
-    currentStaked,
-    DAOStaked: DAOStaked.daoValue,
-  };
+    return {
+      currentStaked,
+      DAOStaked: DAOStaked.daoValue,
+    };
+  } catch (error) {
+    console.error("Error fetching staking volume:", error);
+    throw error;
+  }
 };
 
 const getSuuplyInfo = async (): Promise<{
@@ -55,9 +93,23 @@ const getSuuplyInfo = async (): Promise<{
       fetch(
         "https://price.api.tokamak.network/circulationSupply",
         FETCH_OPTIONS
-      ).then((res) => res.json()),
+      ).then(async (res) => {
+        if (!res.ok) {
+          throw new Error(
+            `Circulation supply API error: ${res.status} ${res.statusText}`
+          );
+        }
+        return res.json();
+      }),
       fetch("https://price.api.tokamak.network/supply", FETCH_OPTIONS).then(
-        (res) => res.json()
+        async (res) => {
+          if (!res.ok) {
+            throw new Error(
+              `Total supply API error: ${res.status} ${res.statusText}`
+            );
+          }
+          return res.json();
+        }
       ),
     ]);
 

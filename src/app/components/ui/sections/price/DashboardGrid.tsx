@@ -170,14 +170,22 @@ const DashboardGridItem = (props: DashboardItem) => {
 export default function DashboardGrid() {
   const [dashboardItemList, setDashboardItemList] = useState<DashboardItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
+        console.log("Fetching price data from /api/price...");
         const response = await fetch("/api/price");
+        console.log("Response status:", response.status);
+        
         if (!response.ok) {
-          throw new Error("Failed to fetch price data");
+          throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
         }
+        
+        const data = await response.json();
+        console.log("Received data:", data);
+        
         const {
           tonPrice,
           marketCap,
@@ -190,7 +198,7 @@ export default function DashboardGrid() {
           stakedVolume,
           liquidity,
           liquidityUSD,
-        } = await response.json();
+        } = data;
 
         const itemList: DashboardItem[] = [
           {
@@ -399,9 +407,10 @@ export default function DashboardGrid() {
     ];
 
         setDashboardItemList(itemList);
+        console.log("Dashboard data set successfully");
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
-        setDashboardItemList([]);
+        setError(error instanceof Error ? error.message : "Unknown error");
       } finally {
         setIsLoading(false);
       }
@@ -411,11 +420,29 @@ export default function DashboardGrid() {
   }, []);
 
   if (isLoading) {
-    return <div className="flex flex-col gap-y-[120px] h-screen" />; // Placeholder
+    return (
+      <div className="flex flex-col gap-y-[120px] [@media(max-width:760px)]:gap-y-[90px]">
+        <div className="text-center py-20">Loading price data...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-y-[120px] [@media(max-width:760px)]:gap-y-[90px]">
+        <div className="text-center py-20 text-red-500">
+          Error loading price data: {error}
+        </div>
+      </div>
+    );
   }
 
   if (dashboardItemList.length === 0) {
-    return null;
+    return (
+      <div className="flex flex-col gap-y-[120px] [@media(max-width:760px)]:gap-y-[90px]">
+        <div className="text-center py-20">No price data available</div>
+      </div>
+    );
   }
 
   return (

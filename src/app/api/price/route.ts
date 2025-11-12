@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { fetchPriceDatas } from "./index";
 
-export const revalidate = 60;
 export const dynamic = "force-dynamic";
 
 export async function GET() {
@@ -16,4 +15,3 @@ export async function GET() {
     );
   }
 }
-

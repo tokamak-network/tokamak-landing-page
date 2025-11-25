@@ -4,6 +4,9 @@ import axios from "axios";
 import { MediumPost } from "@/app/components/ui/sections/insight/types";
 import { NextResponse } from "next/server";
 
+// Vercel에서 Node.js runtime 사용 (axios, cheerio 필요)
+export const runtime = "nodejs";
+// 20분마다 재검증 (ISR)
 export const revalidate = 1200;
 
 interface CustomFeed {
@@ -18,11 +21,16 @@ interface CustomItem {
   pubDate: string;
   "content:encoded"?: string; // Medium RSS uses this field
   author: string;
-  categories: string[];
+  categories?: string[];
 }
 
-function processCategories(categories: string[]): string[] {
+function processCategories(categories: string[] | undefined): string[] {
   const validCategories = ["news", "tokamak-network", "research"];
+  
+  // Handle undefined or empty categories
+  if (!categories || categories.length === 0) {
+    return ["tokamak-network"];
+  }
 
   // Check if there's at least one valid category
   const hasValidCategory = categories.some((category) =>

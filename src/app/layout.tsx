@@ -32,12 +32,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="font-proxima">
+    <html lang="en" className="font-proxima" suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/fuc6kbq.css" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <FocusProvider>{children}</FocusProvider>
       </body>

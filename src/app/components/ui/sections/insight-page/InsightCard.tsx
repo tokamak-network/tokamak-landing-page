@@ -3,7 +3,7 @@
 import { MediumPost } from "../insight/types";
 import Image from "next/image";
 import DefaultThumbnail from "@/assets/images/insight/default-thumnail.svg";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { NewsDate } from "../insight/news/NewDate";
 import { formatDistanceToNow } from "date-fns";
 import { useIsMobile } from "@/app/hooks/layout/useIsMobile";
@@ -33,7 +33,15 @@ export function InsightMainCard({
     return "Tokamak Network";
   }, [category, post.categories]);
 
-  const relativeTime = formatRelativeTime(post.pubDate);
+  // Hydration mismatch 방지: 클라이언트에서만 상대 시간 계산
+  const [relativeTime, setRelativeTime] = useState<string>(() => 
+    formatRelativeTime(post.pubDate)
+  );
+  
+  useEffect(() => {
+    setRelativeTime(formatRelativeTime(post.pubDate));
+  }, [post.pubDate]);
+
   const { isMobile: isTablet } = useIsMobile(1279);
   const { isMobile } = useIsMobile(793);
 
@@ -92,7 +100,9 @@ export function InsightMainCard({
         </h1>
         <div className="flex gap-x-[15px]">
           <span className="text-[13px] font-bold">{categoryName}</span>
-          <span className="text-[13px]">{relativeTime}</span>
+          <span className="text-[13px]" suppressHydrationWarning>
+            {relativeTime}
+          </span>
         </div>
       </div>
     </div>

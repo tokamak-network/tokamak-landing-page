@@ -9,6 +9,8 @@ export const runtime = "nodejs";
 // Disable caching for debugging
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+// Set maximum execution time (in seconds)
+export const maxDuration = 30;
 
 interface CustomFeed {
   title: string;
@@ -111,7 +113,7 @@ class MediumFeedParser {
       const rssPosts = await Promise.race([
         this.parser.parseURL(this.baseUrl),
         new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("RSS fetch timeout")), 15000)
+          setTimeout(() => reject(new Error("RSS fetch timeout")), 10000)
         ),
       ]).then((feed) => {
         console.log(`Successfully fetched ${feed.items.length} posts from RSS`);
@@ -162,15 +164,9 @@ class MediumFeedParser {
 
 // Internal function for fetching Medium posts
 async function fetchMediumPosts(): Promise<MediumPost[]> {
-  try {
-    const mediumParser = new MediumFeedParser();
-    const result = await mediumParser.getPosts();
-    return result;
-  } catch (error) {
-    console.error("Error fetching Medium posts:", error);
-    // Return empty array on error
-    return [];
-  }
+  const mediumParser = new MediumFeedParser();
+  const result = await mediumParser.getPosts();
+  return result;
 }
 
 // API Route handler

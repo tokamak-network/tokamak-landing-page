@@ -4,10 +4,11 @@ import axios from "axios";
 import { MediumPost } from "@/app/components/ui/sections/insight/types";
 import { NextResponse } from "next/server";
 
-// Vercel에서 Node.js runtime 사용 (axios, cheerio 필요)
+// Use Node.js runtime on Vercel (required for axios, cheerio)
 export const runtime = "nodejs";
-// 20분마다 재검증 (ISR)
-export const revalidate = 1200;
+// Disable caching for debugging
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface CustomFeed {
   title: string;
@@ -26,7 +27,7 @@ interface CustomItem {
 
 function processCategories(categories: string[] | undefined): string[] {
   const validCategories = ["news", "tokamak-network", "research"];
-  
+
   // Handle undefined or empty categories
   if (!categories || categories.length === 0) {
     return ["tokamak-network"];
@@ -66,7 +67,12 @@ class MediumFeedParser {
 
   private async scrapeMorePosts(): Promise<MediumPost[]> {
     try {
-      const response = await axios.get(`https://medium.com/${this.username}`);
+      const response = await axios.get(`https://medium.com/${this.username}`, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (compatible; Tokamak/1.0)",
+        },
+        timeout: 10000,
+      });
       const $ = cheerio.load(response.data);
       const posts: MediumPost[] = [];
 
@@ -99,9 +105,17 @@ class MediumFeedParser {
 
   async getPosts(): Promise<MediumPost[]> {
     try {
-      // Fetch from RSS feed
-      const rssPosts = await this.parser.parseURL(this.baseUrl).then((feed) =>
-        feed.items.map((item) => {
+      console.log("Fetching Medium RSS feed from:", this.baseUrl);
+
+      // Fetch from RSS feed with timeout
+      const rssPosts = await Promise.race([
+        this.parser.parseURL(this.baseUrl),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("RSS fetch timeout")), 15000)
+        ),
+      ]).then((feed) => {
+        console.log(`Successfully fetched ${feed.items.length} posts from RSS`);
+        return feed.items.map((item) => {
           // Thumbnail extraction logic
           let thumbnail: string | undefined = undefined;
           if (item["content:encoded"]) {
@@ -119,8 +133,8 @@ class MediumFeedParser {
             content: item["content:encoded"],
             categories: processCategories(item.categories),
           };
-        })
-      );
+        });
+      });
 
       // Fetch additional posts through scraping
       // const scrapedPosts = await this.scrapeMorePosts();
@@ -133,9 +147,14 @@ class MediumFeedParser {
       //   }
       // });
 
+      console.log(`Returning ${allPosts.length} total posts`);
       return allPosts;
     } catch (error) {
       console.error("Error fetching Medium posts:", error);
+      console.error(
+        "Error details:",
+        error instanceof Error ? error.message : String(error)
+      );
       throw error;
     }
   }
@@ -157,10 +176,31 @@ async function fetchMediumPosts(): Promise<MediumPost[]> {
 // API Route handler
 export async function GET() {
   try {
+    console.log("Medium API route called");
     const posts = await fetchMediumPosts();
-    return NextResponse.json(posts);
+    console.log(`Returning ${posts.length} posts to client`);
+
+    return NextResponse.json(posts, {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    });
   } catch (error) {
     console.error("Error in API route:", error);
-    return NextResponse.json([], { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error("Error message:", errorMessage);
+
+    // Return error details in development, empty array in production
+    return NextResponse.json(
+      {
+        error: errorMessage,
+        posts: [],
+        timestamp: new Date().toISOString(),
+      },
+      { status: 500 }
+    );
   }
 }

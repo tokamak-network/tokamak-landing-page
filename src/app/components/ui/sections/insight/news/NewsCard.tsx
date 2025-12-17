@@ -2,7 +2,7 @@ import Image from "next/image";
 import { MediumPost } from "../types";
 import { NewsDate } from "./NewDate";
 import DefaultThumbnail from "@/assets/images/insight/default-thumnail.svg";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export function NewsCard({
   post,
@@ -11,6 +11,8 @@ export function NewsCard({
   post: MediumPost;
   category: string;
 }) {
+  const [imgError, setImgError] = useState(false);
+  
   const categoryName = useMemo(() => {
     if (category !== "All") return category;
     const validCategories = ["news", "tokamak-network", "research"];
@@ -24,6 +26,13 @@ export function NewsCard({
     return "Tokamak Network";
   }, [category, post.categories]);
 
+  // Determine which image source to use
+  const imageSrc = useMemo(() => {
+    if (imgError) return DefaultThumbnail;
+    if (!post.thumbnail || post.thumbnail.trim() === "") return DefaultThumbnail;
+    return post.thumbnail;
+  }, [post.thumbnail, imgError]);
+
   return (
     <a
       href={post.link}
@@ -36,10 +45,11 @@ export function NewsCard({
       "
       >
         <Image
-          src={post.thumbnail || DefaultThumbnail}
+          src={imageSrc}
           alt={post.title}
           fill
           className="object-cover"
+          onError={() => setImgError(true)}
         />
       </div>
       <div className="flex justify-between items-center text-sm mb-2">

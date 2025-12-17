@@ -20,6 +20,8 @@ export function InsightMainCard({
   post: MediumPost;
   category: string;
 }) {
+  const [imgError, setImgError] = useState(false);
+  
   const categoryName = useMemo(() => {
     if (category !== "All") return category;
     const validCategories = ["news", "tokamak-network", "research"];
@@ -32,6 +34,13 @@ export function InsightMainCard({
     if (displayCategory === "news") return "News";
     return "Tokamak Network";
   }, [category, post.categories]);
+
+  // Determine which image source to use
+  const imageSrc = useMemo(() => {
+    if (imgError) return DefaultThumbnail;
+    if (!post.thumbnail || post.thumbnail.trim() === "") return DefaultThumbnail;
+    return post.thumbnail;
+  }, [post.thumbnail, imgError]);
 
   // Hydration mismatch 방지: 클라이언트에서만 상대 시간 계산
   const [relativeTime, setRelativeTime] = useState<string>(() => 
@@ -52,7 +61,7 @@ export function InsightMainCard({
         <div className="flex flex-col text-tokamak-black  max-w-[570px]">
           <div className="rounded-[14px]">
             <Image
-              src={post.thumbnail || DefaultThumbnail}
+              src={imageSrc}
               alt={post.title}
               width={570}
               height={320}
@@ -60,6 +69,7 @@ export function InsightMainCard({
               border
           border-[#DEDEDE]
               "
+              onError={() => setImgError(true)}
             />
           </div>
           <div className="flex justify-between items-center text-sm mb-2 w-full max-w-[570px]">
@@ -82,7 +92,7 @@ export function InsightMainCard({
       onClick={() => window.open(post.link)}
     >
       <Image
-        src={post.thumbnail || DefaultThumbnail}
+        src={imageSrc}
         alt={post.title}
         width={600}
         height={337}
@@ -90,6 +100,7 @@ export function InsightMainCard({
         border
           border-[#DEDEDE]
         "
+        onError={() => setImgError(true)}
       />
       <div
         className="flex flex-col pt-[30px]

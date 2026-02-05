@@ -11,9 +11,9 @@ import PraveenImage from "@/assets/members/member=Praveen Surendran.png";
 import MonicaImage from "@/assets/members/member=Monica Kim.png";
 import HarveyImage from "@/assets/members/member=Harvey Jo.png";
 import SuhyeonImage from "@/assets/members/member=Suhyeon Lee.png";
-import NamImage from "@/assets/members/member=Pham Tien Nam.png";
+// import NamImage from "@/assets/members/member=Pham Tien Nam.png";
 import JakeImage from "@/assets/members/member=Jake Jang.png";
-import MuhammedImage from "@/assets/members/member=Muhammed Ali Bingol.png";
+// import MuhammedImage from "@/assets/members/member=Muhammed Ali Bingol.png";
 import TheoImage from "@/assets/members/member=Theo Lee.png";
 import MehdiImage from "@/assets/members/member=Mehdi Beriane.png";
 import IreneImage from "@/assets/members/member=Irene Bae.png";
@@ -24,11 +24,11 @@ import GeorgeImage from "@/assets/members/member=Negru George.png";
 // import JamesImage from "@/assets/members/member=James Bello.png";
 import JasonImage from "@/assets/members/member=Jason Hwang.png";
 import AryanImage from "@/assets/members/member=Aryan Soni.png";
-import NilImage from "@/assets/members/member=Nil.png";
-import LucaImage from "@/assets/members/member=Luca.png";
+// import NilImage from "@/assets/members/member=Nil.png";
+// import LucaImage from "@/assets/members/member=Luca.png";
 // import JeffImage from "@/assets/members/member=Jeff.png";
 import AmirImage from "@/assets/members/member=Amir.png";
-import ManishImage from "@/assets/members/member=Manish.png";
+// import ManishImage from "@/assets/members/member=Manish.png";
 import EugenieImage from "@/assets/members/member=Eugenie Nguyen.png";
 
 const teamMembers = [
@@ -88,21 +88,21 @@ const teamMembers = [
     role: "Researcher",
     imageUrl: SuhyeonImage,
   },
-  {
-    name: "Pham Tien Nam",
-    role: "L2 Engineer",
-    imageUrl: NamImage,
-  },
+  // {
+  //   name: "Pham Tien Nam",
+  //   role: "L2 Engineer",
+  //   imageUrl: NamImage,
+  // },
   {
     name: "Jake Jang",
     role: "ZKP Researcher",
     imageUrl: JakeImage,
   },
-  {
-    name: "Muhammed Ali Bingol",
-    role: "ZKP Researcher",
-    imageUrl: MuhammedImage,
-  },
+  // {
+  //   name: "Muhammed Ali Bingol",
+  //   role: "ZKP Researcher",
+  //   imageUrl: MuhammedImage,
+  // },
   {
     name: "Theo Lee",
     role: "Blockchain Engineer",
@@ -158,16 +158,16 @@ const teamMembers = [
   //   role: "Blockchain Developer",
   //   imageUrl: JustinImage,
   // },
-  {
-    name: "Najmeh Soroush",
-    role: "ZKP Researcher",
-    imageUrl: NilImage,
-  },
-  {
-    name: "Luca Dall'Ava",
-    role: "ZKP Researcher",
-    imageUrl: LucaImage,
-  },
+  // {
+  //   name: "Najmeh Soroush",
+  //   role: "ZKP Researcher",
+  //   imageUrl: NilImage,
+  // },
+  // {
+  //   name: "Luca Dall'Ava",
+  //   role: "ZKP Researcher",
+  //   imageUrl: LucaImage,
+  // },
   // {
   //   name: "Jeff",
   //   role: "Blockchain Engineer",
@@ -178,11 +178,11 @@ const teamMembers = [
     role: "Blockchain Engineer",
     imageUrl: AmirImage,
   },
-  {
-    name: "Manish Kumar",
-    role: "Blockchain Engineer",
-    imageUrl: ManishImage,
-  },
+  // {
+  //   name: "Manish Kumar",
+  //   role: "Blockchain Engineer",
+  //   imageUrl: ManishImage,
+  // },
   {
     name: "Eugenie Nguyen",
     role: "Researcher",

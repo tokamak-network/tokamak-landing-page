@@ -29,7 +29,7 @@ import AryanImage from "@/assets/members/member=Aryan Soni.png";
 // import JeffImage from "@/assets/members/member=Jeff.png";
 import AmirImage from "@/assets/members/member=Amir.png";
 // import ManishImage from "@/assets/members/member=Manish.png";
-import EugenieImage from "@/assets/members/member=Eugenie Nguyen.png";
+// import EugenieImage from "@/assets/members/member=Eugenie Nguyen.png";
 
 const teamMembers = [
   {
@@ -183,11 +183,11 @@ const teamMembers = [
   //   role: "Blockchain Engineer",
   //   imageUrl: ManishImage,
   // },
-  {
-    name: "Eugenie Nguyen",
-    role: "Researcher",
-    imageUrl: EugenieImage,
-  },
+  // {
+  //   name: "Eugenie Nguyen",
+  //   role: "Researcher",
+  //   imageUrl: EugenieImage,
+  // },
 ];
 
 const TeamGrid: React.FC = () => {

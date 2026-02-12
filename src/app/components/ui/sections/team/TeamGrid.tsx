@@ -17,13 +17,13 @@ import JakeImage from "@/assets/members/member=Jake Jang.png";
 import TheoImage from "@/assets/members/member=Theo Lee.png";
 import MehdiImage from "@/assets/members/member=Mehdi Beriane.png";
 import IreneImage from "@/assets/members/member=Irene Bae.png";
-import ShailendraImage from "@/assets/members/member=Singh Shailendra.png";
-import GeorgeImage from "@/assets/members/member=Negru George.png";
+// import ShailendraImage from "@/assets/members/member=Singh Shailendra.png";
+// import GeorgeImage from "@/assets/members/member=Negru George.png";
 // import VictorImage from "@/assets/members/member=Victor Hazard.png";
 // import KaidenImage from "@/assets/members/member=Kaiden Araki.png";
 // import JamesImage from "@/assets/members/member=James Bello.png";
 import JasonImage from "@/assets/members/member=Jason Hwang.png";
-import AryanImage from "@/assets/members/member=Aryan Soni.png";
+// import AryanImage from "@/assets/members/member=Aryan Soni.png";
 // import NilImage from "@/assets/members/member=Nil.png";
 // import LucaImage from "@/assets/members/member=Luca.png";
 // import JeffImage from "@/assets/members/member=Jeff.png";
@@ -118,16 +118,16 @@ const teamMembers = [
     role: "HR Manager",
     imageUrl: IreneImage,
   },
-  {
-    name: "Singh Shailendra",
-    role: "Blockchain Engineer",
-    imageUrl: ShailendraImage,
-  },
-  {
-    name: "Negru George",
-    role: "Blockchain Engineer",
-    imageUrl: GeorgeImage,
-  },
+  // {
+  //   name: "Singh Shailendra",
+  //   role: "Blockchain Engineer",
+  //   imageUrl: ShailendraImage,
+  // },
+  // {
+  //   name: "Negru George",
+  //   role: "Blockchain Engineer",
+  //   imageUrl: GeorgeImage,
+  // },
   // {
   //   name: "Victor Hazard",
   //   role: "Software Engineer",
@@ -143,11 +143,11 @@ const teamMembers = [
   //   role: "Software Engineer",
   //   imageUrl: JamesImage,
   // },
-  {
-    name: "Aryan Soni",
-    role: "Blockchain Engineer",
-    imageUrl: AryanImage,
-  },
+  // {
+  //   name: "Aryan Soni",
+  //   role: "Blockchain Engineer",
+  //   imageUrl: AryanImage,
+  // },
   // {
   //   name: "Kaibin Huang",
   //   role: "ZKP researcher",

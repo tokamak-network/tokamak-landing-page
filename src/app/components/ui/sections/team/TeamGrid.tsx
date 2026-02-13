@@ -7,7 +7,7 @@ import AleImage from "@/assets/members/member=Ale.png";
 // import JamieImage from "@/assets/members/member=Jamie.png";
 
 import JadenImage from "@/assets/members/member=Jaden Kong.png";
-import PraveenImage from "@/assets/members/member=Praveen Surendran.png";
+// import PraveenImage from "@/assets/members/member=Praveen Surendran.png";
 import MonicaImage from "@/assets/members/member=Monica Kim.png";
 import HarveyImage from "@/assets/members/member=Harvey Jo.png";
 import SuhyeonImage from "@/assets/members/member=Suhyeon Lee.png";
@@ -68,11 +68,11 @@ const teamMembers = [
     role: "Managing Director",
     imageUrl: JadenImage,
   },
-  {
-    name: "Praveen Surendran",
-    role: "Researcher",
-    imageUrl: PraveenImage,
-  },
+  // {
+  //   name: "Praveen Surendran",
+  //   role: "Researcher",
+  //   imageUrl: PraveenImage,
+  // },
   {
     name: "Monica Kim",
     role: "UX/UI Designer",

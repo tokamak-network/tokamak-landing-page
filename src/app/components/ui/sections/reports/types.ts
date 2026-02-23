@@ -22,7 +22,6 @@ export interface ReportSummary extends ReportMeta {
 
 export interface Contributor {
   name: string;
-  avatarUrl: string;
   profileUrl: string;
 }
 

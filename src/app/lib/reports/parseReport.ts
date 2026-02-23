@@ -9,20 +9,13 @@ import type {
   RepoCardData,
   Contributor,
 } from "@/app/components/ui/sections/reports/types";
+import { DEFAULT_STATS } from "./constants";
 
-const DEFAULT_STATS: ReportStats = {
-  commits: "0",
-  linesChanged: "0",
-  activeRepos: "0",
-  contributors: "0",
-  netGrowth: "0",
-};
-
-function sanitizeUrl(url: string): string {
+export function sanitizeUrl(url: string): string {
   try {
     const parsed = new URL(url);
     if (parsed.protocol === "https:" || parsed.protocol === "http:") {
-      return url;
+      return parsed.href;
     }
     return "";
   } catch {
@@ -30,7 +23,7 @@ function sanitizeUrl(url: string): string {
   }
 }
 
-function extractBetweenComments(
+export function extractBetweenComments(
   html: string,
   startMarker: string,
   endMarker: string
@@ -44,12 +37,42 @@ function extractBetweenComments(
   return html.slice(afterStart, endIdx).trim();
 }
 
-function parseStats(html: string): ReportStats {
+function findStatValue(
+  $: cheerio.CheerioAPI,
+  container: cheerio.Cheerio<AnyNode>,
+  labels: Record<string, string>
+): Record<string, string> {
+  const entries: Record<string, string> = {};
+
+  container.find("div").each((_: number, el: AnyNode) => {
+    const children = $(el).children("div");
+    if (children.length < 2) return;
+
+    // Only process leaf-level stat containers (children should not contain nested divs)
+    const firstChild = $(children[0]);
+    const lastChild = $(children[children.length - 1]);
+    if (firstChild.find("div").length > 0 || lastChild.find("div").length > 0)
+      return;
+
+    const value = firstChild.text().trim();
+    const label = lastChild.text().trim().toLowerCase();
+
+    for (const [key, field] of Object.entries(labels)) {
+      if (label.includes(key) && !entries[field]) {
+        entries[field] = value;
+        break;
+      }
+    }
+  });
+
+  return entries;
+}
+
+export function parseStats(html: string): ReportStats {
   const statsHtml = extractBetweenComments(html, "STATS BAR", "BODY");
   if (!statsHtml) return { ...DEFAULT_STATS };
 
   const $ = cheerio.load(statsHtml);
-  const statDivs = $("div[style*='text-align:center']");
 
   const labels: Record<string, keyof ReportStats> = {
     commits: "commits",
@@ -61,22 +84,7 @@ function parseStats(html: string): ReportStats {
     "net change": "netGrowth",
   };
 
-  const entries: Partial<ReportStats> = {};
-  statDivs.each((_: number, el: AnyNode) => {
-    const children = $(el).children("div");
-    if (children.length < 2) return;
-
-    const value = $(children[0]).text().trim();
-    const label = $(children[children.length - 1]).text().trim().toLowerCase();
-
-    for (const [key, field] of Object.entries(labels)) {
-      if (label.includes(key)) {
-        entries[field] = value;
-        break;
-      }
-    }
-  });
-
+  const entries = findStatValue($, $.root(), labels);
   return { ...DEFAULT_STATS, ...entries };
 }
 
@@ -93,23 +101,23 @@ function parseExecutiveSummary(html: string): {
 
   const $ = cheerio.load(summaryHtml);
 
-  // Real HTML: <h3> for headline, <p> for narrative
   const headline: string =
     $("h3").first().text().trim() ||
     $("p[style*='font-weight:bold']").first().text().trim() ||
     $("p").first().text().trim();
 
   const paragraphs = $("p").toArray();
-  const narrative: string =
-    paragraphs.length > 0
-      ? $(paragraphs[paragraphs.length - 1]).text().trim()
-      : "";
+  const narrative: string = paragraphs
+    .map((p) => $(p).text().trim())
+    .filter(Boolean)
+    .join("\n\n");
 
   return { headline, narrative };
 }
 
 function extractRepoStats(
-  card: cheerio.Cheerio<AnyNode>
+  card: cheerio.Cheerio<AnyNode>,
+  $: cheerio.CheerioAPI
 ): RepoCardData["stats"] {
   const defaults = {
     commits: "0",
@@ -119,40 +127,16 @@ function extractRepoStats(
     netLines: "0",
   };
 
-  // Real HTML: stats in div with gap:24px or gap:20px, containing text-align:center divs
-  const statsContainer = card.find(
-    "div[style*='justify-content:space-around']"
-  ).first();
-
-  if (!statsContainer.length) return defaults;
-
-  const $ = cheerio.load(statsContainer.html() || "");
-  const statLabels: Record<string, keyof typeof defaults> = {
+  const labels: Record<string, string> = {
     commits: "commits",
     contributors: "contributors",
     "lines added": "linesAdded",
     "lines deleted": "linesDeleted",
     "net change": "netLines",
     "net lines": "netLines",
-    net: "netLines",
   };
 
-  const entries: Partial<typeof defaults> = {};
-  $("div[style*='text-align:center']").each((_: number, el: AnyNode) => {
-    const children = $(el).children("div");
-    if (children.length < 2) return;
-
-    const value = $(children[0]).text().trim();
-    const label = $(children[children.length - 1]).text().trim().toLowerCase();
-
-    for (const [key, field] of Object.entries(statLabels)) {
-      if (label.includes(key)) {
-        entries[field] = value;
-        break;
-      }
-    }
-  });
-
+  const entries = findStatValue($, card, labels);
   return { ...defaults, ...entries };
 }
 
@@ -173,24 +157,24 @@ function extractAccomplishments(
 }
 
 function extractContributors(
-  sections: Record<string, cheerio.Cheerio<AnyNode>>,
   card: cheerio.Cheerio<AnyNode>,
   $: cheerio.CheerioAPI
 ): Contributor[] {
   const contributors: Contributor[] = [];
 
-  // Real HTML: contributors are in a div with "Top Contributors:" text
-  // Pattern: <a href="...">name</a> <span>(N commits)</span>
-  const contributorDiv = card.find("div").filter((_: number, el: AnyNode) => {
-    return $(el).find("strong").text().includes("Top Contributors");
-  }).first();
+  const contributorDiv = card
+    .find("div")
+    .filter((_: number, el: AnyNode) =>
+      $(el).find("strong").text().includes("Top Contributors")
+    )
+    .first();
 
   if (contributorDiv.length) {
     contributorDiv.find("a").each((_: number, a: AnyNode) => {
       const profileUrl = sanitizeUrl($(a).attr("href") || "");
       const name: string = $(a).text().trim();
       if (name) {
-        contributors.push({ name, avatarUrl: "", profileUrl });
+        contributors.push({ name, profileUrl });
       }
     });
   }
@@ -198,70 +182,81 @@ function extractContributors(
   return contributors;
 }
 
-function parseRepoCards(html: string): RepoCardData[] {
+function buildCardFromDiv(
+  div: cheerio.Cheerio<AnyNode>,
+  $: cheerio.CheerioAPI
+): RepoCardData | null {
+  const repoName: string = div.find("h3").first().text().trim();
+  if (!repoName) return null;
+
+  let githubUrl = "";
+  div.find("a").each((_i: number, a: AnyNode) => {
+    const href = $(a).attr("href") || "";
+    const text = $(a).text().trim();
+    if (
+      (text.includes("GitHub") || href.includes("github.com")) &&
+      !githubUrl
+    ) {
+      githubUrl = sanitizeUrl(href);
+    }
+  });
+
+  const description: string = div.find("p").first().text().trim();
+  const repoStats = extractRepoStats(div, $);
+
+  const sections: Record<string, cheerio.Cheerio<AnyNode>> = {};
+  div.find("h4").each((_i: number, h4: AnyNode) => {
+    const title: string = $(h4).text().trim().toLowerCase();
+    sections[title] = $(h4);
+  });
+
+  return {
+    repoName,
+    githubUrl,
+    description,
+    stats: repoStats,
+    accomplishments: extractAccomplishments(sections, $),
+    codeAnalysis: sections["code analysis"]
+      ? sections["code analysis"].next("p").text().trim()
+      : "",
+    nextSteps: sections["next steps"]
+      ? sections["next steps"].next("p").text().trim()
+      : "",
+    topContributors: extractContributors(div, $),
+  };
+}
+
+export function parseRepoCards(html: string): RepoCardData[] {
   const cardsHtml = extractBetweenComments(html, "REPO CARDS", "FOOTER");
   if (!cardsHtml) return [];
 
   const $ = cheerio.load(cardsHtml);
   const cards: RepoCardData[] = [];
 
-  const cardDivs = $(
-    "div[style*='background:#fff'][style*='border:1px solid #e8e8e8'][style*='border-radius:12px']"
-  );
+  // Find repo cards by structural marker: top-level divs that contain an <h3>
+  $.root()
+    .children("div")
+    .each((_: number, el: AnyNode) => {
+      const div = $(el);
+      if (!div.find("h3").length) return;
 
-  cardDivs.each((_: number, cardEl: AnyNode) => {
-    const card = $(cardEl);
-
-    // Real HTML: <h3> contains repo name directly, GitHub link is a separate <a>
-    const repoName: string = card.find("h3").first().text().trim();
-
-    // GitHub URL: look for <a> with "GitHub" text or github.com href
-    let githubUrl = "";
-    card.find("a").each((_i: number, a: AnyNode) => {
-      const href = $(a).attr("href") || "";
-      const text = $(a).text().trim();
-      if (
-        (text.includes("GitHub") || href.includes("github.com")) &&
-        !githubUrl
-      ) {
-        githubUrl = sanitizeUrl(href);
-      }
+      const card = buildCardFromDiv(div, $);
+      if (card) cards.push(card);
     });
 
-    // Description: first <p> after the header area
-    const description: string = card.find("p").first().text().trim();
-
-    const repoStats = extractRepoStats(card);
-
-    const sections: Record<string, cheerio.Cheerio<AnyNode>> = {};
-    card.find("h4").each((_i: number, h4: AnyNode) => {
-      const title: string = $(h4).text().trim().toLowerCase();
-      sections[title] = $(h4);
-    });
-
-    const accomplishments = extractAccomplishments(sections, $);
-
-    const codeAnalysis: string = sections["code analysis"]
-      ? sections["code analysis"].next("p").text().trim()
-      : "";
-
-    const nextSteps: string = sections["next steps"]
-      ? sections["next steps"].next("p").text().trim()
-      : "";
-
-    const topContributors = extractContributors(sections, card, $);
-
-    cards.push({
-      repoName,
-      githubUrl,
-      description,
-      stats: repoStats,
-      accomplishments,
-      codeAnalysis,
-      nextSteps,
-      topContributors,
-    });
-  });
+  // Fallback: if root children didn't work, try nested divs with <h3> + <h4>
+  if (cards.length === 0) {
+    $("div")
+      .filter((_: number, el: AnyNode) => {
+        const d = $(el);
+        return d.find("h3").length > 0 && d.find("h4").length > 0;
+      })
+      .each((_: number, el: AnyNode) => {
+        const card = buildCardFromDiv($(el), $);
+        if (!card || cards.some((c) => c.repoName === card.repoName)) return;
+        cards.push(card);
+      });
+  }
 
   return cards;
 }
@@ -275,17 +270,10 @@ export function parseReportSummary(
     const stats = parseStats(html);
     const { headline } = parseExecutiveSummary(html);
 
-    return {
-      ...meta,
-      stats,
-      executiveHeadline: headline,
-    };
-  } catch {
-    return {
-      ...meta,
-      stats: { ...DEFAULT_STATS },
-      executiveHeadline: "",
-    };
+    return { ...meta, stats, executiveHeadline: headline };
+  } catch (error) {
+    console.error(`[reports] Failed to parse summary for ${meta.slug}:`, error);
+    return { ...meta, stats: { ...DEFAULT_STATS }, executiveHeadline: "" };
   }
 }
 
@@ -306,7 +294,8 @@ export function parseReportDetail(
       executiveNarrative: narrative,
       repos,
     };
-  } catch {
+  } catch (error) {
+    console.error(`[reports] Failed to parse detail for ${meta.slug}:`, error);
     return {
       ...meta,
       stats: { ...DEFAULT_STATS },

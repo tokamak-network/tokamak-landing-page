@@ -52,17 +52,22 @@ function parseStats(html: string): ReportStats {
   const statDivs = $("div[style*='text-align:center']");
 
   const labels: Record<string, keyof ReportStats> = {
-    "total commits": "commits",
+    commits: "commits",
     "lines changed": "linesChanged",
+    "active repos": "activeRepos",
     "active repositories": "activeRepos",
     contributors: "contributors",
     "net growth": "netGrowth",
+    "net change": "netGrowth",
   };
 
   const entries: Partial<ReportStats> = {};
   statDivs.each((_: number, el: AnyNode) => {
-    const value = $(el).find("div").first().text().trim();
-    const label = $(el).find("div").last().text().trim().toLowerCase();
+    const children = $(el).children("div");
+    if (children.length < 2) return;
+
+    const value = $(children[0]).text().trim();
+    const label = $(children[children.length - 1]).text().trim().toLowerCase();
 
     for (const [key, field] of Object.entries(labels)) {
       if (label.includes(key)) {
@@ -87,12 +92,16 @@ function parseExecutiveSummary(html: string): {
   if (!summaryHtml) return { headline: "", narrative: "" };
 
   const $ = cheerio.load(summaryHtml);
+
+  // Real HTML: <h3> for headline, <p> for narrative
   const headline: string =
+    $("h3").first().text().trim() ||
     $("p[style*='font-weight:bold']").first().text().trim() ||
     $("p").first().text().trim();
+
   const paragraphs = $("p").toArray();
   const narrative: string =
-    paragraphs.length > 1
+    paragraphs.length > 0
       ? $(paragraphs[paragraphs.length - 1]).text().trim()
       : "";
 
@@ -102,23 +111,49 @@ function parseExecutiveSummary(html: string): {
 function extractRepoStats(
   card: cheerio.Cheerio<AnyNode>
 ): RepoCardData["stats"] {
-  const statsText: string = card
-    .find("div[style*='display:flex'][style*='gap:20px']")
-    .first()
-    .text();
-
-  const extractNum = (pattern: RegExp): string => {
-    const match = statsText.match(pattern);
-    return match ? match[1] : "0";
+  const defaults = {
+    commits: "0",
+    contributors: "0",
+    linesAdded: "0",
+    linesDeleted: "0",
+    netLines: "0",
   };
 
-  return {
-    commits: extractNum(/Commits:\s*([\d,]+)/),
-    contributors: extractNum(/Contributors:\s*([\d,]+)/),
-    linesAdded: extractNum(/(\+[\d,]+)/),
-    linesDeleted: extractNum(/(-[\d,]+)/),
-    netLines: extractNum(/Net:\s*([+-]?[\d,]+)/),
+  // Real HTML: stats in div with gap:24px or gap:20px, containing text-align:center divs
+  const statsContainer = card.find(
+    "div[style*='justify-content:space-around']"
+  ).first();
+
+  if (!statsContainer.length) return defaults;
+
+  const $ = cheerio.load(statsContainer.html() || "");
+  const statLabels: Record<string, keyof typeof defaults> = {
+    commits: "commits",
+    contributors: "contributors",
+    "lines added": "linesAdded",
+    "lines deleted": "linesDeleted",
+    "net change": "netLines",
+    "net lines": "netLines",
+    net: "netLines",
   };
+
+  const entries: Partial<typeof defaults> = {};
+  $("div[style*='text-align:center']").each((_: number, el: AnyNode) => {
+    const children = $(el).children("div");
+    if (children.length < 2) return;
+
+    const value = $(children[0]).text().trim();
+    const label = $(children[children.length - 1]).text().trim().toLowerCase();
+
+    for (const [key, field] of Object.entries(statLabels)) {
+      if (label.includes(key)) {
+        entries[field] = value;
+        break;
+      }
+    }
+  });
+
+  return { ...defaults, ...entries };
 }
 
 function extractAccomplishments(
@@ -139,23 +174,27 @@ function extractAccomplishments(
 
 function extractContributors(
   sections: Record<string, cheerio.Cheerio<AnyNode>>,
+  card: cheerio.Cheerio<AnyNode>,
   $: cheerio.CheerioAPI
 ): Contributor[] {
   const contributors: Contributor[] = [];
-  const h4 = sections["top contributors"];
-  if (h4) {
-    h4.nextAll("div")
-      .first()
-      .find("a")
-      .each((_: number, a: AnyNode) => {
-        const profileUrl = sanitizeUrl($(a).attr("href") || "");
-        const name: string = $(a).find("span").text().trim();
-        const avatarUrl = sanitizeUrl($(a).find("img").attr("src") || "");
-        if (name) {
-          contributors.push({ name, avatarUrl, profileUrl });
-        }
-      });
+
+  // Real HTML: contributors are in a div with "Top Contributors:" text
+  // Pattern: <a href="...">name</a> <span>(N commits)</span>
+  const contributorDiv = card.find("div").filter((_: number, el: AnyNode) => {
+    return $(el).find("strong").text().includes("Top Contributors");
+  }).first();
+
+  if (contributorDiv.length) {
+    contributorDiv.find("a").each((_: number, a: AnyNode) => {
+      const profileUrl = sanitizeUrl($(a).attr("href") || "");
+      const name: string = $(a).text().trim();
+      if (name) {
+        contributors.push({ name, avatarUrl: "", profileUrl });
+      }
+    });
   }
+
   return contributors;
 }
 
@@ -173,9 +212,24 @@ function parseRepoCards(html: string): RepoCardData[] {
   cardDivs.each((_: number, cardEl: AnyNode) => {
     const card = $(cardEl);
 
+    // Real HTML: <h3> contains repo name directly, GitHub link is a separate <a>
     const repoName: string = card.find("h3").first().text().trim();
-    const githubUrl = sanitizeUrl(card.find("h3 a").first().attr("href") || "");
-    const description: string = card.find("h3").first().next("p").text().trim();
+
+    // GitHub URL: look for <a> with "GitHub" text or github.com href
+    let githubUrl = "";
+    card.find("a").each((_i: number, a: AnyNode) => {
+      const href = $(a).attr("href") || "";
+      const text = $(a).text().trim();
+      if (
+        (text.includes("GitHub") || href.includes("github.com")) &&
+        !githubUrl
+      ) {
+        githubUrl = sanitizeUrl(href);
+      }
+    });
+
+    // Description: first <p> after the header area
+    const description: string = card.find("p").first().text().trim();
 
     const repoStats = extractRepoStats(card);
 
@@ -195,7 +249,7 @@ function parseRepoCards(html: string): RepoCardData[] {
       ? sections["next steps"].next("p").text().trim()
       : "";
 
-    const topContributors = extractContributors(sections, $);
+    const topContributors = extractContributors(sections, card, $);
 
     cards.push({
       repoName,

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { Contributor } from "./types";
 
 export default function ContributorBadge({
@@ -8,27 +7,18 @@ export default function ContributorBadge({
 }) {
   const hasValidUrl = contributor.profileUrl.startsWith("https://");
 
-  const content = (
+  const badge = (
     <span
-      className={`flex items-center gap-[6px] px-[8px] py-[4px] rounded-full
-        bg-[#f5f5f5] transition-colors duration-200 ${
-          hasValidUrl ? "hover:bg-[#e8e8e8]" : ""
+      className={`inline-flex items-center gap-[6px] px-[10px] py-[4px] rounded-full
+        bg-[#f5f5f5] text-[12px] text-[#333] transition-colors duration-200 ${
+          hasValidUrl ? "hover:bg-[#e8e8e8] hover:text-[#0078FF]" : ""
         }`}
     >
-      {contributor.avatarUrl && (
-        <Image
-          src={contributor.avatarUrl}
-          alt={contributor.name}
-          width={20}
-          height={20}
-          className="rounded-full"
-        />
-      )}
-      <span className="text-[12px] text-[#333]">{contributor.name}</span>
+      {contributor.name}
     </span>
   );
 
-  if (!hasValidUrl) return content;
+  if (!hasValidUrl) return badge;
 
   return (
     <a
@@ -36,7 +26,7 @@ export default function ContributorBadge({
       target="_blank"
       rel="noopener noreferrer"
     >
-      {content}
+      {badge}
     </a>
   );
 }

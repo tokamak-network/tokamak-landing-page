@@ -8,6 +8,7 @@ export default defineConfig({
       include: [
         "src/app/lib/reports/**/*.ts",
         "src/app/components/ui/sections/reports/sortRepos.ts",
+        "src/app/components/ui/sections/reports/yearUtils.ts",
       ],
       exclude: ["src/**/*.test.ts", "src/**/__tests__/**"],
       thresholds: {

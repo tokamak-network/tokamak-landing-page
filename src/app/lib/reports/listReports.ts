@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import type { ReportMeta } from "@/app/components/ui/sections/reports/types";
-import { SLUG_PATTERN, SLUG_VALIDATION_PATTERN } from "./constants";
+import { SLUG_PATTERN } from "./constants";
 
 const REPORTS_DIR = path.join(process.cwd(), "public", "reports");
 
@@ -49,7 +49,7 @@ export function listReports(): ReportMeta[] {
 }
 
 export function getReportPath(slug: string): string | null {
-  if (!SLUG_VALIDATION_PATTERN.test(slug)) return null;
+  if (!SLUG_PATTERN.test(slug)) return null;
 
   const filePath = path.join(REPORTS_DIR, `${slug}.html`);
   if (!fs.existsSync(filePath)) return null;

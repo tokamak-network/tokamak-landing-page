@@ -21,7 +21,7 @@ export default function ReportsListing({
         </>
       }
       subtitle="Biweekly engineering progress across all Tokamak Network repositories"
-      maxWidth="800px"
+      contentClassName="max-w-[800px]"
     >
       <div className="flex flex-col gap-[16px]">
         {reports.length === 0 ? (

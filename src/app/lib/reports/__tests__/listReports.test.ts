@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { SLUG_PATTERN, SLUG_VALIDATION_PATTERN } from "../constants";
+import { SLUG_PATTERN } from "../constants";
 
 describe("SLUG_PATTERN", () => {
   it("matches valid slugs and captures groups", () => {
@@ -20,28 +20,22 @@ describe("SLUG_PATTERN", () => {
   });
 });
 
-describe("SLUG_VALIDATION_PATTERN", () => {
+describe("SLUG_PATTERN as validator", () => {
   it("validates correct slugs", () => {
-    expect(SLUG_VALIDATION_PATTERN.test("report-2026-02-01-15")).toBe(true);
-    expect(SLUG_VALIDATION_PATTERN.test("report-2025-12-16-31")).toBe(true);
+    expect(SLUG_PATTERN.test("report-2026-02-01-15")).toBe(true);
+    expect(SLUG_PATTERN.test("report-2025-12-16-31")).toBe(true);
   });
 
   it("rejects path traversal attempts", () => {
+    expect(SLUG_PATTERN.test("../../../etc/passwd")).toBe(false);
     expect(
-      SLUG_VALIDATION_PATTERN.test("../../../etc/passwd")
-    ).toBe(false);
-    expect(
-      SLUG_VALIDATION_PATTERN.test("report-2026-02-01-15/../../../etc/passwd")
+      SLUG_PATTERN.test("report-2026-02-01-15/../../../etc/passwd")
     ).toBe(false);
   });
 
   it("rejects slugs with extra characters", () => {
-    expect(
-      SLUG_VALIDATION_PATTERN.test("report-2026-02-01-15-extra")
-    ).toBe(false);
-    expect(
-      SLUG_VALIDATION_PATTERN.test("prefix-report-2026-02-01-15")
-    ).toBe(false);
+    expect(SLUG_PATTERN.test("report-2026-02-01-15-extra")).toBe(false);
+    expect(SLUG_PATTERN.test("prefix-report-2026-02-01-15")).toBe(false);
   });
 });
 

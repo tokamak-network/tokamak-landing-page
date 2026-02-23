@@ -6,12 +6,12 @@ import { CLIP_PATHS } from "@/app/constants/styles";
 export default function ReportsPageLayout({
   title,
   subtitle,
-  maxWidth = "800px",
+  contentClassName = "max-w-[800px]",
   children,
 }: {
   title: React.ReactNode;
   subtitle: string;
-  maxWidth?: string;
+  contentClassName?: string;
   children: React.ReactNode;
 }) {
   const { isFocused } = useFocus();
@@ -59,10 +59,7 @@ export default function ReportsPageLayout({
             clipPath: CLIP_PATHS.polygon,
           }}
         >
-          <div
-            className="w-full px-[24px] flex flex-col"
-            style={{ maxWidth }}
-          >
+          <div className={`w-full px-[24px] flex flex-col ${contentClassName}`}>
             {children}
           </div>
         </div>

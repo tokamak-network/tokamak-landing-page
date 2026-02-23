@@ -24,7 +24,7 @@ export default function ReportDetail({
         </>
       }
       subtitle={report.dateLabel}
-      maxWidth="900px"
+      contentClassName="max-w-[900px]"
     >
       <div className="flex flex-col gap-[32px]">
         {/* BACK LINK */}

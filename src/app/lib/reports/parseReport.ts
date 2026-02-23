@@ -11,6 +11,8 @@ import type {
 } from "@/app/components/ui/sections/reports/types";
 import { DEFAULT_STATS } from "./constants";
 
+// ── URL sanitization ──
+
 export function sanitizeUrl(url: string): string {
   try {
     const parsed = new URL(url);
@@ -22,6 +24,8 @@ export function sanitizeUrl(url: string): string {
     return "";
   }
 }
+
+// ── Section extraction ──
 
 export function extractBetweenComments(
   html: string,
@@ -36,6 +40,34 @@ export function extractBetweenComments(
   const afterStart = startIdx + `<!-- ${startMarker} -->`.length;
   return html.slice(afterStart, endIdx).trim();
 }
+
+interface ExtractedSections {
+  stats: string;
+  summary: string;
+  cards: string;
+  missing: string[];
+}
+
+function extractSections(html: string): ExtractedSections {
+  const missing: string[] = [];
+
+  const stats = extractBetweenComments(html, "STATS BAR", "BODY");
+  if (!stats) missing.push("STATS BAR");
+
+  const summary = extractBetweenComments(
+    html,
+    "EXECUTIVE SUMMARY",
+    "REPO CARDS"
+  );
+  if (!summary) missing.push("EXECUTIVE SUMMARY");
+
+  const cards = extractBetweenComments(html, "REPO CARDS", "FOOTER");
+  if (!cards) missing.push("REPO CARDS");
+
+  return { stats, summary, cards, missing };
+}
+
+// ── Stats parsing ──
 
 function findStatValue(
   $: cheerio.CheerioAPI,
@@ -68,52 +100,54 @@ function findStatValue(
   return entries;
 }
 
-export function parseStats(html: string): ReportStats {
-  const statsHtml = extractBetweenComments(html, "STATS BAR", "BODY");
-  if (!statsHtml) return { ...DEFAULT_STATS };
+const STAT_LABELS: Record<string, keyof ReportStats> = {
+  commits: "commits",
+  "lines changed": "linesChanged",
+  "active repos": "activeRepos",
+  "active repositories": "activeRepos",
+  contributors: "contributors",
+  "net growth": "netGrowth",
+  "net change": "netGrowth",
+};
 
-  const $ = cheerio.load(statsHtml);
-
-  const labels: Record<string, keyof ReportStats> = {
-    commits: "commits",
-    "lines changed": "linesChanged",
-    "active repos": "activeRepos",
-    "active repositories": "activeRepos",
-    contributors: "contributors",
-    "net growth": "netGrowth",
-    "net change": "netGrowth",
-  };
-
-  const entries = findStatValue($, $.root(), labels);
+function parseStatsFragment(fragment: string): ReportStats {
+  const $ = cheerio.load(fragment);
+  const entries = findStatValue($, $.root(), STAT_LABELS);
   return { ...DEFAULT_STATS, ...entries };
 }
 
-function parseExecutiveSummary(html: string): {
+/** Public API — extracts section from full HTML then parses. Used by tests. */
+export function parseStats(html: string): ReportStats {
+  const fragment = extractBetweenComments(html, "STATS BAR", "BODY");
+  if (!fragment) return { ...DEFAULT_STATS };
+  return parseStatsFragment(fragment);
+}
+
+// ── Executive Summary parsing ──
+
+interface SummaryResult {
   headline: string;
   narrative: string;
-} {
-  const summaryHtml = extractBetweenComments(
-    html,
-    "EXECUTIVE SUMMARY",
-    "REPO CARDS"
-  );
-  if (!summaryHtml) return { headline: "", narrative: "" };
+}
 
-  const $ = cheerio.load(summaryHtml);
+function parseSummaryFragment(fragment: string): SummaryResult {
+  const $ = cheerio.load(fragment);
 
   const headline: string =
     $("h3").first().text().trim() ||
     $("p[style*='font-weight:bold']").first().text().trim() ||
     $("p").first().text().trim();
 
-  const paragraphs = $("p").toArray();
-  const narrative: string = paragraphs
+  const narrative: string = $("p")
+    .toArray()
     .map((p) => $(p).text().trim())
     .filter(Boolean)
     .join("\n\n");
 
   return { headline, narrative };
 }
+
+// ── Repo Card parsing ──
 
 function extractRepoStats(
   card: cheerio.Cheerio<AnyNode>,
@@ -144,24 +178,20 @@ function extractAccomplishments(
   sections: Record<string, cheerio.Cheerio<AnyNode>>,
   $: cheerio.CheerioAPI
 ): string[] {
-  const accomplishments: string[] = [];
   const h4 = sections["key accomplishments"];
-  if (h4) {
-    h4.next("ul")
-      .find("li")
-      .each((_: number, li: AnyNode) => {
-        accomplishments.push($(li).text().trim());
-      });
-  }
-  return accomplishments;
+  if (!h4) return [];
+
+  return h4
+    .next("ul")
+    .find("li")
+    .toArray()
+    .map((li) => $(li).text().trim());
 }
 
 function extractContributors(
   card: cheerio.Cheerio<AnyNode>,
   $: cheerio.CheerioAPI
 ): Contributor[] {
-  const contributors: Contributor[] = [];
-
   const contributorDiv = card
     .find("div")
     .filter((_: number, el: AnyNode) =>
@@ -169,17 +199,32 @@ function extractContributors(
     )
     .first();
 
-  if (contributorDiv.length) {
-    contributorDiv.find("a").each((_: number, a: AnyNode) => {
-      const profileUrl = sanitizeUrl($(a).attr("href") || "");
-      const name: string = $(a).text().trim();
-      if (name) {
-        contributors.push({ name, profileUrl });
-      }
-    });
-  }
+  if (!contributorDiv.length) return [];
 
-  return contributors;
+  return contributorDiv
+    .find("a")
+    .toArray()
+    .map((a) => ({
+      name: $(a).text().trim(),
+      profileUrl: sanitizeUrl($(a).attr("href") || ""),
+    }))
+    .filter((c) => c.name.length > 0);
+}
+
+function findGithubUrl(
+  div: cheerio.Cheerio<AnyNode>,
+  $: cheerio.CheerioAPI
+): string {
+  const link = div
+    .find("a")
+    .toArray()
+    .find((a) => {
+      const href = $(a).attr("href") || "";
+      const text = $(a).text().trim();
+      return text.includes("GitHub") || href.includes("github.com");
+    });
+
+  return link ? sanitizeUrl($(link).attr("href") || "") : "";
 }
 
 function buildCardFromDiv(
@@ -189,18 +234,7 @@ function buildCardFromDiv(
   const repoName: string = div.find("h3").first().text().trim();
   if (!repoName) return null;
 
-  let githubUrl = "";
-  div.find("a").each((_i: number, a: AnyNode) => {
-    const href = $(a).attr("href") || "";
-    const text = $(a).text().trim();
-    if (
-      (text.includes("GitHub") || href.includes("github.com")) &&
-      !githubUrl
-    ) {
-      githubUrl = sanitizeUrl(href);
-    }
-  });
-
+  const githubUrl = findGithubUrl(div, $);
   const description: string = div.find("p").first().text().trim();
   const repoStats = extractRepoStats(div, $);
 
@@ -226,11 +260,8 @@ function buildCardFromDiv(
   };
 }
 
-export function parseRepoCards(html: string): RepoCardData[] {
-  const cardsHtml = extractBetweenComments(html, "REPO CARDS", "FOOTER");
-  if (!cardsHtml) return [];
-
-  const $ = cheerio.load(cardsHtml);
+function parseCardsFragment(fragment: string): RepoCardData[] {
+  const $ = cheerio.load(fragment);
   const cards: RepoCardData[] = [];
 
   // Find repo cards by structural marker: top-level divs that contain an <h3>
@@ -261,18 +292,47 @@ export function parseRepoCards(html: string): RepoCardData[] {
   return cards;
 }
 
+/** Public API — extracts section from full HTML then parses. Used by tests. */
+export function parseRepoCards(html: string): RepoCardData[] {
+  const fragment = extractBetweenComments(html, "REPO CARDS", "FOOTER");
+  if (!fragment) return [];
+  return parseCardsFragment(fragment);
+}
+
+// ── Top-level report parsers ──
+
+function warnMissingMarkers(slug: string, missing: string[]): void {
+  if (missing.length > 0) {
+    console.warn(
+      `[reports] ${slug}: missing HTML markers: ${missing.join(", ")}. ` +
+        "Check that the report HTML contains <!-- STATS BAR -->, " +
+        "<!-- EXECUTIVE SUMMARY -->, <!-- REPO CARDS -->, and <!-- FOOTER --> comments."
+    );
+  }
+}
+
 export function parseReportSummary(
   filePath: string,
   meta: ReportMeta
 ): ReportSummary {
   try {
     const html = fs.readFileSync(filePath, "utf-8");
-    const stats = parseStats(html);
-    const { headline } = parseExecutiveSummary(html);
+    const { stats: statsFragment, summary: summaryFragment, missing } =
+      extractSections(html);
+
+    warnMissingMarkers(meta.slug, missing);
+
+    const stats = statsFragment
+      ? parseStatsFragment(statsFragment)
+      : { ...DEFAULT_STATS };
+
+    const headline = summaryFragment
+      ? parseSummaryFragment(summaryFragment).headline
+      : "";
 
     return { ...meta, stats, executiveHeadline: headline };
   } catch (error) {
-    console.error(`[reports] Failed to parse summary for ${meta.slug}:`, error);
+    console.warn(`[reports] Failed to parse summary for ${meta.slug}:`, error);
     return { ...meta, stats: { ...DEFAULT_STATS }, executiveHeadline: "" };
   }
 }
@@ -283,9 +343,24 @@ export function parseReportDetail(
 ): ReportDetail {
   try {
     const html = fs.readFileSync(filePath, "utf-8");
-    const stats = parseStats(html);
-    const { headline, narrative } = parseExecutiveSummary(html);
-    const repos = parseRepoCards(html);
+    const {
+      stats: statsFragment,
+      summary: summaryFragment,
+      cards: cardsFragment,
+      missing,
+    } = extractSections(html);
+
+    warnMissingMarkers(meta.slug, missing);
+
+    const stats = statsFragment
+      ? parseStatsFragment(statsFragment)
+      : { ...DEFAULT_STATS };
+
+    const { headline, narrative } = summaryFragment
+      ? parseSummaryFragment(summaryFragment)
+      : { headline: "", narrative: "" };
+
+    const repos = cardsFragment ? parseCardsFragment(cardsFragment) : [];
 
     return {
       ...meta,
@@ -295,7 +370,7 @@ export function parseReportDetail(
       repos,
     };
   } catch (error) {
-    console.error(`[reports] Failed to parse detail for ${meta.slug}:`, error);
+    console.warn(`[reports] Failed to parse detail for ${meta.slug}:`, error);
     return {
       ...meta,
       stats: { ...DEFAULT_STATS },

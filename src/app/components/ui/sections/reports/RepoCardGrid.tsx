@@ -3,41 +3,8 @@
 import { useState, useMemo } from "react";
 import type { RepoCardData } from "./types";
 import RepoCard from "./RepoCard";
-
-type SortKey = "name" | "commits" | "lines" | "contributors";
-
-const SORT_OPTIONS: { key: SortKey; label: string }[] = [
-  { key: "name", label: "Name" },
-  { key: "commits", label: "Commits" },
-  { key: "lines", label: "Lines Changed" },
-  { key: "contributors", label: "Contributors" },
-];
-
-function parseNum(s: string): number {
-  return parseInt(s.replace(/[^0-9-]/g, ""), 10) || 0;
-}
-
-function sortRepos(repos: RepoCardData[], sortKey: SortKey): RepoCardData[] {
-  return [...repos].sort((a, b) => {
-    switch (sortKey) {
-      case "name":
-        return a.repoName.localeCompare(b.repoName);
-      case "commits":
-        return parseNum(b.stats.commits) - parseNum(a.stats.commits);
-      case "lines":
-        return (
-          Math.abs(parseNum(b.stats.linesAdded)) +
-          Math.abs(parseNum(b.stats.linesDeleted)) -
-          (Math.abs(parseNum(a.stats.linesAdded)) +
-            Math.abs(parseNum(a.stats.linesDeleted)))
-        );
-      case "contributors":
-        return parseNum(b.stats.contributors) - parseNum(a.stats.contributors);
-      default:
-        return 0;
-    }
-  });
-}
+import { sortRepos, SORT_OPTIONS } from "./sortRepos";
+import type { SortKey } from "./sortRepos";
 
 export default function RepoCardGrid({ repos }: { repos: RepoCardData[] }) {
   const [search, setSearch] = useState("");

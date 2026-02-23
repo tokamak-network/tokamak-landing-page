@@ -41,24 +41,41 @@ export default function ReportsListing({
         </div>
       ) : (
         <>
-          <div className="flex flex-wrap gap-[8px] mb-[24px]">
-            {groups.map((group) => (
-              <button
-                key={group.label}
-                onClick={() => setSelectedLabel(group.label)}
-                aria-pressed={group.label === selectedLabel}
-                className={`px-[16px] py-[8px] rounded-[8px] text-[14px] font-[500] transition-colors duration-150
-                  ${
-                    group.label === selectedLabel
-                      ? "bg-[#0078FF] text-white"
-                      : "bg-[#F4F4F4] text-[#1C1C1C] hover:bg-[#E8E8E8]"
-                  }`}
-              >
-                {group.label}
-              </button>
-            ))}
+          <div className="border-b border-[#EDEDF0] mb-[24px]">
+            <div className="flex gap-[4px] overflow-x-auto" role="tablist" aria-label="Filter reports by quarter">
+              {groups.map((group) => {
+                const isActive = group.label === selectedLabel;
+                return (
+                  <button
+                    key={group.label}
+                    onClick={() => setSelectedLabel(group.label)}
+                    role="tab"
+                    aria-selected={isActive}
+                    className={`relative px-[16px] py-[10px] text-[14px] font-[500] transition-all duration-200
+                      ${
+                        isActive
+                          ? "text-[#0078FF]"
+                          : "text-[#808992] hover:text-[#1C1C1C]"
+                      }`}
+                  >
+                    {group.label}
+                    <span
+                      className={`ml-[6px] text-[12px] font-[400] ${
+                        isActive ? "text-[#0078FF]" : "text-[#808992]"
+                      }`}
+                    >
+                      ({group.reports.length})
+                    </span>
+                    <span
+                      className={`absolute bottom-0 left-[16px] right-[16px] h-[2px] bg-[#0078FF] rounded-full transition-all duration-200
+                        ${isActive ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"}`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <div className="flex flex-col gap-[16px]">
+          <div className="flex flex-col gap-[16px]" role="tabpanel">
             {selectedGroup?.reports.map((report) => (
               <ReportCard key={report.slug} report={report} />
             ))}

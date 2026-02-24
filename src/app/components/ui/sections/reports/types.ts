@@ -81,6 +81,12 @@ export interface CategoryFocusItem {
   synergies: string[];
 }
 
+export interface RepoCategoryInfo {
+  label: string;
+  color: string;
+  icon: string;
+}
+
 export interface ReportDetail extends ReportMeta {
   stats: ReportStats;
   executiveHeadline: string;

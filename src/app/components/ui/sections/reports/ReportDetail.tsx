@@ -1,6 +1,7 @@
 "use client";
 
-import type { ReportDetail as ReportDetailType } from "./types";
+import { useMemo } from "react";
+import type { ReportDetail as ReportDetailType, RepoCategoryInfo } from "./types";
 import StatsBar from "./StatsBar";
 import ExecutiveSummary from "./ExecutiveSummary";
 import EcosystemLandscape from "./EcosystemLandscape";
@@ -20,6 +21,17 @@ export default function ReportDetail({
 }: {
   report: ReportDetailType;
 }) {
+  const categoryMap = useMemo(() => {
+    if (!report.ecosystemLandscape) return undefined;
+    const map = new Map<string, RepoCategoryInfo>();
+    for (const cat of report.ecosystemLandscape.categories) {
+      for (const repo of cat.repos) {
+        map.set(repo.name, { label: cat.name, color: cat.color, icon: cat.icon });
+      }
+    }
+    return map;
+  }, [report.ecosystemLandscape]);
+
   return (
     <ReportsPageLayout
       title={
@@ -99,7 +111,7 @@ export default function ReportDetail({
               {report.repos.length} repositories
             </span>
           </div>
-          <RepoCardGrid repos={report.repos} />
+          <RepoCardGrid repos={report.repos} categoryMap={categoryMap} />
         </div>
       </div>
     </ReportsPageLayout>

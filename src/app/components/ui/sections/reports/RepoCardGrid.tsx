@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { RepoCardData } from "./types";
+import type { RepoCardData, RepoCategoryInfo } from "./types";
 import RepoCard from "./RepoCard";
 import CompactRepoRow from "./CompactRepoRow";
 import MinorReposSection from "./MinorReposSection";
@@ -12,8 +12,12 @@ import type { CategoryGroup } from "./repoTiers";
 
 function CategoryGroupSection({ group }: { group: CategoryGroup }) {
   return (
-    <div className="flex flex-col gap-[8px]">
+    <div
+      className="flex flex-col gap-[8px] pl-[12px]"
+      style={group.color ? { borderLeft: `3px solid ${group.color}` } : undefined}
+    >
       <div className="flex items-center gap-[8px]">
+        {group.icon && <span className="text-[16px]">{group.icon}</span>}
         <h3 className="text-[14px] font-[600] text-[#1C1C1C]">
           {group.label}
         </h3>
@@ -30,7 +34,13 @@ function CategoryGroupSection({ group }: { group: CategoryGroup }) {
   );
 }
 
-export default function RepoCardGrid({ repos }: { repos: RepoCardData[] }) {
+export default function RepoCardGrid({
+  repos,
+  categoryMap,
+}: {
+  repos: RepoCardData[];
+  categoryMap?: Map<string, RepoCategoryInfo>;
+}) {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("commits");
 
@@ -46,7 +56,7 @@ export default function RepoCardGrid({ repos }: { repos: RepoCardData[] }) {
   }, [repos, search, sortKey]);
 
   // Tiered view for non-search mode
-  const tiered = useMemo(() => tierRepos(repos), [repos]);
+  const tiered = useMemo(() => tierRepos(repos, categoryMap), [repos, categoryMap]);
 
   return (
     <div className="flex flex-col gap-[16px]">
@@ -148,7 +158,7 @@ export default function RepoCardGrid({ repos }: { repos: RepoCardData[] }) {
             <div className="flex flex-col gap-[24px]">
               {tiered.categories.map((group) => (
                 <CategoryGroupSection
-                  key={group.category}
+                  key={group.label}
                   group={group}
                 />
               ))}

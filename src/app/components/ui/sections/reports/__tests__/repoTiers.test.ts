@@ -1,11 +1,6 @@
 import { describe, it, expect } from "vitest";
-import {
-  scoreRepo,
-  categorizeRepo,
-  getCategoryLabel,
-  tierRepos,
-} from "../repoTiers";
-import type { RepoCardData } from "../types";
+import { scoreRepo, tierRepos } from "../repoTiers";
+import type { RepoCardData, RepoCategoryInfo } from "../types";
 
 function makeRepo(
   name: string,
@@ -40,70 +35,6 @@ describe("scoreRepo", () => {
   it("handles formatted numbers with commas", () => {
     const repo = makeRepo("test", "1,000", "+50,000", "-10,000", "+40,000");
     expect(scoreRepo(repo)).toBe(1000 * 2 + 50000 + 10000);
-  });
-});
-
-describe("categorizeRepo", () => {
-  it("categorizes infrastructure repos", () => {
-    expect(categorizeRepo("tokamak-optimism-v2")).toBe("infrastructure");
-    expect(categorizeRepo("thanos-bridge")).toBe("infrastructure");
-    expect(categorizeRepo("tokamak-thanos")).toBe("infrastructure");
-    expect(categorizeRepo("titan-chain")).toBe("infrastructure");
-  });
-
-  it("categorizes DeFi repos", () => {
-    expect(categorizeRepo("ton-staking-v2")).toBe("defi");
-    expect(categorizeRepo("delegate-staking-mvp")).toBe("defi");
-    expect(categorizeRepo("vton-airdrop-simulator")).toBe("defi");
-    expect(categorizeRepo("TON-total-supply")).toBe("defi");
-  });
-
-  it("categorizes AI & Security repos", () => {
-    expect(categorizeRepo("SentinAI")).toBe("ai-security");
-    expect(categorizeRepo("tokamak-ai-agent")).toBe("ai-security");
-    expect(categorizeRepo("smart-contract-audit-tool")).toBe("ai-security");
-    expect(categorizeRepo("Tokamak-AI-Layer")).toBe("ai-security");
-    expect(categorizeRepo("agent-key-management")).toBe("ai-security");
-    expect(categorizeRepo("ai-kits")).toBe("ai-security");
-  });
-
-  it("categorizes Frontend repos", () => {
-    expect(categorizeRepo("tokamak-landing-page")).toBe("frontend");
-    expect(categorizeRepo("trh-platform-ui")).toBe("frontend");
-    expect(categorizeRepo("tokamak-app-hub")).toBe("frontend");
-    expect(categorizeRepo("trh-platform-desktop")).toBe("frontend");
-  });
-
-  it("categorizes ZK & Privacy repos", () => {
-    expect(categorizeRepo("zk-dex")).toBe("zk-privacy");
-    expect(categorizeRepo("zk-mafia")).toBe("zk-privacy");
-    expect(categorizeRepo("Commit-Reveal2")).toBe("zk-privacy");
-    expect(categorizeRepo("secure-vote")).toBe("zk-privacy");
-    expect(categorizeRepo("private-app-channel-manager")).toBe("zk-privacy");
-  });
-
-  it("categorizes Tooling repos", () => {
-    expect(categorizeRepo("Ooo-report-generator")).toBe("tooling");
-    expect(categorizeRepo("ai-setup-guide")).toBe("tooling");
-    expect(categorizeRepo("google-meet-analyze")).toBe("tooling");
-    expect(categorizeRepo("trh-sdk")).toBe("tooling");
-  });
-
-  it("returns other for unmatched names", () => {
-    expect(categorizeRepo("Zodiac")).toBe("other");
-    expect(categorizeRepo("tokamon")).toBe("other");
-  });
-});
-
-describe("getCategoryLabel", () => {
-  it("returns human-readable label", () => {
-    expect(getCategoryLabel("infrastructure")).toBe("Infrastructure");
-    expect(getCategoryLabel("defi")).toBe("DeFi & Staking");
-    expect(getCategoryLabel("ai-security")).toBe("AI & Security");
-    expect(getCategoryLabel("frontend")).toBe("Frontend & UI");
-    expect(getCategoryLabel("zk-privacy")).toBe("ZK & Privacy");
-    expect(getCategoryLabel("tooling")).toBe("Tooling & Ops");
-    expect(getCategoryLabel("other")).toBe("Other");
   });
 });
 
@@ -159,41 +90,59 @@ describe("tierRepos", () => {
     expect(result.categories).toHaveLength(0);
   });
 
-  it("groups remaining significant repos by category", () => {
+  it("groups mid-tier repos into flat list without categoryMap", () => {
     const repos = [
       // 7 high-activity repos for highlights
       ...Array.from({ length: 7 }, (_, i) =>
         makeRepo(`highlight-${i}`, "100", "+10000", "-5000", "+5000")
       ),
-      // Category repos
-      makeRepo("tokamak-optimism-v2", "20", "+500", "-200", "+300"),
-      makeRepo("ton-staking-v2", "15", "+300", "-100", "+200"),
-      makeRepo("zk-dex", "10", "+200", "-50", "+150"),
+      // Significant repos (not minor)
+      makeRepo("repo-a", "20", "+500", "-200", "+300"),
+      makeRepo("repo-b", "15", "+300", "-100", "+200"),
     ];
     const result = tierRepos(repos);
     expect(result.highlights).toHaveLength(7);
-    const categoryNames = result.categories.map((c) => c.category);
-    expect(categoryNames).toContain("infrastructure");
-    expect(categoryNames).toContain("defi");
-    expect(categoryNames).toContain("zk-privacy");
+    expect(result.categories).toHaveLength(1);
+    expect(result.categories[0].label).toBe("Repositories");
+    expect(result.categories[0].color).toBe("");
+    expect(result.categories[0].icon).toBe("");
+    expect(result.categories[0].repos).toHaveLength(2);
   });
 
-  it("orders categories in consistent order", () => {
+  it("groups mid-tier repos by landscape categories when categoryMap provided", () => {
+    const categoryMap = new Map<string, RepoCategoryInfo>([
+      ["infra-repo", { label: "Infrastructure", color: "#E11D48", icon: "⚙️" }],
+      ["defi-repo", { label: "DeFi & Staking", color: "#7C3AED", icon: "💰" }],
+      ["another-infra", { label: "Infrastructure", color: "#E11D48", icon: "⚙️" }],
+    ]);
+
     const repos = [
+      // 7 highlights
       ...Array.from({ length: 7 }, (_, i) =>
         makeRepo(`highlight-${i}`, "100", "+10000", "-5000", "+5000")
       ),
-      makeRepo("zk-dex", "10", "+200", "-50", "+150"),
-      makeRepo("tokamak-optimism-v2", "20", "+500", "-200", "+300"),
-      makeRepo("tokamak-landing-page", "8", "+100", "-30", "+70"),
+      // Categorized repos
+      makeRepo("infra-repo", "20", "+500", "-200", "+300"),
+      makeRepo("defi-repo", "15", "+300", "-100", "+200"),
+      makeRepo("another-infra", "10", "+200", "-50", "+150"),
+      // Unmatched repo → "Other"
+      makeRepo("unknown-repo", "12", "+250", "-80", "+170"),
     ];
-    const result = tierRepos(repos);
-    const categoryNames = result.categories.map((c) => c.category);
-    // Infrastructure should come before zk-privacy, which comes before frontend
-    const infraIdx = categoryNames.indexOf("infrastructure");
-    const zkIdx = categoryNames.indexOf("zk-privacy");
-    const frontIdx = categoryNames.indexOf("frontend");
-    expect(infraIdx).toBeLessThan(zkIdx);
-    expect(zkIdx).toBeLessThan(frontIdx);
+    const result = tierRepos(repos, categoryMap);
+    expect(result.highlights).toHaveLength(7);
+
+    const labels = result.categories.map((c) => c.label);
+    expect(labels).toContain("Infrastructure");
+    expect(labels).toContain("DeFi & Staking");
+    expect(labels).toContain("Other");
+
+    const infraGroup = result.categories.find((c) => c.label === "Infrastructure")!;
+    expect(infraGroup.color).toBe("#E11D48");
+    expect(infraGroup.icon).toBe("⚙️");
+    expect(infraGroup.repos).toHaveLength(2);
+
+    const otherGroup = result.categories.find((c) => c.label === "Other")!;
+    expect(otherGroup.color).toBe("#888");
+    expect(otherGroup.repos).toHaveLength(1);
   });
 });

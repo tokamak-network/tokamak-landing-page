@@ -102,19 +102,29 @@ export function parseCategoryFocusFragment(
   const items: CategoryFocusItem[] = [];
 
   // Each card is a div with inline border-left:4px solid #COLOR
-  $("div[style*='border-left:4px solid']").each((_: number, el: AnyNode) => {
+  $("div")
+    .filter((_: number, el: AnyNode) =>
+      /border-left:\s*4px\s+solid/.test($(el).attr("style") || "")
+    )
+    .each((_: number, el: AnyNode) => {
     const card = $(el);
     const headerRow = card.children("div").first();
 
     // Icon: first span with font-size:18px
     const icon = headerRow
-      .find("span[style*='font-size:18px']")
+      .find("span")
+      .filter((_i: number, s: AnyNode) =>
+        /font-size:\s*18px/.test($(s).attr("style") || "")
+      )
       .text()
       .trim();
 
     // Name: span with font-size:16px (distinguishes from badge which is 11px)
     const name = headerRow
-      .find("span[style*='font-size:16px']")
+      .find("span")
+      .filter((_i: number, s: AnyNode) =>
+        /font-size:\s*16px/.test($(s).attr("style") || "")
+      )
       .text()
       .trim();
 
@@ -132,7 +142,7 @@ export function parseCategoryFocusFragment(
 
     // Color from border-left
     const style = card.attr("style") || "";
-    const colorMatch = style.match(/border-left:4px solid\s*(#[0-9A-Fa-f]{3,8})/);
+    const colorMatch = style.match(/border-left:\s*4px\s+solid\s*(#[0-9A-Fa-f]{3,8})/);
     const color = colorMatch ? colorMatch[1] : "#888";
 
     // Top repos from .synergy-repo-chip
@@ -152,7 +162,9 @@ export function parseCategoryFocusFragment(
 
     // Focus narrative: text after "Current Focus" label
     let focusNarrative = "";
-    card.find("div[style*='text-transform:uppercase']").each(
+    card.find("div").filter((_f: number, d: AnyNode) =>
+      /text-transform:\s*uppercase/.test($(d).attr("style") || "")
+    ).each(
       (_i: number, labelEl: AnyNode) => {
         const labelText = $(labelEl).text().trim().toLowerCase();
         if (labelText.includes("current focus")) {
@@ -163,7 +175,9 @@ export function parseCategoryFocusFragment(
 
     // Synergies: <li> items under "Potential Synergies" section
     const synergies: string[] = [];
-    card.find("div[style*='text-transform:uppercase']").each(
+    card.find("div").filter((_f: number, d: AnyNode) =>
+      /text-transform:\s*uppercase/.test($(d).attr("style") || "")
+    ).each(
       (_i: number, labelEl: AnyNode) => {
         const labelText = $(labelEl).text().trim().toLowerCase();
         if (labelText.includes("potential synergies")) {

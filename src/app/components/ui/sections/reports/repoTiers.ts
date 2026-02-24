@@ -1,4 +1,4 @@
-import type { RepoCardData } from "./types";
+import type { RepoCardData, RepoCategoryInfo } from "./types";
 import { parseNum } from "@/app/lib/utils/format";
 
 // ── Scoring ──
@@ -9,76 +9,6 @@ export function scoreRepo(repo: RepoCardData): number {
   const deleted = Math.abs(parseNum(repo.stats.linesDeleted));
   return commits * 2 + added + deleted;
 }
-
-// ── Categorization ──
-
-export type RepoCategory =
-  | "infrastructure"
-  | "defi"
-  | "ai-security"
-  | "frontend"
-  | "zk-privacy"
-  | "tooling"
-  | "other";
-
-const CATEGORY_META: Record<RepoCategory, string> = {
-  infrastructure: "Infrastructure",
-  defi: "DeFi & Staking",
-  "ai-security": "AI & Security",
-  frontend: "Frontend & UI",
-  "zk-privacy": "ZK & Privacy",
-  tooling: "Tooling & Ops",
-  other: "Other",
-};
-
-const CATEGORY_PATTERNS: [RepoCategory, RegExp][] = [
-  // Order matters: more specific patterns first, broad patterns last.
-  // Use word-boundary-like patterns ([-/]|^|$) to avoid substring false positives.
-  [
-    "zk-privacy",
-    /zk[-]|zero-knowledge|zkp|privacy|private|commit-reveal|voting|loot-box|mafia|secure-vote/i,
-  ],
-  [
-    "infrastructure",
-    /optimism|thanos|titan|(?:^|[-/])l2(?:$|[-/])|bridge|(?:^|[-/])chain(?:$|[-/])|rollup|data-layer|fraud-proof|dispute/i,
-  ],
-  ["defi", /staking|swap|defi|vault|lending|ton-|airdrop|supply/i],
-  [
-    "ai-security",
-    /ai-agent|ai-layer|ai-kit|ai-token|ai-play|ai-team|sentinai|sentinel|audit|security|(?:^|[-/])agent(?:$|[-/])|learning/i,
-  ],
-  [
-    "frontend",
-    /landing|dashboard|website|(?:^|[-])ui(?:$|[-])|frontend|portal|app-hub|thumbnail|desktop/i,
-  ],
-  [
-    "tooling",
-    /tool|(?:^|[-/])cli(?:$|[-/])|(?:^|[-/])sdk(?:$|[-/])|(?:^|[-/])bot(?:$|[-/])|report|generator|setup-guide|playground|(?:^|[-/])hr(?:$|[-/])|crewcode|meet-analyze|nanobot/i,
-  ],
-];
-
-export function categorizeRepo(repoName: string): RepoCategory {
-  for (const [category, pattern] of CATEGORY_PATTERNS) {
-    if (pattern.test(repoName)) return category;
-  }
-  return "other";
-}
-
-export function getCategoryLabel(category: RepoCategory): string {
-  return CATEGORY_META[category];
-}
-
-// ── Category ordering (display order) ──
-
-const CATEGORY_ORDER: RepoCategory[] = [
-  "infrastructure",
-  "ai-security",
-  "defi",
-  "zk-privacy",
-  "frontend",
-  "tooling",
-  "other",
-];
 
 // ── Minor repo detection ──
 
@@ -94,8 +24,9 @@ function isMinorRepo(repo: RepoCardData): boolean {
 // ── Tiering ──
 
 export interface CategoryGroup {
-  category: RepoCategory;
   label: string;
+  color: string;
+  icon: string;
   repos: RepoCardData[];
 }
 
@@ -105,17 +36,18 @@ export interface TieredRepos {
   minor: RepoCardData[];
 }
 
-const HIGHLIGHT_COUNT = 7;
+export const HIGHLIGHT_COUNT = 7;
 
-export function tierRepos(repos: RepoCardData[]): TieredRepos {
+export function tierRepos(
+  repos: RepoCardData[],
+  categoryMap?: Map<string, RepoCategoryInfo>
+): TieredRepos {
   const scored = repos.map((repo) => ({ repo, score: scoreRepo(repo) }));
   scored.sort((a, b) => b.score - a.score);
 
   const highlights = scored.slice(0, HIGHLIGHT_COUNT).map((s) => s.repo);
 
-  const remaining = scored
-    .slice(HIGHLIGHT_COUNT)
-    .map((s) => s.repo);
+  const remaining = scored.slice(HIGHLIGHT_COUNT).map((s) => s.repo);
 
   const minor: RepoCardData[] = [];
   const significant: RepoCardData[] = [];
@@ -128,21 +60,44 @@ export function tierRepos(repos: RepoCardData[]): TieredRepos {
     }
   }
 
-  const grouped = new Map<RepoCategory, RepoCardData[]>();
-  for (const repo of significant) {
-    const cat = categorizeRepo(repo.repoName);
-    const list = grouped.get(cat) ?? [];
-    list.push(repo);
-    grouped.set(cat, list);
-  }
-
-  const categories: CategoryGroup[] = CATEGORY_ORDER
-    .filter((cat) => grouped.has(cat))
-    .map((cat) => ({
-      category: cat,
-      label: getCategoryLabel(cat),
-      repos: grouped.get(cat)!,
-    }));
+  const categories: CategoryGroup[] = buildCategoryGroups(
+    significant,
+    categoryMap
+  );
 
   return { highlights, categories, minor };
+}
+
+function buildCategoryGroups(
+  repos: RepoCardData[],
+  categoryMap?: Map<string, RepoCategoryInfo>
+): CategoryGroup[] {
+  if (!categoryMap || categoryMap.size === 0) {
+    // Flat fallback for old reports without landscape data
+    if (repos.length === 0) return [];
+    return [{ label: "Repositories", color: "", icon: "", repos }];
+  }
+
+  const grouped = new Map<string, { info: RepoCategoryInfo; repos: RepoCardData[] }>();
+
+  for (const repo of repos) {
+    const info = categoryMap.get(repo.repoName) ?? {
+      label: "Other",
+      color: "#888",
+      icon: "",
+    };
+    const existing = grouped.get(info.label);
+    if (existing) {
+      existing.repos.push(repo);
+    } else {
+      grouped.set(info.label, { info, repos: [repo] });
+    }
+  }
+
+  return Array.from(grouped.values()).map(({ info, repos: groupRepos }) => ({
+    label: info.label,
+    color: info.color,
+    icon: info.icon,
+    repos: groupRepos,
+  }));
 }

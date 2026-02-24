@@ -54,11 +54,11 @@ function FocusCard({ item }: { item: CategoryFocusItem }) {
       )}
 
       {/* Potential Synergies */}
-      {item.synergies.length > 0 && (
-        <div className="mt-[12px]">
-          <div className="text-[11px] font-[600] text-[#EA580C] uppercase tracking-[0.03em] mb-[6px]">
-            Potential Synergies
-          </div>
+      <div className="mt-[12px]">
+        <div className="text-[11px] font-[600] text-[#EA580C] uppercase tracking-[0.03em] mb-[6px]">
+          Potential Synergies
+        </div>
+        {item.synergies.length > 0 ? (
           <ul className="pl-[18px] text-[12px] text-[#555] leading-[1.5] list-disc">
             {item.synergies.map((s, i) => (
               <li key={i} className="mb-[6px]">
@@ -66,8 +66,12 @@ function FocusCard({ item }: { item: CategoryFocusItem }) {
               </li>
             ))}
           </ul>
-        </div>
-      )}
+        ) : (
+          <span className="text-[12px] text-[#999] italic">
+            No cross-category synergies identified
+          </span>
+        )}
+      </div>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import type { ReportStats } from "./types";
 import AdditionsBar from "./AdditionsBar";
 
 const SECONDARY_STATS: { key: keyof ReportStats; label: string }[] = [
+  { key: "commits", label: "Commits" },
   { key: "activeRepos", label: "Active Repos" },
   { key: "contributors", label: "Contributors" },
   { key: "netGrowth", label: "Net Growth" },
@@ -32,10 +33,10 @@ export default function StatsBar({
         <div className="bg-[#f8f9fa] rounded-[12px] p-[20px] [@media(max-width:640px)]:p-[16px] border border-[#EDEDF0]">
           <div className="flex items-baseline justify-between mb-[12px]">
             <span className="text-[11px] text-[#808992] uppercase tracking-[0.06em] font-[600]">
-              Code Changes
+              Total Lines Changed
             </span>
             <span className="text-[28px] [@media(max-width:640px)]:text-[22px] font-[700] text-[#0078FF]">
-              {stats.linesChanged}
+              {stats.linesChanged.replace(/^\+/, "")}
             </span>
           </div>
 
@@ -58,8 +59,8 @@ export default function StatsBar({
           )}
         </div>
 
-        {/* Secondary stats: 3-column grid */}
-        <div className="grid grid-cols-3 gap-[8px]">
+        {/* Secondary stats: 4-column grid */}
+        <div className="grid grid-cols-4 [@media(max-width:640px)]:grid-cols-2 gap-[8px]">
           {SECONDARY_STATS.map(({ key, label }) => (
             <div
               key={key}

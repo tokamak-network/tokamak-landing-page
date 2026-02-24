@@ -130,7 +130,10 @@ export function parseCategoryFocusFragment(
 
     // Badge: "N repos · M commits"
     const badgeText = headerRow
-      .find("span[style*='border-radius:10px']")
+      .find("span")
+      .filter((_b: number, b: AnyNode) =>
+        /border-radius:\s*10px/.test($(b).attr("style") || "")
+      )
       .text()
       .trim();
     const repoMatch = badgeText.match(/(\d+)\s*repos?/i);

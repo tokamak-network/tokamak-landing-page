@@ -9,12 +9,13 @@ import { sortRepos, SORT_OPTIONS } from "./sortRepos";
 import type { SortKey } from "./sortRepos";
 import { tierRepos } from "./repoTiers";
 import type { CategoryGroup } from "./repoTiers";
+import { sanitizeColor } from "@/app/lib/utils/format";
 
 function CategoryGroupSection({ group }: { group: CategoryGroup }) {
   return (
     <div
       className="flex flex-col gap-[8px] pl-[12px]"
-      style={group.color ? { borderLeft: `3px solid ${group.color}` } : undefined}
+      style={group.color ? { borderLeft: `3px solid ${sanitizeColor(group.color)}` } : undefined}
     >
       <div className="flex items-center gap-[8px]">
         {group.icon && <span className="text-[16px]">{group.icon}</span>}

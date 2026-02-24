@@ -1,6 +1,7 @@
 "use client";
 
 import type { CategoryFocusItem } from "./types";
+import { sanitizeColor } from "@/app/lib/utils/format";
 
 function RepoChip({ name, commits }: { name: string; commits: number }) {
   return (
@@ -15,7 +16,7 @@ function FocusCard({ item }: { item: CategoryFocusItem }) {
   return (
     <div
       className="bg-white border border-[#e8e8e8] rounded-[10px] p-[20px_24px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
-      style={{ borderLeft: `4px solid ${item.color}` }}
+      style={{ borderLeft: `4px solid ${sanitizeColor(item.color)}` }}
     >
       {/* Header */}
       <div className="flex items-center gap-[8px] mb-[10px]">

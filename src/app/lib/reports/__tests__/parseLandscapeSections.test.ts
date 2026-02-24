@@ -186,4 +186,27 @@ describe("parseCategoryFocusFragment", () => {
     const result = parseCategoryFocusFragment("");
     expect(result).toEqual([]);
   });
+
+  it("tolerates whitespace variations in inline styles", () => {
+    const wsFragment = `
+<div style="background:#fff; border-left: 4px  solid #AA00FF;">
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span style="font-size: 18px;">&#x1f512;</span>
+    <span style="font-size: 16px; font-weight:700;color:#1a1a1a;">Spaced Category</span>
+    <span style="background:#f0f0f0;color:#555;padding:2px 10px; border-radius: 10px; font-size:11px;font-weight:700;margin-left:auto;">5 repos · 300 commits</span>
+  </div>
+  <div style="margin-bottom:8px;">
+    <div style="font-size:0.8rem;font-weight:600;color:#2A72E5; text-transform: uppercase; letter-spacing:0.5px;margin-bottom:4px;">Current Focus</div>
+    <div style="font-size:13px;color:#444;line-height:1.5;">Testing whitespace tolerance.</div>
+  </div>
+</div>
+    `;
+    const result = parseCategoryFocusFragment(wsFragment);
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("Spaced Category");
+    expect(result[0].color).toBe("#AA00FF");
+    expect(result[0].repoCount).toBe(5);
+    expect(result[0].commitCount).toBe(300);
+    expect(result[0].focusNarrative).toBe("Testing whitespace tolerance.");
+  });
 });

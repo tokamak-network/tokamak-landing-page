@@ -145,4 +145,37 @@ describe("tierRepos", () => {
     expect(otherGroup.color).toBe("#888");
     expect(otherGroup.repos).toHaveLength(1);
   });
+
+  it("matches repos by exact name between landscape and repo cards", () => {
+    // Simulates the real data flow: landscape has repo names from HTML,
+    // RepoCardData has repoName from a different HTML section.
+    // They must match exactly.
+    const categoryMap = new Map<string, RepoCategoryInfo>([
+      ["zk-dex", { label: "Privacy & ZK", color: "#7C3AED", icon: "🔒" }],
+      ["tokamak-thanos", { label: "Infrastructure", color: "#E11D48", icon: "⚙️" }],
+    ]);
+
+    const repos = [
+      ...Array.from({ length: 7 }, (_, i) =>
+        makeRepo(`highlight-${i}`, "100", "+10000", "-5000", "+5000")
+      ),
+      makeRepo("zk-dex", "20", "+500", "-200", "+300"),
+      makeRepo("tokamak-thanos", "15", "+300", "-100", "+200"),
+      // Case mismatch — should NOT match, goes to "Other"
+      makeRepo("ZK-DEX-v2", "10", "+200", "-50", "+150"),
+    ];
+    const result = tierRepos(repos, categoryMap);
+
+    const zkGroup = result.categories.find((c) => c.label === "Privacy & ZK")!;
+    expect(zkGroup.repos).toHaveLength(1);
+    expect(zkGroup.repos[0].repoName).toBe("zk-dex");
+
+    const infraGroup = result.categories.find((c) => c.label === "Infrastructure")!;
+    expect(infraGroup.repos).toHaveLength(1);
+
+    // ZK-DEX-v2 doesn't match "zk-dex" exactly → Other
+    const otherGroup = result.categories.find((c) => c.label === "Other")!;
+    expect(otherGroup.repos).toHaveLength(1);
+    expect(otherGroup.repos[0].repoName).toBe("ZK-DEX-v2");
+  });
 });

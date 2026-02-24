@@ -8,6 +8,11 @@ export const formatNumber = (num?: number | string): string => {
   return num.toLocaleString("en-US");
 };
 
+/** Validate a CSS hex color string. Returns the color if valid, fallback otherwise. */
+export function sanitizeColor(color: string, fallback = "#888"): string {
+  return /^#[0-9A-Fa-f]{3,8}$/.test(color) ? color : fallback;
+}
+
 export const formatCurrencyString = (value?: number | string): string => {
   if (!value) return "";
   // 숫자 타입인 경우 바로 포맷팅

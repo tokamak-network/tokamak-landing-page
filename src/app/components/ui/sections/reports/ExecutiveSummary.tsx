@@ -7,18 +7,39 @@ export default function ExecutiveSummary({
 }) {
   if (!headline && !narrative) return null;
 
+  const paragraphs = narrative
+    ? narrative.split("\n\n").filter((p) => p.trim())
+    : [];
+
   return (
-    <div className="flex flex-col gap-[12px]">
-      <h2 className="text-[20px] font-[600] text-[#1C1C1C]">
+    <div className="flex flex-col gap-[16px]">
+      <span className="text-[11px] font-[700] text-[#0078FF] uppercase tracking-[0.05em]">
         Executive Summary
-      </h2>
+      </span>
+
       {headline && (
-        <p className="text-[16px] font-[500] text-[#1C1C1C] leading-[1.5]">
+        <h2 className="text-[24px] [@media(max-width:640px)]:text-[20px] font-[700] text-[#1C1C1C] leading-[1.3]">
           {headline}
-        </p>
+        </h2>
       )}
-      {narrative && (
-        <p className="text-[14px] text-[#444] leading-[1.7]">{narrative}</p>
+
+      <div className="h-[1px] bg-gradient-to-r from-transparent via-[#e0e0e0] to-transparent" />
+
+      {paragraphs.length > 0 && (
+        <div className="flex flex-col gap-[12px]">
+          {paragraphs.map((p, i) => (
+            <p
+              key={i}
+              className="text-[15px] text-[#555] leading-[1.8]"
+            >
+              {p}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {narrative && paragraphs.length === 0 && (
+        <p className="text-[15px] text-[#555] leading-[1.8]">{narrative}</p>
       )}
     </div>
   );

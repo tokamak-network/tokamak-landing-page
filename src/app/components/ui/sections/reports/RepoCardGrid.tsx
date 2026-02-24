@@ -69,11 +69,6 @@ export default function RepoCardGrid({ repos }: { repos: RepoCardData[] }) {
         </select>
       </div>
 
-      {/* COUNT */}
-      <span className="text-[13px] text-[#808992]">
-        {filtered.length} of {repos.length} repositories
-      </span>
-
       {/* CARDS */}
       <div className="flex flex-col gap-[12px]">
         {filtered.length === 0 ? (

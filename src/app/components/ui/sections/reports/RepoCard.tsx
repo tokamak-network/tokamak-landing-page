@@ -3,7 +3,87 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { RepoCardData } from "./types";
+import { parseNum } from "./sortRepos";
 import ContributorBadge from "./ContributorBadge";
+
+function LinesChangedBar({
+  linesAdded,
+  linesDeleted,
+}: {
+  linesAdded: string;
+  linesDeleted: string;
+}) {
+  const added = Math.abs(parseNum(linesAdded));
+  const deleted = Math.abs(parseNum(linesDeleted));
+  const total = added + deleted;
+  if (total === 0) return null;
+
+  const addedPct = (added / total) * 100;
+
+  return (
+    <div className="flex items-center gap-[8px] mt-[4px]">
+      <div className="flex-1 h-[4px] rounded-full overflow-hidden flex bg-[#e8e8e8]">
+        <div
+          className="h-full bg-[#28a745] rounded-l-full"
+          style={{ width: `${addedPct}%` }}
+        />
+        <div
+          className="h-full bg-[#cb2431] rounded-r-full"
+          style={{ width: `${100 - addedPct}%` }}
+        />
+      </div>
+      <span className="text-[11px] text-[#808992] flex-shrink-0">
+        {Math.round(addedPct)}% additions
+      </span>
+    </div>
+  );
+}
+
+function StatPill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-[4px] px-[8px] py-[2px] rounded-full bg-[#f5f5f5] text-[12px] text-[#333]">
+      {children}
+    </span>
+  );
+}
+
+function SubSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="bg-[#f8f9fa] rounded-[8px] p-[16px]">
+      <h4 className="text-[13px] font-[600] text-[#1C1C1C] mb-[8px]">
+        {title}
+      </h4>
+      {children}
+    </div>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 20 20"
+      fill="none"
+      className="flex-shrink-0 mt-[2px]"
+    >
+      <path
+        d="M5 10L8.5 13.5L15 7"
+        stroke="#28a745"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 export default function RepoCard({ repo }: { repo: RepoCardData }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,16 +91,29 @@ export default function RepoCard({ repo }: { repo: RepoCardData }) {
   const hasValidGithubUrl = repo.githubUrl.startsWith("https://");
 
   return (
-    <div className="rounded-[12px] border border-[#DEDEDE] bg-white overflow-hidden">
+    <div
+      id={`repo-${repo.repoName}`}
+      style={{ scrollMarginTop: "110px" }}
+      className="rounded-[12px] border border-[#DEDEDE] bg-white overflow-hidden"
+    >
       {/* HEADER - always visible */}
-      <button
-        onClick={() => setIsOpen((prev) => !prev)}
-        aria-expanded={isOpen}
-        aria-controls={panelId}
-        className="w-full flex items-center justify-between p-[20px] [@media(max-width:640px)]:p-[16px]
-          hover:bg-[#fafafa] transition-colors duration-150 text-left cursor-pointer"
-      >
-        <div className="flex flex-col gap-[8px] min-w-0 flex-1">
+      <div className="flex items-center justify-between p-[20px] [@media(max-width:640px)]:p-[16px]
+        hover:bg-[#fafafa] transition-colors duration-150">
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => setIsOpen((prev) => !prev)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setIsOpen((prev) => !prev);
+            }
+          }}
+          aria-expanded={isOpen}
+          aria-controls={panelId}
+          className="flex flex-col gap-[8px] min-w-0 flex-1 text-left cursor-pointer"
+        >
+          {/* Repo name + GitHub link */}
           <div className="flex items-center gap-[8px] flex-wrap">
             <span className="text-[16px] font-[600] text-[#1C1C1C] truncate">
               {repo.repoName}
@@ -46,21 +139,30 @@ export default function RepoCard({ repo }: { repo: RepoCardData }) {
             )}
           </div>
 
-          {/* Stats row */}
-          <div className="flex items-center gap-[12px] [@media(max-width:640px)]:gap-[8px] flex-wrap text-[12px]">
-            <span className="text-[#333]">
+          {/* Stat pills */}
+          <div className="flex items-center gap-[6px] [@media(max-width:640px)]:gap-[4px] flex-wrap">
+            <StatPill>
               <span className="font-[500]">{repo.stats.commits}</span> commits
-            </span>
-            <span className="text-[#333]">
-              <span className="font-[500]">{repo.stats.contributors}</span>{" "}
-              contributors
-            </span>
-            <span className="text-[#28a745]">{repo.stats.linesAdded}</span>
-            <span className="text-[#cb2431]">{repo.stats.linesDeleted}</span>
-            <span className="text-[#333]">
+            </StatPill>
+            <StatPill>
+              <span className="font-[500]">{repo.stats.contributors}</span> contribs
+            </StatPill>
+            <StatPill>
+              <span className="text-[#28a745] font-[500]">{repo.stats.linesAdded}</span>
+            </StatPill>
+            <StatPill>
+              <span className="text-[#cb2431] font-[500]">{repo.stats.linesDeleted}</span>
+            </StatPill>
+            <span className="text-[12px] text-[#333]">
               net {repo.stats.netLines}
             </span>
           </div>
+
+          {/* Lines changed bar */}
+          <LinesChangedBar
+            linesAdded={repo.stats.linesAdded}
+            linesDeleted={repo.stats.linesDeleted}
+          />
         </div>
 
         <svg
@@ -81,7 +183,7 @@ export default function RepoCard({ repo }: { repo: RepoCardData }) {
             strokeLinejoin="round"
           />
         </svg>
-      </button>
+      </div>
 
       {/* BODY - expandable */}
       <AnimatePresence initial={false}>
@@ -104,48 +206,40 @@ export default function RepoCard({ repo }: { repo: RepoCardData }) {
               )}
 
               {repo.accomplishments.length > 0 && (
-                <div>
-                  <h4 className="text-[14px] font-[600] text-[#1C1C1C] mb-[8px]">
-                    Key Accomplishments
-                  </h4>
-                  <ul className="list-disc list-inside flex flex-col gap-[4px]">
+                <SubSection title="Key Accomplishments">
+                  <ul className="flex flex-col gap-[6px]">
                     {repo.accomplishments.map((item, i) => (
                       <li
                         key={i}
-                        className="text-[13px] text-[#444] leading-[1.6]"
+                        className="flex items-start gap-[8px] text-[13px] text-[#444] leading-[1.6]"
                       >
-                        {item}
+                        <CheckIcon />
+                        <span>{item}</span>
                       </li>
                     ))}
                   </ul>
-                </div>
+                </SubSection>
               )}
 
               {repo.codeAnalysis && (
-                <div>
-                  <h4 className="text-[14px] font-[600] text-[#1C1C1C] mb-[8px]">
-                    Code Analysis
-                  </h4>
+                <SubSection title="Code Analysis">
                   <p className="text-[13px] text-[#444] leading-[1.6]">
                     {repo.codeAnalysis}
                   </p>
-                </div>
+                </SubSection>
               )}
 
               {repo.nextSteps && (
-                <div>
-                  <h4 className="text-[14px] font-[600] text-[#1C1C1C] mb-[8px]">
-                    Next Steps
-                  </h4>
+                <SubSection title="Next Steps">
                   <p className="text-[13px] text-[#444] leading-[1.6]">
                     {repo.nextSteps}
                   </p>
-                </div>
+                </SubSection>
               )}
 
               {repo.topContributors.length > 0 && (
                 <div>
-                  <h4 className="text-[14px] font-[600] text-[#1C1C1C] mb-[8px]">
+                  <h4 className="text-[13px] font-[600] text-[#1C1C1C] mb-[8px]">
                     Top Contributors
                   </h4>
                   <div className="flex flex-wrap gap-[8px]">

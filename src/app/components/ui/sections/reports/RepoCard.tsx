@@ -3,41 +3,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { RepoCardData } from "./types";
-import { parseNum } from "./sortRepos";
 import ContributorBadge from "./ContributorBadge";
-
-function LinesChangedBar({
-  linesAdded,
-  linesDeleted,
-}: {
-  linesAdded: string;
-  linesDeleted: string;
-}) {
-  const added = Math.abs(parseNum(linesAdded));
-  const deleted = Math.abs(parseNum(linesDeleted));
-  const total = added + deleted;
-  if (total === 0) return null;
-
-  const addedPct = (added / total) * 100;
-
-  return (
-    <div className="flex items-center gap-[8px] mt-[4px]">
-      <div className="flex-1 h-[4px] rounded-full overflow-hidden flex bg-[#e8e8e8]">
-        <div
-          className="h-full bg-[#28a745] rounded-l-full"
-          style={{ width: `${addedPct}%` }}
-        />
-        <div
-          className="h-full bg-[#cb2431] rounded-r-full"
-          style={{ width: `${100 - addedPct}%` }}
-        />
-      </div>
-      <span className="text-[11px] text-[#808992] flex-shrink-0">
-        {Math.round(addedPct)}% additions
-      </span>
-    </div>
-  );
-}
+import AdditionsBar from "./AdditionsBar";
 
 function StatPill({ children }: { children: React.ReactNode }) {
   return (
@@ -139,14 +106,8 @@ export default function RepoCard({ repo }: { repo: RepoCardData }) {
             )}
           </div>
 
-          {/* Stat pills */}
+          {/* Stat pills — lines first, commits secondary */}
           <div className="flex items-center gap-[6px] [@media(max-width:640px)]:gap-[4px] flex-wrap">
-            <StatPill>
-              <span className="font-[500]">{repo.stats.commits}</span> commits
-            </StatPill>
-            <StatPill>
-              <span className="font-[500]">{repo.stats.contributors}</span> contribs
-            </StatPill>
             <StatPill>
               <span className="text-[#28a745] font-[500]">{repo.stats.linesAdded}</span>
             </StatPill>
@@ -156,12 +117,24 @@ export default function RepoCard({ repo }: { repo: RepoCardData }) {
             <span className="text-[12px] text-[#333]">
               net {repo.stats.netLines}
             </span>
+            <span className="text-[12px] text-[#C4C4C4] mx-[2px]" aria-hidden="true">
+              ·
+            </span>
+            <span className="text-[12px] text-[#808992]">
+              {repo.stats.commits} commits
+            </span>
+            <span className="text-[12px] text-[#808992]">
+              {repo.stats.contributors} contribs
+            </span>
           </div>
 
           {/* Lines changed bar */}
-          <LinesChangedBar
+          <AdditionsBar
             linesAdded={repo.stats.linesAdded}
             linesDeleted={repo.stats.linesDeleted}
+            height={4}
+            showLabel
+            className="mt-[4px]"
           />
         </div>
 

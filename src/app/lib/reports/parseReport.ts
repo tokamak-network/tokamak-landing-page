@@ -10,6 +10,7 @@ import type {
   Contributor,
 } from "@/app/components/ui/sections/reports/types";
 import { DEFAULT_STATS } from "./constants";
+import { parseNum } from "@/app/lib/utils/format";
 
 // ── URL sanitization ──
 
@@ -23,6 +24,29 @@ export function sanitizeUrl(url: string): string {
   } catch {
     return "";
   }
+}
+
+// ── Utilities ──
+
+function formatWithCommas(n: number, prefix: string): string {
+  return `${prefix}${n.toLocaleString("en-US")}`;
+}
+
+function aggregateRepoLines(
+  repos: RepoCardData[]
+): { linesAdded: string; linesDeleted: string } {
+  let totalAdded = 0;
+  let totalDeleted = 0;
+
+  for (const repo of repos) {
+    totalAdded += Math.abs(parseNum(repo.stats.linesAdded));
+    totalDeleted += Math.abs(parseNum(repo.stats.linesDeleted));
+  }
+
+  return {
+    linesAdded: formatWithCommas(totalAdded, "+"),
+    linesDeleted: formatWithCommas(totalDeleted, "-"),
+  };
 }
 
 // ── Section extraction ──
@@ -362,9 +386,14 @@ export function parseReportDetail(
 
     const repos = cardsFragment ? parseCardsFragment(cardsFragment) : [];
 
+    const enrichedStats =
+      repos.length > 0
+        ? { ...stats, ...aggregateRepoLines(repos) }
+        : stats;
+
     return {
       ...meta,
-      stats,
+      stats: enrichedStats,
       executiveHeadline: headline,
       executiveNarrative: narrative,
       repos,

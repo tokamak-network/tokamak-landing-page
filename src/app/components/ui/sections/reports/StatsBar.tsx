@@ -1,7 +1,13 @@
 import type { ReportStats } from "./types";
+import AdditionsBar from "./AdditionsBar";
 
-const STAT_ITEMS: { key: keyof ReportStats; label: string }[] = [
-  { key: "commits", label: "Commits" },
+const SECONDARY_STATS: { key: keyof ReportStats; label: string }[] = [
+  { key: "activeRepos", label: "Active Repos" },
+  { key: "contributors", label: "Contributors" },
+  { key: "netGrowth", label: "Net Growth" },
+];
+
+const LISTING_STAT_COLUMNS: { key: keyof ReportStats; label: string }[] = [
   { key: "linesChanged", label: "Lines Changed" },
   { key: "activeRepos", label: "Active Repos" },
   { key: "contributors", label: "Contributors" },
@@ -18,34 +24,69 @@ export default function StatsBar({
   variant?: "default" | "cards";
 }) {
   if (variant === "cards") {
+    const hasBreakdown = stats.linesAdded && stats.linesDeleted;
+
     return (
-      <div className="grid grid-cols-5 gap-[8px] [@media(max-width:640px)]:grid-cols-3 [@media(max-width:400px)]:grid-cols-2">
-        {STAT_ITEMS.map(({ key, label }) => (
-          <div
-            key={key}
-            className="flex flex-col items-center text-center bg-[#f8f9fa] rounded-[8px] py-[16px] px-[12px]"
-          >
-            <span className="text-[22px] [@media(max-width:640px)]:text-[18px] font-[700] text-[#1C1C1C]">
-              {stats[key]}
+      <div className="flex flex-col gap-[12px]">
+        {/* Hero: Code Changes */}
+        <div className="bg-[#f8f9fa] rounded-[12px] p-[20px] [@media(max-width:640px)]:p-[16px] border border-[#EDEDF0]">
+          <div className="flex items-baseline justify-between mb-[12px]">
+            <span className="text-[11px] text-[#808992] uppercase tracking-[0.06em] font-[600]">
+              Code Changes
             </span>
-            <span className="text-[11px] text-[#808992] uppercase tracking-[0.02em]">
-              {label}
+            <span className="text-[28px] [@media(max-width:640px)]:text-[22px] font-[700] text-[#0078FF]">
+              {stats.linesChanged}
             </span>
           </div>
-        ))}
+
+          {hasBreakdown && (
+            <>
+              <AdditionsBar
+                linesAdded={stats.linesAdded!}
+                linesDeleted={stats.linesDeleted!}
+                height={6}
+              />
+              <div className="flex items-center justify-between mt-[8px]">
+                <span className="text-[13px] [@media(max-width:640px)]:text-[12px] text-[#28a745] font-[500]">
+                  {stats.linesAdded} added
+                </span>
+                <span className="text-[13px] [@media(max-width:640px)]:text-[12px] text-[#cb2431] font-[500]">
+                  {stats.linesDeleted} deleted
+                </span>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Secondary stats: 3-column grid */}
+        <div className="grid grid-cols-3 gap-[8px]">
+          {SECONDARY_STATS.map(({ key, label }) => (
+            <div
+              key={key}
+              className="flex flex-col items-center text-center bg-[#f8f9fa] rounded-[8px] py-[14px] px-[12px]"
+            >
+              <span className="text-[20px] [@media(max-width:640px)]:text-[16px] font-[700] text-[#1C1C1C]">
+                {stats[key]}
+              </span>
+              <span className="text-[11px] text-[#808992] uppercase tracking-[0.02em]">
+                {label}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
     <div
-      className={`grid grid-cols-5 ${
+      className={`grid grid-cols-4 ${
         compact
-          ? "gap-2 [@media(max-width:640px)]:grid-cols-3 [@media(max-width:400px)]:grid-cols-2"
-          : "gap-4 [@media(max-width:640px)]:grid-cols-3 [@media(max-width:400px)]:grid-cols-2"
+          ? "gap-2 [@media(max-width:640px)]:grid-cols-2 [@media(max-width:400px)]:grid-cols-2"
+          : "gap-4 [@media(max-width:640px)]:grid-cols-2 [@media(max-width:400px)]:grid-cols-2"
       }`}
     >
-      {STAT_ITEMS.map(({ key, label }) => (
+      {LISTING_STAT_COLUMNS.map(({ key, label }, i) => (
         <div
           key={key}
           className={`flex flex-col items-center text-center ${
@@ -53,8 +94,16 @@ export default function StatsBar({
           }`}
         >
           <span
-            className={`font-[600] text-[#1C1C1C] ${
-              compact ? "text-[14px]" : "text-[20px] [@media(max-width:640px)]:text-[16px]"
+            className={`font-[600] ${
+              i === 0 ? "text-[#0078FF]" : "text-[#1C1C1C]"
+            } ${
+              compact
+                ? i === 0
+                  ? "text-[16px]"
+                  : "text-[14px]"
+                : i === 0
+                  ? "text-[22px] [@media(max-width:640px)]:text-[18px]"
+                  : "text-[20px] [@media(max-width:640px)]:text-[16px]"
             }`}
           >
             {stats[key]}

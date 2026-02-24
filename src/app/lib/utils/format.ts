@@ -1,3 +1,8 @@
+/** Parse a display-formatted number string (e.g. "+3,939,114") into a plain number. */
+export function parseNum(s: string): number {
+  return parseInt(s.replace(/[^0-9-]/g, ""), 10) || 0;
+}
+
 export const formatNumber = (num?: number | string): string => {
   if (!num) return "";
   return num.toLocaleString("en-US");

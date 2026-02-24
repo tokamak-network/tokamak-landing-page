@@ -58,16 +58,16 @@ export default function ReportDetail({
           All Reports
         </Link>
 
+        {/* STATS BAR - hero code changes */}
+        <StatsBar stats={report.stats} variant="cards" />
+
+        <GradientDivider />
+
         {/* EXECUTIVE SUMMARY */}
         <ExecutiveSummary
           headline={report.executiveHeadline}
           narrative={report.executiveNarrative}
         />
-
-        <GradientDivider />
-
-        {/* STATS BAR - cards mode */}
-        <StatsBar stats={report.stats} variant="cards" />
 
         <GradientDivider />
 

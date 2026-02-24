@@ -13,6 +13,8 @@ export interface ReportStats {
   activeRepos: string;
   contributors: string;
   netGrowth: string;
+  linesAdded?: string;
+  linesDeleted?: string;
 }
 
 export interface ReportSummary extends ReportMeta {

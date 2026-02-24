@@ -35,14 +35,15 @@ export default function CompactRepoRow({ repo }: { repo: RepoCardData }) {
           {repo.repoName}
         </span>
         <div className="flex items-center gap-[8px] flex-shrink-0">
-          <span className="text-[12px] text-[#808992]">
-            {repo.stats.commits} commits
-          </span>
           <span className="text-[12px] text-[#28a745]">
             {repo.stats.linesAdded}
           </span>
           <span className="text-[12px] text-[#cb2431]">
             {repo.stats.linesDeleted}
+          </span>
+          <span className="text-[12px] text-[#C4C4C4]" aria-hidden="true">·</span>
+          <span className="text-[12px] text-[#808992]">
+            {repo.stats.commits} commits
           </span>
         </div>
       </div>

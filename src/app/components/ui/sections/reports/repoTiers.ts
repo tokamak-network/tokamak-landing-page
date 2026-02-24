@@ -1,5 +1,5 @@
 import type { RepoCardData } from "./types";
-import { parseNum } from "./sortRepos";
+import { parseNum } from "@/app/lib/utils/format";
 
 // ── Scoring ──
 

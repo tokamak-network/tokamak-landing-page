@@ -1,4 +1,6 @@
 import type { RepoCardData } from "./types";
+export { parseNum } from "@/app/lib/utils/format";
+import { parseNum } from "@/app/lib/utils/format";
 
 export type SortKey = "name" | "commits" | "lines" | "contributors";
 
@@ -8,10 +10,6 @@ export const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "lines", label: "Lines Changed" },
   { key: "contributors", label: "Contributors" },
 ];
-
-export function parseNum(s: string): number {
-  return parseInt(s.replace(/[^0-9-]/g, ""), 10) || 0;
-}
 
 export function sortRepos(
   repos: RepoCardData[],

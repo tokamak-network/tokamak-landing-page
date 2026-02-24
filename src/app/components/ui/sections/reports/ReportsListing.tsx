@@ -9,7 +9,7 @@ import ReportsPageLayout from "./ReportsPageLayout";
 
 const TITLE = (
   <>
-    Development
+    Biweekly
     <span className="font-[400] [@media(max-width:650px)]:block">
       {" "}
       Reports

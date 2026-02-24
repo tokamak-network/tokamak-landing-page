@@ -5,7 +5,7 @@ import ReportsListing from "@/app/components/ui/sections/reports/ReportsListing"
 import type { ReportSummary } from "@/app/components/ui/sections/reports/types";
 
 export const metadata: Metadata = {
-  title: "Development Reports | Tokamak Network",
+  title: "Biweekly Reports | Tokamak Network",
   description:
     "Biweekly engineering progress across all Tokamak Network repositories",
 };

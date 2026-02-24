@@ -4,21 +4,18 @@ import { parseNum } from "@/app/lib/utils/format";
 // ── Scoring ──
 
 export function scoreRepo(repo: RepoCardData): number {
-  const commits = parseNum(repo.stats.commits);
   const added = Math.abs(parseNum(repo.stats.linesAdded));
   const deleted = Math.abs(parseNum(repo.stats.linesDeleted));
-  return commits * 2 + added + deleted;
+  return added + deleted;
 }
 
 // ── Minor repo detection ──
 
-const MINOR_MAX_COMMITS = 3;
 const MINOR_MAX_NET_LINES = 100;
 
 function isMinorRepo(repo: RepoCardData): boolean {
-  const commits = parseNum(repo.stats.commits);
   const net = Math.abs(parseNum(repo.stats.netLines));
-  return commits <= MINOR_MAX_COMMITS && net <= MINOR_MAX_NET_LINES;
+  return net <= MINOR_MAX_NET_LINES;
 }
 
 // ── Tiering ──

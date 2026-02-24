@@ -69,7 +69,6 @@ export default function MinorReposSection({
                     {repo.repoName}
                   </span>
                   <div className="flex items-center gap-[12px] flex-shrink-0 text-[#808992]">
-                    <span>{repo.stats.commits} commits</span>
                     <span>net {repo.stats.netLines}</span>
                   </div>
                 </div>

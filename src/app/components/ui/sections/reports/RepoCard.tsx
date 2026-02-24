@@ -106,7 +106,7 @@ export default function RepoCard({ repo }: { repo: RepoCardData }) {
             )}
           </div>
 
-          {/* Stat pills — lines first, commits secondary */}
+          {/* Stat pills */}
           <div className="flex items-center gap-[6px] [@media(max-width:640px)]:gap-[4px] flex-wrap">
             <StatPill>
               <span className="text-[#28a745] font-[500]">{repo.stats.linesAdded}</span>
@@ -116,12 +116,6 @@ export default function RepoCard({ repo }: { repo: RepoCardData }) {
             </StatPill>
             <span className="text-[12px] text-[#333]">
               net {repo.stats.netLines}
-            </span>
-            <span className="text-[12px] text-[#C4C4C4] mx-[2px]" aria-hidden="true">
-              ·
-            </span>
-            <span className="text-[12px] text-[#808992]">
-              {repo.stats.commits} commits
             </span>
             <span className="text-[12px] text-[#808992]">
               {repo.stats.contributors} contribs

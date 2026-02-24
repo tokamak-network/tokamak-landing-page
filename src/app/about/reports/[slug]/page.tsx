@@ -22,7 +22,7 @@ export async function generateMetadata({
   return {
     title: meta
       ? `${meta.dateLabel} Report | Tokamak Network`
-      : "Development Report | Tokamak Network",
+      : "Biweekly Report | Tokamak Network",
   };
 }
 

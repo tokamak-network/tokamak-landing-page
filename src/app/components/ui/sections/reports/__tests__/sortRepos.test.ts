@@ -95,15 +95,6 @@ describe("sortRepos", () => {
     ]);
   });
 
-  it("sorts by commits descending", () => {
-    const sorted = sortRepos(repos, "commits");
-    expect(sorted.map((r) => r.repoName)).toEqual([
-      "Alpha",
-      "Bravo",
-      "Charlie",
-    ]);
-  });
-
   it("sorts by lines changed descending (added + deleted)", () => {
     const sorted = sortRepos(repos, "lines");
     expect(sorted.map((r) => r.repoName)).toEqual([

@@ -2,7 +2,6 @@ import type { ReportStats } from "./types";
 import AdditionsBar from "./AdditionsBar";
 
 const SECONDARY_STATS: { key: keyof ReportStats; label: string }[] = [
-  { key: "commits", label: "Commits" },
   { key: "activeRepos", label: "Active Repos" },
   { key: "contributors", label: "Contributors" },
   { key: "netGrowth", label: "Net Growth" },
@@ -59,8 +58,8 @@ export default function StatsBar({
           )}
         </div>
 
-        {/* Secondary stats: 4-column grid */}
-        <div className="grid grid-cols-4 [@media(max-width:640px)]:grid-cols-2 gap-[8px]">
+        {/* Secondary stats: 3-column grid */}
+        <div className="grid grid-cols-3 gap-[8px]">
           {SECONDARY_STATS.map(({ key, label }) => (
             <div
               key={key}

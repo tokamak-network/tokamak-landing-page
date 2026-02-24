@@ -41,10 +41,6 @@ export default function CompactRepoRow({ repo }: { repo: RepoCardData }) {
           <span className="text-[12px] text-[#cb2431]">
             {repo.stats.linesDeleted}
           </span>
-          <span className="text-[12px] text-[#C4C4C4]" aria-hidden="true">·</span>
-          <span className="text-[12px] text-[#808992]">
-            {repo.stats.commits} commits
-          </span>
         </div>
       </div>
       <svg

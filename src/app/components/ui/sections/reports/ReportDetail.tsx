@@ -36,7 +36,7 @@ export default function ReportDetail({
     <ReportsPageLayout
       title={
         <>
-          Development
+          Biweekly
           <span className="font-[400] [@media(max-width:650px)]:block">
             {" "}
             Report

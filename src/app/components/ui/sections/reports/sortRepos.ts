@@ -2,11 +2,10 @@ import type { RepoCardData } from "./types";
 export { parseNum } from "@/app/lib/utils/format";
 import { parseNum } from "@/app/lib/utils/format";
 
-export type SortKey = "name" | "commits" | "lines" | "contributors";
+export type SortKey = "name" | "lines" | "contributors";
 
 export const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "name", label: "Name" },
-  { key: "commits", label: "Commits" },
   { key: "lines", label: "Lines Changed" },
   { key: "contributors", label: "Contributors" },
 ];
@@ -19,8 +18,6 @@ export function sortRepos(
     switch (sortKey) {
       case "name":
         return a.repoName.localeCompare(b.repoName);
-      case "commits":
-        return parseNum(b.stats.commits) - parseNum(a.stats.commits);
       case "lines":
         return (
           Math.abs(parseNum(b.stats.linesAdded)) +

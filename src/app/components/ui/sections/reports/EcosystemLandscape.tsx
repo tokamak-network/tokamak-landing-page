@@ -14,16 +14,13 @@ const ACTIVITY_COLORS: Record<string, string> = {
 
 function SummaryPills({
   totalRepos,
-  totalCommits,
   totalCategories,
 }: {
   totalRepos: number;
-  totalCommits: number;
   totalCategories: number;
 }) {
   const pills = [
     { label: "Repositories", value: totalRepos },
-    { label: "Commits", value: totalCommits.toLocaleString("en-US") },
     { label: "Categories", value: totalCategories },
   ];
 
@@ -127,8 +124,7 @@ function CategoryCard({ category }: { category: LandscapeCategory }) {
           {category.name}
         </span>
         <span className="ml-auto text-[11px] text-[#888] font-[600] whitespace-nowrap">
-          {category.repoCount} repos &middot;{" "}
-          {category.commitCount.toLocaleString("en-US")} commits
+          {category.repoCount} repos
         </span>
       </div>
 
@@ -155,7 +151,6 @@ export default function EcosystemLandscape({
 
       <SummaryPills
         totalRepos={data.totalRepos}
-        totalCommits={data.totalCommits}
         totalCategories={data.totalCategories}
       />
 

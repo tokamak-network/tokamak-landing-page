@@ -43,7 +43,7 @@ export default function RepoCardGrid({
   categoryMap?: Map<string, RepoCategoryInfo>;
 }) {
   const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("commits");
+  const [sortKey, setSortKey] = useState<SortKey>("lines");
 
   const isSearching = search.trim().length > 0;
 

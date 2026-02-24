@@ -3,11 +3,10 @@
 import type { CategoryFocusItem } from "./types";
 import { sanitizeColor } from "@/app/lib/utils/format";
 
-function RepoChip({ name, commits }: { name: string; commits: number }) {
+function RepoChip({ name }: { name: string }) {
   return (
-    <span className="inline-flex items-center gap-[4px] bg-[#f5f7fa] text-[12px] text-[#444] px-[10px] py-[4px] rounded-full">
+    <span className="inline-flex items-center bg-[#f5f7fa] text-[12px] text-[#444] px-[10px] py-[4px] rounded-full">
       <span className="font-[600]">{name}</span>
-      <span className="text-[#999]">({commits})</span>
     </span>
   );
 }
@@ -28,8 +27,7 @@ function FocusCard({ item }: { item: CategoryFocusItem }) {
           className="ml-auto bg-[#f0f0f0] text-[#555] px-[10px] py-[2px] rounded-[10px]
             text-[11px] font-[700] whitespace-nowrap"
         >
-          {item.repoCount} repos &middot;{" "}
-          {item.commitCount.toLocaleString("en-US")} commits
+          {item.repoCount} repos
         </span>
       </div>
 
@@ -37,7 +35,7 @@ function FocusCard({ item }: { item: CategoryFocusItem }) {
       {item.topRepos.length > 0 && (
         <div className="flex flex-wrap gap-[6px] mb-[10px]">
           {item.topRepos.map((repo) => (
-            <RepoChip key={repo.name} name={repo.name} commits={repo.commits} />
+            <RepoChip key={repo.name} name={repo.name} />
           ))}
         </div>
       )}

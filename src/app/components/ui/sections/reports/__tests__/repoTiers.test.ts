@@ -22,9 +22,9 @@ function makeRepo(
 }
 
 describe("scoreRepo", () => {
-  it("calculates score as commits*2 + |added| + |deleted|", () => {
+  it("calculates score as |added| + |deleted|", () => {
     const repo = makeRepo("test", "10", "+500", "-200", "+300");
-    expect(scoreRepo(repo)).toBe(10 * 2 + 500 + 200);
+    expect(scoreRepo(repo)).toBe(500 + 200);
   });
 
   it("handles zero values", () => {
@@ -34,7 +34,7 @@ describe("scoreRepo", () => {
 
   it("handles formatted numbers with commas", () => {
     const repo = makeRepo("test", "1,000", "+50,000", "-10,000", "+40,000");
-    expect(scoreRepo(repo)).toBe(1000 * 2 + 50000 + 10000);
+    expect(scoreRepo(repo)).toBe(50000 + 10000);
   });
 });
 
@@ -56,24 +56,24 @@ describe("tierRepos", () => {
     expect(result.highlights[0].repoName).toBe("repo-9");
   });
 
-  it("separates minor repos (<=3 commits AND |net| <= 100)", () => {
+  it("separates minor repos (|net| <= 100)", () => {
     const repos = [
       // 7 high-activity repos to fill highlights
       ...Array.from({ length: 7 }, (_, i) =>
         makeRepo(`big-repo-${i}`, "100", "+10000", "-5000", "+5000")
       ),
-      // Medium repo — not minor
+      // Medium repo — not minor (net 300)
       makeRepo("medium-repo", "20", "+500", "-200", "+300"),
-      // Minor repos
+      // Minor repos (net <= 100)
       makeRepo("tiny-repo-1", "2", "+10", "-5", "+5"),
       makeRepo("tiny-repo-2", "1", "+3", "-1", "+2"),
-      makeRepo("some-commits-but-tiny-net", "3", "+50", "-0", "+50"),
+      makeRepo("tiny-net-repo", "30", "+50", "-0", "+50"),
     ];
     const result = tierRepos(repos);
     const minorNames = result.minor.map((r) => r.repoName);
     expect(minorNames).toContain("tiny-repo-1");
     expect(minorNames).toContain("tiny-repo-2");
-    expect(minorNames).toContain("some-commits-but-tiny-net");
+    expect(minorNames).toContain("tiny-net-repo");
     expect(minorNames).not.toContain("medium-repo");
   });
 

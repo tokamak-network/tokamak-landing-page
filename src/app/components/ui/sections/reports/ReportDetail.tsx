@@ -95,7 +95,7 @@ export default function ReportDetail({
         {report.categoryFocus && report.categoryFocus.length > 0 && (
           <>
             <GradientDivider />
-            <CategoryFocusSynergies items={report.categoryFocus} />
+            <CategoryFocusSynergies items={report.categoryFocus} repos={report.repos} />
           </>
         )}
 

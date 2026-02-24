@@ -97,22 +97,22 @@ export default function RepoCard({ repo }: { repo: RepoCardData }) {
       className="rounded-[12px] border border-[#DEDEDE] bg-white overflow-hidden"
     >
       {/* HEADER - always visible */}
-      <div className="flex items-center justify-between p-[20px] [@media(max-width:640px)]:p-[16px]
-        hover:bg-[#fafafa] transition-colors duration-150">
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={() => setIsOpen((prev) => !prev)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              setIsOpen((prev) => !prev);
-            }
-          }}
-          aria-expanded={isOpen}
-          aria-controls={panelId}
-          className="flex flex-col gap-[8px] min-w-0 flex-1 text-left cursor-pointer"
-        >
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => setIsOpen((prev) => !prev)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setIsOpen((prev) => !prev);
+          }
+        }}
+        aria-expanded={isOpen}
+        aria-controls={panelId}
+        className="flex items-center justify-between p-[20px] [@media(max-width:640px)]:p-[16px]
+          hover:bg-[#fafafa] transition-colors duration-150 text-left cursor-pointer"
+      >
+        <div className="flex flex-col gap-[8px] min-w-0 flex-1">
           {/* Repo name + GitHub link */}
           <div className="flex items-center gap-[8px] flex-wrap">
             <span className="text-[16px] font-[600] text-[#1C1C1C] truncate">

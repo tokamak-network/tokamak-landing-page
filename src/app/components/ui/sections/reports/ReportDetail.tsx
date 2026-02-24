@@ -4,7 +4,6 @@ import type { ReportDetail as ReportDetailType } from "./types";
 import StatsBar from "./StatsBar";
 import ExecutiveSummary from "./ExecutiveSummary";
 import RepoCardGrid from "./RepoCardGrid";
-import ReportNav from "./ReportNav";
 import ReportsPageLayout from "./ReportsPageLayout";
 import Link from "next/link";
 
@@ -85,9 +84,6 @@ export default function ReportDetail({
           <RepoCardGrid repos={report.repos} />
         </div>
       </div>
-
-      {/* FLOATING NAV */}
-      <ReportNav repos={report.repos} />
     </ReportsPageLayout>
   );
 }

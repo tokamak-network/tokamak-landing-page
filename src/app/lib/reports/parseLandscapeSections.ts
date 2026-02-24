@@ -163,11 +163,14 @@ export function parseCategoryFocusFragment(
         return { name: repoName, commits };
       });
 
+    // Uppercase label divs (shared query for focus + synergies)
+    const uppercaseDivs = card.find("div").filter((_f: number, d: AnyNode) =>
+      /text-transform:\s*uppercase/.test($(d).attr("style") || "")
+    );
+
     // Focus narrative: text after "Current Focus" label
     let focusNarrative = "";
-    card.find("div").filter((_f: number, d: AnyNode) =>
-      /text-transform:\s*uppercase/.test($(d).attr("style") || "")
-    ).each(
+    uppercaseDivs.each(
       (_i: number, labelEl: AnyNode) => {
         const labelText = $(labelEl).text().trim().toLowerCase();
         if (labelText.includes("current focus")) {
@@ -178,9 +181,7 @@ export function parseCategoryFocusFragment(
 
     // Synergies: <li> items under "Potential Synergies" section
     const synergies: string[] = [];
-    card.find("div").filter((_f: number, d: AnyNode) =>
-      /text-transform:\s*uppercase/.test($(d).attr("style") || "")
-    ).each(
+    uppercaseDivs.each(
       (_i: number, labelEl: AnyNode) => {
         const labelText = $(labelEl).text().trim().toLowerCase();
         if (labelText.includes("potential synergies")) {

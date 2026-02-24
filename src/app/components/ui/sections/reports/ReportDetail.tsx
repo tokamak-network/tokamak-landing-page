@@ -72,7 +72,7 @@ export default function ReportDetail({
           All Reports
         </Link>
 
-        {/* STATS BAR - hero code changes */}
+        {/* STATS BAR - hero total lines changed */}
         <StatsBar stats={report.stats} variant="cards" />
 
         <GradientDivider />

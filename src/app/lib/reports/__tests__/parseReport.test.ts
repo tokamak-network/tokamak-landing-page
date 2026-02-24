@@ -130,6 +130,25 @@ describe("parseStats", () => {
     const stats = parseStats(html);
     expect(stats.activeRepos).toBe("42");
   });
+
+  it("parses stats when BODY marker is absent (new format)", () => {
+    const html = `
+<!-- STATS BAR -->
+<div style="display:flex;">
+  <div><div>500</div><div>Commits</div></div>
+  <div><div>+1.2M</div><div>Lines Changed</div></div>
+  <div><div>30</div><div>Active Repos</div></div>
+  <div><div>8</div><div>Contributors</div></div>
+  <div><div>+900K</div><div>Net Growth</div></div>
+</div>
+<!-- EXECUTIVE SUMMARY -->
+<div>summary content</div>
+    `;
+    const stats = parseStats(html);
+    expect(stats.commits).toBe("500");
+    expect(stats.linesChanged).toBe("+1.2M");
+    expect(stats.activeRepos).toBe("30");
+  });
 });
 
 describe("parseRepoCards", () => {

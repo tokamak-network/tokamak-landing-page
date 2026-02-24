@@ -8,7 +8,13 @@ import type {
   ReportMeta,
   RepoCardData,
   Contributor,
+  EcosystemLandscape,
+  CategoryFocusItem,
 } from "@/app/components/ui/sections/reports/types";
+import {
+  parseLandscapeFragment,
+  parseCategoryFocusFragment,
+} from "./parseLandscapeSections";
 import { DEFAULT_STATS } from "./constants";
 import { parseNum } from "@/app/lib/utils/format";
 
@@ -69,26 +75,42 @@ interface ExtractedSections {
   stats: string;
   summary: string;
   cards: string;
+  landscape: string;
+  categoryFocus: string;
   missing: string[];
 }
 
 function extractSections(html: string): ExtractedSections {
   const missing: string[] = [];
 
-  const stats = extractBetweenComments(html, "STATS BAR", "BODY");
+  // Stats: try old format first (BODY), fall back to new format (EXECUTIVE SUMMARY)
+  const stats =
+    extractBetweenComments(html, "STATS BAR", "BODY") ||
+    extractBetweenComments(html, "STATS BAR", "EXECUTIVE SUMMARY");
   if (!stats) missing.push("STATS BAR");
 
-  const summary = extractBetweenComments(
+  // Summary: try new format first (ECOSYSTEM LANDSCAPE), fall back to old (REPO CARDS)
+  const summary =
+    extractBetweenComments(html, "EXECUTIVE SUMMARY", "ECOSYSTEM LANDSCAPE") ||
+    extractBetweenComments(html, "EXECUTIVE SUMMARY", "REPO CARDS");
+  if (!summary) missing.push("EXECUTIVE SUMMARY");
+
+  const landscape = extractBetweenComments(
     html,
-    "EXECUTIVE SUMMARY",
+    "ECOSYSTEM LANDSCAPE",
+    "CATEGORY FOCUS & SYNERGIES"
+  );
+
+  const categoryFocus = extractBetweenComments(
+    html,
+    "CATEGORY FOCUS & SYNERGIES",
     "REPO CARDS"
   );
-  if (!summary) missing.push("EXECUTIVE SUMMARY");
 
   const cards = extractBetweenComments(html, "REPO CARDS", "FOOTER");
   if (!cards) missing.push("REPO CARDS");
 
-  return { stats, summary, cards, missing };
+  return { stats, summary, cards, landscape, categoryFocus, missing };
 }
 
 // ── Stats parsing ──
@@ -142,7 +164,9 @@ function parseStatsFragment(fragment: string): ReportStats {
 
 /** Public API — extracts section from full HTML then parses. Used by tests. */
 export function parseStats(html: string): ReportStats {
-  const fragment = extractBetweenComments(html, "STATS BAR", "BODY");
+  const fragment =
+    extractBetweenComments(html, "STATS BAR", "BODY") ||
+    extractBetweenComments(html, "STATS BAR", "EXECUTIVE SUMMARY");
   if (!fragment) return { ...DEFAULT_STATS };
   return parseStatsFragment(fragment);
 }
@@ -371,6 +395,8 @@ export function parseReportDetail(
       stats: statsFragment,
       summary: summaryFragment,
       cards: cardsFragment,
+      landscape: landscapeFragment,
+      categoryFocus: categoryFocusFragment,
       missing,
     } = extractSections(html);
 
@@ -391,12 +417,21 @@ export function parseReportDetail(
         ? { ...stats, ...aggregateRepoLines(repos) }
         : stats;
 
+    const ecosystemLandscape: EcosystemLandscape | undefined =
+      landscapeFragment ? parseLandscapeFragment(landscapeFragment) : undefined;
+    const categoryFocus: CategoryFocusItem[] | undefined =
+      categoryFocusFragment
+        ? parseCategoryFocusFragment(categoryFocusFragment)
+        : undefined;
+
     return {
       ...meta,
       stats: enrichedStats,
       executiveHeadline: headline,
       executiveNarrative: narrative,
       repos,
+      ecosystemLandscape,
+      categoryFocus,
     };
   } catch (error) {
     console.warn(`[reports] Failed to parse detail for ${meta.slug}:`, error);

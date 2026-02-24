@@ -3,6 +3,8 @@
 import type { ReportDetail as ReportDetailType } from "./types";
 import StatsBar from "./StatsBar";
 import ExecutiveSummary from "./ExecutiveSummary";
+import EcosystemLandscape from "./EcosystemLandscape";
+import CategoryFocusSynergies from "./CategoryFocusSynergies";
 import RepoCardGrid from "./RepoCardGrid";
 import ReportsPageLayout from "./ReportsPageLayout";
 import Link from "next/link";
@@ -30,7 +32,7 @@ export default function ReportDetail({
         </>
       }
       subtitle={report.dateLabel}
-      contentClassName="max-w-[900px]"
+      contentClassName="max-w-[1100px]"
     >
       <div className="flex flex-col gap-[40px]">
         {/* BACK LINK */}
@@ -68,6 +70,22 @@ export default function ReportDetail({
           headline={report.executiveHeadline}
           narrative={report.executiveNarrative}
         />
+
+        {/* ECOSYSTEM LANDSCAPE */}
+        {report.ecosystemLandscape && (
+          <>
+            <GradientDivider />
+            <EcosystemLandscape data={report.ecosystemLandscape} />
+          </>
+        )}
+
+        {/* CATEGORY FOCUS & SYNERGIES */}
+        {report.categoryFocus && report.categoryFocus.length > 0 && (
+          <>
+            <GradientDivider />
+            <CategoryFocusSynergies items={report.categoryFocus} />
+          </>
+        )}
 
         <GradientDivider />
 

@@ -1,6 +1,14 @@
-/** Parse a display-formatted number string (e.g. "+3,939,114") into a plain number. */
+/** Parse a display-formatted number string (e.g. "+3,939,114", "+4.9M") into a plain number. */
 export function parseNum(s: string): number {
-  return parseInt(s.replace(/[^0-9-]/g, ""), 10) || 0;
+  if (typeof s !== "string" || !s) return 0;
+  const cleaned = s.trim().replace(/,/g, "");
+  const value = parseFloat(cleaned);
+  if (isNaN(value)) return 0;
+  const lastChar = cleaned.slice(-1).toUpperCase();
+  if (lastChar === "B") return Math.round(value * 1_000_000_000);
+  if (lastChar === "M") return Math.round(value * 1_000_000);
+  if (lastChar === "K") return Math.round(value * 1_000);
+  return Math.round(value);
 }
 
 export const formatNumber = (num?: number | string): string => {

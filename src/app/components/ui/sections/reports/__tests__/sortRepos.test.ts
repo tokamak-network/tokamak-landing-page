@@ -38,9 +38,12 @@ describe("parseNum", () => {
     expect(parseNum("-17,072")).toBe(-17072);
   });
 
-  it("parses abbreviations like +4.9M as 49", () => {
-    // parseInt strips after decimal, so "+4.9M" → "49" → 49
-    expect(parseNum("+4.9M")).toBe(49);
+  it("parses M suffix (millions)", () => {
+    expect(parseNum("+4.9M")).toBe(4_900_000);
+  });
+
+  it("parses K suffix (thousands)", () => {
+    expect(parseNum("+2.5K")).toBe(2_500);
   });
 
   it("returns 0 for empty string", () => {

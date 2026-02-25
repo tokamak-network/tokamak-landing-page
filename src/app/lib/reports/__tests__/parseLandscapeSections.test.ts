@@ -99,6 +99,31 @@ describe("parseLandscapeFragment", () => {
     expect(result.totalCommits).toBe(0);
     expect(result.categories).toEqual([]);
   });
+
+  it("parses 'projects' and 'code changes' labels (new format)", () => {
+    const newFormatFragment = `
+<div class="stats-bar">
+  <div class="stat"><span class="stat-num">67</span><span class="stat-label">Active Projects</span></div>
+  <div class="stat"><span class="stat-num">4,898,658</span><span class="stat-label">Code Changes</span></div>
+  <div class="stat"><span class="stat-num">10</span><span class="stat-label">Categories</span></div>
+</div>
+<div class="landscape-grid">
+  <div class="category-section" data-category="DeFi">
+    <div class="category-header" style="border-left-color:#2A72E5;">
+      <span class="category-icon">&#x1f4b0;</span>
+      <span class="category-title">DeFi</span>
+      <span class="category-count">9 projects · 1,100,255 code changes</span>
+    </div>
+  </div>
+</div>
+    `;
+    const result = parseLandscapeFragment(newFormatFragment);
+    expect(result.totalRepos).toBe(67);
+    expect(result.totalCommits).toBe(4898658);
+    expect(result.totalCategories).toBe(10);
+    expect(result.categories[0].repoCount).toBe(9);
+    expect(result.categories[0].commitCount).toBe(1100255);
+  });
 });
 
 describe("parseCategoryFocusFragment", () => {
@@ -185,6 +210,26 @@ describe("parseCategoryFocusFragment", () => {
   it("returns empty array for empty input", () => {
     const result = parseCategoryFocusFragment("");
     expect(result).toEqual([]);
+  });
+
+  it("parses 'projects' and 'code changes' in badge (new format)", () => {
+    const newBadge = `
+<div style="background:#fff;border-left:4px solid #2A72E5;">
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span style="font-size:18px;">&#x1f4b0;</span>
+    <span style="font-size:16px;font-weight:700;color:#1a1a1a;">DeFi</span>
+    <span style="background:#f0f0f0;color:#555;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;margin-left:auto;">9 projects · 1,100,255 code changes</span>
+  </div>
+  <div style="margin-bottom:8px;">
+    <div style="font-size:0.8rem;font-weight:600;color:#2A72E5;text-transform:uppercase;">Current Focus</div>
+    <div style="font-size:13px;color:#444;">DeFi is growing.</div>
+  </div>
+</div>
+    `;
+    const result = parseCategoryFocusFragment(newBadge);
+    expect(result).toHaveLength(1);
+    expect(result[0].repoCount).toBe(9);
+    expect(result[0].commitCount).toBe(1100255);
   });
 
   it("tolerates whitespace variations in inline styles", () => {

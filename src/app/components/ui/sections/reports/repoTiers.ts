@@ -91,10 +91,17 @@ function buildCategoryGroups(
     }
   }
 
-  return Array.from(grouped.values()).map(({ info, repos: groupRepos }) => ({
+  const groups = Array.from(grouped.values()).map(({ info, repos: groupRepos }) => ({
     label: info.label,
     color: info.color,
     icon: info.icon,
     repos: groupRepos,
   }));
+
+  const scored = groups.map((g) => ({
+    group: g,
+    total: g.repos.reduce((sum, r) => sum + scoreRepo(r), 0),
+  }));
+  scored.sort((a, b) => b.total - a.total);
+  return scored.map((s) => s.group);
 }

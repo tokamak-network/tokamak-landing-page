@@ -2,15 +2,13 @@ import type { ReportStats } from "./types";
 import AdditionsBar from "./AdditionsBar";
 
 const SECONDARY_STATS: { key: keyof ReportStats; label: string }[] = [
-  { key: "activeRepos", label: "Active Repos" },
-  { key: "contributors", label: "Contributors" },
+  { key: "activeRepos", label: "Active Projects" },
   { key: "netGrowth", label: "Net Growth" },
 ];
 
 const LISTING_STAT_COLUMNS: { key: keyof ReportStats; label: string }[] = [
   { key: "linesChanged", label: "Lines Changed" },
-  { key: "activeRepos", label: "Active Repos" },
-  { key: "contributors", label: "Contributors" },
+  { key: "activeRepos", label: "Active Projects" },
   { key: "netGrowth", label: "Net Growth" },
 ];
 
@@ -34,7 +32,7 @@ export default function StatsBar({
             <span className="text-[11px] text-[#808992] uppercase tracking-[0.06em] font-[600]">
               Total Lines Changed
             </span>
-            <span className="text-[28px] [@media(max-width:640px)]:text-[22px] font-[700] text-[#0078FF]">
+            <span className="text-[48px] [@media(max-width:640px)]:text-[36px] font-[700] text-[#0078FF]">
               {stats.linesChanged.replace(/^\+/, "")}
             </span>
           </div>
@@ -58,8 +56,8 @@ export default function StatsBar({
           )}
         </div>
 
-        {/* Secondary stats: 3-column grid */}
-        <div className="grid grid-cols-3 gap-[8px]">
+        {/* Secondary stats: 2-column grid */}
+        <div className="grid grid-cols-2 gap-[8px]">
           {SECONDARY_STATS.map(({ key, label }) => (
             <div
               key={key}
@@ -80,7 +78,7 @@ export default function StatsBar({
 
   return (
     <div
-      className={`grid grid-cols-4 ${
+      className={`grid grid-cols-3 ${
         compact
           ? "gap-2 [@media(max-width:640px)]:grid-cols-2 [@media(max-width:400px)]:grid-cols-2"
           : "gap-4 [@media(max-width:640px)]:grid-cols-2 [@media(max-width:400px)]:grid-cols-2"

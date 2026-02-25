@@ -45,10 +45,10 @@ function parseCategorySection(
   const icon = header.find(".category-icon").text().trim();
   const name = header.find(".category-title").text().trim();
 
-  // Parse "10 repos · 538 commits" from .category-count
+  // Parse "10 repos · 538 commits" or "10 projects · 538 code changes" from .category-count
   const countText = header.find(".category-count").text().trim();
-  const repoMatch = countText.match(/(\d+)\s*repos?/i);
-  const commitMatch = countText.match(/([\d,]+)\s*commits?/i);
+  const repoMatch = countText.match(/(\d+)\s*(?:repos?|projects?)/i);
+  const commitMatch = countText.match(/([\d,]+)\s*(?:commits?|code\s*changes?)/i);
   const repoCount = repoMatch ? parseInt(repoMatch[1], 10) : 0;
   const commitCount = commitMatch
     ? parseInt(commitMatch[1].replace(/,/g, ""), 10)
@@ -81,8 +81,8 @@ export function parseLandscapeFragment(fragment: string): EcosystemLandscape {
       10
     );
     const label = $(el).find(".stat-label").text().trim().toLowerCase();
-    if (label.includes("repositor")) totalRepos = num || 0;
-    else if (label.includes("commit")) totalCommits = num || 0;
+    if (label.includes("repositor") || label.includes("project")) totalRepos = num || 0;
+    else if (label.includes("commit") || label.includes("change")) totalCommits = num || 0;
     else if (label.includes("categor")) totalCategories = num || 0;
   });
 
@@ -136,8 +136,8 @@ export function parseCategoryFocusFragment(
       )
       .text()
       .trim();
-    const repoMatch = badgeText.match(/(\d+)\s*repos?/i);
-    const commitMatch = badgeText.match(/([\d,]+)\s*commits?/i);
+    const repoMatch = badgeText.match(/(\d+)\s*(?:repos?|projects?)/i);
+    const commitMatch = badgeText.match(/([\d,]+)\s*(?:commits?|code\s*changes?)/i);
     const repoCount = repoMatch ? parseInt(repoMatch[1], 10) : 0;
     const commitCount = commitMatch
       ? parseInt(commitMatch[1].replace(/,/g, ""), 10)

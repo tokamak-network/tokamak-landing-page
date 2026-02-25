@@ -2,27 +2,8 @@
 
 import { useMemo } from "react";
 import type { CategoryFocusItem, RepoCardData } from "./types";
-import { sanitizeColor, parseNum } from "@/app/lib/utils/format";
-
-interface RepoLines {
-  added: number;
-  deleted: number;
-}
-
-function buildLinesMap(repos: RepoCardData[]): Map<string, RepoLines> {
-  const map = new Map<string, RepoLines>();
-  for (const r of repos) {
-    map.set(r.repoName, {
-      added: Math.abs(parseNum(r.stats.linesAdded)),
-      deleted: Math.abs(parseNum(r.stats.linesDeleted)),
-    });
-  }
-  return map;
-}
-
-function formatNum(n: number): string {
-  return n.toLocaleString("en-US");
-}
+import { sanitizeColor } from "@/app/lib/utils/format";
+import { type RepoLines, buildLinesMap, formatNum } from "./repoLinesUtils";
 
 function RepoChip({
   name,
@@ -146,6 +127,31 @@ function FocusCard({
   );
 }
 
+function categoryTotalLines(
+  item: CategoryFocusItem,
+  linesMap: Map<string, RepoLines>
+): number {
+  let total = 0;
+  for (const repo of item.topRepos) {
+    const lines = linesMap.get(repo.name);
+    if (lines) total += lines.added + lines.deleted;
+  }
+  return total;
+}
+
+function sortTopRepos(
+  topRepos: CategoryFocusItem["topRepos"],
+  linesMap: Map<string, RepoLines>
+): CategoryFocusItem["topRepos"] {
+  return [...topRepos].sort((a, b) => {
+    const aLines = linesMap.get(a.name);
+    const bLines = linesMap.get(b.name);
+    const aTotal = aLines ? aLines.added + aLines.deleted : 0;
+    const bTotal = bLines ? bLines.added + bLines.deleted : 0;
+    return bTotal - aTotal;
+  });
+}
+
 export default function CategoryFocusSynergies({
   items,
   repos,
@@ -155,6 +161,16 @@ export default function CategoryFocusSynergies({
 }) {
   const linesMap = useMemo(() => buildLinesMap(repos), [repos]);
 
+  const sortedItems = useMemo(() => {
+    const withSortedRepos = items.map((item) => ({
+      ...item,
+      topRepos: sortTopRepos(item.topRepos, linesMap),
+    }));
+    return [...withSortedRepos].sort(
+      (a, b) => categoryTotalLines(b, linesMap) - categoryTotalLines(a, linesMap)
+    );
+  }, [items, linesMap]);
+
   return (
     <div className="flex flex-col gap-[20px]">
       <span className="text-[11px] font-[700] text-[#0078FF] uppercase tracking-[0.05em]">
@@ -162,7 +178,7 @@ export default function CategoryFocusSynergies({
       </span>
 
       <div className="flex flex-col gap-[16px]">
-        {items.map((item) => (
+        {sortedItems.map((item) => (
           <FocusCard key={item.name} item={item} linesMap={linesMap} />
         ))}
       </div>

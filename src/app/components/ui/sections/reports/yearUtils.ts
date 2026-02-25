@@ -36,5 +36,5 @@ export function formatShortDate(report: ReportSummary): string {
 }
 
 export function formatCompactStats(stats: ReportSummary["stats"]): string {
-  return `${stats.linesChanged} lines changed · ${stats.activeRepos} repos · ${stats.contributors} contributors`;
+  return `${stats.linesChanged} lines changed · ${stats.activeRepos} projects`;
 }

@@ -40,7 +40,7 @@ function formatWithCommas(n: number, prefix: string): string {
 
 function aggregateRepoLines(
   repos: RepoCardData[]
-): { linesAdded: string; linesDeleted: string } {
+): { linesChanged: string; linesAdded: string; linesDeleted: string } {
   let totalAdded = 0;
   let totalDeleted = 0;
 
@@ -50,6 +50,7 @@ function aggregateRepoLines(
   }
 
   return {
+    linesChanged: formatWithCommas(totalAdded + totalDeleted, ""),
     linesAdded: formatWithCommas(totalAdded, "+"),
     linesDeleted: formatWithCommas(totalDeleted, "-"),
   };
@@ -89,10 +90,11 @@ function extractSections(html: string): ExtractedSections {
     extractBetweenComments(html, "STATS BAR", "EXECUTIVE SUMMARY");
   if (!stats) missing.push("STATS BAR");
 
-  // Summary: try new format first (ECOSYSTEM LANDSCAPE), fall back to old (REPO CARDS)
+  // Summary: try new format first (ECOSYSTEM LANDSCAPE), fall back to old (REPO CARDS / PROJECT CARDS)
   const summary =
     extractBetweenComments(html, "EXECUTIVE SUMMARY", "ECOSYSTEM LANDSCAPE") ||
-    extractBetweenComments(html, "EXECUTIVE SUMMARY", "REPO CARDS");
+    extractBetweenComments(html, "EXECUTIVE SUMMARY", "REPO CARDS") ||
+    extractBetweenComments(html, "EXECUTIVE SUMMARY", "PROJECT CARDS");
   if (!summary) missing.push("EXECUTIVE SUMMARY");
 
   const landscape = extractBetweenComments(
@@ -101,13 +103,13 @@ function extractSections(html: string): ExtractedSections {
     "CATEGORY FOCUS & SYNERGIES"
   );
 
-  const categoryFocus = extractBetweenComments(
-    html,
-    "CATEGORY FOCUS & SYNERGIES",
-    "REPO CARDS"
-  );
+  const categoryFocus =
+    extractBetweenComments(html, "CATEGORY FOCUS & SYNERGIES", "REPO CARDS") ||
+    extractBetweenComments(html, "CATEGORY FOCUS & SYNERGIES", "PROJECT CARDS");
 
-  const cards = extractBetweenComments(html, "REPO CARDS", "FOOTER");
+  const cards =
+    extractBetweenComments(html, "REPO CARDS", "FOOTER") ||
+    extractBetweenComments(html, "PROJECT CARDS", "FOOTER");
   if (!cards) missing.push("REPO CARDS");
 
   return { stats, summary, cards, landscape, categoryFocus, missing };
@@ -149,8 +151,10 @@ function findStatValue(
 const STAT_LABELS: Record<string, keyof ReportStats> = {
   commits: "commits",
   "lines changed": "linesChanged",
+  "code changes": "linesChanged",
   "active repos": "activeRepos",
   "active repositories": "activeRepos",
+  "active projects": "activeRepos",
   contributors: "contributors",
   "net growth": "netGrowth",
   "net change": "netGrowth",
@@ -213,7 +217,9 @@ function extractRepoStats(
     commits: "commits",
     contributors: "contributors",
     "lines added": "linesAdded",
+    "code added": "linesAdded",
     "lines deleted": "linesDeleted",
+    "code deleted": "linesDeleted",
     "net change": "netLines",
     "net lines": "netLines",
   };
@@ -342,7 +348,9 @@ function parseCardsFragment(fragment: string): RepoCardData[] {
 
 /** Public API — extracts section from full HTML then parses. Used by tests. */
 export function parseRepoCards(html: string): RepoCardData[] {
-  const fragment = extractBetweenComments(html, "REPO CARDS", "FOOTER");
+  const fragment =
+    extractBetweenComments(html, "REPO CARDS", "FOOTER") ||
+    extractBetweenComments(html, "PROJECT CARDS", "FOOTER");
   if (!fragment) return [];
   return parseCardsFragment(fragment);
 }
@@ -365,7 +373,7 @@ export function parseReportSummary(
 ): ReportSummary {
   try {
     const html = fs.readFileSync(filePath, "utf-8");
-    const { stats: statsFragment, summary: summaryFragment, missing } =
+    const { stats: statsFragment, summary: summaryFragment, cards: cardsFragment, missing } =
       extractSections(html);
 
     warnMissingMarkers(meta.slug, missing);
@@ -374,11 +382,15 @@ export function parseReportSummary(
       ? parseStatsFragment(statsFragment)
       : { ...DEFAULT_STATS };
 
+    const repos = cardsFragment ? parseCardsFragment(cardsFragment) : [];
+    const enrichedStats =
+      repos.length > 0 ? { ...stats, ...aggregateRepoLines(repos) } : stats;
+
     const headline = summaryFragment
       ? parseSummaryFragment(summaryFragment).headline
       : "";
 
-    return { ...meta, stats, executiveHeadline: headline };
+    return { ...meta, stats: enrichedStats, executiveHeadline: headline };
   } catch (error) {
     console.warn(`[reports] Failed to parse summary for ${meta.slug}:`, error);
     return { ...meta, stats: { ...DEFAULT_STATS }, executiveHeadline: "" };

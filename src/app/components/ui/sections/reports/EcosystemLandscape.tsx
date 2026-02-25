@@ -1,10 +1,79 @@
 "use client";
 
+import { useMemo } from "react";
 import type {
   EcosystemLandscape as EcosystemLandscapeType,
   LandscapeCategory,
   LandscapeRepo,
+  RepoCardData,
 } from "./types";
+import { sanitizeColor } from "@/app/lib/utils/format";
+import { type RepoLines, buildLinesMap, formatNum } from "./repoLinesUtils";
+
+function categoryLinesTotal(
+  category: LandscapeCategory,
+  linesMap: Map<string, RepoLines>
+): number {
+  let total = 0;
+  for (const repo of category.repos) {
+    const lines = linesMap.get(repo.name);
+    if (lines) total += lines.added + lines.deleted;
+  }
+  return total;
+}
+
+function repoLinesTotal(
+  repo: LandscapeRepo,
+  linesMap: Map<string, RepoLines>
+): number {
+  const lines = linesMap.get(repo.name);
+  return lines ? lines.added + lines.deleted : 0;
+}
+
+const MAX_CATEGORY_SIZE = 9;
+
+const ACTIVITY_LABEL: Record<string, string> = {
+  high: "High Activity",
+  medium: "Medium Activity",
+  low: "Low Activity",
+};
+
+function splitLargeCategories(
+  categories: LandscapeCategory[]
+): LandscapeCategory[] {
+  const result: LandscapeCategory[] = [];
+
+  for (const cat of categories) {
+    if (cat.repos.length <= MAX_CATEGORY_SIZE) {
+      result.push(cat);
+      continue;
+    }
+
+    const buckets: Record<string, LandscapeRepo[]> = {
+      high: [],
+      medium: [],
+      low: [],
+    };
+    for (const repo of cat.repos) {
+      const bucket = buckets[repo.activity] ?? buckets.low;
+      bucket.push(repo);
+    }
+
+    for (const level of ["high", "medium", "low"] as const) {
+      const levelRepos = buckets[level];
+      if (levelRepos.length === 0) continue;
+      result.push({
+        ...cat,
+        name: `${cat.name} (${ACTIVITY_LABEL[level]})`,
+        repoCount: levelRepos.length,
+        commitCount: 0,
+        repos: levelRepos,
+      });
+    }
+  }
+
+  return result;
+}
 
 const ACTIVITY_COLORS: Record<string, string> = {
   high: "#22C55E",
@@ -20,7 +89,7 @@ function SummaryPills({
   totalCategories: number;
 }) {
   const pills = [
-    { label: "Repositories", value: totalRepos },
+    { label: "Projects", value: totalRepos },
     { label: "Categories", value: totalCategories },
   ];
 
@@ -50,7 +119,7 @@ function CategoryLegend({ categories }: { categories: LandscapeCategory[] }) {
         >
           <span
             className="w-[8px] h-[8px] rounded-full inline-block shrink-0"
-            style={{ background: cat.color }}
+            style={{ background: sanitizeColor(cat.color) }}
           />
           {cat.name}
         </span>
@@ -82,7 +151,13 @@ function ActivityLegend() {
   );
 }
 
-function RepoMiniCard({ repo }: { repo: LandscapeRepo }) {
+function RepoMiniCard({
+  repo,
+  lines,
+}: {
+  repo: LandscapeRepo;
+  lines: RepoLines | undefined;
+}) {
   return (
     <a
       href={repo.githubUrl || undefined}
@@ -90,17 +165,26 @@ function RepoMiniCard({ repo }: { repo: LandscapeRepo }) {
       rel="noopener noreferrer"
       className="flex items-start gap-[8px] px-[10px] py-[8px] rounded-[6px]
         hover:bg-[#f5f7fa] transition-colors duration-150 group"
-      style={{ borderLeft: `3px solid ${repo.categoryColor}` }}
+      style={{ borderLeft: `3px solid ${sanitizeColor(repo.categoryColor)}` }}
     >
       <span
         className="w-[7px] h-[7px] rounded-full mt-[5px] shrink-0"
         style={{ background: ACTIVITY_COLORS[repo.activity] }}
         title={`${repo.activity} activity`}
       />
-      <div className="min-w-0">
-        <span className="text-[13px] font-[600] text-[#1C1C1C] group-hover:text-[#0078FF] transition-colors truncate block">
-          {repo.name}
-        </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-[6px]">
+          <span className="text-[13px] font-[600] text-[#1C1C1C] group-hover:text-[#0078FF] transition-colors truncate">
+            {repo.name}
+          </span>
+          {lines && (lines.added > 0 || lines.deleted > 0) && (
+            <span className="text-[12px] whitespace-nowrap shrink-0">
+              <span className="text-[#28a745]">+{formatNum(lines.added)}</span>
+              {" / "}
+              <span className="text-[#cb2431]">-{formatNum(lines.deleted)}</span>
+            </span>
+          )}
+        </div>
         {repo.description && (
           <span className="text-[11px] text-[#888] leading-[1.4] line-clamp-1 block">
             {repo.description}
@@ -111,27 +195,64 @@ function RepoMiniCard({ repo }: { repo: LandscapeRepo }) {
   );
 }
 
-function CategoryCard({ category }: { category: LandscapeCategory }) {
+function CategoryCard({
+  category,
+  linesMap,
+}: {
+  category: LandscapeCategory;
+  linesMap: Map<string, RepoLines>;
+}) {
+  const catLines = useMemo(() => {
+    let added = 0;
+    let deleted = 0;
+    for (const repo of category.repos) {
+      const lines = linesMap.get(repo.name);
+      if (lines) {
+        added += lines.added;
+        deleted += lines.deleted;
+      }
+    }
+    return { added, deleted };
+  }, [category.repos, linesMap]);
+
+  const hasLines = catLines.added > 0 || catLines.deleted > 0;
+
   return (
     <div className="bg-white border border-[#e8e8e8] rounded-[10px] overflow-hidden">
       {/* Header */}
       <div
         className="flex items-center gap-[8px] px-[16px] py-[12px] border-b border-[#f0f0f0]"
-        style={{ borderLeft: `4px solid ${category.color}` }}
+        style={{ borderLeft: `4px solid ${sanitizeColor(category.color)}` }}
       >
         <span className="text-[16px]">{category.icon}</span>
         <span className="text-[14px] font-[700] text-[#1C1C1C]">
           {category.name}
         </span>
-        <span className="ml-auto text-[11px] text-[#888] font-[600] whitespace-nowrap">
-          {category.repoCount} repos
-        </span>
+        <div className="ml-auto flex items-center gap-[6px]">
+          <span className="text-[11px] text-[#888] font-[600] whitespace-nowrap">
+            {category.repoCount} repos
+          </span>
+          {hasLines && (
+            <span
+              className="bg-[#f0f0f0] px-[8px] py-[1px] rounded-[10px]
+                text-[11px] font-[700] whitespace-nowrap"
+            >
+              <span className="text-[#28a745]">+{formatNum(catLines.added)}</span>
+              {" / "}
+              <span className="text-[#cb2431]">-{formatNum(catLines.deleted)}</span>
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Repo list */}
       <div className="flex flex-col py-[4px]">
         {category.repos.map((repo) => (
-          <RepoMiniCard key={repo.name} repo={repo} />
+          <RepoMiniCard
+            key={repo.name}
+            repo={repo}
+            lines={linesMap.get(repo.name)}
+          />
         ))}
       </div>
     </div>
@@ -140,9 +261,26 @@ function CategoryCard({ category }: { category: LandscapeCategory }) {
 
 export default function EcosystemLandscape({
   data,
+  repos = [],
 }: {
   data: EcosystemLandscapeType;
+  repos?: RepoCardData[];
 }) {
+  const linesMap = useMemo(() => buildLinesMap(repos), [repos]);
+
+  const sortedCategories = useMemo(() => {
+    const split = splitLargeCategories(data.categories);
+    const sorted = [...split].sort(
+      (a, b) => categoryLinesTotal(b, linesMap) - categoryLinesTotal(a, linesMap)
+    );
+    return sorted.map((cat) => ({
+      ...cat,
+      repos: [...cat.repos].sort(
+        (a, b) => repoLinesTotal(b, linesMap) - repoLinesTotal(a, linesMap)
+      ),
+    }));
+  }, [data.categories, linesMap]);
+
   return (
     <div className="flex flex-col gap-[20px]">
       <span className="text-[11px] font-[700] text-[#0078FF] uppercase tracking-[0.05em]">
@@ -151,17 +289,17 @@ export default function EcosystemLandscape({
 
       <SummaryPills
         totalRepos={data.totalRepos}
-        totalCategories={data.totalCategories}
+        totalCategories={sortedCategories.length}
       />
 
       <div className="flex flex-col gap-[8px]">
-        <CategoryLegend categories={data.categories} />
+        <CategoryLegend categories={sortedCategories} />
         <ActivityLegend />
       </div>
 
       <div className="grid grid-cols-1 [@media(min-width:700px)]:grid-cols-2 gap-[16px]">
-        {data.categories.map((cat) => (
-          <CategoryCard key={cat.name} category={cat} />
+        {sortedCategories.map((cat) => (
+          <CategoryCard key={cat.name} category={cat} linesMap={linesMap} />
         ))}
       </div>
     </div>

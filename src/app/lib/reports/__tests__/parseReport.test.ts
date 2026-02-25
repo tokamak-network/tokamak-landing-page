@@ -131,6 +131,22 @@ describe("parseStats", () => {
     expect(stats.activeRepos).toBe("42");
   });
 
+  it("parses 'Code Changes' and 'Active Projects' labels (new format)", () => {
+    const html = `
+<!-- STATS BAR -->
+<div style="display:flex;">
+  <div><div>4,898,658</div><div>Code Changes</div></div>
+  <div><div>+2,979,570</div><div>Net Growth</div></div>
+  <div><div>67</div><div>Active Projects</div></div>
+</div>
+<!-- EXECUTIVE SUMMARY -->
+    `;
+    const stats = parseStats(html);
+    expect(stats.linesChanged).toBe("4,898,658");
+    expect(stats.activeRepos).toBe("67");
+    expect(stats.netGrowth).toBe("+2,979,570");
+  });
+
   it("parses stats when BODY marker is absent (new format)", () => {
     const html = `
 <!-- STATS BAR -->
@@ -249,6 +265,55 @@ describe("parseRepoCards", () => {
     expect(cards).toHaveLength(2);
     expect(cards[0].repoName).toBe("RepoA");
     expect(cards[1].repoName).toBe("RepoB");
+  });
+
+  it("parses cards with PROJECT CARDS marker", () => {
+    const html = `
+<!-- PROJECT CARDS -->
+<div style="background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:32px;">
+  <div style="display:flex;justify-content:space-between;">
+    <h3 style="margin:0;">Tokamak-AI-Layer</h3>
+    <a href="https://github.com/tokamak-network/Tokamak-AI-Layer" target="_blank">GitHub</a>
+  </div>
+  <p style="color:#555;">AI layer description.</p>
+  <div style="display:flex;gap:24px;">
+    <div style="text-align:center;"><div>+663,824</div><div>Code Added</div></div>
+    <div style="text-align:center;"><div>-16,351</div><div>Code Deleted</div></div>
+    <div style="text-align:center;"><div>+647,473</div><div>Net Change</div></div>
+  </div>
+  <h4>Key Accomplishments</h4>
+  <ul><li>Established TAL foundation</li></ul>
+</div>
+<!-- FOOTER -->
+    `;
+    const cards = parseRepoCards(html);
+    expect(cards).toHaveLength(1);
+    expect(cards[0].repoName).toBe("Tokamak-AI-Layer");
+    expect(cards[0].stats.linesAdded).toBe("+663,824");
+    expect(cards[0].stats.linesDeleted).toBe("-16,351");
+    expect(cards[0].stats.netLines).toBe("+647,473");
+  });
+
+  it("parses stats with 'Code Added'/'Code Deleted' labels", () => {
+    const html = `
+<!-- PROJECT CARDS -->
+<div>
+  <h3>test-repo</h3>
+  <p>desc</p>
+  <div style="display:flex;">
+    <div style="text-align:center;"><div>+500</div><div>Code Added</div></div>
+    <div style="text-align:center;"><div>-200</div><div>Code Deleted</div></div>
+    <div style="text-align:center;"><div>+300</div><div>Net Change</div></div>
+  </div>
+  <h4>Key Accomplishments</h4>
+  <ul><li>Item</li></ul>
+</div>
+<!-- FOOTER -->
+    `;
+    const cards = parseRepoCards(html);
+    expect(cards[0].stats.linesAdded).toBe("+500");
+    expect(cards[0].stats.linesDeleted).toBe("-200");
+    expect(cards[0].stats.netLines).toBe("+300");
   });
 
   it("rejects malicious contributor URLs", () => {

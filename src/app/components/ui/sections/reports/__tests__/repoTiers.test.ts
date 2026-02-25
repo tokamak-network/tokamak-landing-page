@@ -178,4 +178,24 @@ describe("tierRepos", () => {
     expect(otherGroup.repos).toHaveLength(1);
     expect(otherGroup.repos[0].repoName).toBe("ZK-DEX-v2");
   });
+
+  it("sorts categories by total line changes descending", () => {
+    const categoryMap = new Map<string, RepoCategoryInfo>([
+      ["small-repo", { label: "Small Category", color: "#AAA", icon: "S" }],
+      ["big-repo", { label: "Big Category", color: "#BBB", icon: "B" }],
+      ["mid-repo", { label: "Mid Category", color: "#CCC", icon: "M" }],
+    ]);
+
+    const repos = [
+      ...Array.from({ length: 7 }, (_, i) =>
+        makeRepo(`highlight-${i}`, "100", "+10000", "-5000", "+5000")
+      ),
+      makeRepo("small-repo", "5", "+200", "-50", "+150"),
+      makeRepo("big-repo", "50", "+5000", "-2000", "+3000"),
+      makeRepo("mid-repo", "20", "+500", "-200", "+300"),
+    ];
+    const result = tierRepos(repos, categoryMap);
+    const labels = result.categories.map((c) => c.label);
+    expect(labels).toEqual(["Big Category", "Mid Category", "Small Category"]);
+  });
 });

@@ -87,7 +87,7 @@ export default function ReportDetail({
         {report.ecosystemLandscape && (
           <>
             <GradientDivider />
-            <EcosystemLandscape data={report.ecosystemLandscape} />
+            <EcosystemLandscape data={report.ecosystemLandscape} repos={report.repos} />
           </>
         )}
 

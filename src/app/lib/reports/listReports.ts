@@ -5,6 +5,19 @@ import { SLUG_PATTERN } from "./constants";
 
 const REPORTS_DIR = path.join(process.cwd(), "public", "reports");
 
+const TITLE_NUMBER_RE = /Biweekly\s+Report\s+#(\d+)/i;
+
+function readReportNumber(slug: string): number | undefined {
+  const filePath = path.join(REPORTS_DIR, `${slug}.html`);
+  try {
+    const head = fs.readFileSync(filePath, "utf-8").slice(0, 1024);
+    const match = head.match(TITLE_NUMBER_RE);
+    return match ? parseInt(match[1], 10) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
@@ -37,7 +50,7 @@ export function listReports(): ReportMeta[] {
 
   const files = fs.readdirSync(REPORTS_DIR);
 
-  return files
+  const sorted = files
     .filter((f) => f.endsWith(".html"))
     .map((f) => parseSlug(f.replace(".html", "")))
     .filter((meta): meta is ReportMeta => meta !== null)
@@ -46,6 +59,12 @@ export function listReports(): ReportMeta[] {
       if (a.month !== b.month) return b.month - a.month;
       return b.startDay - a.startDay;
     });
+
+  const total = sorted.length;
+  return sorted.map((meta, i) => ({
+    ...meta,
+    reportNumber: readReportNumber(meta.slug) ?? total - i,
+  }));
 }
 
 export function getReportPath(slug: string): string | null {

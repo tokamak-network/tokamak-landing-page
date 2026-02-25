@@ -38,9 +38,11 @@ export default function ReportDetail({
         <>
           Biweekly
           <span className="font-[400] [@media(max-width:650px)]:block">
-            {" "}
-            Report
+            {" "}Report
           </span>
+          {report.reportNumber != null && (
+            <span className="font-[400]"> #{report.reportNumber}</span>
+          )}
         </>
       }
       subtitle={report.dateLabel}

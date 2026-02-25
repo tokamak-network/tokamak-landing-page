@@ -6,7 +6,7 @@ export type SortKey = "name" | "lines" | "contributors";
 
 export const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "name", label: "Name" },
-  { key: "lines", label: "Lines Changed" },
+  { key: "lines", label: "Code Changes" },
   { key: "contributors", label: "Contributors" },
 ];
 

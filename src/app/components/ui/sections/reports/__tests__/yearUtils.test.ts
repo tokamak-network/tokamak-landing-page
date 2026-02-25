@@ -101,6 +101,6 @@ describe("formatCompactStats", () => {
       contributors: "16",
       netGrowth: "+3.0M",
     };
-    expect(formatCompactStats(stats)).toBe("+4.9M lines changed · 67 projects");
+    expect(formatCompactStats(stats)).toBe("+4.9M code changes · 67 projects");
   });
 });

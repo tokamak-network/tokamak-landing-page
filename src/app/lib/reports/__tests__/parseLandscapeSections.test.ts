@@ -100,6 +100,109 @@ describe("parseLandscapeFragment", () => {
     expect(result.categories).toEqual([]);
   });
 
+  it("computes activity from line data when no .activity-dot (new format)", () => {
+    const newFormatRepos = `
+<div class="landscape-grid">
+  <div class="category-section" data-category="DeFi">
+    <div class="category-header" style="border-left-color:#2A72E5;">
+      <span class="category-icon">&#x1f4b0;</span>
+      <span class="category-title">DeFi</span>
+      <span class="category-count">3 projects · 700,000 code changes</span>
+    </div>
+    <div class="category-repos">
+      <a class="repo-card" style="border-left:3px solid #2A72E5;">
+        <div class="repo-top">
+          <span class="repo-name">high-repo</span>
+          <span class="repo-lines-total">551,403</span>
+        </div>
+        <div class="repo-desc">High activity repo</div>
+        <div class="repo-bottom">
+          <span class="repo-lines-detail">
+            <span class="repo-lines-added">+306,677</span> /
+            <span class="repo-lines-deleted">-244,726</span>
+          </span>
+        </div>
+      </a>
+      <a class="repo-card" style="border-left:3px solid #2A72E5;">
+        <div class="repo-top">
+          <span class="repo-name">medium-repo</span>
+          <span class="repo-lines-total">50,000</span>
+        </div>
+        <div class="repo-desc">Medium activity repo</div>
+        <div class="repo-bottom">
+          <span class="repo-lines-detail">
+            <span class="repo-lines-added">+30,000</span> /
+            <span class="repo-lines-deleted">-20,000</span>
+          </span>
+        </div>
+      </a>
+      <a class="repo-card" style="border-left:3px solid #2A72E5;">
+        <div class="repo-top">
+          <span class="repo-name">low-repo</span>
+          <span class="repo-lines-total">5,000</span>
+        </div>
+        <div class="repo-desc">Low activity repo</div>
+        <div class="repo-bottom">
+          <span class="repo-lines-detail">
+            <span class="repo-lines-added">+3,000</span> /
+            <span class="repo-lines-deleted">-2,000</span>
+          </span>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+    `;
+    const result = parseLandscapeFragment(newFormatRepos);
+    const repos = result.categories[0].repos;
+    expect(repos).toHaveLength(3);
+
+    // Activity computed from totalLines
+    expect(repos[0].activity).toBe("high"); // 551,403 >= 100k
+    expect(repos[1].activity).toBe("medium"); // 50,000 >= 10k
+    expect(repos[2].activity).toBe("low"); // 5,000 < 10k
+  });
+
+  it("parses linesAdded and linesDeleted from new format", () => {
+    const newFormatRepos = `
+<div class="landscape-grid">
+  <div class="category-section" data-category="DeFi">
+    <div class="category-header" style="border-left-color:#2A72E5;">
+      <span class="category-icon">&#x1f4b0;</span>
+      <span class="category-title">DeFi</span>
+      <span class="category-count">1 project · 100 code changes</span>
+    </div>
+    <div class="category-repos">
+      <a class="repo-card" style="border-left:3px solid #2A72E5;">
+        <div class="repo-top">
+          <span class="repo-name">my-repo</span>
+          <span class="repo-lines-total">551,403</span>
+        </div>
+        <div class="repo-desc">A repo</div>
+        <div class="repo-bottom">
+          <span class="repo-lines-detail">
+            <span class="repo-lines-added">+306,677</span> /
+            <span class="repo-lines-deleted">-244,726</span>
+          </span>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+    `;
+    const result = parseLandscapeFragment(newFormatRepos);
+    const repo = result.categories[0].repos[0];
+    expect(repo.linesAdded).toBe(306677);
+    expect(repo.linesDeleted).toBe(244726);
+  });
+
+  it("does not include linesAdded/linesDeleted for old format", () => {
+    const result = parseLandscapeFragment(fragment);
+    const repo = result.categories[0].repos[0];
+    expect(repo.linesAdded).toBeUndefined();
+    expect(repo.linesDeleted).toBeUndefined();
+  });
+
   it("parses 'projects' and 'code changes' labels (new format)", () => {
     const newFormatFragment = `
 <div class="stats-bar">

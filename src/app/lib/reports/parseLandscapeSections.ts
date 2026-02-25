@@ -11,11 +11,19 @@ import { sanitizeUrl } from "./parseReport";
 
 // ── Ecosystem Landscape ──
 
-function parseActivityLevel(title: string): ActivityLevel {
+function parseActivityLevel(title: string, totalLines: number): ActivityLevel {
   const lower = title.toLowerCase();
   if (lower.includes("high")) return "high";
   if (lower.includes("medium")) return "medium";
+  if (lower.includes("low")) return "low";
+  // Fallback: compute from line changes
+  if (totalLines >= 100_000) return "high";
+  if (totalLines >= 10_000) return "medium";
   return "low";
+}
+
+function parseNumericText(text: string): number {
+  return parseInt(text.replace(/[^0-9]/g, ""), 10) || 0;
 }
 
 function parseRepoCard(
@@ -24,15 +32,27 @@ function parseRepoCard(
   categoryColor: string
 ): LandscapeRepo {
   const anchor = $(el);
-  return {
+  const activityTitle = anchor.find(".activity-dot").attr("title") || "";
+  const totalLinesText = anchor.find(".repo-lines-total").text().trim();
+  const totalLines = parseNumericText(totalLinesText);
+
+  const addedText = anchor.find(".repo-lines-added").text().trim();
+  const deletedText = anchor.find(".repo-lines-deleted").text().trim();
+  const linesAdded = addedText ? parseNumericText(addedText) : undefined;
+  const linesDeleted = deletedText ? parseNumericText(deletedText) : undefined;
+
+  const repo: LandscapeRepo = {
     name: anchor.find(".repo-name").text().trim(),
     description: anchor.find(".repo-desc").text().trim(),
     githubUrl: sanitizeUrl(anchor.attr("href") || ""),
-    activity: parseActivityLevel(
-      anchor.find(".activity-dot").attr("title") || ""
-    ),
+    activity: parseActivityLevel(activityTitle, totalLines),
     categoryColor,
   };
+
+  if (linesAdded !== undefined) repo.linesAdded = linesAdded;
+  if (linesDeleted !== undefined) repo.linesDeleted = linesDeleted;
+
+  return repo;
 }
 
 function parseCategorySection(

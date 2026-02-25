@@ -22,9 +22,12 @@ export default function FeaturedReportCard({
         </span>
       </div>
 
-      <h3 className="text-[22px] [@media(max-width:640px)]:text-[18px] font-[600] text-[#1C1C1C] group-hover:text-[#0078FF] transition-colors duration-200 mb-[8px]">
-        {report.dateLabel}
+      <h3 className="text-[22px] [@media(max-width:640px)]:text-[18px] font-[600] text-[#1C1C1C] group-hover:text-[#0078FF] transition-colors duration-200 mb-[4px]">
+        Biweekly{report.reportNumber != null && (
+          <span className="text-[#0078FF] font-[700]"> #{report.reportNumber}</span>
+        )}
       </h3>
+      <p className="text-[15px] text-[#808992] mb-[8px]">{report.dateLabel}</p>
 
       {report.executiveHeadline && (
         <p className="text-[15px] text-[#444] leading-[1.5] mb-[20px] line-clamp-2">

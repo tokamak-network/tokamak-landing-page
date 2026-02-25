@@ -16,7 +16,10 @@ export default function ArchiveReportRow({
     >
       <div className="flex flex-col [@media(min-width:640px)]:flex-row [@media(min-width:640px)]:items-center gap-[4px] [@media(min-width:640px)]:gap-[16px] min-w-0">
         <span className="text-[15px] font-[600] text-[#1C1C1C] whitespace-nowrap group-hover:text-[#0078FF] transition-colors duration-150">
-          {formatShortDate(report)}
+          Biweekly{report.reportNumber != null && (
+            <span className="text-[#0078FF] font-[700]"> #{report.reportNumber}</span>
+          )}
+          <span className="text-[#808992] font-[400] ml-[8px]">{formatShortDate(report)}</span>
         </span>
         <span className="text-[13px] text-[#808992] truncate">
           {formatCompactStats(report.stats)}

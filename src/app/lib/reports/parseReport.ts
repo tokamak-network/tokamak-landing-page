@@ -182,6 +182,14 @@ interface SummaryResult {
   narrative: string;
 }
 
+const ABBR_NUM_RE = /\d+(?:\.\d+)?[MKBmkb]/;
+
+function replaceAbbreviatedWithExact(text: string, exact: string): string {
+  return ABBR_NUM_RE.test(text)
+    ? text.replace(ABBR_NUM_RE, exact.replace(/^\+/, ""))
+    : text;
+}
+
 function parseSummaryFragment(fragment: string): SummaryResult {
   const $ = cheerio.load(fragment);
 
@@ -386,9 +394,10 @@ export function parseReportSummary(
     const enrichedStats =
       repos.length > 0 ? { ...stats, ...aggregateRepoLines(repos) } : stats;
 
-    const headline = summaryFragment
+    const rawHeadline = summaryFragment
       ? parseSummaryFragment(summaryFragment).headline
       : "";
+    const headline = replaceAbbreviatedWithExact(rawHeadline, enrichedStats.linesChanged);
 
     return { ...meta, stats: enrichedStats, executiveHeadline: headline };
   } catch (error) {
@@ -418,7 +427,7 @@ export function parseReportDetail(
       ? parseStatsFragment(statsFragment)
       : { ...DEFAULT_STATS };
 
-    const { headline, narrative } = summaryFragment
+    const { headline: rawHeadline, narrative } = summaryFragment
       ? parseSummaryFragment(summaryFragment)
       : { headline: "", narrative: "" };
 
@@ -439,7 +448,7 @@ export function parseReportDetail(
     return {
       ...meta,
       stats: enrichedStats,
-      executiveHeadline: headline,
+      executiveHeadline: replaceAbbreviatedWithExact(rawHeadline, enrichedStats.linesChanged),
       executiveNarrative: narrative,
       repos,
       ecosystemLandscape,

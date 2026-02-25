@@ -16,8 +16,9 @@ function categoryLinesTotal(
 ): number {
   let total = 0;
   for (const repo of category.repos) {
-    const lines = linesMap.get(repo.name);
-    if (lines) total += lines.added + lines.deleted;
+    const added = repo.linesAdded ?? linesMap.get(repo.name)?.added ?? 0;
+    const deleted = repo.linesDeleted ?? linesMap.get(repo.name)?.deleted ?? 0;
+    total += added + deleted;
   }
   return total;
 }
@@ -26,8 +27,9 @@ function repoLinesTotal(
   repo: LandscapeRepo,
   linesMap: Map<string, RepoLines>
 ): number {
-  const lines = linesMap.get(repo.name);
-  return lines ? lines.added + lines.deleted : 0;
+  const added = repo.linesAdded ?? linesMap.get(repo.name)?.added ?? 0;
+  const deleted = repo.linesDeleted ?? linesMap.get(repo.name)?.deleted ?? 0;
+  return added + deleted;
 }
 
 const MAX_CATEGORY_SIZE = 9;
@@ -130,9 +132,9 @@ function CategoryLegend({ categories }: { categories: LandscapeCategory[] }) {
 
 function ActivityLegend() {
   const levels = [
-    { label: "High (20+)", color: ACTIVITY_COLORS.high },
-    { label: "Medium (5-19)", color: ACTIVITY_COLORS.medium },
-    { label: "Low (<5)", color: ACTIVITY_COLORS.low },
+    { label: "High (100k+)", color: ACTIVITY_COLORS.high },
+    { label: "Medium (10k-100k)", color: ACTIVITY_COLORS.medium },
+    { label: "Low (<10k)", color: ACTIVITY_COLORS.low },
   ];
 
   return (
@@ -158,12 +160,16 @@ function RepoMiniCard({
   repo: LandscapeRepo;
   lines: RepoLines | undefined;
 }) {
+  const added = repo.linesAdded ?? lines?.added ?? 0;
+  const deleted = repo.linesDeleted ?? lines?.deleted ?? 0;
+  const total = added + deleted;
+
   return (
     <a
       href={repo.githubUrl || undefined}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-start gap-[8px] px-[10px] py-[8px] rounded-[6px]
+      className="flex items-start gap-[8px] px-[10px] py-[10px] rounded-[6px]
         hover:bg-[#f5f7fa] transition-colors duration-150 group"
       style={{ borderLeft: `3px solid ${sanitizeColor(repo.categoryColor)}` }}
     >
@@ -173,24 +179,35 @@ function RepoMiniCard({
         title={`${repo.activity} activity`}
       />
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-[6px]">
-          <span className="text-[13px] font-[600] text-[#1C1C1C] group-hover:text-[#0078FF] transition-colors truncate">
-            {repo.name}
-          </span>
-          {lines && (lines.added > 0 || lines.deleted > 0) && (
-            <span className="text-[12px] whitespace-nowrap shrink-0">
-              <span className="text-[#28a745]">+{formatNum(lines.added)}</span>
-              {" / "}
-              <span className="text-[#cb2431]">-{formatNum(lines.deleted)}</span>
-            </span>
-          )}
-        </div>
+        <span className="text-[13px] font-[600] text-[#1C1C1C] group-hover:text-[#0078FF] transition-colors truncate block">
+          {repo.name}
+        </span>
         {repo.description && (
           <span className="text-[11px] text-[#888] leading-[1.4] line-clamp-1 block">
             {repo.description}
           </span>
         )}
+        {(added > 0 || deleted > 0) && (
+          <div className="flex items-center gap-[4px] mt-[2px]">
+            <span className="text-[11px] text-[#28a745] font-[500]">+{formatNum(added)}</span>
+            <span className="text-[11px] text-[#888]">/</span>
+            <span className="text-[11px] text-[#cb2431] font-[500]">-{formatNum(deleted)}</span>
+          </div>
+        )}
       </div>
+      {total > 0 && (
+        <div className="shrink-0 text-right ml-[4px]">
+          <span className="text-[9px] font-[600] text-[#888] uppercase tracking-[0.5px]">
+            Code Changes
+          </span>
+          <span
+            className="text-[14px] font-[700] block leading-[1.2]"
+            style={{ color: sanitizeColor(repo.categoryColor) }}
+          >
+            {formatNum(total)}
+          </span>
+        </div>
+      )}
     </a>
   );
 }
@@ -206,11 +223,9 @@ function CategoryCard({
     let added = 0;
     let deleted = 0;
     for (const repo of category.repos) {
-      const lines = linesMap.get(repo.name);
-      if (lines) {
-        added += lines.added;
-        deleted += lines.deleted;
-      }
+      const mapLines = linesMap.get(repo.name);
+      added += repo.linesAdded ?? mapLines?.added ?? 0;
+      deleted += repo.linesDeleted ?? mapLines?.deleted ?? 0;
     }
     return { added, deleted };
   }, [category.repos, linesMap]);
@@ -246,7 +261,7 @@ function CategoryCard({
       </div>
 
       {/* Repo list */}
-      <div className="flex flex-col py-[4px]">
+      <div className="flex flex-col py-[6px] gap-[2px]">
         {category.repos.map((repo) => (
           <RepoMiniCard
             key={repo.name}
@@ -297,7 +312,7 @@ export default function EcosystemLandscape({
         <ActivityLegend />
       </div>
 
-      <div className="grid grid-cols-1 [@media(min-width:700px)]:grid-cols-2 gap-[16px]">
+      <div className="grid grid-cols-1 [@media(min-width:700px)]:grid-cols-2 gap-[20px]">
         {sortedCategories.map((cat) => (
           <CategoryCard key={cat.name} category={cat} linesMap={linesMap} />
         ))}

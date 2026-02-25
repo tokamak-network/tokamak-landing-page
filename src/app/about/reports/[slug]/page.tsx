@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import {
   listReports,
   getReportPath,
-  parseSlug,
 } from "@/app/lib/reports/listReports";
 import { parseReportDetail } from "@/app/lib/reports/parseReport";
 import ReportDetail from "@/app/components/ui/sections/reports/ReportDetail";
@@ -18,12 +17,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const meta = parseSlug(slug);
-  return {
-    title: meta
-      ? `${meta.dateLabel} Report | Tokamak Network`
-      : "Biweekly Report | Tokamak Network",
-  };
+  const all = listReports();
+  const found = all.find((r) => r.slug === slug);
+  const label = found
+    ? `Biweekly Report #${found.reportNumber} — ${found.dateLabel}`
+    : "Biweekly Report";
+  return { title: `${label} | Tokamak Network` };
 }
 
 export default async function ReportDetailPage({
@@ -33,8 +32,9 @@ export default async function ReportDetailPage({
 }) {
   const { slug } = await params;
 
-  const meta = parseSlug(slug);
-  if (!meta) {
+  const all = listReports();
+  const found = all.find((r) => r.slug === slug);
+  if (!found) {
     notFound();
   }
 
@@ -43,7 +43,7 @@ export default async function ReportDetailPage({
     notFound();
   }
 
-  const report = parseReportDetail(filePath, meta);
+  const report = parseReportDetail(filePath, found);
 
   return <ReportDetail report={report} />;
 }

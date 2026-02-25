@@ -5,6 +5,7 @@ export interface ReportMeta {
   startDay: number;
   endDay: number;
   dateLabel: string;
+  reportNumber?: number;
 }
 
 export interface ReportStats {
@@ -52,6 +53,8 @@ export interface LandscapeRepo {
   githubUrl: string;
   activity: ActivityLevel;
   categoryColor: string;
+  linesAdded?: number;
+  linesDeleted?: number;
 }
 
 export interface LandscapeCategory {

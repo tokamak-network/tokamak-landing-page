@@ -17,11 +17,6 @@ const featureItems = [
 ];
 const aboutItems = [
   {
-    name: "Team",
-    link: "/about/team",
-    isExternal: false,
-  },
-  {
     name: "Price Dashboard",
     link: "/about/price",
     isExternal: false,

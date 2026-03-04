@@ -23,9 +23,17 @@ export default {
         black: "#1C1C1C",
         "tokamak-blue": "#0078FF",
         "tokamak-black": "#1C1C1C",
+        primary: "#135bec",
+        surface: "#141414",
+        "surface-hover": "#1c1c1c",
+        "border-color": "#262626",
       },
       fontFamily: {
         sans: ["Proxima Nova"],
+        display: ["var(--font-manrope)", "Manrope", ...fontFamily.sans],
+      },
+      borderRadius: {
+        xl: "0.75rem",
       },
       animation: {
         "infinite-scroll": "infinite-scroll 15s linear infinite",

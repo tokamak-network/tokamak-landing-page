@@ -5,4 +5,5 @@ export interface DashboardMetric {
   readonly changePercent: string;
   readonly changeDirection: "up" | "down";
   readonly sparkline: readonly number[];
+  readonly barColor: string;
 }

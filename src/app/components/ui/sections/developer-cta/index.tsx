@@ -5,7 +5,6 @@ import GithubIcon from "@/assets/icons/common/github.svg";
 import GithubIconHover from "@/assets/icons/common/github-black.svg";
 import NotionIcon from "@/assets/icons/common/notion.svg";
 import { LINKS } from "@/app/constants/links";
-import { CLIP_PATHS } from "@/app/constants/styles";
 
 interface CtaCard {
   readonly title: string;
@@ -49,16 +48,16 @@ function CtaCardItem({ card }: { readonly card: CtaCard }) {
       href={card.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex flex-col items-center justify-center gap-4 p-8 bg-white rounded-[16px] border border-[#E5E5E5]
-        hover:border-[#0078FF] hover:shadow-lg transition-all duration-200 group flex-1 min-w-[240px]"
+      className="flex flex-col items-center justify-center gap-4 p-8 bg-surface rounded-xl border border-border-color
+        hover:border-primary/50 transition-all duration-200 group flex-1 min-w-[240px]"
     >
-      <div className="w-12 h-12 flex items-center justify-center rounded-full bg-[#F5F5F5] group-hover:bg-[#0078FF] transition-colors duration-200">
+      <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary transition-colors duration-200">
         <Image
           src={card.icon}
           alt={card.title}
           width={24}
           height={24}
-          className="group-hover:hidden"
+          className="brightness-0 invert group-hover:hidden"
         />
         <Image
           src={card.iconHover}
@@ -68,11 +67,11 @@ function CtaCardItem({ card }: { readonly card: CtaCard }) {
           className="hidden group-hover:block"
         />
       </div>
-      <h3 className="text-[20px] font-[600] text-[#1C1C1C]">{card.title}</h3>
-      <p className="text-[15px] font-[300] text-[#808992] text-center">
+      <h3 className="text-[20px] font-[700] text-white">{card.title}</h3>
+      <p className="text-[14px] text-slate-400 text-center">
         {card.description}
       </p>
-      <span className="text-[14px] font-[500] text-[#0078FF] group-hover:text-[#0078FF]">
+      <span className="text-[14px] font-[500] text-primary">
         {card.buttonLabel} &rarr;
       </span>
     </a>
@@ -81,19 +80,15 @@ function CtaCardItem({ card }: { readonly card: CtaCard }) {
 
 export default function DeveloperCta() {
   return (
-    <section
-      className="w-full bg-white flex justify-center px-[25px] [@media(max-width:1000px)]:px-[15px] py-[90px] [@media(max-width:640px)]:py-[60px]"
-      style={{ clipPath: CLIP_PATHS.polygon }}
-    >
+    <section className="w-full flex justify-center px-6 [@media(max-width:1000px)]:px-4 py-[90px] [@media(max-width:640px)]:py-[60px]">
       <div className="w-full max-w-[1200px] flex flex-col items-center">
-        <h2 className="text-[30px] font-[100] text-[#1C1C1C] mb-[9px] text-center">
-          Start Building with{" "}
-          <span className="font-[600]">Tokamak Network</span>
+        <h2 className="text-[24px] font-[700] text-white mb-2 text-center tracking-tight">
+          Start Building with Tokamak Network
         </h2>
-        <p className="text-[15px] font-[300] text-[#808992] mb-[60px] text-center">
+        <p className="text-[14px] text-slate-400 mb-[60px] text-center">
           Everything you need to launch your own L2
         </p>
-        <div className="flex gap-[24px] w-full [@media(max-width:800px)]:flex-col [@media(max-width:800px)]:items-center">
+        <div className="flex gap-4 w-full [@media(max-width:800px)]:flex-col [@media(max-width:800px)]:items-center">
           {CTA_CARDS.map((card) => (
             <CtaCardItem key={card.title} card={card} />
           ))}

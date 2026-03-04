@@ -1,6 +1,5 @@
 import * as React from "react";
 import type { ProtocolCardProps } from "./types";
-import { LinkItem } from "./LinkItem";
 import Image from "next/image";
 
 interface ActivityBadge {
@@ -9,9 +8,21 @@ interface ActivityBadge {
 }
 
 const BADGE_STYLES = {
-  high: "bg-[#28a745]/15 text-[#28a745] border-[#28a745]/30",
-  medium: "bg-[#FFB800]/15 text-[#FFB800] border-[#FFB800]/30",
-  low: "bg-[#808992]/15 text-[#808992] border-[#808992]/30",
+  high: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
+  medium: "text-amber-400 bg-amber-400/10 border-amber-400/20",
+  low: "text-slate-400 bg-slate-400/10 border-slate-400/20",
+} as const;
+
+const BADGE_LABELS = {
+  high: "Active",
+  medium: "Active",
+  low: "Beta",
+} as const;
+
+const ICON_STYLES = {
+  high: "bg-primary/20 text-primary",
+  medium: "bg-indigo-500/20 text-indigo-400",
+  low: "bg-rose-500/20 text-rose-400",
 } as const;
 
 export interface ProtocolCardWithBadgeProps extends ProtocolCardProps {
@@ -22,42 +33,36 @@ export const ProtocolCardWithBadge: React.FC<ProtocolCardWithBadgeProps> = ({
   icon,
   title,
   description,
-  links,
   alt,
   badge,
 }) => {
+  const level = badge?.level ?? "medium";
+
   return (
-    <div className="flex flex-col grow shrink w-[360px] min-w-[240px]">
-      <div className="flex items-center gap-[10px]">
+    <div className="flex items-center gap-4 p-4 rounded-xl border border-border-color bg-surface hover:border-primary/50 transition-colors">
+      <div
+        className={`flex h-12 w-12 items-center justify-center rounded shrink-0 ${ICON_STYLES[level]}`}
+      >
         <Image
           loading="lazy"
           src={icon}
           alt={alt}
-          width={32}
-          height={32}
-          className="object-contain w-8 aspect-square"
+          width={24}
+          height={24}
+          className="object-contain"
         />
-        {badge && (
-          <span
-            className={`px-[8px] py-[2px] text-[11px] font-[500] rounded-full border ${BADGE_STYLES[badge.level]}`}
-          >
-            {badge.label}
-          </span>
-        )}
       </div>
-      <div className="flex flex-col flex-1 h-full mt-[18px] w-full">
-        <div className="text-lg text-white h-[22px] mb-[6px] font-[400]">
-          {title}
-        </div>
-        <div className="text-[15px] font-[300] text-white opacity-[0.8] mt-[6px]">
-          {description}
-        </div>
-        <div className="flex gap-4 items-center w-full h-[16px] mt-[6px] opacity-[0.8]">
-          {links?.map((link, index) => (
-            <LinkItem key={index} {...link} />
-          ))}
-        </div>
+      <div className="flex flex-col flex-1 min-w-0">
+        <p className="text-white text-[14px] font-[700] truncate">{title}</p>
+        <p className="text-slate-400 text-[12px] truncate">{description}</p>
       </div>
+      {badge && (
+        <span
+          className={`text-[12px] font-[500] px-2 py-1 rounded border shrink-0 ${BADGE_STYLES[badge.level]}`}
+        >
+          {BADGE_LABELS[badge.level]}
+        </span>
+      )}
     </div>
   );
 };

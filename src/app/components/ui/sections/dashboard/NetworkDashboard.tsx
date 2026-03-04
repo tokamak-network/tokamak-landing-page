@@ -3,56 +3,66 @@
 import { DASHBOARD_METRICS } from "./data";
 import { SparklineChart } from "./SparklineChart";
 import type { DashboardMetric } from "./types";
-import LiveDot from "@/app/components/shared/LiveDot";
 
-function DashboardCard({ metric }: { readonly metric: DashboardMetric }) {
-  const isPositive = metric.changeDirection === "up";
+function TrendBadge({
+  percent,
+  direction,
+}: {
+  readonly percent: string;
+  readonly direction: "up" | "down";
+}) {
+  const isUp = direction === "up";
 
   return (
-    <div className="flex flex-col justify-between p-[20px] bg-[#242424] rounded-[16px] border border-[#333] hover:border-[#0078FF]/40 transition-colors duration-200 min-h-[180px]">
-      <div className="flex items-center justify-between mb-[12px]">
-        <span className="text-[13px] font-[400] text-white/50 uppercase tracking-wider">
+    <span
+      className={`text-[12px] font-[500] flex items-center px-2 py-0.5 rounded border
+        ${isUp ? "text-emerald-400 bg-emerald-400/10 border-emerald-400/20" : "text-rose-400 bg-rose-400/10 border-rose-400/20"}`}
+    >
+      <span className="text-[14px] mr-0.5">{isUp ? "↑" : "↓"}</span>
+      {percent.replace(/^[+-]/, "")}
+    </span>
+  );
+}
+
+function DashboardCard({ metric }: { readonly metric: DashboardMetric }) {
+  return (
+    <div className="flex flex-col rounded-xl border border-border-color bg-surface p-6 gap-4 relative overflow-hidden group">
+      <div className="flex justify-between items-start">
+        <p className="text-slate-400 text-[14px] font-[500] flex items-center gap-2">
           {metric.title}
-        </span>
-        <LiveDot />
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+        </p>
+        <TrendBadge percent={metric.changePercent} direction={metric.changeDirection} />
       </div>
 
-      <div className="mb-[8px]">
-        <span className="text-[24px] [@media(max-width:640px)]:text-[20px] font-[600] text-white leading-tight">
-          {metric.value}
-        </span>
-      </div>
+      <p className="text-white text-[30px] font-[700] tracking-tight leading-tight">
+        {metric.value}
+      </p>
 
-      <div className="flex items-center gap-[4px] mb-[16px]">
-        <span
-          className={`text-[13px] font-[500] ${
-            isPositive ? "text-[#28a745]" : "text-[#cb2431]"
-          }`}
-        >
-          {metric.changePercent}
-        </span>
-        <span className="text-[11px] text-white/30">vs last period</span>
+      <div className="mt-2">
+        <SparklineChart data={metric.sparkline} color={metric.barColor} />
       </div>
-
-      <SparklineChart
-        data={metric.sparkline}
-        color={isPositive ? "#28a745" : "#cb2431"}
-      />
     </div>
   );
 }
 
 export default function NetworkDashboard() {
   return (
-    <section className="w-full bg-[#1C1C1C] flex justify-center px-[25px] [@media(max-width:1000px)]:px-[15px] py-[80px] [@media(max-width:640px)]:py-[50px]">
-      <div className="w-full max-w-[1200px] flex flex-col items-center">
-        <h2 className="text-[30px] font-[100] text-white mb-[9px] text-center">
-          Network <span className="font-[600]">Status</span>
-        </h2>
-        <p className="text-[15px] font-[300] text-white/50 mb-[50px] text-center">
-          Real-time ecosystem metrics
-        </p>
-        <div className="w-full grid grid-cols-3 [@media(max-width:900px)]:grid-cols-2 [@media(max-width:640px)]:grid-cols-1 gap-[16px]">
+    <section className="w-full flex justify-center px-6 [@media(max-width:1000px)]:px-4 py-[80px] [@media(max-width:640px)]:py-[50px]">
+      <div className="w-full max-w-[1200px] flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-white text-[24px] font-[700] tracking-tight">
+            Network Status
+          </h2>
+          <span className="flex items-center gap-2 text-[12px] font-[500] text-emerald-400 bg-emerald-400/10 px-3 py-1.5 rounded-full border border-emerald-400/20">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
+            System Operational
+          </span>
+        </div>
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 [@media(min-width:1024px)]:grid-cols-3 gap-4">
           {DASHBOARD_METRICS.map((metric) => (
             <DashboardCard key={metric.id} metric={metric} />
           ))}

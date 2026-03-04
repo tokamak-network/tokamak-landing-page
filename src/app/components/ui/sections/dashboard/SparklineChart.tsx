@@ -5,22 +5,24 @@ interface SparklineChartProps {
 
 export function SparklineChart({
   data,
-  color = "#0078FF",
+  color = "#135bec",
 }: SparklineChartProps) {
   const max = Math.max(...data);
+  const steps = data.length;
 
   return (
-    <div className="flex items-end gap-[2px] h-[32px] w-full">
+    <div className="flex items-end gap-1 h-10 w-full opacity-60 group-hover:opacity-100 transition-opacity">
       {data.map((value, i) => {
         const heightPercent = max > 0 ? (value / max) * 100 : 0;
-        const isLast = i === data.length - 1;
+        const opacity = 0.2 + (i / (steps - 1)) * 0.8;
         return (
           <div
             key={`bar-${i}`}
-            className="flex-1 rounded-[1px] min-w-[3px]"
+            className="w-full rounded-t min-w-[3px]"
             style={{
               height: `${Math.max(heightPercent, 4)}%`,
-              backgroundColor: isLast ? color : `${color}40`,
+              backgroundColor: color,
+              opacity,
             }}
           />
         );

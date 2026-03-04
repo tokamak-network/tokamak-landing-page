@@ -10,20 +10,10 @@ interface ProtocolGridCProps {
 
 export const ProtocolGridC: React.FC<ProtocolGridCProps> = ({ protocols }) => {
   return (
-    <div className="w-full flex flex-col items-center">
-      <h2 className="text-[30px] font-[100] text-white mb-[9px] text-center">
-        Protocol <span className="font-[600]">Overview</span>
-      </h2>
-      <p className="text-[15px] font-[300] text-white/50 mb-[50px] text-center">
-        Active development across the ecosystem
-      </p>
-      <div className="w-full max-w-[1200px] px-[25px]">
-        <div className="grid grid-cols-1 [@media(min-width:768px)]:grid-cols-2 [@media(min-width:1200px)]:grid-cols-3 gap-[60px]">
-          {protocols.map((protocol) => (
-            <ProtocolCardWithBadge key={protocol.title} {...protocol} />
-          ))}
-        </div>
-      </div>
+    <div className="grid grid-cols-1 [@media(min-width:641px)_and_(max-width:1023px)]:grid-cols-2 gap-4">
+      {protocols.map((protocol) => (
+        <ProtocolCardWithBadge key={protocol.title} {...protocol} />
+      ))}
     </div>
   );
 };

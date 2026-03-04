@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Github, TrendingUp, TrendingDown } from "lucide-react";
+import { Github } from "lucide-react";
 
 export interface ShowcaseRepo {
   repoName: string;
@@ -70,18 +70,12 @@ function RepoCard({
 
       {/* Stats row */}
       <div className="flex gap-6 mb-5">
-        <div className="flex items-center gap-1.5">
-          <TrendingUp size={14} className="text-[#00C853]" />
-          <span className="text-[13px] font-[700] text-[#00C853]">
-            {repo.linesAdded}
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <TrendingDown size={14} className="text-[#FF4444]" />
-          <span className="text-[13px] font-[700] text-[#FF4444]">
-            {repo.linesDeleted}
-          </span>
-        </div>
+        <span className="text-[13px] font-[700] text-[#00C853]">
+          +{repo.linesAdded.replace(/^\+/, "")}
+        </span>
+        <span className="text-[13px] font-[700] text-[#FF4444]">
+          -{repo.linesDeleted.replace(/^-/, "")}
+        </span>
         <span className="text-[13px] font-[700] text-[#929298]">
           net {repo.netLines}
         </span>

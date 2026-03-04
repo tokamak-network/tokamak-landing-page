@@ -59,7 +59,7 @@ export default function LatestFeedClient({
   if (loading && reportItems.length === 0) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-lg text-gray-600">Loading...</div>
+        <div className="text-lg text-slate-500">Loading...</div>
       </div>
     );
   }
@@ -81,13 +81,13 @@ export default function LatestFeedClient({
       <div className="flex gap-6 mt-[60px] text-[14px] font-[500]">
         <Link
           href="/about/reports"
-          className="text-[#0078FF] hover:underline"
+          className="text-primary hover:underline"
         >
           View all reports &rarr;
         </Link>
         <Link
           href="/about/insight"
-          className="text-[#0078FF] hover:underline"
+          className="text-primary hover:underline"
         >
           View all posts &rarr;
         </Link>

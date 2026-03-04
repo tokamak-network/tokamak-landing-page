@@ -21,11 +21,9 @@ export default function ConfigSelector({
   disabled = false,
 }: ConfigSelectorProps) {
   return (
-    <div className="flex flex-col gap-2">
-      <span className="text-[13px] font-[500] text-white/60 uppercase tracking-wider">
-        {title}
-      </span>
-      <div className="flex gap-2 flex-wrap">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4 border-b border-white/10">
+      <span className="text-white font-[500]">{title}</span>
+      <div className="flex p-1 bg-black/40 rounded-lg border border-white/5">
         {options.map((option) => {
           const isSelected = selected === option.value;
           return (
@@ -34,11 +32,11 @@ export default function ConfigSelector({
               type="button"
               disabled={disabled}
               onClick={() => onSelect(option.value)}
-              className={`px-4 py-2 rounded-[10px] text-[14px] font-[500] transition-all duration-200 border
+              className={`px-4 py-2 text-[14px] font-[500] rounded-md transition-all duration-200
                 ${
                   isSelected
-                    ? "bg-[#0078FF] text-white border-[#0078FF] shadow-[0_0_12px_rgba(0,120,255,0.3)]"
-                    : "bg-white/10 text-white/80 border-white/20 hover:bg-white/20 hover:border-white/40"
+                    ? "bg-white/10 text-white shadow-sm border border-white/10"
+                    : "text-slate-300 hover:text-white border border-transparent"
                 }
                 ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
             >

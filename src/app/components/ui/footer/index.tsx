@@ -1,56 +1,87 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import TokamakLogo from "@/assets/images/Tokamak_Symbol.svg";
 import TokamakLogoText from "@/assets/images/Tokamak_LogoText.svg";
-import { CLIP_PATHS } from "@/app/constants/styles";
 import { NAV_COLUMNS } from "./navData";
-import FooterNavColumn from "./FooterNavColumn";
 import InlineNewsletter from "./InlineNewsletter";
 
 export default function Footer() {
   return (
-    <div className="w-full h-full">
-      <footer
-        className="w-full py-[60px] bg-[#1C1C1C] flex justify-center px-[25px] [@media(max-width:1000px)]:px-[15px]"
-        style={{ clipPath: CLIP_PATHS.topCutCorners }}
-      >
-        <div className="flex flex-col w-full max-w-[1220px] gap-y-[40px]">
-          {/* Top: Logo + Glassmorphism Nav Card */}
-          <div className="flex justify-between items-start w-full [@media(max-width:1000px)]:flex-col-reverse gap-y-[30px]">
-            {/* Logo */}
-            <div className="flex [@media(min-width:1001px)]:flex-col justify-between [@media(max-width:1000px)]:items-center w-full h-full [@media(max-width:800px)]:justify-center [@media(min-width:1001px)]:max-w-[200px]">
-              <figure className="flex items-center gap-2 [@media(max-width:800px)]:hidden">
-                <Image loading="lazy" src={TokamakLogo} alt="Tokamak Network Logo" className="brightness-0 invert" />
-                <Image loading="lazy" src={TokamakLogoText} alt="Tokamak Network" className="brightness-0 invert" />
-              </figure>
-            </div>
-
-            {/* Navigation — glassmorphism card */}
-            <div className="flex text-right [@media(max-width:800px)]:hidden p-[24px] rounded-[16px] bg-white/[0.04] border border-white/[0.08]">
-              {NAV_COLUMNS.map((col) => (
-                <FooterNavColumn
-                  key={col.title}
-                  column={col}
-                  headingClass="font-[600] mb-4 text-white"
-                  linkClass="hover:text-tokamak-blue hover:opacity-100 opacity-[0.5] transition-colors text-white"
-                />
-              ))}
-            </div>
+    <footer className="relative z-10 w-full border-t border-white/5">
+      <div className="max-w-[1200px] mx-auto px-6 py-[60px]">
+        {/* Top: Logo + Nav + Newsletter */}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr] gap-y-[40px] gap-x-[40px] mb-[40px]">
+          {/* Logo + Tagline */}
+          <div className="flex flex-col gap-3">
+            <figure className="flex items-center gap-2">
+              <Image loading="lazy" src={TokamakLogo} alt="Tokamak Network Logo" className="brightness-0 invert" />
+              <Image loading="lazy" src={TokamakLogoText} alt="Tokamak Network" className="brightness-0 invert" />
+            </figure>
+            <p className="text-[13px] text-slate-500 leading-relaxed">
+              Every app deserves its own L2.
+            </p>
           </div>
 
-          {/* Newsletter + Copyright */}
-          <div className="border-t border-white/[0.12] pt-[30px] flex justify-between items-end [@media(max-width:800px)]:flex-col [@media(max-width:800px)]:items-center gap-y-[20px]">
+          {/* Navigation — glass card */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 [@media(max-width:640px)]:hidden glass-panel rounded-2xl p-6">
+            {NAV_COLUMNS.map((col) => (
+              <div key={col.title} className="flex flex-col gap-2">
+                <h3 className="text-[12px] font-[600] text-white uppercase tracking-wide mb-1">
+                  {col.title}
+                </h3>
+                {col.links.map((link) =>
+                  link.isInternal ? (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      className="text-[13px] text-slate-500 hover:text-primary transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      className="text-[13px] text-slate-500 hover:text-primary transition-colors"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {link.label}
+                    </a>
+                  )
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Newsletter */}
+          <div className="[@media(max-width:799px)]:hidden">
             <InlineNewsletter variant="dark" />
-            <div className="text-[11px] text-white font-normal opacity-[0.4]">
-              &copy; {new Date().getFullYear()} Tokamak Network{" "}
-              <span className="[@media(max-width:800px)]:hidden">
-                | All Rights Reserved.
-              </span>
-            </div>
           </div>
         </div>
-      </footer>
-    </div>
+
+        {/* Bottom: Divider + Copyright + Social */}
+        <div className="border-t border-white/10 pt-[24px] flex justify-between items-center [@media(max-width:640px)]:flex-col [@media(max-width:640px)]:gap-3">
+          <p className="text-[11px] text-white/30">
+            &copy; {new Date().getFullYear()} Tokamak Network | All Rights Reserved.
+          </p>
+          <div className="flex gap-4">
+            {NAV_COLUMNS.find((c) => c.title === "Social")?.links.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] text-white/30 hover:text-primary transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }

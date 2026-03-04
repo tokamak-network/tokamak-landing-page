@@ -8,7 +8,9 @@ import Footer from "./components/ui/footer";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center w-full font-[Proxima_Nova] bg-[#1C1C1C]">
+    <div className="flex flex-col items-center w-full font-display bg-[#0a0a0a] mesh-gradient relative">
+      {/* Dot pattern overlay */}
+      <div className="absolute inset-0 dot-pattern pointer-events-none opacity-50 z-0" />
       <Header />
       <SimulatorHero />
       <EcosystemDashboard />

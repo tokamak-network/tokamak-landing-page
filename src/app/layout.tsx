@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { FocusProvider } from "@/context/FocusContext";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -32,12 +28,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="font-proxima" suppressHydrationWarning>
+    <html lang="en" className={spaceGrotesk.variable} suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/fuc6kbq.css" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className="font-display antialiased bg-[#0a0a0a] text-slate-100"
         suppressHydrationWarning
       >
         <FocusProvider>{children}</FocusProvider>

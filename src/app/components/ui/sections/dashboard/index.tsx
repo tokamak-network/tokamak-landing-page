@@ -1,4 +1,3 @@
-import { CLIP_PATHS } from "@/app/constants/styles";
 import MetricCard from "./MetricCard";
 
 const METRICS = [
@@ -24,18 +23,15 @@ const METRICS = [
 
 export default function EcosystemDashboard() {
   return (
-    <section
-      className="w-full bg-[#F7F8FA] flex justify-center px-[25px] [@media(max-width:1000px)]:px-[15px] py-[90px] [@media(max-width:640px)]:py-[60px]"
-      style={{ clipPath: CLIP_PATHS.polygon }}
-    >
+    <section className="relative z-10 w-full flex justify-center px-6 py-[100px] [@media(max-width:640px)]:py-[60px]">
       <div className="w-full max-w-[1200px] flex flex-col items-center">
-        <h2 className="text-[30px] font-[100] text-[#1C1C1C] mb-[9px] text-center">
-          Ecosystem <span className="font-[600]">Dashboard</span>
+        <h2 className="text-[36px] md:text-[40px] font-[700] text-white tracking-[-0.02em] mb-4 text-center text-glow">
+          Ecosystem Dashboard
         </h2>
-        <p className="text-[15px] font-[300] text-[#808992] mb-[60px] text-center">
+        <p className="text-[16px] text-slate-400 mb-[60px] text-center">
           Live metrics from the Tokamak Network ecosystem
         </p>
-        <div className="flex gap-[24px] w-full [@media(max-width:800px)]:flex-col [@media(max-width:800px)]:items-center">
+        <div className="flex gap-6 w-full [@media(max-width:800px)]:flex-col [@media(max-width:800px)]:items-center">
           {METRICS.map((metric) => (
             <MetricCard
               key={metric.label}

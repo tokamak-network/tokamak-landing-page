@@ -16,16 +16,16 @@ export default function MetricCard({
   delay = 0,
 }: MetricCardProps) {
   return (
-    <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 flex-1 min-w-[260px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-      <span className="text-[13px] font-[500] text-slate-400 uppercase tracking-wider mb-3">
+    <div className="flex flex-col items-center justify-center p-10 bg-surface flex-1 min-w-[260px] shadow-[0_24px_65px_rgba(0,0,0,0.64)]">
+      <span className="text-[12px] font-[700] text-[#929298] uppercase tracking-[0.08em] mb-4">
         {label}
       </span>
       <AnimatedCounter
         value={value}
         delay={delay}
-        className="text-[42px] [@media(max-width:500px)]:text-[32px] font-[700] text-primary leading-tight"
+        className="text-[56px] [@media(max-width:500px)]:text-[40px] font-[900] text-primary leading-tight"
       />
-      <span className="text-[14px] text-slate-500 mt-2 text-center">
+      <span className="text-[14px] text-[#929298] mt-3 text-center">
         {description}
       </span>
     </div>

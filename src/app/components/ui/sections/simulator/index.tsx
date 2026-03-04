@@ -67,33 +67,35 @@ export default function SimulatorHero() {
   const isDeploying = phase === "deploying" || phase === "complete";
 
   return (
-    <section className="relative z-10 w-full min-h-[860px] [@media(max-width:700px)]:min-h-[700px] overflow-hidden flex items-center justify-center">
+    <section className="relative z-10 w-full min-h-[900px] [@media(max-width:700px)]:min-h-[700px] overflow-hidden flex items-center justify-center">
       {/* Background network visualization */}
       <div className="absolute inset-0">
         <NetworkVisualization isDeploying={isDeploying} />
       </div>
 
-      {/* Blue glow behind hero */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-primary/20 blur-[100px] rounded-full pointer-events-none" />
+      {/* Subtle dot grid */}
+      <div className="absolute inset-0 dot-grid pointer-events-none" />
 
       {/* Content — side-by-side layout */}
-      <div className="relative z-10 w-full max-w-[1200px] mx-auto px-6 pt-[140px] pb-[80px] flex flex-col [@media(min-width:960px)]:flex-row items-center [@media(min-width:960px)]:items-center justify-between gap-12">
+      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-6 pt-[200px] pb-[120px] flex flex-col [@media(min-width:960px)]:flex-row items-center [@media(min-width:960px)]:items-center justify-between gap-16">
         {/* Left: Hero text + CTA */}
-        <div className="flex flex-col gap-6 text-left max-w-[520px] [@media(max-width:959px)]:text-center [@media(max-width:959px)]:items-center">
-          <h1 className="text-[48px] md:text-[72px] [@media(max-width:650px)]:text-[36px] leading-[1.05] text-white font-[700] tracking-[-0.04em] text-glow">
-            Build Your L2 <br />in Seconds
+        <div className="flex flex-col gap-8 text-left max-w-[560px] [@media(max-width:959px)]:text-center [@media(max-width:959px)]:items-center">
+          <h1 className="text-[54px] md:text-[80px] [@media(max-width:650px)]:text-[40px] leading-[1.05] text-white font-[900] tracking-[0.06em] uppercase">
+            Build Your L2
+            <br />
+            In Seconds
           </h1>
-          <p className="text-slate-400 text-[18px] md:text-[20px] [@media(max-width:650px)]:text-[14px] font-[400] leading-relaxed max-w-[520px]">
-            A premium crypto protocol for deploying and scaling custom Layer 2 solutions with unmatched speed and security.
+          <p className="text-[#c5c5ca] text-[18px] md:text-[20px] [@media(max-width:650px)]:text-[14px] font-[400] leading-relaxed max-w-[520px]">
+            A premium crypto protocol for deploying and scaling custom Layer 2
+            solutions with unmatched speed and security.
           </p>
-          <div className="flex gap-4 mt-4 [@media(max-width:400px)]:flex-col [@media(max-width:400px)]:w-full">
+          <div className="flex gap-4 mt-2 [@media(max-width:400px)]:flex-col [@media(max-width:400px)]:w-full">
             <a
               href={LINKS.ROLLUP_HUB}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-[14px] rounded-full bg-primary hover:bg-primary/90 text-white text-[16px] font-[600]
-                transition-all duration-200 text-center
-                shadow-[0_0_20px_rgba(0,119,255,0.4)] hover:shadow-[0_0_30px_rgba(0,119,255,0.6)] hover:-translate-y-0.5"
+              className="px-10 py-[16px] bg-primary hover:bg-primary/90 text-black text-[14px] font-[700] uppercase tracking-[0.06em]
+                transition-all duration-300 text-center hover:-translate-y-1"
             >
               Start Building
             </a>
@@ -101,21 +103,21 @@ export default function SimulatorHero() {
               href={LINKS.DOCS}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-[14px] rounded-full bg-white/5 hover:bg-white/10 text-white/80 text-[16px] font-[500]
-                transition-all duration-200 text-center cursor-pointer border border-white/10 hover:border-white/20"
+              className="px-10 py-[16px] bg-surface hover:bg-[#222225] text-white text-[14px] font-[700] uppercase tracking-[0.06em]
+                transition-all duration-300 text-center cursor-pointer hover:-translate-y-1"
             >
               Read Docs
             </a>
           </div>
         </div>
 
-        {/* Right: Glass Configuration Panel */}
-        <div className="w-full max-w-md [@media(max-width:959px)]:max-w-[560px] glass-panel rounded-2xl p-6 [@media(max-width:500px)]:p-5">
+        {/* Right: Configuration Panel — charcoal card */}
+        <div className="w-full max-w-md [@media(max-width:959px)]:max-w-[560px] card-charcoal p-6 [@media(max-width:500px)]:p-5">
           {phase === "config" && (
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-white text-[18px] font-[600]">
-                  Configuration
+                <h3 className="text-white text-[14px] font-[700] uppercase tracking-[0.06em]">
+                  L2 Configurator
                 </h3>
                 <Settings size={16} className="text-primary" />
               </div>
@@ -147,8 +149,8 @@ export default function SimulatorHero() {
               <button
                 type="button"
                 onClick={handleDeploy}
-                className="mt-2 w-full flex items-center justify-center gap-2 rounded-xl h-12 bg-primary/20 hover:bg-primary border border-primary/30 hover:border-primary text-primary hover:text-white text-[14px] font-[700] tracking-wide
-                  transition-all duration-200 cursor-pointer"
+                className="mt-2 w-full flex items-center justify-center gap-2 h-12 bg-primary hover:bg-primary/90 text-black text-[14px] font-[700] uppercase tracking-[0.06em]
+                  transition-all duration-300 cursor-pointer hover:-translate-y-1"
               >
                 <span>Deploy Instance</span>
                 <Rocket size={16} />
@@ -159,17 +161,17 @@ export default function SimulatorHero() {
           {phase === "deploying" && (
             <div className="flex flex-col gap-6 min-h-[240px] justify-center">
               <div className="flex items-center gap-3 mb-2">
-                <div className="text-[13px] font-[500] text-white/40 uppercase tracking-wider">
+                <div className="text-[13px] font-[700] text-[#929298] uppercase tracking-[0.06em]">
                   Deploying
                 </div>
                 <div className="flex gap-1">
-                  <span className="px-2 py-0.5 rounded-full bg-white/10 text-[12px] text-white/60">
+                  <span className="px-2 py-0.5 bg-white/10 text-[12px] text-white/60 uppercase">
                     {throughput}
                   </span>
-                  <span className="px-2 py-0.5 rounded-full bg-white/10 text-[12px] text-white/60">
+                  <span className="px-2 py-0.5 bg-white/10 text-[12px] text-white/60 uppercase">
                     {privacy}
                   </span>
-                  <span className="px-2 py-0.5 rounded-full bg-white/10 text-[12px] text-white/60">
+                  <span className="px-2 py-0.5 bg-white/10 text-[12px] text-white/60 uppercase">
                     {vm}
                   </span>
                 </div>
@@ -180,7 +182,7 @@ export default function SimulatorHero() {
 
           {phase === "complete" && (
             <div className="flex flex-col items-center gap-6 py-4">
-              <div className="w-16 h-16 rounded-full bg-[#28a745]/20 flex items-center justify-center">
+              <div className="w-16 h-16 bg-[#28a745]/20 flex items-center justify-center">
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                   <path
                     d="M6 16L13 23L26 9"
@@ -193,10 +195,10 @@ export default function SimulatorHero() {
               </div>
 
               <div className="text-center">
-                <h3 className="text-[24px] font-[600] text-white mb-2">
+                <h3 className="text-[24px] font-[900] text-white mb-2 uppercase tracking-[0.06em]">
                   Your L2 is ready.
                 </h3>
-                <p className="text-[14px] text-slate-400">
+                <p className="text-[14px] text-[#929298]">
                   {throughput} throughput &middot; {privacy} privacy &middot;{" "}
                   {vm.toUpperCase()}
                 </p>
@@ -207,17 +209,16 @@ export default function SimulatorHero() {
                   href={LINKS.ROLLUP_HUB}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-8 py-[12px] rounded-full bg-primary hover:bg-primary/90 text-white text-[14px] font-[600]
-                    transition-all duration-200 text-center
-                    shadow-[0_0_20px_rgba(0,119,255,0.4)]"
+                  className="px-8 py-[14px] bg-primary hover:bg-primary/90 text-black text-[14px] font-[700] uppercase tracking-[0.06em]
+                    transition-all duration-300 text-center hover:-translate-y-1"
                 >
                   Deploy for Real &rarr;
                 </a>
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="px-6 py-[12px] rounded-full bg-white/5 hover:bg-white/10 text-white/70 text-[14px] font-[500]
-                    transition-all duration-200 cursor-pointer border border-white/10"
+                  className="px-6 py-[14px] bg-surface hover:bg-[#222225] text-white/70 text-[14px] font-[500] uppercase tracking-[0.06em]
+                    transition-all duration-300 cursor-pointer"
                 >
                   Try Again
                 </button>

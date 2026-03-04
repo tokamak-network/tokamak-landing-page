@@ -33,7 +33,7 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://use.typekit.net/fuc6kbq.css" />
       </head>
       <body
-        className="font-display antialiased bg-[#0a0a0a] text-slate-100"
+        className="font-display antialiased bg-black text-[#c5c5ca]"
         suppressHydrationWarning
       >
         <FocusProvider>{children}</FocusProvider>

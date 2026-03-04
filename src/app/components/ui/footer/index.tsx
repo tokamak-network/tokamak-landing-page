@@ -9,8 +9,8 @@ import InlineNewsletter from "./InlineNewsletter";
 
 export default function Footer() {
   return (
-    <footer className="relative z-10 w-full border-t border-white/5">
-      <div className="max-w-[1200px] mx-auto px-6 py-[60px]">
+    <footer className="relative z-10 w-full border-t border-[#434347]">
+      <div className="max-w-[1280px] mx-auto px-6 py-[60px]">
         {/* Top: Logo + Nav + Newsletter */}
         <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr] gap-y-[40px] gap-x-[40px] mb-[40px]">
           {/* Logo + Tagline */}
@@ -19,16 +19,16 @@ export default function Footer() {
               <Image loading="lazy" src={TokamakLogo} alt="Tokamak Network Logo" className="brightness-0 invert" />
               <Image loading="lazy" src={TokamakLogoText} alt="Tokamak Network" className="brightness-0 invert" />
             </figure>
-            <p className="text-[13px] text-slate-500 leading-relaxed">
+            <p className="text-[13px] text-[#929298] leading-relaxed">
               Every app deserves its own L2.
             </p>
           </div>
 
-          {/* Navigation — glass card */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 [@media(max-width:640px)]:hidden glass-panel rounded-2xl p-6">
+          {/* Navigation */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 [@media(max-width:640px)]:hidden">
             {NAV_COLUMNS.map((col) => (
               <div key={col.title} className="flex flex-col gap-2">
-                <h3 className="text-[12px] font-[600] text-white uppercase tracking-wide mb-1">
+                <h3 className="text-[11px] font-[700] text-white uppercase tracking-[0.08em] mb-1">
                   {col.title}
                 </h3>
                 {col.links.map((link) =>
@@ -36,7 +36,7 @@ export default function Footer() {
                     <Link
                       key={link.label}
                       href={link.href}
-                      className="text-[13px] text-slate-500 hover:text-primary transition-colors"
+                      className="text-[13px] text-[#929298] hover:text-primary transition-colors duration-300"
                     >
                       {link.label}
                     </Link>
@@ -44,7 +44,7 @@ export default function Footer() {
                     <a
                       key={link.label}
                       href={link.href}
-                      className="text-[13px] text-slate-500 hover:text-primary transition-colors"
+                      className="text-[13px] text-[#929298] hover:text-primary transition-colors duration-300"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -63,8 +63,8 @@ export default function Footer() {
         </div>
 
         {/* Bottom: Divider + Copyright + Social */}
-        <div className="border-t border-white/10 pt-[24px] flex justify-between items-center [@media(max-width:640px)]:flex-col [@media(max-width:640px)]:gap-3">
-          <p className="text-[11px] text-white/30">
+        <div className="border-t border-[#434347] pt-[24px] flex justify-between items-center [@media(max-width:640px)]:flex-col [@media(max-width:640px)]:gap-3">
+          <p className="text-[11px] text-[#929298]">
             &copy; {new Date().getFullYear()} Tokamak Network | All Rights Reserved.
           </p>
           <div className="flex gap-4">
@@ -74,7 +74,7 @@ export default function Footer() {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[11px] text-white/30 hover:text-primary transition-colors"
+                className="text-[11px] text-[#929298] hover:text-primary transition-colors duration-300"
               >
                 {link.label}
               </a>

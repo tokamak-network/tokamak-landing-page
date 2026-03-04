@@ -35,21 +35,23 @@ export default function ConfigSelector({
         const nextIdx = (currentIdx + 1) % options.length;
         onSelect(options[nextIdx].value);
       }}
-      className={`flex items-center justify-between gap-4 rounded-xl bg-black/40 border border-white/5 p-4 hover:border-primary/50 transition-colors cursor-pointer group
+      className={`flex items-center justify-between gap-4 bg-black/60 border border-[#434347] p-4 hover:border-primary transition-colors duration-300 cursor-pointer group
         ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
     >
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+        <div className="w-10 h-10 bg-primary/20 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-black transition-colors duration-300">
           {icon}
         </div>
         <div className="flex flex-col gap-0.5 text-left">
-          <p className="text-white text-[14px] font-[700] leading-tight">{title}</p>
-          <p className="text-slate-400 text-[12px]">
-            {subtitle}
+          <p className="text-white text-[14px] font-[700] leading-tight uppercase tracking-[0.04em]">
+            {title}
           </p>
+          <p className="text-[#929298] text-[12px]">{subtitle}</p>
         </div>
       </div>
-      <span className="text-slate-500 group-hover:text-primary transition-colors text-[18px]">&#x203A;</span>
+      <span className="text-[#434347] group-hover:text-primary transition-colors duration-300 text-[18px]">
+        &#x203A;
+      </span>
     </button>
   );
 }

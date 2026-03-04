@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 interface ConfigOption {
   readonly label: string;
   readonly value: string;
@@ -8,7 +10,7 @@ interface ConfigOption {
 interface ConfigSelectorProps {
   readonly title: string;
   readonly subtitle: string;
-  readonly icon: string;
+  readonly icon: ReactNode;
   readonly options: readonly ConfigOption[];
   readonly selected: string;
   readonly onSelect: (value: string) => void;
@@ -37,7 +39,7 @@ export default function ConfigSelector({
         ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
     >
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors text-[20px]">
+        <div className="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
           {icon}
         </div>
         <div className="flex flex-col gap-0.5 text-left">

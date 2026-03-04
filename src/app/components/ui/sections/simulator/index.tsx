@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { Zap, Shield, Monitor, Rocket, Settings } from "lucide-react";
 import { LINKS } from "@/app/constants/links";
 import ConfigSelector from "./ConfigSelector";
 import DeployAnimation from "./DeployAnimation";
@@ -116,12 +117,12 @@ export default function SimulatorHero() {
                 <h3 className="text-white text-[18px] font-[600]">
                   Configuration
                 </h3>
-                <span className="text-primary text-[14px]">&#x2699;</span>
+                <Settings size={16} className="text-primary" />
               </div>
               <ConfigSelector
                 title="Throughput"
                 subtitle={THROUGHPUT_SUBTITLES[throughput]}
-                icon="⚡"
+                icon={<Zap size={20} />}
                 options={THROUGHPUT_OPTIONS}
                 selected={throughput}
                 onSelect={setThroughput}
@@ -129,7 +130,7 @@ export default function SimulatorHero() {
               <ConfigSelector
                 title="Privacy"
                 subtitle={PRIVACY_SUBTITLES[privacy]}
-                icon="🔒"
+                icon={<Shield size={20} />}
                 options={PRIVACY_OPTIONS}
                 selected={privacy}
                 onSelect={setPrivacy}
@@ -137,7 +138,7 @@ export default function SimulatorHero() {
               <ConfigSelector
                 title="VM Options"
                 subtitle={VM_SUBTITLES[vm]}
-                icon="🖥"
+                icon={<Monitor size={20} />}
                 options={VM_OPTIONS}
                 selected={vm}
                 onSelect={setVm}
@@ -150,7 +151,7 @@ export default function SimulatorHero() {
                   transition-all duration-200 cursor-pointer"
               >
                 <span>Deploy Instance</span>
-                <span>🚀</span>
+                <Rocket size={16} />
               </button>
             </div>
           )}

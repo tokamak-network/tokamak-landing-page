@@ -14,16 +14,33 @@ const THROUGHPUT_OPTIONS = [
   { label: "Ultra", value: "ultra" },
 ] as const;
 
+const THROUGHPUT_SUBTITLES: Record<string, string> = {
+  standard: "Standard throughput setup",
+  high: "High throughput setup",
+  ultra: "Ultra throughput setup",
+};
+
 const PRIVACY_OPTIONS = [
   { label: "Public", value: "public" },
   { label: "Private", value: "private" },
   { label: "Hybrid", value: "hybrid" },
 ] as const;
 
+const PRIVACY_SUBTITLES: Record<string, string> = {
+  public: "Public chain configuration",
+  private: "Advanced privacy config",
+  hybrid: "Hybrid privacy mode",
+};
+
 const VM_OPTIONS = [
   { label: "EVM", value: "evm" },
   { label: "zk-EVM", value: "zk-evm" },
 ] as const;
+
+const VM_SUBTITLES: Record<string, string> = {
+  evm: "Standard EVM runtime",
+  "zk-evm": "Zero-knowledge EVM",
+};
 
 export default function SimulatorHero() {
   const [phase, setPhase] = useState<SimulatorPhase>("config");
@@ -65,8 +82,8 @@ export default function SimulatorHero() {
           <h1 className="text-[48px] md:text-[72px] [@media(max-width:650px)]:text-[36px] leading-[1.05] text-white font-[700] tracking-[-0.04em] text-glow">
             Build Your L2 <br />in Seconds
           </h1>
-          <p className="text-[18px] [@media(max-width:650px)]:text-[14px] text-slate-400 leading-relaxed max-w-[460px]">
-            Deploy customizable Layer 2 solutions with unmatched speed, security, and flexibility.
+          <p className="text-slate-400 text-[18px] md:text-[20px] [@media(max-width:650px)]:text-[14px] font-[400] leading-relaxed max-w-[520px]">
+            A premium crypto protocol for deploying and scaling custom Layer 2 solutions with unmatched speed and security.
           </p>
           <div className="flex gap-4 mt-4 [@media(max-width:400px)]:flex-col [@media(max-width:400px)]:w-full">
             <a
@@ -92,15 +109,18 @@ export default function SimulatorHero() {
         </div>
 
         {/* Right: Glass Configuration Panel */}
-        <div className="w-full max-w-[480px] [@media(max-width:959px)]:max-w-[560px] glass-panel rounded-2xl p-6 [@media(max-width:500px)]:p-5">
+        <div className="w-full max-w-md [@media(max-width:959px)]:max-w-[560px] glass-panel rounded-2xl p-6 [@media(max-width:500px)]:p-5">
           {phase === "config" && (
             <div className="flex flex-col gap-4">
-              <h3 className="text-white text-[18px] font-[600] mb-1">
-                Configuration
-              </h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-white text-[18px] font-[600]">
+                  Configuration
+                </h3>
+                <span className="text-primary text-[14px]">&#x2699;</span>
+              </div>
               <ConfigSelector
                 title="Throughput"
-                subtitle="Speed"
+                subtitle={THROUGHPUT_SUBTITLES[throughput]}
                 icon="⚡"
                 options={THROUGHPUT_OPTIONS}
                 selected={throughput}
@@ -108,15 +128,15 @@ export default function SimulatorHero() {
               />
               <ConfigSelector
                 title="Privacy"
-                subtitle="Mode"
+                subtitle={PRIVACY_SUBTITLES[privacy]}
                 icon="🔒"
                 options={PRIVACY_OPTIONS}
                 selected={privacy}
                 onSelect={setPrivacy}
               />
               <ConfigSelector
-                title="Virtual Machine"
-                subtitle="Runtime"
+                title="VM Options"
+                subtitle={VM_SUBTITLES[vm]}
                 icon="🖥"
                 options={VM_OPTIONS}
                 selected={vm}
@@ -126,11 +146,11 @@ export default function SimulatorHero() {
               <button
                 type="button"
                 onClick={handleDeploy}
-                className="mt-2 w-full py-[14px] rounded-full bg-primary hover:bg-primary/90 text-white text-[16px] font-[600]
-                  transition-all duration-200 cursor-pointer
-                  shadow-[0_0_20px_rgba(0,119,255,0.4)]"
+                className="mt-2 w-full flex items-center justify-center gap-2 rounded-xl h-12 bg-primary/20 hover:bg-primary border border-primary/30 hover:border-primary text-primary hover:text-white text-[14px] font-[700] tracking-wide
+                  transition-all duration-200 cursor-pointer"
               >
-                Deploy Instance
+                <span>Deploy Instance</span>
+                <span>🚀</span>
               </button>
             </div>
           )}

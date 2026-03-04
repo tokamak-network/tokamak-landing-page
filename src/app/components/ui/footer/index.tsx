@@ -129,14 +129,6 @@ export default function Footer() {
               <ul className="space-y-2 text-sm text-gray-600 font-[400]">
                 <li>
                   <Link
-                    href="/about/team"
-                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
-                  >
-                    Team
-                  </Link>
-                </li>
-                <li>
-                  <Link
                     href="/about/price"
                     className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
                   >

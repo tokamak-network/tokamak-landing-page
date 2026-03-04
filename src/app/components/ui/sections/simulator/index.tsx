@@ -58,39 +58,66 @@ export default function SimulatorHero() {
       {/* Blue glow behind hero */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-primary/20 blur-[100px] rounded-full pointer-events-none" />
 
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-[1200px] mx-auto px-6 pt-[140px] pb-[80px] flex flex-col items-center">
-        {/* Title */}
-        <div className="text-center mb-[50px]">
-          <h1 className="text-[48px] md:text-[72px] [@media(max-width:650px)]:text-[36px] leading-[1.1] text-white font-[700] tracking-[-0.04em] mb-6 drop-shadow-[0_0_15px_rgba(0,119,255,0.3)]">
+      {/* Content — side-by-side layout */}
+      <div className="relative z-10 w-full max-w-[1200px] mx-auto px-6 pt-[140px] pb-[80px] flex flex-col [@media(min-width:960px)]:flex-row items-center [@media(min-width:960px)]:items-center justify-between gap-12">
+        {/* Left: Hero text + CTA */}
+        <div className="flex flex-col gap-6 text-left max-w-[520px] [@media(max-width:959px)]:text-center [@media(max-width:959px)]:items-center">
+          <h1 className="text-[48px] md:text-[72px] [@media(max-width:650px)]:text-[36px] leading-[1.05] text-white font-[700] tracking-[-0.04em] text-glow">
             Build Your L2 <br />in Seconds
           </h1>
-          <p className="text-[18px] [@media(max-width:650px)]:text-[14px] text-slate-400 max-w-[600px] mx-auto leading-relaxed">
+          <p className="text-[18px] [@media(max-width:650px)]:text-[14px] text-slate-400 leading-relaxed max-w-[460px]">
             Deploy customizable Layer 2 solutions with unmatched speed, security, and flexibility.
           </p>
+          <div className="flex gap-4 mt-4 [@media(max-width:400px)]:flex-col [@media(max-width:400px)]:w-full">
+            <a
+              href={LINKS.ROLLUP_HUB}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-[14px] rounded-full bg-primary hover:bg-primary/90 text-white text-[16px] font-[600]
+                transition-all duration-200 text-center
+                shadow-[0_0_20px_rgba(0,119,255,0.4)] hover:shadow-[0_0_30px_rgba(0,119,255,0.6)] hover:-translate-y-0.5"
+            >
+              Start Building
+            </a>
+            <a
+              href={LINKS.DOCS}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-[14px] rounded-full bg-white/5 hover:bg-white/10 text-white/80 text-[16px] font-[500]
+                transition-all duration-200 text-center cursor-pointer border border-white/10 hover:border-white/20"
+            >
+              Read Docs
+            </a>
+          </div>
         </div>
 
-        {/* Glassmorphism Simulator Card */}
-        <div className="w-full max-w-[640px] rounded-2xl p-8 [@media(max-width:500px)]:p-5 bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+        {/* Right: Glass Configuration Panel */}
+        <div className="w-full max-w-[480px] [@media(max-width:959px)]:max-w-[560px] glass-panel rounded-2xl p-6 [@media(max-width:500px)]:p-5">
           {phase === "config" && (
-            <div className="flex flex-col gap-6">
-              <h3 className="text-white text-[18px] font-[600] mb-2 flex items-center gap-2">
-                Configure Your Chain
+            <div className="flex flex-col gap-4">
+              <h3 className="text-white text-[18px] font-[600] mb-1">
+                Configuration
               </h3>
               <ConfigSelector
                 title="Throughput"
+                subtitle="Speed"
+                icon="⚡"
                 options={THROUGHPUT_OPTIONS}
                 selected={throughput}
                 onSelect={setThroughput}
               />
               <ConfigSelector
                 title="Privacy"
+                subtitle="Mode"
+                icon="🔒"
                 options={PRIVACY_OPTIONS}
                 selected={privacy}
                 onSelect={setPrivacy}
               />
               <ConfigSelector
                 title="Virtual Machine"
+                subtitle="Runtime"
+                icon="🖥"
                 options={VM_OPTIONS}
                 selected={vm}
                 onSelect={setVm}
@@ -99,11 +126,11 @@ export default function SimulatorHero() {
               <button
                 type="button"
                 onClick={handleDeploy}
-                className="mt-4 w-full py-[14px] rounded-full bg-primary hover:bg-primary/90 text-white text-[16px] font-[600]
+                className="mt-2 w-full py-[14px] rounded-full bg-primary hover:bg-primary/90 text-white text-[16px] font-[600]
                   transition-all duration-200 cursor-pointer
                   shadow-[0_0_20px_rgba(0,119,255,0.4)]"
               >
-                Launch Your L2
+                Deploy Instance
               </button>
             </div>
           )}

@@ -72,7 +72,7 @@ export default function ProtocolsHighlight() {
   }, []);
 
   return (
-    <section className="w-full flex justify-center bg-[#1C1C1C] px-6 py-[100px] [@media(max-width:700px)]:py-[60px]">
+    <section id="protocols" className="w-full flex justify-center bg-[#1C1C1C] px-6 py-[100px] [@media(max-width:700px)]:py-[60px]">
       <div ref={ref} className="w-full max-w-[1200px]">
         <h2 className="text-[14px] uppercase tracking-[3px] text-[#0078FF] font-[500] mb-4 text-center">
           Protocols

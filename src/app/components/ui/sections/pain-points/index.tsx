@@ -93,7 +93,7 @@ export default function PainPoints() {
         <p className="text-[28px] [@media(max-width:700px)]:text-[22px] text-white/80 font-[300] text-center mb-[60px] max-w-[600px] mx-auto leading-snug">
           Building on shared L2s means accepting trade-offs
         </p>
-        <div className="grid grid-cols-3 [@media(max-width:900px)]:grid-cols-1 gap-6">
+        <div className="grid [@media(min-width:1200px)]:grid-cols-3 [@media(min-width:700px)_and_(max-width:1199px)]:grid-cols-2 [@media(max-width:699px)]:grid-cols-1 gap-6">
           {PAIN_POINTS.map((point, i) => (
             <PainPointCard key={point.title} point={point} index={i} />
           ))}

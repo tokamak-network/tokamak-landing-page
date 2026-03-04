@@ -130,11 +130,11 @@ export default function Solution() {
 
         <ArchitectureDiagram />
 
-        <div className="grid grid-cols-3 [@media(max-width:900px)]:grid-cols-1 gap-6 mt-[60px]">
+        <div className="grid [@media(min-width:1200px)]:grid-cols-3 [@media(min-width:700px)_and_(max-width:1199px)]:grid-cols-2 [@media(max-width:699px)]:grid-cols-1 gap-6 mt-[60px]">
           {DIFFERENTIATORS.map((d, i) => (
             <div
               key={d.title}
-              className="flex flex-col items-start p-6 transition-all duration-700"
+              className="flex flex-col items-start p-6 bg-white/[0.03] border border-white/[0.06] rounded-2xl hover:border-white/[0.12] hover:bg-white/[0.05] transition-all duration-700"
               style={{
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? "translateY(0)" : "translateY(20px)",

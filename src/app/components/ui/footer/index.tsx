@@ -5,18 +5,11 @@ import TokamakLogo from "@/assets/images/Tokamak_Symbol.svg";
 import TokamakLogoText from "@/assets/images/Tokamak_LogoText.svg";
 import { LINKS } from "@/app/constants/links";
 import Link from "next/link";
-import { useFocus } from "@/context/FocusContext";
 import InlineNewsletter from "./InlineNewsletter";
 
 export default function Footer() {
-  const { isFocused } = useFocus();
   return (
-    <div
-      className="w-full h-full"
-      style={{
-        backgroundColor: isFocused ? "#0078ff" : "",
-      }}
-    >
+    <div className="w-full h-full">
       <footer
         className="w-full py-[60px] bg-white flex justify-center px-[25px] [@media(max-width:1000px)]:px-[15px]"
         style={{
@@ -222,7 +215,7 @@ export default function Footer() {
             <InlineNewsletter />
             {/* Copyright */}
             <div className="text-[11px] text-[#1c1c1c] font-normal opacity-[0.6]">
-              &copy; 2025 Tokamak Network{" "}
+              &copy; {new Date().getFullYear()} Tokamak Network{" "}
               <span className="[@media(max-width:800px)]:hidden">
                 | All Rights Reserved.
               </span>

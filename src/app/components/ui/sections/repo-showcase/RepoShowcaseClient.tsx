@@ -134,7 +134,7 @@ export default function RepoShowcaseClient({
   if (repos.length === 0) return null;
 
   return (
-    <section className="relative z-10 w-full flex justify-center bg-surface px-6 py-[160px] [@media(max-width:700px)]:py-[80px]">
+    <section id="repo-showcase" className="relative z-10 w-full flex justify-center bg-surface px-6 py-[160px] [@media(max-width:700px)]:py-[80px]">
       <div ref={ref} className="w-full max-w-[1280px]">
         <h2 className="text-[12px] uppercase tracking-[0.08em] text-primary font-[700] mb-4 text-center">
           Notable Repositories

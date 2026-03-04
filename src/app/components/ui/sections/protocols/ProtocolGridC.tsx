@@ -18,9 +18,9 @@ export const ProtocolGridC: React.FC<ProtocolGridCProps> = ({ protocols }) => {
         Active development across the ecosystem
       </p>
       <div className="w-full max-w-[1200px] px-[25px]">
-        <div className="flex flex-wrap gap-[60px] [@media(min-width:1200px)]:grid [@media(min-width:1200px)]:grid-cols-3">
-          {protocols.map((protocol, index) => (
-            <ProtocolCardWithBadge key={index} {...protocol} />
+        <div className="grid grid-cols-1 [@media(min-width:768px)]:grid-cols-2 [@media(min-width:1200px)]:grid-cols-3 gap-[60px]">
+          {protocols.map((protocol) => (
+            <ProtocolCardWithBadge key={protocol.title} {...protocol} />
           ))}
         </div>
       </div>

@@ -33,6 +33,8 @@ export const ProtocolCardWithBadge: React.FC<ProtocolCardWithBadgeProps> = ({
           loading="lazy"
           src={icon}
           alt={alt}
+          width={32}
+          height={32}
           className="object-contain w-8 aspect-square"
         />
         {badge && (

@@ -113,19 +113,19 @@ export const protocolsDataC: readonly ProtocolCardWithBadgeProps[] = [
   },
   {
     icon: randomnessIcon,
-    title: "Veriable randomness",
+    title: "Verifiable randomness",
     description:
       "Completing development of a minimal distributed randomness protocol and releasing it as open source.",
     alt: "Randomness icon",
     links: [
       {
         icon: "Website",
-        alt: "Veriable randomness website",
+        alt: "Verifiable randomness website",
         link: "https://www.notion.so/tokamak/Introduction-to-Random-number-generator-project-0606bbad49ba4e63b8500902ba5afd31",
       },
       {
         icon: "Github",
-        alt: "Veriable randomness github",
+        alt: "Verifiable randomness github",
         link: "https://github.com/tokamak-network/Randomness-Beacon",
       },
     ],

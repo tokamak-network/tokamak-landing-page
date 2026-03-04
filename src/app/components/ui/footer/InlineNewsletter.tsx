@@ -7,12 +7,13 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export default function InlineNewsletter() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [validationError, setValidationError] = useState("");
 
   const onSubscribe = useCallback(async () => {
     if (!email) return;
 
     if (!EMAIL_REGEX.test(email)) {
-      alert("Please enter a valid email address.");
+      setValidationError("Please enter a valid email address.");
       return;
     }
 
@@ -59,7 +60,10 @@ export default function InlineNewsletter() {
           type="email"
           placeholder="Enter your email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (validationError) setValidationError("");
+          }}
           onKeyDown={handleKeyDown}
           className="flex-1 px-4 py-2 h-[40px] rounded-full bg-[#F5F5F5] text-[#1C1C1C] text-[13px] outline-none
             placeholder:text-[#808992] font-[400] border border-transparent focus:border-[#0078FF] transition-colors"
@@ -74,6 +78,9 @@ export default function InlineNewsletter() {
           {status === "loading" ? "..." : status === "success" ? "Subscribed!" : "SUBSCRIBE"}
         </button>
       </div>
+      {validationError && (
+        <p className="text-[11px] text-[#cb2431] mt-1">{validationError}</p>
+      )}
       {status === "error" && (
         <p className="text-[11px] text-[#cb2431] mt-1">
           Subscription failed. Please try again.

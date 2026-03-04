@@ -1,44 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps } from "firebase/app";
 import { getDatabase, ref, push } from "firebase/database";
 
-// 환경 변수 검증
-const FIREBASE_API_KEY = process.env.NEXT_FIREBASE_API_KEY;
-const FIREBASE_AUTH_DOMAIN = process.env.NEXT_FIREBASE_AUTH_DOMAIN;
-const FIREBASE_PROJECT_ID = process.env.NEXT_FIREBASE_PROJECT_ID;
-const FIREBASE_STORAGE_BUCKET = process.env.NEXT_FIREBASE_STORAGE_BUCKET;
-const FIREBASE_MESSAGING_SENDER_ID =
-  process.env.NEXT_FIREBASE_MESSAGING_SENDER_ID;
-const FIREBASE_APP_ID = process.env.NEXT_FIREBASE_APP_ID;
-const FIREBASE_DATABASE_URL = process.env.NEXT_FIREBASE_DATABASE_URL;
+function getFirebaseApp() {
+  const existing = getApps();
+  if (existing.length > 0) return existing[0];
 
-if (
-  !FIREBASE_API_KEY ||
-  !FIREBASE_AUTH_DOMAIN ||
-  !FIREBASE_PROJECT_ID ||
-  !FIREBASE_STORAGE_BUCKET ||
-  !FIREBASE_MESSAGING_SENDER_ID ||
-  !FIREBASE_APP_ID ||
-  !FIREBASE_DATABASE_URL
-) {
-  throw new Error(
-    "Firebase configuration is incomplete. Please check your environment variables."
-  );
+  const apiKey = process.env.NEXT_FIREBASE_API_KEY;
+  const authDomain = process.env.NEXT_FIREBASE_AUTH_DOMAIN;
+  const projectId = process.env.NEXT_FIREBASE_PROJECT_ID;
+  const storageBucket = process.env.NEXT_FIREBASE_STORAGE_BUCKET;
+  const messagingSenderId = process.env.NEXT_FIREBASE_MESSAGING_SENDER_ID;
+  const appId = process.env.NEXT_FIREBASE_APP_ID;
+  const databaseURL = process.env.NEXT_FIREBASE_DATABASE_URL;
+
+  if (
+    !apiKey ||
+    !authDomain ||
+    !projectId ||
+    !storageBucket ||
+    !messagingSenderId ||
+    !appId ||
+    !databaseURL
+  ) {
+    throw new Error(
+      "Firebase configuration is incomplete. Please check your environment variables."
+    );
+  }
+
+  return initializeApp({
+    apiKey,
+    authDomain,
+    projectId,
+    storageBucket,
+    messagingSenderId,
+    appId,
+    databaseURL,
+  });
 }
-
-const firebaseConfig = {
-  apiKey: FIREBASE_API_KEY,
-  authDomain: FIREBASE_AUTH_DOMAIN,
-  projectId: FIREBASE_PROJECT_ID,
-  storageBucket: FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
-  appId: FIREBASE_APP_ID,
-  databaseURL: FIREBASE_DATABASE_URL,
-};
-
-// Firebase 초기화
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,6 +51,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Firebase에 이메일 저장 - push()로 자동 키 생성
+    const app = getFirebaseApp();
+    const database = getDatabase(app);
     const dbPath = `biweekly-report/email-list`;
     const dbRef = ref(database, dbPath);
 

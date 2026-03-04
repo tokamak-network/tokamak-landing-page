@@ -1,8 +1,9 @@
+import { Gamepad2, Coins, Building2 } from "lucide-react";
 import UseCaseCard from "./UseCaseCard";
 
 const USE_CASES = [
   {
-    icon: "\u{1F3AE}",
+    icon: <Gamepad2 size={24} />,
     title: "Gaming",
     description:
       "Run your game on a dedicated L2 with ultra-low latency and no congestion from other apps.",
@@ -13,7 +14,7 @@ const USE_CASES = [
     ],
   },
   {
-    icon: "\u{1F4B0}",
+    icon: <Coins size={24} />,
     title: "DeFi",
     description:
       "Build financial protocols on a chain tailored for high-throughput trading and privacy.",
@@ -24,7 +25,7 @@ const USE_CASES = [
     ],
   },
   {
-    icon: "\u{1F3E2}",
+    icon: <Building2 size={24} />,
     title: "Enterprise",
     description:
       "Deploy permissioned L2s with compliance-ready configurations for institutional use.",

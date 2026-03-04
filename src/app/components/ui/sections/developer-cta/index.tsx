@@ -1,9 +1,5 @@
-import Image from "next/image";
-import DocIcon from "@/assets/icons/common/doc.svg";
-import DocIconHover from "@/assets/icons/common/doc-white.svg";
-import GithubIcon from "@/assets/icons/common/github.svg";
-import GithubIconHover from "@/assets/icons/common/github-black.svg";
-import NotionIcon from "@/assets/icons/common/notion.svg";
+import type { ReactNode } from "react";
+import { BookOpen, Github, Award } from "lucide-react";
 import { LINKS } from "@/app/constants/links";
 
 interface CtaCard {
@@ -11,8 +7,7 @@ interface CtaCard {
   readonly description: string;
   readonly buttonLabel: string;
   readonly href: string;
-  readonly icon: typeof DocIcon;
-  readonly iconHover: typeof DocIconHover;
+  readonly icon: ReactNode;
 }
 
 const CTA_CARDS: readonly CtaCard[] = [
@@ -21,24 +16,21 @@ const CTA_CARDS: readonly CtaCard[] = [
     description: "Read the documentation",
     buttonLabel: "Open Docs",
     href: LINKS.DOCS,
-    icon: DocIcon,
-    iconHover: DocIconHover,
+    icon: <BookOpen size={24} />,
   },
   {
     title: "GitHub",
     description: "Explore the codebase",
     buttonLabel: "View Code",
     href: LINKS.GITHUB,
-    icon: GithubIcon,
-    iconHover: GithubIconHover,
+    icon: <Github size={24} />,
   },
   {
     title: "Grant",
     description: "Get funded to build",
     buttonLabel: "Apply Now",
     href: LINKS.GRANT,
-    icon: NotionIcon,
-    iconHover: NotionIcon,
+    icon: <Award size={24} />,
   },
 ] as const;
 
@@ -51,21 +43,8 @@ function CtaCardItem({ card }: { readonly card: CtaCard }) {
       className="flex flex-col items-center justify-center gap-4 p-8 rounded-2xl glass-panel
         hover:border-primary/50 transition-all duration-200 group flex-1 min-w-[240px]"
     >
-      <div className="w-12 h-12 flex items-center justify-center rounded-full bg-primary/20 group-hover:bg-primary transition-colors duration-200">
-        <Image
-          src={card.icon}
-          alt={card.title}
-          width={24}
-          height={24}
-          className="group-hover:hidden brightness-0 invert"
-        />
-        <Image
-          src={card.iconHover}
-          alt={card.title}
-          width={24}
-          height={24}
-          className="hidden group-hover:block brightness-0 invert"
-        />
+      <div className="w-12 h-12 flex items-center justify-center rounded-full bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-200">
+        {card.icon}
       </div>
       <h3 className="text-[20px] font-[600] text-white group-hover:text-primary transition-colors">
         {card.title}

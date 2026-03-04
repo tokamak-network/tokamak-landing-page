@@ -1,7 +1,8 @@
+import type { ReactNode } from "react";
 import { LINKS } from "@/app/constants/links";
 
 interface UseCaseCardProps {
-  readonly icon: string;
+  readonly icon: ReactNode;
   readonly title: string;
   readonly description: string;
   readonly features: readonly string[];
@@ -22,7 +23,7 @@ export default function UseCaseCard({
         hover:border-primary/50 transition-all duration-200 group flex-1 min-w-[280px]"
     >
       <div className="w-12 h-12 rounded-full bg-primary/20 text-primary flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
-        <span className="text-[24px]">{icon}</span>
+        {icon}
       </div>
       <h3 className="text-[20px] font-[600] text-white mb-2 group-hover:text-primary transition-colors">
         {title}

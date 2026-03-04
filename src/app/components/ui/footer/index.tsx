@@ -4,72 +4,84 @@ import Image from "next/image";
 import Link from "next/link";
 import TokamakLogo from "@/assets/images/Tokamak_Symbol.svg";
 import TokamakLogoText from "@/assets/images/Tokamak_LogoText.svg";
-import { CLIP_PATHS } from "@/app/constants/styles";
 import { NAV_COLUMNS } from "./navData";
 import InlineNewsletter from "./InlineNewsletter";
 
 export default function Footer() {
   return (
-    <div className="w-full h-full">
-      <footer
-        className="w-full py-[80px] bg-white flex justify-center px-[25px] [@media(max-width:1000px)]:px-[15px]"
-        style={{ clipPath: CLIP_PATHS.topCutCorners }}
-      >
-        <div className="flex flex-col items-center w-full max-w-[1220px]">
-          {/* Centered Logo */}
-          <figure className="flex items-center gap-2 mb-[48px]">
-            <Image loading="lazy" src={TokamakLogo} alt="Tokamak Network Logo" />
-            <Image loading="lazy" src={TokamakLogoText} alt="Tokamak Network" />
-          </figure>
+    <footer className="w-full bg-slate-50 border-t border-slate-200">
+      <div className="max-w-[1200px] mx-auto px-6 py-[60px]">
+        {/* Top: Logo + Nav + Newsletter */}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr] gap-y-[40px] gap-x-[40px] mb-[40px]">
+          {/* Logo + Tagline */}
+          <div className="flex flex-col gap-3">
+            <figure className="flex items-center gap-2">
+              <Image loading="lazy" src={TokamakLogo} alt="Tokamak Network Logo" />
+              <Image loading="lazy" src={TokamakLogoText} alt="Tokamak Network" />
+            </figure>
+            <p className="text-[13px] text-slate-500 leading-relaxed">
+              Every app deserves its own L2.
+            </p>
+          </div>
 
-          {/* Navigation — horizontal centered groups */}
-          <div className="flex flex-wrap justify-center gap-x-[60px] gap-y-[32px] mb-[48px] [@media(max-width:640px)]:hidden">
+          {/* Navigation columns */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 [@media(max-width:640px)]:hidden">
             {NAV_COLUMNS.map((col) => (
-              <div key={col.title} className="flex flex-col items-center">
-                <h3 className="text-[11px] font-[500] uppercase tracking-[3px] text-[#0078FF] mb-[12px]">
+              <div key={col.title} className="flex flex-col gap-2">
+                <h3 className="text-[12px] font-[600] text-slate-900 uppercase tracking-wide mb-1">
                   {col.title}
                 </h3>
-                <div className="flex flex-wrap justify-center gap-x-[20px] gap-y-[6px]">
-                  {col.links.map((link) =>
-                    link.isInternal ? (
-                      <Link
-                        key={link.label}
-                        href={link.href}
-                        className="text-[14px] font-[300] text-[#1C1C1C] opacity-[0.5] hover:opacity-100 hover:text-tokamak-blue transition-all"
-                      >
-                        {link.label}
-                      </Link>
-                    ) : (
-                      <a
-                        key={link.label}
-                        href={link.href}
-                        className="text-[14px] font-[300] text-[#1C1C1C] opacity-[0.5] hover:opacity-100 hover:text-tokamak-blue transition-all"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {link.label}
-                      </a>
-                    )
-                  )}
-                </div>
+                {col.links.map((link) =>
+                  link.isInternal ? (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      className="text-[13px] text-slate-500 hover:text-[#0078FF] transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      className="text-[13px] text-slate-500 hover:text-[#0078FF] transition-colors"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {link.label}
+                    </a>
+                  )
+                )}
               </div>
             ))}
           </div>
 
-          {/* Divider */}
-          <div className="w-full max-w-[600px] border-t border-[#E5E5E5] mb-[40px]" />
-
-          {/* Newsletter — centered */}
-          <div className="flex justify-center w-full mb-[40px]">
+          {/* Newsletter */}
+          <div className="[@media(max-width:799px)]:hidden">
             <InlineNewsletter variant="light" />
           </div>
+        </div>
 
-          {/* Copyright */}
-          <p className="text-[11px] text-[#1c1c1c] font-[300] opacity-[0.4]">
+        {/* Bottom: Divider + Copyright */}
+        <div className="border-t border-slate-200 pt-[24px] flex justify-between items-center [@media(max-width:640px)]:flex-col [@media(max-width:640px)]:gap-3">
+          <p className="text-[11px] text-slate-400">
             &copy; {new Date().getFullYear()} Tokamak Network | All Rights Reserved.
           </p>
+          <div className="flex gap-4">
+            {NAV_COLUMNS.find((c) => c.title === "Social")?.links.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] text-slate-400 hover:text-[#0078FF] transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
         </div>
-      </footer>
-    </div>
+      </div>
+    </footer>
   );
 }

@@ -5,7 +5,6 @@ import GithubIcon from "@/assets/icons/common/github.svg";
 import GithubIconHover from "@/assets/icons/common/github-black.svg";
 import NotionIcon from "@/assets/icons/common/notion.svg";
 import { LINKS } from "@/app/constants/links";
-import { CLIP_PATHS } from "@/app/constants/styles";
 
 interface CtaCard {
   readonly title: string;
@@ -18,8 +17,8 @@ interface CtaCard {
 
 const CTA_CARDS: readonly CtaCard[] = [
   {
-    title: "Docs",
-    description: "Read the documentation",
+    title: "Documentation",
+    description: "Everything you need to build, deploy, and scale your L2.",
     buttonLabel: "Open Docs",
     href: LINKS.DOCS,
     icon: DocIcon,
@@ -27,15 +26,15 @@ const CTA_CARDS: readonly CtaCard[] = [
   },
   {
     title: "GitHub",
-    description: "Explore the codebase",
+    description: "Explore our open-source repositories and contribute.",
     buttonLabel: "View Code",
     href: LINKS.GITHUB,
     icon: GithubIcon,
     iconHover: GithubIconHover,
   },
   {
-    title: "Grant",
-    description: "Get funded to build",
+    title: "Grant Program",
+    description: "Get funding to build the next big thing on Tokamak Network.",
     buttonLabel: "Apply Now",
     href: LINKS.GRANT,
     icon: NotionIcon,
@@ -49,10 +48,9 @@ function CtaCardItem({ card }: { readonly card: CtaCard }) {
       href={card.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex flex-col items-center justify-center gap-4 p-8 bg-white rounded-[16px] border border-[#E5E5E5]
-        hover:border-[#0078FF] hover:shadow-lg transition-all duration-200 group flex-1 min-w-[240px]"
+      className="group flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:border-[#0078FF] hover:shadow-md flex-1 min-w-[240px]"
     >
-      <div className="w-12 h-12 flex items-center justify-center rounded-full bg-[#F5F5F5] group-hover:bg-[#0078FF] transition-colors duration-200">
+      <div className="w-12 h-12 rounded-lg bg-[#0078FF]/10 text-[#0078FF] flex items-center justify-center mb-2">
         <Image
           src={card.icon}
           alt={card.title}
@@ -68,32 +66,21 @@ function CtaCardItem({ card }: { readonly card: CtaCard }) {
           className="hidden group-hover:block"
         />
       </div>
-      <h3 className="text-[20px] font-[600] text-[#1C1C1C]">{card.title}</h3>
-      <p className="text-[15px] font-[300] text-[#808992] text-center">
+      <h3 className="text-[20px] font-[700] text-slate-900 group-hover:text-[#0078FF] transition-colors">
+        {card.title}
+      </h3>
+      <p className="text-[14px] text-slate-500 leading-relaxed">
         {card.description}
       </p>
-      <span className="text-[14px] font-[500] text-[#0078FF] group-hover:text-[#0078FF]">
-        {card.buttonLabel} &rarr;
-      </span>
     </a>
   );
 }
 
 export default function DeveloperCta() {
   return (
-    <section
-      className="w-full bg-white flex justify-center px-[25px] [@media(max-width:1000px)]:px-[15px] py-[90px] [@media(max-width:640px)]:py-[60px]"
-      style={{ clipPath: CLIP_PATHS.polygon }}
-    >
-      <div className="w-full max-w-[1200px] flex flex-col items-center">
-        <h2 className="text-[30px] font-[100] text-[#1C1C1C] mb-[9px] text-center">
-          Start Building with{" "}
-          <span className="font-[600]">Tokamak Network</span>
-        </h2>
-        <p className="text-[15px] font-[300] text-[#808992] mb-[60px] text-center">
-          Everything you need to launch your own L2
-        </p>
-        <div className="flex gap-[24px] w-full [@media(max-width:800px)]:flex-col [@media(max-width:800px)]:items-center">
+    <section className="w-full bg-background-light flex justify-center px-6 py-[100px] [@media(max-width:700px)]:py-[60px]">
+      <div className="w-full max-w-[1200px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {CTA_CARDS.map((card) => (
             <CtaCardItem key={card.title} card={card} />
           ))}

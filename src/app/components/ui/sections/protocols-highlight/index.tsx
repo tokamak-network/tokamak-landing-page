@@ -72,12 +72,12 @@ export default function ProtocolsHighlight() {
   }, []);
 
   return (
-    <section id="protocols" className="w-full flex justify-center bg-[#1C1C1C] px-6 py-[100px] [@media(max-width:700px)]:py-[60px]">
+    <section id="protocols" className="w-full flex justify-center bg-slate-50 px-6 py-[100px] [@media(max-width:700px)]:py-[60px]">
       <div ref={ref} className="w-full max-w-[1200px]">
         <h2 className="text-[14px] uppercase tracking-[3px] text-[#0078FF] font-[500] mb-4 text-center">
           Protocols
         </h2>
-        <p className="text-[28px] [@media(max-width:700px)]:text-[22px] text-white/80 font-[300] text-center mb-[60px] max-w-[500px] mx-auto leading-snug">
+        <p className="text-[28px] [@media(max-width:700px)]:text-[22px] text-slate-900 font-[700] text-center mb-[60px] max-w-[500px] mx-auto leading-snug tracking-tight">
           Key capabilities powering the network
         </p>
 
@@ -85,7 +85,7 @@ export default function ProtocolsHighlight() {
           {HIGHLIGHTS.map((protocol, i) => (
             <div
               key={protocol.title}
-              className="flex flex-col p-8 bg-white/[0.03] border border-white/[0.06] rounded-2xl transition-all duration-700 hover:border-white/[0.12]"
+              className="flex flex-col p-8 bg-white border border-slate-200 rounded-xl shadow-sm transition-all duration-700 hover:border-[#0078FF] hover:-translate-y-1"
               style={{
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? "translateY(0)" : "translateY(20px)",
@@ -98,10 +98,10 @@ export default function ProtocolsHighlight() {
                 alt={protocol.alt}
                 className="object-contain w-8 h-8 mb-4"
               />
-              <h3 className="text-[18px] font-[500] text-white mb-2">
+              <h3 className="text-[18px] font-[600] text-slate-900 mb-2">
                 {protocol.title}
               </h3>
-              <p className="text-[14px] text-white/50 font-[300] leading-relaxed mb-4 flex-1">
+              <p className="text-[14px] text-slate-500 leading-relaxed mb-4 flex-1">
                 {protocol.description}
               </p>
               {protocol.link && (
@@ -121,7 +121,7 @@ export default function ProtocolsHighlight() {
         <div className="text-center mt-8">
           <Link
             href="/#protocols"
-            className="text-[14px] text-white/40 hover:text-white/60 font-[400] transition-colors"
+            className="text-[14px] text-slate-400 hover:text-slate-600 font-[400] transition-colors"
           >
             See all 12 protocols →
           </Link>

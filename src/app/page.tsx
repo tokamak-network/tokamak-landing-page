@@ -10,7 +10,7 @@ import Footer from "./components/ui/footer";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center w-full font-[Proxima_Nova] bg-[#1C1C1C]">
+    <div className="flex flex-col items-center w-full font-display bg-background-light">
       <Header />
       <HeroB />
       <PainPoints />

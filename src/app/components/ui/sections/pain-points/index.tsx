@@ -13,19 +13,19 @@ const PAIN_POINTS: PainPoint[] = [
     icon: "🔗",
     title: "Shared Congestion",
     description:
-      "Your users compete with every other app on the same chain. Traffic spikes elsewhere slow your app down.",
+      "Stop competing for block space and paying unpredictable gas fees during network spikes.",
   },
   {
     icon: "⚙️",
     title: "One-Size-Fits-All",
     description:
-      "Generic L2s force you to compromise on throughput, cost, or privacy. Your app deserves tailored infrastructure.",
+      "Standard networks limit your ability to customize gas tokens, consensus, or privacy.",
   },
   {
     icon: "⏳",
     title: "Months to Launch",
     description:
-      "Setting up L2 infrastructure takes engineering teams months of configuration, testing, and deployment.",
+      "Building an L2 from scratch takes massive engineering resources and time.",
   },
 ];
 
@@ -60,7 +60,7 @@ function PainPointCard({
   return (
     <div
       ref={ref}
-      className="flex flex-col items-start p-8 bg-white/[0.04] border border-white/[0.08] rounded-2xl transition-all duration-700"
+      className="flex flex-col items-start p-8 bg-white border border-slate-200 rounded-xl shadow-sm transition-all duration-700 hover:-translate-y-1"
       style={{
         opacity: isVisible ? 1 : 0,
         transform: isVisible
@@ -70,10 +70,10 @@ function PainPointCard({
       }}
     >
       <span className="text-[32px] mb-4">{point.icon}</span>
-      <h3 className="text-[20px] font-[500] text-white mb-3">
+      <h3 className="text-[20px] font-[700] text-[#e63946] mb-3">
         {point.title}
       </h3>
-      <p className="text-[15px] text-white/60 font-[300] leading-relaxed">
+      <p className="text-[15px] text-slate-600 leading-relaxed">
         {point.description}
       </p>
     </div>
@@ -84,14 +84,14 @@ export default function PainPoints() {
   return (
     <section
       id="pain-points"
-      className="w-full flex justify-center bg-[#1C1C1C] px-6 py-[100px] [@media(max-width:700px)]:py-[60px]"
+      className="w-full flex justify-center bg-slate-50 px-6 py-[100px] [@media(max-width:700px)]:py-[60px]"
     >
       <div className="w-full max-w-[1200px]">
-        <h2 className="text-[14px] uppercase tracking-[3px] text-[#0078FF] font-[500] mb-4 text-center">
-          The Problem
+        <h2 className="text-[36px] md:text-[40px] [@media(max-width:700px)]:text-[28px] font-[700] tracking-tight text-slate-900 text-center mb-4">
+          The limits of current infrastructure
         </h2>
-        <p className="text-[28px] [@media(max-width:700px)]:text-[22px] text-white/80 font-[300] text-center mb-[60px] max-w-[600px] mx-auto leading-snug">
-          Building on shared L2s means accepting trade-offs
+        <p className="text-[18px] text-slate-600 text-center mb-[60px] max-w-[600px] mx-auto leading-snug">
+          Why deploying your own L2 is the right choice for your application.
         </p>
         <div className="grid [@media(min-width:1200px)]:grid-cols-3 [@media(min-width:700px)_and_(max-width:1199px)]:grid-cols-2 [@media(max-width:699px)]:grid-cols-1 gap-6">
           {PAIN_POINTS.map((point, i) => (

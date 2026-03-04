@@ -59,7 +59,7 @@ function ArchitectureDiagram() {
       {steps.map((step, i) => (
         <div key={step.label} className="flex items-center gap-2 [@media(max-width:700px)]:flex-col">
           <div
-            className="px-6 py-3 rounded-xl border text-[14px] font-[500] text-white transition-all duration-500"
+            className="px-6 py-3 rounded-xl border text-[14px] font-[500] text-slate-900 transition-all duration-500"
             style={{
               borderColor: step.color,
               backgroundColor: `${step.color}15`,
@@ -72,7 +72,7 @@ function ArchitectureDiagram() {
           </div>
           {i < steps.length - 1 && (
             <span
-              className="text-white/30 text-[18px] [@media(max-width:700px)]:rotate-90 transition-opacity duration-500"
+              className="text-slate-400 text-[18px] [@media(max-width:700px)]:rotate-90 transition-opacity duration-500"
               style={{
                 opacity: isVisible ? 1 : 0,
                 transitionDelay: `${i * 200 + 100}ms`,
@@ -110,13 +110,13 @@ export default function Solution() {
   }, []);
 
   return (
-    <section className="w-full flex justify-center bg-[#1C1C1C] px-6 py-[100px] [@media(max-width:700px)]:py-[60px]">
+    <section className="w-full flex justify-center bg-white px-6 py-[100px] [@media(max-width:700px)]:py-[60px]">
       <div ref={ref} className="w-full max-w-[1200px]">
         <h2 className="text-[14px] uppercase tracking-[3px] text-[#0078FF] font-[500] mb-4 text-center">
           The Solution
         </h2>
         <p
-          className="text-[32px] [@media(max-width:700px)]:text-[24px] text-white font-[400] text-center mb-[20px] max-w-[700px] mx-auto leading-snug transition-all duration-700"
+          className="text-[32px] [@media(max-width:700px)]:text-[24px] text-slate-900 font-[700] text-center mb-[20px] max-w-[700px] mx-auto leading-snug tracking-tight transition-all duration-700"
           style={{
             opacity: isVisible ? 1 : 0,
             transform: isVisible ? "translateY(0)" : "translateY(20px)",
@@ -124,7 +124,7 @@ export default function Solution() {
         >
           Tokamak lets you launch a tailored L2 in minutes.
         </p>
-        <p className="text-[16px] text-white/50 font-[300] text-center mb-[40px] max-w-[500px] mx-auto">
+        <p className="text-[16px] text-slate-500 text-center mb-[40px] max-w-[500px] mx-auto">
           From your application to Ethereum, in one seamless flow.
         </p>
 
@@ -134,7 +134,7 @@ export default function Solution() {
           {DIFFERENTIATORS.map((d, i) => (
             <div
               key={d.title}
-              className="flex flex-col items-start p-6 bg-white/[0.03] border border-white/[0.06] rounded-2xl hover:border-white/[0.12] hover:bg-white/[0.05] transition-all duration-700"
+              className="flex flex-col items-start p-6 bg-slate-50 border border-slate-200 rounded-xl shadow-sm hover:border-[#0078FF] hover:-translate-y-1 transition-all duration-700"
               style={{
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? "translateY(0)" : "translateY(20px)",
@@ -142,10 +142,10 @@ export default function Solution() {
               }}
             >
               <div className="w-2 h-2 rounded-full bg-[#0078FF] mb-4" />
-              <h3 className="text-[18px] font-[500] text-white mb-2">
+              <h3 className="text-[18px] font-[600] text-slate-900 mb-2">
                 {d.title}
               </h3>
-              <p className="text-[14px] text-white/50 font-[300] leading-relaxed">
+              <p className="text-[14px] text-slate-500 leading-relaxed">
                 {d.description}
               </p>
             </div>

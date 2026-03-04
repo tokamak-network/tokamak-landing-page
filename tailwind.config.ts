@@ -23,9 +23,13 @@ export default {
         black: "#1C1C1C",
         "tokamak-blue": "#0078FF",
         "tokamak-black": "#1C1C1C",
+        "background-light": "#f5f5f8",
+        "background-dark": "#0a0f1a",
+        primary: "#0078FF",
       },
       fontFamily: {
         sans: ["Proxima Nova"],
+        display: ["var(--font-inter)", "Inter", "sans-serif"],
       },
       animation: {
         "infinite-scroll": "infinite-scroll 15s linear infinite",

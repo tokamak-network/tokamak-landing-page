@@ -7,8 +7,8 @@ import DefaultThumbnail from "@/assets/images/insight/default-thumnail.svg";
 import type { FeedItem } from "./types";
 
 const BADGE_STYLES = {
-  blog: "bg-[#1C1C1C] text-white",
-  report: "bg-[#0078FF] text-white",
+  blog: "bg-[#434347] text-white",
+  report: "bg-primary text-black",
 } as const;
 
 const BADGE_LABELS = {
@@ -46,9 +46,9 @@ export function FeedCard({ item }: { readonly item: FeedItem }) {
   return (
     <Wrapper
       {...linkProps}
-      className="flex flex-col w-full max-w-[360px] text-[#1C1C1C] cursor-pointer group"
+      className="flex flex-col w-full max-w-[360px] text-white cursor-pointer group"
     >
-      <div className="relative w-full h-[198px] overflow-hidden mb-4 rounded-[14px] border border-[#DEDEDE]">
+      <div className="relative w-full h-[198px] overflow-hidden mb-4 border border-[#434347]">
         <Image
           src={imageSrc}
           alt={item.title}
@@ -57,24 +57,24 @@ export function FeedCard({ item }: { readonly item: FeedItem }) {
           onError={() => setImgError(true)}
         />
         <span
-          className={`absolute top-3 left-3 px-3 py-1 rounded-full text-[11px] font-[600] ${BADGE_STYLES[item.type]}`}
+          className={`absolute top-3 left-3 px-3 py-1 text-[11px] font-[700] uppercase tracking-[0.06em] ${BADGE_STYLES[item.type]}`}
         >
           {BADGE_LABELS[item.type]}
         </span>
       </div>
       <div className="flex justify-between items-center text-sm mb-2">
-        <span className="text-[13px] font-[700]">
+        <span className="text-[13px] font-[700] text-[#929298] uppercase tracking-[0.04em]">
           {item.type === "report" ? "Dev Report" : "Blog"}
         </span>
-        <span className="text-gray-500 font-[400] text-[13px]">
+        <span className="text-[#929298] font-[400] text-[13px]">
           {formatDate(item.date)}
         </span>
       </div>
-      <span className="text-[18px] font-[500] line-clamp-2 group-hover:text-[#0078FF] transition-colors">
+      <span className="text-[18px] font-[700] line-clamp-2 group-hover:text-primary transition-colors duration-300">
         {item.title}
       </span>
       {item.statsSummary && (
-        <span className="text-[13px] font-[300] text-[#808992] mt-1">
+        <span className="text-[13px] font-[400] text-[#929298] mt-1">
           {item.statsSummary}
         </span>
       )}

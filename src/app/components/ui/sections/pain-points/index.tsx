@@ -1,28 +1,34 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Link2, Settings, Clock } from "lucide-react";
+import type { ReactNode } from "react";
 
 interface PainPoint {
-  icon: string;
+  icon: ReactNode;
+  accentColor: string;
   title: string;
   description: string;
 }
 
 const PAIN_POINTS: PainPoint[] = [
   {
-    icon: "🔗",
+    icon: <Link2 size={24} />,
+    accentColor: "#FF4444",
     title: "Shared Congestion",
     description:
       "Stop competing for block space and paying unpredictable gas fees during network spikes.",
   },
   {
-    icon: "⚙️",
+    icon: <Settings size={24} />,
+    accentColor: "#FF8844",
     title: "One-Size-Fits-All",
     description:
       "Standard networks limit your ability to customize gas tokens, consensus, or privacy.",
   },
   {
-    icon: "⏳",
+    icon: <Clock size={24} />,
+    accentColor: "#FFAA00",
     title: "Months to Launch",
     description:
       "Building an L2 from scratch takes massive engineering resources and time.",
@@ -60,20 +66,26 @@ function PainPointCard({
   return (
     <div
       ref={ref}
-      className="flex flex-col items-start p-8 bg-white border border-slate-200 rounded-xl shadow-sm transition-all duration-700 hover:-translate-y-1"
+      className="flex flex-col items-start p-8 card-charcoal"
       style={{
         opacity: isVisible ? 1 : 0,
-        transform: isVisible
-          ? "translateY(0)"
-          : "translateY(30px)",
+        transform: isVisible ? "translateY(0)" : "translateY(30px)",
         transitionDelay: `${index * 150}ms`,
       }}
     >
-      <span className="text-[32px] mb-4">{point.icon}</span>
-      <h3 className="text-[20px] font-[700] text-[#e63946] mb-3">
+      <div
+        className="w-12 h-12 flex items-center justify-center mb-5"
+        style={{ backgroundColor: `${point.accentColor}20`, color: point.accentColor }}
+      >
+        {point.icon}
+      </div>
+      <h3
+        className="text-[18px] font-[900] uppercase tracking-[0.06em] mb-3"
+        style={{ color: point.accentColor }}
+      >
         {point.title}
       </h3>
-      <p className="text-[15px] text-slate-600 leading-relaxed">
+      <p className="text-[15px] text-[#c5c5ca] leading-relaxed">
         {point.description}
       </p>
     </div>
@@ -84,13 +96,13 @@ export default function PainPoints() {
   return (
     <section
       id="pain-points"
-      className="w-full flex justify-center bg-slate-50 px-6 py-[100px] [@media(max-width:700px)]:py-[60px]"
+      className="relative z-10 w-full flex justify-center bg-black px-6 py-[160px] [@media(max-width:700px)]:py-[80px]"
     >
-      <div className="w-full max-w-[1200px]">
-        <h2 className="text-[36px] md:text-[40px] [@media(max-width:700px)]:text-[28px] font-[700] tracking-tight text-slate-900 text-center mb-4">
-          The limits of current infrastructure
+      <div className="w-full max-w-[1280px]">
+        <h2 className="text-[38px] md:text-[48px] [@media(max-width:700px)]:text-[32px] font-[900] tracking-[0.06em] uppercase text-white text-center mb-4">
+          The Limits
         </h2>
-        <p className="text-[18px] text-slate-600 text-center mb-[60px] max-w-[600px] mx-auto leading-snug">
+        <p className="text-[16px] text-[#929298] text-center mb-[80px] max-w-[600px] mx-auto">
           Why deploying your own L2 is the right choice for your application.
         </p>
         <div className="grid [@media(min-width:1200px)]:grid-cols-3 [@media(min-width:700px)_and_(max-width:1199px)]:grid-cols-2 [@media(max-width:699px)]:grid-cols-1 gap-6">

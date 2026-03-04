@@ -72,20 +72,20 @@ export default function ProtocolsHighlight() {
   }, []);
 
   return (
-    <section id="protocols" className="w-full flex justify-center bg-slate-50 px-6 py-[100px] [@media(max-width:700px)]:py-[60px]">
-      <div ref={ref} className="w-full max-w-[1200px]">
-        <h2 className="text-[14px] uppercase tracking-[3px] text-[#0078FF] font-[500] mb-4 text-center">
+    <section id="protocols" className="relative z-10 w-full flex justify-center bg-black px-6 py-[160px] [@media(max-width:700px)]:py-[80px]">
+      <div ref={ref} className="w-full max-w-[1280px]">
+        <h2 className="text-[12px] uppercase tracking-[0.08em] text-primary font-[700] mb-4 text-center">
           Protocols
         </h2>
-        <p className="text-[28px] [@media(max-width:700px)]:text-[22px] text-slate-900 font-[700] text-center mb-[60px] max-w-[500px] mx-auto leading-snug tracking-tight">
-          Key capabilities powering the network
+        <p className="text-[38px] [@media(max-width:700px)]:text-[28px] text-white font-[900] text-center mb-[80px] max-w-[500px] mx-auto leading-tight tracking-[0.04em] uppercase">
+          Powering the Network
         </p>
 
         <div className="grid grid-cols-2 [@media(max-width:700px)]:grid-cols-1 gap-6">
           {HIGHLIGHTS.map((protocol, i) => (
             <div
               key={protocol.title}
-              className="flex flex-col p-8 bg-white border border-slate-200 rounded-xl shadow-sm transition-all duration-700 hover:border-[#0078FF] hover:-translate-y-1"
+              className="flex flex-col p-8 card-charcoal"
               style={{
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? "translateY(0)" : "translateY(20px)",
@@ -96,12 +96,12 @@ export default function ProtocolsHighlight() {
                 loading="lazy"
                 src={protocol.icon}
                 alt={protocol.alt}
-                className="object-contain w-8 h-8 mb-4"
+                className="object-contain w-8 h-8 mb-5 brightness-0 invert"
               />
-              <h3 className="text-[18px] font-[600] text-slate-900 mb-2">
+              <h3 className="text-[18px] font-[900] text-white mb-2 uppercase tracking-[0.04em]">
                 {protocol.title}
               </h3>
-              <p className="text-[14px] text-slate-500 leading-relaxed mb-4 flex-1">
+              <p className="text-[14px] text-[#929298] leading-relaxed mb-4 flex-1">
                 {protocol.description}
               </p>
               {protocol.link && (
@@ -109,7 +109,7 @@ export default function ProtocolsHighlight() {
                   href={protocol.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[13px] text-[#0078FF] hover:text-[#3399ff] font-[400] transition-colors"
+                  className="text-[13px] text-primary font-[700] uppercase tracking-[0.04em] transition-colors duration-300"
                 >
                   Learn More →
                 </a>
@@ -121,7 +121,7 @@ export default function ProtocolsHighlight() {
         <div className="text-center mt-8">
           <Link
             href="/#protocols"
-            className="text-[14px] text-slate-400 hover:text-slate-600 font-[400] transition-colors"
+            className="text-[14px] text-[#929298] hover:text-primary font-[700] uppercase tracking-[0.04em] transition-colors duration-300"
           >
             See all 12 protocols →
           </Link>

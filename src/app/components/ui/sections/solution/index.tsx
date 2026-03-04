@@ -45,10 +45,10 @@ function ArchitectureDiagram() {
   }, []);
 
   const steps = [
-    { label: "Your App", color: "#0078FF" },
-    { label: "Tokamak SDK", color: "#0078FF" },
-    { label: "Custom L2", color: "#0078FF" },
-    { label: "Ethereum", color: "#627EEA" },
+    { label: "YOUR APP", color: "#0077FF" },
+    { label: "TOKAMAK SDK", color: "#0077FF" },
+    { label: "CUSTOM L2", color: "#0077FF" },
+    { label: "ETHEREUM", color: "#627EEA" },
   ];
 
   return (
@@ -59,7 +59,7 @@ function ArchitectureDiagram() {
       {steps.map((step, i) => (
         <div key={step.label} className="flex items-center gap-2 [@media(max-width:700px)]:flex-col">
           <div
-            className="px-6 py-3 rounded-xl border text-[14px] font-[500] text-slate-900 transition-all duration-500"
+            className="px-6 py-3 border text-[14px] font-[700] text-white uppercase tracking-[0.06em] transition-all duration-500"
             style={{
               borderColor: step.color,
               backgroundColor: `${step.color}15`,
@@ -72,7 +72,7 @@ function ArchitectureDiagram() {
           </div>
           {i < steps.length - 1 && (
             <span
-              className="text-slate-400 text-[18px] [@media(max-width:700px)]:rotate-90 transition-opacity duration-500"
+              className="text-[#434347] text-[18px] [@media(max-width:700px)]:rotate-90 transition-opacity duration-500"
               style={{
                 opacity: isVisible ? 1 : 0,
                 transitionDelay: `${i * 200 + 100}ms`,
@@ -110,21 +110,21 @@ export default function Solution() {
   }, []);
 
   return (
-    <section className="w-full flex justify-center bg-white px-6 py-[100px] [@media(max-width:700px)]:py-[60px]">
-      <div ref={ref} className="w-full max-w-[1200px]">
-        <h2 className="text-[14px] uppercase tracking-[3px] text-[#0078FF] font-[500] mb-4 text-center">
+    <section className="relative z-10 w-full flex justify-center bg-black px-6 py-[160px] [@media(max-width:700px)]:py-[80px]">
+      <div ref={ref} className="w-full max-w-[1280px]">
+        <h2 className="text-[12px] uppercase tracking-[0.08em] text-primary font-[700] mb-4 text-center">
           The Solution
         </h2>
         <p
-          className="text-[32px] [@media(max-width:700px)]:text-[24px] text-slate-900 font-[700] text-center mb-[20px] max-w-[700px] mx-auto leading-snug tracking-tight transition-all duration-700"
+          className="text-[38px] [@media(max-width:700px)]:text-[28px] text-white font-[900] text-center mb-[20px] max-w-[700px] mx-auto leading-tight tracking-[0.04em] uppercase transition-all duration-700"
           style={{
             opacity: isVisible ? 1 : 0,
             transform: isVisible ? "translateY(0)" : "translateY(20px)",
           }}
         >
-          Tokamak lets you launch a tailored L2 in minutes.
+          Launch a Tailored L2 in Minutes
         </p>
-        <p className="text-[16px] text-slate-500 text-center mb-[40px] max-w-[500px] mx-auto">
+        <p className="text-[16px] text-[#929298] text-center mb-[40px] max-w-[500px] mx-auto">
           From your application to Ethereum, in one seamless flow.
         </p>
 
@@ -134,18 +134,18 @@ export default function Solution() {
           {DIFFERENTIATORS.map((d, i) => (
             <div
               key={d.title}
-              className="flex flex-col items-start p-6 bg-slate-50 border border-slate-200 rounded-xl shadow-sm hover:border-[#0078FF] hover:-translate-y-1 transition-all duration-700"
+              className="flex flex-col items-start p-8 card-charcoal"
               style={{
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? "translateY(0)" : "translateY(20px)",
                 transitionDelay: `${i * 150 + 400}ms`,
               }}
             >
-              <div className="w-2 h-2 rounded-full bg-[#0078FF] mb-4" />
-              <h3 className="text-[18px] font-[600] text-slate-900 mb-2">
+              <div className="w-2 h-2 bg-primary mb-4" />
+              <h3 className="text-[18px] font-[900] text-white mb-2 uppercase tracking-[0.04em]">
                 {d.title}
               </h3>
-              <p className="text-[14px] text-slate-500 leading-relaxed">
+              <p className="text-[14px] text-[#929298] leading-relaxed">
                 {d.description}
               </p>
             </div>

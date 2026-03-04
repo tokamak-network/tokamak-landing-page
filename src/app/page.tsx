@@ -10,7 +10,7 @@ import Footer from "./components/ui/footer";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center w-full font-display bg-background-light">
+    <div className="flex flex-col items-center w-full font-display bg-black relative grain-overlay">
       <Header />
       <HeroB />
       <PainPoints />

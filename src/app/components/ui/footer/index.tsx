@@ -9,17 +9,17 @@ import InlineNewsletter from "./InlineNewsletter";
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-slate-50 border-t border-slate-200">
-      <div className="max-w-[1200px] mx-auto px-6 py-[60px]">
+    <footer className="w-full bg-black border-t border-[#434347]">
+      <div className="max-w-[1280px] mx-auto px-6 py-[60px]">
         {/* Top: Logo + Nav + Newsletter */}
         <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr] gap-y-[40px] gap-x-[40px] mb-[40px]">
           {/* Logo + Tagline */}
           <div className="flex flex-col gap-3">
             <figure className="flex items-center gap-2">
-              <Image loading="lazy" src={TokamakLogo} alt="Tokamak Network Logo" />
-              <Image loading="lazy" src={TokamakLogoText} alt="Tokamak Network" />
+              <Image loading="lazy" src={TokamakLogo} alt="Tokamak Network Logo" className="brightness-0 invert" />
+              <Image loading="lazy" src={TokamakLogoText} alt="Tokamak Network" className="brightness-0 invert" />
             </figure>
-            <p className="text-[13px] text-slate-500 leading-relaxed">
+            <p className="text-[13px] text-[#929298] leading-relaxed">
               Every app deserves its own L2.
             </p>
           </div>
@@ -28,7 +28,7 @@ export default function Footer() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 [@media(max-width:640px)]:hidden">
             {NAV_COLUMNS.map((col) => (
               <div key={col.title} className="flex flex-col gap-2">
-                <h3 className="text-[12px] font-[600] text-slate-900 uppercase tracking-wide mb-1">
+                <h3 className="text-[12px] font-[700] text-white uppercase tracking-[0.08em] mb-1">
                   {col.title}
                 </h3>
                 {col.links.map((link) =>
@@ -36,7 +36,7 @@ export default function Footer() {
                     <Link
                       key={link.label}
                       href={link.href}
-                      className="text-[13px] text-slate-500 hover:text-[#0078FF] transition-colors"
+                      className="text-[13px] text-[#929298] hover:text-primary transition-colors duration-300"
                     >
                       {link.label}
                     </Link>
@@ -44,7 +44,7 @@ export default function Footer() {
                     <a
                       key={link.label}
                       href={link.href}
-                      className="text-[13px] text-slate-500 hover:text-[#0078FF] transition-colors"
+                      className="text-[13px] text-[#929298] hover:text-primary transition-colors duration-300"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -58,13 +58,13 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div className="[@media(max-width:799px)]:hidden">
-            <InlineNewsletter variant="light" />
+            <InlineNewsletter variant="dark" />
           </div>
         </div>
 
         {/* Bottom: Divider + Copyright */}
-        <div className="border-t border-slate-200 pt-[24px] flex justify-between items-center [@media(max-width:640px)]:flex-col [@media(max-width:640px)]:gap-3">
-          <p className="text-[11px] text-slate-400">
+        <div className="border-t border-[#434347] pt-[24px] flex justify-between items-center [@media(max-width:640px)]:flex-col [@media(max-width:640px)]:gap-3">
+          <p className="text-[11px] text-[#929298]">
             &copy; {new Date().getFullYear()} Tokamak Network | All Rights Reserved.
           </p>
           <div className="flex gap-4">
@@ -74,7 +74,7 @@ export default function Footer() {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[11px] text-slate-400 hover:text-[#0078FF] transition-colors"
+                className="text-[11px] text-[#929298] hover:text-primary transition-colors duration-300"
               >
                 {link.label}
               </a>

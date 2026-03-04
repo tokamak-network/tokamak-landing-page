@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { FocusProvider } from "@/context/FocusContext";
 
-const inter = Inter({
-  variable: "--font-inter",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
   display: "swap",
 });
@@ -28,12 +28,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" className={spaceGrotesk.variable} suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/fuc6kbq.css" />
       </head>
       <body
-        className="font-display antialiased bg-background-light text-slate-900"
+        className="font-display antialiased bg-black text-[#c5c5ca]"
         suppressHydrationWarning
       >
         <FocusProvider>{children}</FocusProvider>

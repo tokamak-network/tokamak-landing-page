@@ -53,12 +53,12 @@ export default function LatestFeed() {
   const reportItems = loadReportFeedItems();
 
   return (
-    <section className="w-full bg-white flex justify-center px-6 py-[100px] [@media(max-width:700px)]:py-[60px]">
-      <div className="w-full max-w-[1200px] flex flex-col items-center">
-        <h2 className="text-[36px] md:text-[40px] [@media(max-width:700px)]:text-[28px] font-[700] tracking-tight text-slate-900 mb-4 text-center">
+    <section className="relative z-10 w-full bg-surface flex justify-center px-6 py-[160px] [@media(max-width:700px)]:py-[80px]">
+      <div className="w-full max-w-[1280px] flex flex-col items-center">
+        <h2 className="text-[38px] md:text-[48px] [@media(max-width:700px)]:text-[28px] font-[900] tracking-[0.06em] uppercase text-white mb-4 text-center">
           Latest Updates
         </h2>
-        <p className="text-[16px] text-slate-500 mb-[60px] text-center">
+        <p className="text-[16px] text-[#929298] mb-[80px] text-center">
           News, research, and development updates from Tokamak Network
         </p>
         <LatestFeedClient reportItems={reportItems} />

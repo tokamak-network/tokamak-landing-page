@@ -12,14 +12,18 @@ export default function AnimatedCounter({
   duration = 1800,
   delay = 0,
   className,
+  decimals = 0,
 }: {
   value: string;
   duration?: number;
   delay?: number;
   className?: string;
+  decimals?: number;
 }) {
-  const prefix = value.match(/^[+-]/)?.[0] ?? "";
-  const target = Math.abs(parseNum(value));
+  const signPrefix = value.match(/^[+-]/)?.[0] ?? "";
+  const target = decimals > 0
+    ? Math.abs(parseFloat(value.replace(/[^0-9.-]/g, "")) || 0)
+    : Math.abs(parseNum(value));
   const [display, setDisplay] = useState("0");
   const ref = useRef<HTMLSpanElement>(null);
   const hasAnimated = useRef(false);
@@ -44,11 +48,16 @@ export default function AnimatedCounter({
               const elapsed = now - start;
               const progress = Math.min(elapsed / duration, 1);
               const eased = easeOutCubic(progress);
-              const current = Math.round(target * eased);
+              const current = target * eased;
               const formatted =
                 current === 0
                   ? "0"
-                  : prefix + current.toLocaleString("en-US");
+                  : decimals > 0
+                    ? signPrefix + current.toLocaleString("en-US", {
+                        minimumFractionDigits: decimals,
+                        maximumFractionDigits: decimals,
+                      })
+                    : signPrefix + Math.round(current).toLocaleString("en-US");
               setDisplay(formatted);
 
               if (progress < 1) {
@@ -70,7 +79,7 @@ export default function AnimatedCounter({
       if (timerId !== undefined) clearTimeout(timerId);
       if (rafId !== undefined) cancelAnimationFrame(rafId);
     };
-  }, [target, duration, delay, prefix]);
+  }, [target, duration, delay, signPrefix, decimals]);
 
   return (
     <span ref={ref} className={className}>

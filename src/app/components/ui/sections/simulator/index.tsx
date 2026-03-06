@@ -54,7 +54,7 @@ export default function SimulatorHero() {
   const isDeploying = phase === "deploying" || phase === "complete";
 
   return (
-    <section className="relative z-10 w-full min-h-[900px] [@media(max-width:700px)]:min-h-[700px] overflow-hidden flex items-center justify-center">
+    <section className="relative z-10 w-full min-h-dvh overflow-hidden flex items-center justify-center">
       {/* Background network visualization */}
       <div className="absolute inset-0">
         <NetworkVisualization isDeploying={isDeploying} />
@@ -64,7 +64,7 @@ export default function SimulatorHero() {
       <div className="absolute inset-0 dot-grid pointer-events-none" />
 
       {/* Content — side-by-side layout */}
-      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-6 pt-[200px] pb-[120px] flex flex-col [@media(min-width:960px)]:flex-row items-center [@media(min-width:960px)]:items-center justify-between gap-10">
+      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-6 pt-[200px] pb-[120px] flex flex-col [@media(min-width:960px)]:flex-row items-center [@media(min-width:960px)]:items-center justify-between gap-10">
         {/* Left: Hero text + CTA */}
         <div className="flex flex-col gap-6 text-left max-w-[680px] [@media(max-width:959px)]:text-center [@media(max-width:959px)]:items-center">
           <h1 className="text-[54px] md:text-[80px] [@media(max-width:650px)]:text-[40px] leading-[1.05] text-white font-[900] tracking-[0.06em] uppercase">

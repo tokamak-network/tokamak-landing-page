@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 
 const DEPLOY_STEPS = [
-  "Initializing L2 configuration...",
-  "Compiling smart contracts...",
-  "Generating rollup proofs...",
-  "Connecting to Ethereum mainnet...",
-  "Deploying sequencer nodes...",
-  "Your L2 is ready.",
+  "Validating chain parameters...",
+  "Generating contract addresses...",
+  "Configuring sequencer settings...",
+  "Setting up batcher and proposer...",
+  "Writing deploy-config.json...",
+  "Config file ready.",
 ] as const;
 
 const STEP_DELAY = 600;

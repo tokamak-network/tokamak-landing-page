@@ -1,53 +1,40 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Zap, Shield, Monitor, Rocket, Settings } from "lucide-react";
+import { Type, Coins, Globe, FileDown, Settings } from "lucide-react";
 import { LINKS } from "@/app/constants/links";
+import ConfigInput from "./ConfigInput";
 import ConfigSelector from "./ConfigSelector";
 import DeployAnimation from "./DeployAnimation";
 import NetworkVisualization from "./NetworkVisualization";
 
 type SimulatorPhase = "config" | "deploying" | "complete";
 
-const THROUGHPUT_OPTIONS = [
-  { label: "Standard", value: "standard" },
-  { label: "High", value: "high" },
-  { label: "Ultra", value: "ultra" },
+const GAS_TOKEN_OPTIONS = [
+  { label: "TON", value: "ton" },
+  { label: "ETH", value: "eth" },
 ] as const;
 
-const THROUGHPUT_SUBTITLES: Record<string, string> = {
-  standard: "Standard throughput setup",
-  high: "High throughput setup",
-  ultra: "Ultra throughput setup",
+const GAS_TOKEN_SUBTITLES: Record<string, string> = {
+  ton: "Tokamak native token",
+  eth: "Ether as gas token",
 };
 
-const PRIVACY_OPTIONS = [
-  { label: "Public", value: "public" },
-  { label: "Private", value: "private" },
-  { label: "Hybrid", value: "hybrid" },
+const NETWORK_OPTIONS = [
+  { label: "Mainnet", value: "mainnet" },
+  { label: "Testnet", value: "testnet" },
 ] as const;
 
-const PRIVACY_SUBTITLES: Record<string, string> = {
-  public: "Public chain configuration",
-  private: "Advanced privacy config",
-  hybrid: "Hybrid privacy mode",
-};
-
-const VM_OPTIONS = [
-  { label: "EVM", value: "evm" },
-  { label: "zk-EVM", value: "zk-evm" },
-] as const;
-
-const VM_SUBTITLES: Record<string, string> = {
-  evm: "Standard EVM runtime",
-  "zk-evm": "Zero-knowledge EVM",
+const NETWORK_SUBTITLES: Record<string, string> = {
+  mainnet: "Ethereum mainnet settlement",
+  testnet: "Sepolia testnet deployment",
 };
 
 export default function SimulatorHero() {
   const [phase, setPhase] = useState<SimulatorPhase>("config");
-  const [throughput, setThroughput] = useState("standard");
-  const [privacy, setPrivacy] = useState("public");
-  const [vm, setVm] = useState("evm");
+  const [chainName, setChainName] = useState("");
+  const [gasToken, setGasToken] = useState("ton");
+  const [network, setNetwork] = useState("mainnet");
 
   const handleDeploy = useCallback(() => {
     setPhase("deploying");
@@ -59,9 +46,9 @@ export default function SimulatorHero() {
 
   const handleReset = useCallback(() => {
     setPhase("config");
-    setThroughput("standard");
-    setPrivacy("public");
-    setVm("evm");
+    setChainName("");
+    setGasToken("ton");
+    setNetwork("mainnet");
   }, []);
 
   const isDeploying = phase === "deploying" || phase === "complete";
@@ -121,29 +108,28 @@ export default function SimulatorHero() {
                 </h3>
                 <Settings size={16} className="text-primary" />
               </div>
-              <ConfigSelector
-                title="Throughput"
-                subtitle={THROUGHPUT_SUBTITLES[throughput]}
-                icon={<Zap size={20} />}
-                options={THROUGHPUT_OPTIONS}
-                selected={throughput}
-                onSelect={setThroughput}
+              <ConfigInput
+                title="Chain Name"
+                placeholder="e.g. my-tokamak-l2"
+                icon={<Type size={20} />}
+                value={chainName}
+                onChange={setChainName}
               />
               <ConfigSelector
-                title="Privacy"
-                subtitle={PRIVACY_SUBTITLES[privacy]}
-                icon={<Shield size={20} />}
-                options={PRIVACY_OPTIONS}
-                selected={privacy}
-                onSelect={setPrivacy}
+                title="Gas Token"
+                subtitle={GAS_TOKEN_SUBTITLES[gasToken]}
+                icon={<Coins size={20} />}
+                options={GAS_TOKEN_OPTIONS}
+                selected={gasToken}
+                onSelect={setGasToken}
               />
               <ConfigSelector
-                title="VM Options"
-                subtitle={VM_SUBTITLES[vm]}
-                icon={<Monitor size={20} />}
-                options={VM_OPTIONS}
-                selected={vm}
-                onSelect={setVm}
+                title="Network"
+                subtitle={NETWORK_SUBTITLES[network]}
+                icon={<Globe size={20} />}
+                options={NETWORK_OPTIONS}
+                selected={network}
+                onSelect={setNetwork}
               />
 
               <button
@@ -152,8 +138,8 @@ export default function SimulatorHero() {
                 className="mt-2 w-full flex items-center justify-center gap-2 h-12 bg-primary hover:bg-primary/90 text-black text-[14px] font-[700] uppercase tracking-[0.06em]
                   transition-all duration-300 cursor-pointer hover:-translate-y-1"
               >
-                <span>Deploy Instance</span>
-                <Rocket size={16} />
+                <span>Generate Config</span>
+                <FileDown size={16} />
               </button>
             </div>
           )}
@@ -162,17 +148,19 @@ export default function SimulatorHero() {
             <div className="flex flex-col gap-6 min-h-[240px] justify-center">
               <div className="flex items-center gap-3 mb-2">
                 <div className="text-[13px] font-[700] text-[#929298] uppercase tracking-[0.06em]">
-                  Deploying
+                  Generating
                 </div>
                 <div className="flex gap-1">
+                  {chainName && (
+                    <span className="px-2 py-0.5 bg-white/10 text-[12px] text-white/60 uppercase">
+                      {chainName}
+                    </span>
+                  )}
                   <span className="px-2 py-0.5 bg-white/10 text-[12px] text-white/60 uppercase">
-                    {throughput}
+                    {gasToken}
                   </span>
                   <span className="px-2 py-0.5 bg-white/10 text-[12px] text-white/60 uppercase">
-                    {privacy}
-                  </span>
-                  <span className="px-2 py-0.5 bg-white/10 text-[12px] text-white/60 uppercase">
-                    {vm}
+                    {network}
                   </span>
                 </div>
               </div>
@@ -196,11 +184,11 @@ export default function SimulatorHero() {
 
               <div className="text-center">
                 <h3 className="text-[24px] font-[900] text-white mb-2 uppercase tracking-[0.06em]">
-                  Your L2 is ready.
+                  Config file ready.
                 </h3>
                 <p className="text-[14px] text-[#929298]">
-                  {throughput} throughput &middot; {privacy} privacy &middot;{" "}
-                  {vm.toUpperCase()}
+                  {chainName || "my-l2"} &middot; {gasToken.toUpperCase()} &middot;{" "}
+                  {network}
                 </p>
               </div>
 
@@ -212,7 +200,7 @@ export default function SimulatorHero() {
                   className="px-8 py-[14px] bg-primary hover:bg-primary/90 text-black text-[14px] font-[700] uppercase tracking-[0.06em]
                     transition-all duration-300 text-center hover:-translate-y-1"
                 >
-                  Deploy for Real &rarr;
+                  Go to Rollup Hub &rarr;
                 </a>
                 <button
                   type="button"

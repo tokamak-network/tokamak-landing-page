@@ -68,13 +68,14 @@ export default function SimulatorHero() {
         {/* Left: Hero text + CTA */}
         <div className="flex flex-col gap-8 text-left max-w-[560px] [@media(max-width:959px)]:text-center [@media(max-width:959px)]:items-center">
           <h1 className="text-[54px] md:text-[80px] [@media(max-width:650px)]:text-[40px] leading-[1.05] text-white font-[900] tracking-[0.06em] uppercase">
-            Build Your L2
+            Own Your L2.
             <br />
-            In Seconds
+            Earn TON Rewards.
           </h1>
           <p className="text-[#c5c5ca] text-[18px] md:text-[20px] [@media(max-width:650px)]:text-[14px] font-[400] leading-relaxed max-w-[520px]">
-            A premium crypto protocol for deploying and scaling custom Layer 2
-            solutions with unmatched speed and security.
+            Deploy your appchain on your own infrastructure.
+            <br />
+            No revenue share. No lock-in. Just seigniorage rewards as your chain grows.
           </p>
           <div className="flex gap-4 mt-2 [@media(max-width:400px)]:flex-col [@media(max-width:400px)]:w-full">
             <a

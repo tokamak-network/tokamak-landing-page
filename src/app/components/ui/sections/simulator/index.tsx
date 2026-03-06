@@ -54,7 +54,7 @@ export default function SimulatorHero() {
   const isDeploying = phase === "deploying" || phase === "complete";
 
   return (
-    <section className="relative z-10 w-full min-h-dvh overflow-hidden flex items-center justify-center">
+    <section className="relative z-10 w-full overflow-hidden flex items-center justify-center">
       {/* Background network visualization */}
       <div className="absolute inset-0">
         <NetworkVisualization isDeploying={isDeploying} />

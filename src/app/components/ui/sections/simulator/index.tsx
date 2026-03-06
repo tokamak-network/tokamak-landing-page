@@ -64,18 +64,14 @@ export default function SimulatorHero() {
       <div className="absolute inset-0 dot-grid pointer-events-none" />
 
       {/* Content — side-by-side layout */}
-      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-6 pt-[200px] pb-[120px] flex flex-col [@media(min-width:960px)]:flex-row items-center [@media(min-width:960px)]:items-center justify-between gap-16">
+      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-6 pt-[200px] pb-[120px] flex flex-col [@media(min-width:960px)]:flex-row items-center [@media(min-width:960px)]:items-center justify-between gap-10">
         {/* Left: Hero text + CTA */}
-        <div className="flex flex-col gap-8 text-left max-w-[560px] [@media(max-width:959px)]:text-center [@media(max-width:959px)]:items-center">
+        <div className="flex flex-col gap-6 text-left max-w-[680px] [@media(max-width:959px)]:text-center [@media(max-width:959px)]:items-center">
           <h1 className="text-[54px] md:text-[80px] [@media(max-width:650px)]:text-[40px] leading-[1.05] text-white font-[900] tracking-[0.06em] uppercase">
-            Own Your L2.
-            <br />
-            Earn TON Rewards.
+            Own Your L2. Earn TON Rewards.
           </h1>
-          <p className="text-[#c5c5ca] text-[18px] md:text-[20px] [@media(max-width:650px)]:text-[14px] font-[400] leading-relaxed max-w-[520px]">
-            Deploy your appchain on your own infrastructure.
-            <br />
-            No revenue share. No lock-in. Just seigniorage rewards as your chain grows.
+          <p className="text-[#c5c5ca] text-[18px] md:text-[20px] [@media(max-width:650px)]:text-[14px] font-[400] leading-relaxed">
+            Deploy your appchain on your own infrastructure. No revenue share. No lock-in. Just seigniorage rewards as your chain grows.
           </p>
           <div className="flex gap-4 mt-2 [@media(max-width:400px)]:flex-col [@media(max-width:400px)]:w-full">
             <a

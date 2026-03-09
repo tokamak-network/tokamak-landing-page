@@ -67,7 +67,7 @@ export default function SimulatorHero() {
       <div className="relative z-10 w-full max-w-[1280px] mx-auto px-6 pt-[250px] pb-[120px] flex flex-col [@media(min-width:960px)]:flex-row items-center [@media(min-width:960px)]:items-center justify-between gap-10">
         {/* Left: Hero text + CTA */}
         <div className="flex flex-col gap-6 text-left max-w-[680px] [@media(max-width:959px)]:text-center [@media(max-width:959px)]:items-center">
-          <h1 className="text-[54px] md:text-[80px] [@media(max-width:650px)]:text-[40px] leading-[1.05] text-white font-[900] tracking-[0.06em] uppercase">
+          <h1 className="font-orbitron text-[44px] md:text-[68px] [@media(max-width:650px)]:text-[34px] leading-[1.1] text-white font-[900] tracking-[0.03em] uppercase">
             Own Your L2. Earn TON Rewards.
           </h1>
           <p className="text-[#c5c5ca] text-[18px] md:text-[20px] [@media(max-width:650px)]:text-[14px] font-[400] leading-relaxed">

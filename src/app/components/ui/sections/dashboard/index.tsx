@@ -112,9 +112,10 @@ export default async function EcosystemDashboard() {
   return (
     <section className="relative z-10 w-full flex justify-center px-6 py-[160px] [@media(max-width:640px)]:py-[80px]">
       <div className="w-full max-w-[1280px] flex flex-col items-center">
-        <h2 className="text-[38px] md:text-[48px] font-[900] text-white tracking-[0.06em] uppercase mb-4 text-center">
+        <h2 className="text-[38px] md:text-[48px] font-[900] text-white tracking-[0.06em] uppercase mb-3 text-center">
           Ecosystem
         </h2>
+        <div className="w-10 h-[3px] bg-primary mx-auto mb-5" />
         <p className="text-[16px] text-[#929298] mb-[80px] text-center">
           Live metrics from the Tokamak Network ecosystem
         </p>

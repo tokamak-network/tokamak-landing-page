@@ -32,6 +32,7 @@ export default {
       fontFamily: {
         sans: ["Proxima Nova"],
         display: ["var(--font-space-grotesk)", "Space Grotesk", "sans-serif"],
+        orbitron: ["var(--font-orbitron)", "Orbitron", "sans-serif"],
       },
       animation: {
         "infinite-scroll": "infinite-scroll 15s linear infinite",

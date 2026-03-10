@@ -110,7 +110,7 @@ export default async function EcosystemDashboard() {
   ];
 
   return (
-    <section className="relative z-10 w-full flex justify-center px-6 py-[160px] [@media(max-width:640px)]:py-[80px]">
+    <section className="relative z-10 w-full flex justify-center px-6 pt-[80px] pb-[160px] [@media(max-width:640px)]:py-[60px]">
       <div className="w-full max-w-[1280px] flex flex-col items-center">
         <h2 className="text-[38px] md:text-[48px] font-[900] text-white tracking-[0.06em] uppercase mb-3 text-center">
           Ecosystem

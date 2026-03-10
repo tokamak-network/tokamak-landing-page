@@ -1,5 +1,6 @@
 import Header from "./components/ui/header";
 import SimulatorHero from "./components/ui/sections/simulator";
+import HowItWorks from "./components/ui/sections/how-it-works";
 import EcosystemDashboard from "./components/ui/sections/dashboard";
 
 import RepoShowcase from "./components/ui/sections/repo-showcase";
@@ -12,6 +13,7 @@ export default function Home() {
     <div className="flex flex-col items-center w-full font-display bg-black relative grain-overlay">
       <Header />
       <SimulatorHero />
+      <HowItWorks />
       <EcosystemDashboard />
 
       <RepoShowcase />

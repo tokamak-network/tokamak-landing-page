@@ -187,13 +187,6 @@ export default function SimulatorHero() {
                 </div>
               </div>
 
-              {/* Checkmarks */}
-              <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-[#434347] pt-3">
-                <span className="text-[11px] text-[#22c55e]">✓ Keys auto-generated</span>
-                <span className="text-[11px] text-[#22c55e]">✓ Modules auto-configured</span>
-                <span className="text-[11px] text-[#22c55e]">✓ 0 extra inputs needed</span>
-              </div>
-
               {/* Deploy button */}
               <button
                 type="button"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Globe, Coins, Gamepad2, LayoutGrid, Settings, ChevronDown } from "lucide-react";
+import { Globe, Coins, Gamepad2, LayoutGrid, Settings } from "lucide-react";
 import { LINKS } from "@/app/constants/links";
 import DeployAnimation from "./DeployAnimation";
 import NetworkVisualization from "./NetworkVisualization";
@@ -108,9 +108,6 @@ export default function SimulatorHero() {
                   </h3>
                   <Settings size={13} className="text-[#929298]" />
                 </div>
-                <button type="button" className="flex items-center gap-1 text-[12px] text-[#929298] hover:text-white transition-colors cursor-pointer">
-                  Details <ChevronDown size={12} />
-                </button>
               </div>
 
               {/* Preset selector */}

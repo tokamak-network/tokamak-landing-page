@@ -151,6 +151,14 @@ export default function Footer() {
                     Insight
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    href="/about/reports"
+                    className="hover:text-tokamak-blue hover:opacity-100 opacity-[0.6] transition-colors text-[#252525]"
+                  >
+                    Reports
+                  </Link>
+                </li>
                 {/* <li>
                   <a
                     href={LINKS.ONBOARDING}

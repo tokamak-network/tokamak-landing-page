@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { ArrowLeft } from "lucide-react";
 import type { ReportDetail as ReportDetailType, RepoCategoryInfo } from "./types";
 import StatsBar from "./StatsBar";
 import ExecutiveSummary from "./ExecutiveSummary";
@@ -12,7 +13,7 @@ import Link from "next/link";
 
 function GradientDivider() {
   return (
-    <div className="h-[1px] bg-gradient-to-r from-transparent via-[#e0e0e0] to-transparent my-[8px]" />
+    <div className="h-[1px] bg-gradient-to-r from-transparent via-[#434347] to-transparent my-[8px]" />
   );
 }
 
@@ -52,25 +53,11 @@ export default function ReportDetail({
         {/* BACK LINK */}
         <Link
           href="/about/reports"
-          className="inline-flex items-center gap-[6px] text-[14px] text-[#808992] hover:text-[#0078FF]
-            bg-[#f5f5f5] hover:bg-[#e8e8e8] rounded-full px-[14px] py-[6px]
+          className="inline-flex items-center gap-[6px] text-[14px] text-[#929298] hover:text-[#0078FF]
+            bg-[#2a2a2e] hover:bg-surface-light px-[14px] py-[6px]
             transition-colors duration-200 self-start"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 20 20"
-            fill="none"
-          >
-            <path
-              d="M12.5 15L7.5 10L12.5 5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <ArrowLeft className="w-4 h-4" />
           All Reports
         </Link>
 
@@ -106,10 +93,10 @@ export default function ReportDetail({
         {/* REPO CARDS */}
         <div className="flex flex-col gap-[16px]">
           <div className="flex flex-col gap-[4px]">
-            <h2 className="text-[20px] font-[600] text-[#1C1C1C]">
+            <h2 className="text-[20px] font-[600] text-white">
               Repository Details
             </h2>
-            <span className="text-[13px] text-[#808992]">
+            <span className="text-[13px] text-[#929298]">
               {report.repos.length} repositories
             </span>
           </div>

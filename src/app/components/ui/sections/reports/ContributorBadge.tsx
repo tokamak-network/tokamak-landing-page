@@ -32,16 +32,16 @@ export default function ContributorBadge({
       onError={() => setAvatarError(true)}
     />
   ) : (
-    <span className="w-[20px] h-[20px] rounded-full bg-[#e8e8e8] text-[#666] text-[10px] font-[600] inline-flex items-center justify-center flex-shrink-0">
+    <span className="w-[20px] h-[20px] rounded-full bg-[#2a2a2e] text-[#929298] text-[10px] font-[600] inline-flex items-center justify-center flex-shrink-0">
       {initial}
     </span>
   );
 
   const badge = (
     <span
-      className={`inline-flex items-center gap-[6px] px-[10px] py-[4px] rounded-full
-        bg-[#f5f5f5] text-[12px] text-[#333] transition-colors duration-200 ${
-          hasValidUrl ? "hover:bg-[#e8e8e8] hover:text-[#0078FF]" : ""
+      className={`inline-flex items-center gap-[6px] px-[10px] py-[4px]
+        bg-[#2a2a2e] text-[12px] text-[#c5c5ca] transition-colors duration-200 ${
+          hasValidUrl ? "hover:bg-surface-light hover:text-[#0078FF]" : ""
         }`}
     >
       {avatar}

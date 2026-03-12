@@ -27,9 +27,9 @@ export default function StatsBar({
     return (
       <div className="flex flex-col gap-[12px]">
         {/* Hero: Total Lines Changed */}
-        <div className="bg-[#f8f9fa] rounded-[12px] p-[20px] [@media(max-width:640px)]:p-[16px] border border-[#EDEDF0]">
+        <div className="bg-surface p-[20px] [@media(max-width:640px)]:p-[16px] border border-[#434347]">
           <div className="flex flex-col gap-[4px] mb-[12px]">
-            <span className="text-[28px] [@media(max-width:640px)]:text-[22px] text-[#1C1C1C] font-[600]">
+            <span className="text-[28px] [@media(max-width:640px)]:text-[22px] text-white font-[600]">
               Total Code Changes
             </span>
             <span className="text-[48px] [@media(max-width:640px)]:text-[36px] font-[700] text-[#0078FF]">
@@ -45,10 +45,10 @@ export default function StatsBar({
                 height={6}
               />
               <div className="flex items-center justify-between mt-[8px]">
-                <span className="text-[13px] [@media(max-width:640px)]:text-[12px] text-[#28a745] font-[500]">
+                <span className="text-[13px] [@media(max-width:640px)]:text-[12px] text-[#00C853] font-[500]">
                   {stats.linesAdded} added
                 </span>
-                <span className="text-[13px] [@media(max-width:640px)]:text-[12px] text-[#cb2431] font-[500]">
+                <span className="text-[13px] [@media(max-width:640px)]:text-[12px] text-[#FF4444] font-[500]">
                   {stats.linesDeleted} deleted
                 </span>
               </div>
@@ -61,12 +61,12 @@ export default function StatsBar({
           {SECONDARY_STATS.map(({ key, label }) => (
             <div
               key={key}
-              className="flex flex-col items-center text-center bg-[#f8f9fa] rounded-[8px] py-[14px] px-[12px]"
+              className="flex flex-col items-center text-center bg-surface py-[14px] px-[12px]"
             >
-              <span className="text-[20px] [@media(max-width:640px)]:text-[16px] font-[700] text-[#1C1C1C]">
+              <span className="text-[20px] [@media(max-width:640px)]:text-[16px] font-[700] text-white">
                 {stats[key]}
               </span>
-              <span className="text-[11px] text-[#808992] uppercase tracking-[0.02em]">
+              <span className="text-[11px] text-[#929298] uppercase tracking-[0.02em]">
                 {label}
               </span>
             </div>
@@ -81,10 +81,10 @@ export default function StatsBar({
       <div className="grid grid-cols-3 gap-2 [@media(max-width:640px)]:grid-cols-2 [@media(max-width:400px)]:grid-cols-2">
         {LISTING_STAT_COLUMNS.map(({ key, label }, i) => (
           <div key={key} className="flex flex-col items-center text-center gap-[2px]">
-            <span className={`font-[600] ${i === 0 ? "text-[#0078FF] text-[16px]" : "text-[#1C1C1C] text-[14px]"}`}>
+            <span className={`font-[600] ${i === 0 ? "text-[#0078FF] text-[16px]" : "text-white text-[14px]"}`}>
               {stats[key]}
             </span>
-            <span className="text-[#808992] text-[10px]">{label}</span>
+            <span className="text-[#929298] text-[10px]">{label}</span>
           </div>
         ))}
       </div>
@@ -104,12 +104,12 @@ export default function StatsBar({
             className={`font-[600] ${
               i === 0
                 ? "text-[28px] [@media(max-width:640px)]:text-[22px] font-[700] text-[#0078FF]"
-                : "text-[20px] [@media(max-width:640px)]:text-[16px] text-[#1C1C1C]"
+                : "text-[20px] [@media(max-width:640px)]:text-[16px] text-white"
             }`}
           >
             {stats[key]}
           </span>
-          <span className="text-[#808992] text-[12px]">{label}</span>
+          <span className="text-[#929298] text-[12px]">{label}</span>
         </div>
       ))}
     </div>

@@ -32,7 +32,7 @@ export default function ReportsListing({
         subtitle={SUBTITLE}
         contentClassName="max-w-[800px]"
       >
-        <div className="text-center py-[60px] text-[#808992] text-[16px]">
+        <div className="text-center py-[60px] text-[#929298] text-[16px]">
           No reports available yet.
         </div>
       </ReportsPageLayout>
@@ -53,7 +53,7 @@ export default function ReportsListing({
       {archiveGroups.map((group) => (
         <div key={group.year}>
           <YearDivider year={group.year} />
-          <div className="rounded-[12px] border border-[#EDEDF0] overflow-hidden">
+          <div className="border border-[#434347] overflow-hidden">
             {group.reports.map((report) => (
               <ArchiveReportRow key={report.slug} report={report} />
             ))}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { Search } from "lucide-react";
 import type { RepoCardData, RepoCategoryInfo } from "./types";
 import RepoCard from "./RepoCard";
 import CompactRepoRow from "./CompactRepoRow";
@@ -19,10 +20,10 @@ function CategoryGroupSection({ group }: { group: CategoryGroup }) {
     >
       <div className="flex items-center gap-[8px]">
         {group.icon && <span className="text-[16px]">{group.icon}</span>}
-        <h3 className="text-[14px] font-[600] text-[#1C1C1C]">
+        <h3 className="text-[14px] font-[600] text-white">
           {group.label}
         </h3>
-        <span className="text-[12px] text-[#808992]">
+        <span className="text-[12px] text-[#929298]">
           {group.repos.length}
         </span>
       </div>
@@ -64,30 +65,16 @@ export default function RepoCardGrid({
       {/* TOOLBAR */}
       <div className="flex items-center gap-[12px] [@media(max-width:640px)]:flex-col [@media(max-width:640px)]:items-stretch">
         <div className="relative flex-1">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#808992"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="absolute left-[12px] top-1/2 -translate-y-1/2"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
+          <Search className="absolute left-[12px] top-1/2 -translate-y-1/2 w-4 h-4 text-[#929298]" />
           <input
             type="text"
             aria-label="Search repositories"
             placeholder="Search repositories..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-[36px] pr-[12px] py-[10px] text-[14px] rounded-[8px]
-              border border-[#DEDEDE] bg-white text-[#1C1C1C]
-              placeholder:text-[#808992]
+            className="w-full pl-[36px] pr-[12px] py-[10px] text-[14px]
+              border border-[#434347] bg-surface text-white
+              placeholder:text-[#929298]
               focus:outline-none focus:border-[#0078FF]
               transition-colors duration-200"
           />
@@ -98,8 +85,8 @@ export default function RepoCardGrid({
             aria-label="Sort repositories"
             value={sortKey}
             onChange={(e) => setSortKey(e.target.value as SortKey)}
-            className="px-[12px] py-[10px] text-[14px] rounded-[8px]
-              border border-[#DEDEDE] bg-white text-[#1C1C1C]
+            className="px-[12px] py-[10px] text-[14px]
+              border border-[#434347] bg-surface text-white
               focus:outline-none focus:border-[#0078FF]
               transition-colors duration-200 cursor-pointer"
           >
@@ -116,12 +103,12 @@ export default function RepoCardGrid({
       {isSearching && (
         <div className="flex flex-col gap-[12px]">
           {filtered.length === 0 ? (
-            <div className="text-center py-[40px] text-[#808992] text-[14px]">
+            <div className="text-center py-[40px] text-[#929298] text-[14px]">
               No repositories match your search.
             </div>
           ) : (
             <>
-              <span className="text-[13px] text-[#808992]">
+              <span className="text-[13px] text-[#929298]">
                 {filtered.length} result{filtered.length !== 1 ? "s" : ""}
               </span>
               {filtered.map((repo) => (
@@ -142,7 +129,7 @@ export default function RepoCardGrid({
                 <span className="text-[11px] font-[700] text-[#0078FF] uppercase tracking-[0.05em]">
                   Highlights
                 </span>
-                <span className="text-[12px] text-[#808992]">
+                <span className="text-[12px] text-[#929298]">
                   Top {tiered.highlights.length} by activity
                 </span>
               </div>

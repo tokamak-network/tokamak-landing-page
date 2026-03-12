@@ -13,13 +13,13 @@ function RepoChip({
   lines: RepoLines | undefined;
 }) {
   return (
-    <span className="inline-flex items-center gap-[4px] bg-[#f5f7fa] text-[12px] text-[#444] px-[10px] py-[4px] rounded-full">
+    <span className="inline-flex items-center gap-[4px] bg-[#2a2a2e] text-[12px] text-[#c5c5ca] px-[10px] py-[4px]">
       <span className="font-[600]">{name}</span>
       {lines && (
-        <span className="text-[#888]">
-          <span className="text-[#28a745]">+{formatNum(lines.added)}</span>
+        <span className="text-[#929298]">
+          <span className="text-[#00C853]">+{formatNum(lines.added)}</span>
           {" / "}
-          <span className="text-[#cb2431]">-{formatNum(lines.deleted)}</span>
+          <span className="text-[#FF4444]">-{formatNum(lines.deleted)}</span>
         </span>
       )}
     </span>
@@ -50,30 +50,30 @@ function FocusCard({
 
   return (
     <div
-      className="bg-white border border-[#e8e8e8] rounded-[10px] p-[20px_24px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+      className="bg-surface border border-[#434347] p-[20px_24px] shadow-[0_1px_3px_rgba(0,0,0,0.2)]"
       style={{ borderLeft: `4px solid ${sanitizeColor(item.color)}` }}
     >
       {/* Header */}
       <div className="flex items-center gap-[8px] mb-[10px] flex-wrap">
         <span className="text-[18px]">{item.icon}</span>
-        <span className="text-[16px] font-[700] text-[#1a1a1a]">
+        <span className="text-[16px] font-[700] text-white">
           {item.name}
         </span>
         <div className="ml-auto flex items-center gap-[6px]">
           <span
-            className="bg-[#f0f0f0] text-[#555] px-[10px] py-[2px] rounded-[10px]
+            className="bg-[#2a2a2e] text-[#c5c5ca] px-[10px] py-[2px]
               text-[11px] font-[700] whitespace-nowrap"
           >
             {item.repoCount} repos
           </span>
           {hasLines && (
             <span
-              className="bg-[#f0f0f0] px-[10px] py-[2px] rounded-[10px]
+              className="bg-[#2a2a2e] px-[10px] py-[2px]
                 text-[11px] font-[700] whitespace-nowrap"
             >
-              <span className="text-[#28a745]">+{formatNum(categoryLines.added)}</span>
+              <span className="text-[#00C853]">+{formatNum(categoryLines.added)}</span>
               {" / "}
-              <span className="text-[#cb2431]">-{formatNum(categoryLines.deleted)}</span>
+              <span className="text-[#FF4444]">-{formatNum(categoryLines.deleted)}</span>
             </span>
           )}
         </div>
@@ -98,7 +98,7 @@ function FocusCard({
           <div className="text-[11px] font-[600] text-[#0078FF] uppercase tracking-[0.03em] mb-[4px]">
             Current Focus
           </div>
-          <div className="text-[13px] text-[#444] leading-[1.5]">
+          <div className="text-[13px] text-[#c5c5ca] leading-[1.5]">
             {item.focusNarrative}
           </div>
         </div>
@@ -110,7 +110,7 @@ function FocusCard({
           Potential Synergies
         </div>
         {item.synergies.length > 0 ? (
-          <ul className="pl-[18px] text-[12px] text-[#555] leading-[1.5] list-disc">
+          <ul className="pl-[18px] text-[12px] text-[#c5c5ca] leading-[1.5] list-disc">
             {item.synergies.map((s, i) => (
               <li key={i} className="mb-[6px]">
                 {s}
@@ -118,7 +118,7 @@ function FocusCard({
             ))}
           </ul>
         ) : (
-          <span className="text-[12px] text-[#999] italic">
+          <span className="text-[12px] text-[#929298] italic">
             No cross-category synergies identified
           </span>
         )}

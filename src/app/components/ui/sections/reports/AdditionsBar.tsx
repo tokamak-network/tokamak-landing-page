@@ -23,20 +23,20 @@ export default function AdditionsBar({
   return (
     <div className={`flex items-center gap-[8px] ${className}`}>
       <div
-        className={`flex-1 rounded-full overflow-hidden flex bg-[#e8e8e8]`}
+        className="flex-1 overflow-hidden flex bg-[#2a2a2e]"
         style={{ height: `${height}px` }}
       >
         <div
-          className="h-full bg-[#28a745] rounded-l-full"
+          className="h-full bg-[#00C853]"
           style={{ width: `${addedPct}%` }}
         />
         <div
-          className="h-full bg-[#cb2431] rounded-r-full"
+          className="h-full bg-[#FF4444]"
           style={{ width: `${100 - addedPct}%` }}
         />
       </div>
       {showLabel && (
-        <span className="text-[11px] text-[#808992] flex-shrink-0">
+        <span className="text-[11px] text-[#929298] flex-shrink-0">
           {Math.round(addedPct)}% additions
         </span>
       )}

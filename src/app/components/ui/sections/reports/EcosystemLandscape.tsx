@@ -100,10 +100,10 @@ function SummaryPills({
       {pills.map((p) => (
         <span
           key={p.label}
-          className="inline-flex items-center gap-[6px] bg-[#f5f7fa] text-[13px] text-[#555]
-            px-[12px] py-[5px] rounded-full font-[600]"
+          className="inline-flex items-center gap-[6px] bg-[#2a2a2e] text-[13px] text-[#c5c5ca]
+            px-[12px] py-[5px] font-[600]"
         >
-          <span className="text-[#1C1C1C]">{p.value}</span>
+          <span className="text-white">{p.value}</span>
           {p.label}
         </span>
       ))}
@@ -117,7 +117,7 @@ function CategoryLegend({ categories }: { categories: LandscapeCategory[] }) {
       {categories.map((cat) => (
         <span
           key={cat.name}
-          className="inline-flex items-center gap-[5px] text-[12px] text-[#666]"
+          className="inline-flex items-center gap-[5px] text-[12px] text-[#929298]"
         >
           <span
             className="w-[8px] h-[8px] rounded-full inline-block shrink-0"
@@ -138,8 +138,8 @@ function ActivityLegend() {
   ];
 
   return (
-    <div className="flex items-center gap-[12px] text-[12px] text-[#888]">
-      <span className="font-[600] text-[#666]">Activity:</span>
+    <div className="flex items-center gap-[12px] text-[12px] text-[#929298]">
+      <span className="font-[600] text-[#929298]">Activity:</span>
       {levels.map((l) => (
         <span key={l.label} className="inline-flex items-center gap-[4px]">
           <span
@@ -169,8 +169,8 @@ function RepoMiniCard({
       href={repo.githubUrl || undefined}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-start gap-[8px] px-[10px] py-[10px] rounded-[6px]
-        hover:bg-[#f5f7fa] transition-colors duration-150 group"
+      className="flex items-start gap-[8px] px-[10px] py-[10px]
+        hover:bg-surface-light transition-colors duration-150 group"
       style={{ borderLeft: `3px solid ${sanitizeColor(repo.categoryColor)}` }}
     >
       <span
@@ -179,25 +179,25 @@ function RepoMiniCard({
         title={`${repo.activity} activity`}
       />
       <div className="min-w-0 flex-1">
-        <span className="text-[13px] font-[600] text-[#1C1C1C] group-hover:text-[#0078FF] transition-colors truncate block">
+        <span className="text-[13px] font-[600] text-white group-hover:text-[#0078FF] transition-colors truncate block">
           {repo.name}
         </span>
         {repo.description && (
-          <span className="text-[11px] text-[#888] leading-[1.4] line-clamp-1 block">
+          <span className="text-[11px] text-[#929298] leading-[1.4] line-clamp-1 block">
             {repo.description}
           </span>
         )}
         {(added > 0 || deleted > 0) && (
           <div className="flex items-center gap-[4px] mt-[2px]">
-            <span className="text-[11px] text-[#28a745] font-[500]">+{formatNum(added)}</span>
-            <span className="text-[11px] text-[#888]">/</span>
-            <span className="text-[11px] text-[#cb2431] font-[500]">-{formatNum(deleted)}</span>
+            <span className="text-[11px] text-[#00C853] font-[500]">+{formatNum(added)}</span>
+            <span className="text-[11px] text-[#929298]">/</span>
+            <span className="text-[11px] text-[#FF4444] font-[500]">-{formatNum(deleted)}</span>
           </div>
         )}
       </div>
       {total > 0 && (
         <div className="shrink-0 text-right ml-[4px]">
-          <span className="text-[9px] font-[600] text-[#888] uppercase tracking-[0.5px]">
+          <span className="text-[9px] font-[600] text-[#929298] uppercase tracking-[0.5px]">
             Code Changes
           </span>
           <span
@@ -233,28 +233,28 @@ function CategoryCard({
   const hasLines = catLines.added > 0 || catLines.deleted > 0;
 
   return (
-    <div className="bg-white border border-[#e8e8e8] rounded-[10px] overflow-hidden">
+    <div className="bg-surface border border-[#434347] overflow-hidden">
       {/* Header */}
       <div
-        className="flex items-center gap-[8px] px-[16px] py-[12px] border-b border-[#f0f0f0]"
+        className="flex items-center gap-[8px] px-[16px] py-[12px] border-b border-[#2a2a2e]"
         style={{ borderLeft: `4px solid ${sanitizeColor(category.color)}` }}
       >
         <span className="text-[16px]">{category.icon}</span>
-        <span className="text-[14px] font-[700] text-[#1C1C1C]">
+        <span className="text-[14px] font-[700] text-white">
           {category.name}
         </span>
         <div className="ml-auto flex items-center gap-[6px]">
-          <span className="text-[11px] text-[#888] font-[600] whitespace-nowrap">
+          <span className="text-[11px] text-[#929298] font-[600] whitespace-nowrap">
             {category.repoCount} repos
           </span>
           {hasLines && (
             <span
-              className="bg-[#f0f0f0] px-[8px] py-[1px] rounded-[10px]
+              className="bg-[#2a2a2e] px-[8px] py-[1px]
                 text-[11px] font-[700] whitespace-nowrap"
             >
-              <span className="text-[#28a745]">+{formatNum(catLines.added)}</span>
+              <span className="text-[#00C853]">+{formatNum(catLines.added)}</span>
               {" / "}
-              <span className="text-[#cb2431]">-{formatNum(catLines.deleted)}</span>
+              <span className="text-[#FF4444]">-{formatNum(catLines.deleted)}</span>
             </span>
           )}
         </div>

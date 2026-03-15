@@ -1,23 +1,64 @@
 import Header from "./components/ui/header";
-import SimulatorHero from "./components/ui/sections/simulator";
-import HowItWorks from "./components/ui/sections/how-it-works";
-import EcosystemDashboard from "./components/ui/sections/dashboard";
-
-import RepoShowcase from "./components/ui/sections/repo-showcase";
+import DataTicker from "./components/ui/sections/data-ticker";
+import HeroVisual from "./components/ui/sections/hero-visual";
+import EcosystemFlow from "./components/ui/sections/ecosystem-flow";
+import EcosystemMetrics from "./components/ui/sections/ecosystem-metrics";
+import RepoLeaderboard from "./components/ui/sections/repo-leaderboard";
 import DeveloperCta from "./components/ui/sections/developer-cta";
+import ActivityStream from "./components/ui/sections/activity-stream";
 import LatestFeed from "./components/ui/sections/latest-feed";
 import Footer from "./components/ui/footer";
+import PulseSpine from "./components/ui/pulse-spine/PulseSpine";
+import { listReports, getReportPath } from "./lib/reports/listReports";
+import { parseReportSummary } from "./lib/reports/parseReport";
+import { fetchPriceDatas } from "./api/price";
 
-export default function Home() {
+export default async function Home() {
+  // Fetch data for hero
+  let codeChanges = 4898658;
+  let netGrowth = 2979570;
+  let activeProjects = 67;
+  let totalStaked = 28500000;
+
+  try {
+    const metas = listReports();
+    if (metas.length > 0) {
+      const latest = metas[0];
+      const filePath = getReportPath(latest.slug);
+      if (filePath) {
+        const summary = parseReportSummary(filePath, latest);
+        if (summary) {
+          const lc = parseInt(summary.stats.linesChanged.replace(/,/g, ""));
+          if (!isNaN(lc) && lc > 0) codeChanges = lc;
+          const ng = parseInt(summary.stats.netGrowth.replace(/,/g, ""));
+          if (!isNaN(ng) && ng > 0) netGrowth = ng;
+          const ar = parseInt(summary.stats.activeRepos.replace(/,/g, ""));
+          if (!isNaN(ar) && ar > 0) activeProjects = ar;
+        }
+      }
+    }
+    const priceData = await fetchPriceDatas();
+    if (priceData?.stakedVolume) {
+      totalStaked = Math.floor(priceData.stakedVolume);
+    }
+  } catch {}
+
   return (
     <div className="flex flex-col items-center w-full font-display bg-black relative grain-overlay">
       <Header />
-      <SimulatorHero />
-      <HowItWorks />
-      <EcosystemDashboard />
-
-      <RepoShowcase />
+      <PulseSpine />
+      <HeroVisual
+        codeChanges={codeChanges}
+        netGrowth={netGrowth}
+        activeProjects={activeProjects}
+        totalStaked={totalStaked}
+      />
+      <DataTicker />
+      <EcosystemFlow />
+      <EcosystemMetrics />
+      <RepoLeaderboard />
       <DeveloperCta />
+      <ActivityStream />
       <LatestFeed />
       <Footer />
     </div>

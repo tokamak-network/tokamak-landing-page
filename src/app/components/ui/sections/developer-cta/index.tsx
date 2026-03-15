@@ -60,7 +60,7 @@ function CtaCardItem({ card }: { readonly card: CtaCard }) {
 
 export default function DeveloperCta() {
   return (
-    <section className="relative z-10 w-full flex justify-center px-6 py-[160px] [@media(max-width:640px)]:py-[80px]">
+    <section id="developer-cta" className="relative z-10 w-full flex justify-center px-6 py-[160px] [@media(max-width:640px)]:py-[80px]">
       <div className="w-full max-w-[1280px] flex flex-col items-center">
         <h2 className="text-[38px] md:text-[48px] font-[900] text-white tracking-[0.06em] uppercase mb-3 text-center">
           Start Building

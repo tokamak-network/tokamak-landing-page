@@ -2,14 +2,29 @@ import { listReports, getReportPath } from "@/app/lib/reports/listReports";
 import { parseReportDetail } from "@/app/lib/reports/parseReport";
 import StreamClient from "./StreamClient";
 
-interface StreamItem {
+export interface StreamItem {
   time: string;
   repoName: string;
   text: string;
+  type: "feat" | "fix" | "refactor" | "test" | "docs" | "infra";
+}
+
+const TYPE_PATTERNS: [RegExp, StreamItem["type"]][] = [
+  [/\bfix(ed|es|ing)?\b|\bbug\b|\bresolv/i, "fix"],
+  [/\btest(s|ing|ed)?\b|\bcoverage\b|\bspec\b/i, "test"],
+  [/\bdoc(s|umentation)?\b|\breadme\b|\bguide/i, "docs"],
+  [/\brefactor(ed|ing)?\b|\bcleanup\b|\brestructur/i, "refactor"],
+  [/\bdeploy\b|\binfra\b|\bci\b|\bpipeline\b|\bdocker\b|\bconfig/i, "infra"],
+];
+
+function inferType(text: string): StreamItem["type"] {
+  for (const [pattern, type] of TYPE_PATTERNS) {
+    if (pattern.test(text)) return type;
+  }
+  return "feat";
 }
 
 function generateTimeLabel(index: number): string {
-  // Generate realistic-looking timestamps going back from "now"
   const minutes = index * 12 + Math.floor(Math.random() * 10);
   if (minutes < 60) return `${minutes}m ago`;
   const hours = Math.floor(minutes / 60);
@@ -21,9 +36,8 @@ function getStreamData(): StreamItem[] {
   const metas = listReports();
   if (metas.length === 0) return [];
 
-  const items: StreamItem[] = [];
+  const items: Omit<StreamItem, "time">[] = [];
 
-  // Get data from the latest 2 reports for more items
   for (const meta of metas.slice(0, 2)) {
     const filePath = getReportPath(meta.slug);
     if (!filePath) continue;
@@ -32,15 +46,14 @@ function getStreamData(): StreamItem[] {
     for (const repo of detail.repos) {
       for (const accomplishment of repo.accomplishments) {
         items.push({
-          time: "", // Will be filled below
           repoName: repo.repoName,
           text: accomplishment,
+          type: inferType(accomplishment),
         });
       }
     }
   }
 
-  // Limit to 30 items and assign time labels
   return items.slice(0, 30).map((item, i) => ({
     ...item,
     time: generateTimeLabel(i),

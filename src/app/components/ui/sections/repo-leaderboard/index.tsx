@@ -1,89 +1,83 @@
 import { listReports, getReportPath } from "@/app/lib/reports/listReports";
 import { parseReportDetail } from "@/app/lib/reports/parseReport";
 import { parseNum } from "@/app/lib/utils/format";
-import type { RepoCardData, ReportDetail } from "@/app/components/ui/sections/reports/types";
 import LeaderboardClient from "./LeaderboardClient";
-import type { LeaderboardRepo } from "./LeaderboardClient";
-
-const TOP_N = 10;
-
-function totalCodeChanges(repo: RepoCardData): number {
-  return (
-    Math.abs(parseNum(repo.stats.linesAdded)) +
-    Math.abs(parseNum(repo.stats.linesDeleted))
-  );
-}
-
-function buildCategoryMap(
-  detail: ReportDetail
-): Map<string, { label: string; color: string }> {
-  const map = new Map<string, { label: string; color: string }>();
-  if (!detail.ecosystemLandscape) return map;
-
-  for (const cat of detail.ecosystemLandscape.categories) {
-    for (const repo of cat.repos) {
-      map.set(repo.name, { label: cat.name, color: cat.color });
-    }
-  }
-  return map;
-}
+import type { TreemapCategory, TreemapRepo } from "./treemapLayout";
 
 function getLeaderboardData(): {
-  repos: LeaderboardRepo[];
+  categories: TreemapCategory[];
   reportLabel: string;
   reportHref: string;
 } {
   const metas = listReports();
   if (metas.length === 0) {
-    return { repos: [], reportLabel: "", reportHref: "/about/reports" };
+    return { categories: [], reportLabel: "", reportHref: "/about/reports" };
   }
 
   const latest = metas[0];
   const filePath = getReportPath(latest.slug);
   if (!filePath) {
-    return { repos: [], reportLabel: "", reportHref: "/about/reports" };
+    return { categories: [], reportLabel: "", reportHref: "/about/reports" };
   }
 
   const detail = parseReportDetail(filePath, latest);
-  const categoryMap = buildCategoryMap(detail);
+  if (!detail.ecosystemLandscape) {
+    return { categories: [], reportLabel: "", reportHref: "/about/reports" };
+  }
 
-  const topRepos = [...detail.repos]
-    .sort((a, b) => totalCodeChanges(b) - totalCodeChanges(a))
-    .slice(0, TOP_N);
+  const landscape = detail.ecosystemLandscape;
 
-  const repos: LeaderboardRepo[] = topRepos.map((repo, i) => {
-    const cat = categoryMap.get(repo.repoName);
-    const added = Math.abs(parseNum(repo.stats.linesAdded));
-    const deleted = Math.abs(parseNum(repo.stats.linesDeleted));
-    return {
-      rank: i + 1,
-      repoName: repo.repoName,
-      githubUrl: repo.githubUrl,
-      category: cat?.label,
-      categoryColor: cat?.color,
-      linesChanged: added + deleted,
-      netGrowth: parseNum(repo.stats.netLines),
-      isActive: added + deleted > 0,
-    };
-  });
+  const categories: TreemapCategory[] = landscape.categories
+    .map((cat) => {
+      const repos: TreemapRepo[] = cat.repos
+        .map((repo) => {
+          const repoCard = detail.repos.find((r) => r.repoName === repo.name);
+          const added = repoCard
+            ? Math.abs(parseNum(repoCard.stats.linesAdded))
+            : 0;
+          const deleted = repoCard
+            ? Math.abs(parseNum(repoCard.stats.linesDeleted))
+            : 0;
+          const linesChanged = added + deleted;
+
+          return {
+            repoName: repo.name,
+            githubUrl: repo.githubUrl,
+            linesChanged,
+            linesAdded: added,
+            linesDeleted: deleted,
+            netGrowth: repoCard ? parseNum(repoCard.stats.netLines) : 0,
+            commits: repoCard?.stats.commits ?? "0",
+            isActive: linesChanged > 0,
+          };
+        })
+        .filter((r) => r.linesChanged > 0);
+
+      return {
+        name: cat.name,
+        color: cat.color || "#0077ff",
+        repos,
+      };
+    })
+    .filter((cat) => cat.repos.length > 0);
 
   const reportLabel = latest.reportNumber
     ? `Biweekly #${latest.reportNumber}`
     : latest.dateLabel;
 
   return {
-    repos,
+    categories,
     reportLabel,
     reportHref: `/about/reports/${latest.slug}`,
   };
 }
 
 export default function RepoLeaderboard() {
-  const { repos, reportLabel, reportHref } = getLeaderboardData();
+  const { categories, reportLabel, reportHref } = getLeaderboardData();
 
   return (
     <LeaderboardClient
-      repos={repos}
+      categories={categories}
       reportLabel={reportLabel}
       reportHref={reportHref}
     />

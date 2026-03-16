@@ -5,109 +5,55 @@ import type { FlowCategory } from "./index";
 
 /* ── Types ─────────────────────────────────────────── */
 
-interface Pt {
-  x: number;
-  y: number;
-}
+interface Pt { x: number; y: number; }
 
-interface FlowStrand {
+interface StreamParticle {
   catIdx: number;
-  repoIdx: number;
-  color: string;
-  secondaryColor: string;
-  catName: string;
-  repoName: string;
-  linesChanged: number;
-  isActive: boolean;
-  // Bezier control points
-  p0: Pt;
-  cp1: Pt;
-  cp2: Pt;
-  p3: Pt;
-  width: number;
-  // Endpoint scatter dots
-  endDots: { x: number; y: number; r: number; alpha: number }[];
-}
-
-interface DustParticle {
-  strandIdx: number;
-  t: number;
-  offset: number; // perpendicular offset from curve
+  x: number; y: number;
+  t: number;        // bezier progress 0→1
   speed: number;
   size: number;
   alpha: number;
+  offset: number;   // perpendicular offset
 }
 
-interface TextParticle {
-  // Target position (text shape)
-  tx: number;
-  ty: number;
-  // Current position
-  x: number;
-  y: number;
-  // Velocity
-  vx: number;
-  vy: number;
-  // Visual
+/** Background curtain particle — white/gray, falls straight down */
+interface RainParticle {
+  x: number; y: number;
+  speed: number;
   size: number;
   alpha: number;
-  // Drip: some particles fall into strands
-  dripping: boolean;
-  dripT: number;
-  dripStrandIdx: number;
+  startX: number;   // original x (reset target)
+}
+
+interface OrbData {
+  x: number; y: number;
+  radius: number;
+  color: string;
+  name: string;
+  totalLines: number;
+  repoCount: number;
 }
 
 /* ── Helpers ───────────────────────────────────────── */
 
-function bezier(p0: Pt, p1: Pt, p2: Pt, p3: Pt, t: number): Pt {
-  const m = 1 - t;
-  return {
-    x:
-      m * m * m * p0.x +
-      3 * m * m * t * p1.x +
-      3 * m * t * t * p2.x +
-      t * t * t * p3.x,
-    y:
-      m * m * m * p0.y +
-      3 * m * m * t * p1.y +
-      3 * m * t * t * p2.y +
-      t * t * t * p3.y,
-  };
-}
-
-function bezierTangent(p0: Pt, p1: Pt, p2: Pt, p3: Pt, t: number): Pt {
-  const m = 1 - t;
-  return {
-    x:
-      3 * m * m * (p1.x - p0.x) +
-      6 * m * t * (p2.x - p1.x) +
-      3 * t * t * (p3.x - p2.x),
-    y:
-      3 * m * m * (p1.y - p0.y) +
-      6 * m * t * (p2.y - p1.y) +
-      3 * t * t * (p3.y - p2.y),
-  };
-}
+function rand(a: number, b: number) { return a + Math.random() * (b - a); }
 
 function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
-  return [
-    parseInt(h.substring(0, 2), 16),
-    parseInt(h.substring(2, 4), 16),
-    parseInt(h.substring(4, 6), 16),
-  ];
+  return [parseInt(h.substring(0, 2), 16), parseInt(h.substring(2, 4), 16), parseInt(h.substring(4, 6), 16)];
 }
 
-function lerpColor(
-  c1: [number, number, number],
-  c2: [number, number, number],
-  t: number
-): [number, number, number] {
-  return [
-    Math.round(c1[0] + (c2[0] - c1[0]) * t),
-    Math.round(c1[1] + (c2[1] - c1[1]) * t),
-    Math.round(c1[2] + (c2[2] - c1[2]) * t),
-  ];
+function lerpColor(c1: [number, number, number], c2: [number, number, number], t: number): [number, number, number] {
+  return [Math.round(c1[0] + (c2[0] - c1[0]) * t), Math.round(c1[1] + (c2[1] - c1[1]) * t), Math.round(c1[2] + (c2[2] - c1[2]) * t)];
+}
+
+function bezier(p0: Pt, p1: Pt, p2: Pt, p3: Pt, t: number): Pt {
+  const m = 1 - t;
+  return {
+    x: m * m * m * p0.x + 3 * m * m * t * p1.x + 3 * m * t * t * p2.x + t * t * t * p3.x,
+    y: m * m * m * p0.y + 3 * m * m * t * p1.y + 3 * m * t * t * p2.y + t * t * t * p3.y,
+  };
 }
 
 function formatNum(n: number): string {
@@ -116,246 +62,158 @@ function formatNum(n: number): string {
   return n.toLocaleString("en-US");
 }
 
-function rand(min: number, max: number): number {
-  return min + Math.random() * (max - min);
-}
-
-/* color palette for secondary color mixing */
-const SECONDARY_COLORS: Record<string, string> = {
-  "#0077ff": "#00ddff",
-  "#22c55e": "#7cffb2",
-  "#a855f7": "#e879f9",
-  "#f59e0b": "#fde68a",
-  "#ef4444": "#fb923c",
-  "#06b6d4": "#67e8f9",
-  "#ec4899": "#f9a8d4",
-};
-
-function getSecondary(hex: string): string {
-  return SECONDARY_COLORS[hex] || "#66ccff";
-}
-
 /* ── Constants ─────────────────────────────────────── */
 
-const CANVAS_HEIGHT = 1400;
-const TOP_Y = 0.09;
-const CAT_Y = 0.40;
-const REPO_Y = 0.80;
-const STRANDS_PER_REPO_MIN = 3;
-const STRANDS_PER_REPO_MAX = 8;
-const DUST_COUNT = 300;
-const TEXT_PARTICLE_DENSITY = 3; // pixel sampling interval
-const TEXT_FONT_SIZE = 72;
-const MOUSE_REPEL_RADIUS = 80;
-const MOUSE_REPEL_FORCE = 3;
-const PARTICLE_RETURN_SPEED = 0.06;
-const DRIP_CHANCE = 0.0008; // per-frame chance of a particle dripping
+const CANVAS_HEIGHT = 1000;
+const TEXT_Y = 0.11;
+const ORB_Y = 0.78;
+const STREAM_PARTICLES = 6000;
+const RAIN_PARTICLES = 3000;    // background curtain
 
 /* ── Component ─────────────────────────────────────── */
 
 export default function FlowCanvas({
   categories,
+  totalRepos,
+  totalCommits,
 }: {
   categories: FlowCategory[];
+  totalRepos: number;
+  totalCommits: number;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const strandsRef = useRef<FlowStrand[]>([]);
-  const dustRef = useRef<DustParticle[]>([]);
-  const textParticlesRef = useRef<TextParticle[]>([]);
-  const textBuiltRef = useRef(false);
+  const orbsRef = useRef<OrbData[]>([]);
+  const streamRef = useRef<StreamParticle[]>([]);
+  const rainRef = useRef<RainParticle[]>([]);
+  const pathsRef = useRef<{ p0: Pt; cp1: Pt; cp2: Pt; p3: Pt }[]>([]);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoReadyRef = useRef(false);
+  const offscreenRef = useRef<HTMLCanvasElement | null>(null);
   const progressRef = useRef(0);
   const mouseRef = useRef<Pt>({ x: -9999, y: -9999 });
-  const hoveredCatRef = useRef(-1);
   const rafRef = useRef<number | undefined>(undefined);
   const visibleRef = useRef(false);
-  const [, setCanvasWidth] = useState(1280);
+  const textWidthRef = useRef(0);
+  const [, setTick] = useState(0);
 
-  /* ── Build strands layout ─────────────────────────── */
+  /* ── Build layout ─────────────────────────────────── */
 
-  const buildLayout = useCallback(
-    (w: number, h: number) => {
-      const cx = w / 2;
-      const topY = h * TOP_Y;
-      const strands: FlowStrand[] = [];
+  const buildLayout = useCallback((w: number, h: number) => {
+    const cx = w / 2;
+    const textY = h * TEXT_Y;
+    const orbCY = h * ORB_Y;
 
-      const totalRepos = categories.reduce(
-        (s, c) => s + c.repos.length,
-        0
-      );
-      const maxLC = Math.max(
-        1,
-        ...categories.flatMap((c) => c.repos.map((r) => r.linesChanged))
-      );
+    // Measure text width for rain curtain
+    const tmpCanvas = document.createElement("canvas");
+    const tmpCtx = tmpCanvas.getContext("2d")!;
+    const maxW = w * 0.88;
+    tmpCtx.font = "900 100px 'Orbitron', sans-serif";
+    const measured = tmpCtx.measureText("TOKAMAK NETWORK").width;
+    const fontSize = Math.min(90, Math.floor((maxW / measured) * 100));
+    tmpCtx.font = `900 ${fontSize}px 'Orbitron', sans-serif`;
+    const textW = tmpCtx.measureText("TOKAMAK NETWORK").width;
+    textWidthRef.current = textW;
 
-      let repoCounter = 0;
+    const textLeft = cx - textW / 2;
+    const textRight = cx + textW / 2;
+    const textBottom = textY + fontSize * 0.35;
 
-      categories.forEach((cat, ci) => {
-        const catCount = categories.length;
-        const catSpread = w * 0.6;
-        const catX =
-          catCount === 1
-            ? cx
-            : cx - catSpread / 2 + (ci / (catCount - 1)) * catSpread;
+    // Sort categories by total lines
+    const catEntries = categories
+      .map((cat, i) => ({
+        cat, idx: i,
+        total: cat.repos.reduce((s, r) => s + r.linesChanged, 0),
+      }))
+      .sort((a, b) => b.total - a.total);
 
-        const secondary = getSecondary(cat.color);
+    const maxTotal = Math.max(1, ...catEntries.map((e) => e.total));
+    const orbSpread = w * 0.85;
+    const count = catEntries.length;
+    const orbs: OrbData[] = [];
+    const paths: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt }[] = new Array(categories.length);
 
-        cat.repos.forEach((repo, ri) => {
-          const repoSpread = w * 0.9;
-          const baseRepoX =
-            totalRepos === 1
-              ? cx
-              : cx -
-                repoSpread / 2 +
-                (repoCounter / (totalRepos - 1)) * repoSpread;
-          const repoY = h * REPO_Y;
+    catEntries.forEach((entry, sortedIdx) => {
+      const { cat, idx: ci, total } = entry;
+      const t = count <= 1 ? 0.5 : sortedIdx / (count - 1);
+      const orbX = cx - orbSpread / 2 + t * orbSpread;
+      const xNorm = (t - 0.5) * 2;
+      const orbY = orbCY + xNorm * xNorm * h * 0.025;
+      const activity = total / maxTotal;
+      const radius = 42 + activity * 35;
 
-          // More strands for more active repos
-          const activity = repo.linesChanged / maxLC;
-          const strandCount = Math.round(
-            STRANDS_PER_REPO_MIN +
-              activity * (STRANDS_PER_REPO_MAX - STRANDS_PER_REPO_MIN)
-          );
+      orbs.push({ x: orbX, y: orbY, radius, color: cat.color, name: cat.name, totalLines: total, repoCount: cat.repos.length });
 
-          // Scatter radius at endpoint (more active = wider spread)
-          const scatterRadius = 15 + activity * 40;
+      // Bezier: start spread across full text width, smoothly curve toward orbs
+      // Start X: distribute across text proportionally
+      const startT = count <= 1 ? 0.5 : sortedIdx / (count - 1);
+      const startX = textLeft + startT * textW;
+      const startY = textBottom;
 
-          for (let si = 0; si < strandCount; si++) {
-            // Vary each strand's endpoint position for the scatter effect
-            const angle = (si / strandCount) * Math.PI * 2 + rand(-0.3, 0.3);
-            const dist = rand(2, scatterRadius);
-            const endX = baseRepoX + Math.cos(angle) * dist;
-            const endY = repoY + Math.sin(angle) * dist * 0.5;
+      // cp1: gentle pull, keep near starting x to avoid over-convergence
+      const cp1x = startX + (orbX - startX) * 0.15;
+      const cp1y = startY + (orbY - startY) * 0.25;
+      // cp2: approach orb more directly
+      const cp2x = orbX + (startX - orbX) * 0.08;
+      const cp2y = startY + (orbY - startY) * 0.7;
 
-            // Vary the bundle path slightly per strand
-            const bundleJitter = rand(-15, 15);
-            const catJitter = rand(-8, 8);
+      paths[ci] = { p0: { x: startX, y: startY }, cp1: { x: cp1x, y: cp1y }, cp2: { x: cp2x, y: cp2y }, p3: { x: orbX, y: orbY } };
+    });
 
-            // Create endpoint scatter dots
-            const dotCount = Math.floor(rand(2, 6));
-            const endDots: FlowStrand["endDots"] = [];
-            for (let d = 0; d < dotCount; d++) {
-              const dAngle = rand(0, Math.PI * 2);
-              const dDist = rand(3, scatterRadius * 0.8);
-              endDots.push({
-                x: baseRepoX + Math.cos(dAngle) * dDist,
-                y: repoY + Math.sin(dAngle) * dDist * 0.5,
-                r: rand(0.8, 2.5),
-                alpha: rand(0.3, 0.9),
-              });
-            }
+    orbsRef.current = orbs;
+    pathsRef.current = paths;
 
-            strands.push({
-              catIdx: ci,
-              repoIdx: ri,
-              color: cat.color,
-              secondaryColor: secondary,
-              catName: cat.name,
-              repoName: repo.name,
-              linesChanged: repo.linesChanged,
-              isActive: repo.isActive,
-              p0: {
-                x: cx + rand(-3, 3),
-                y: topY + rand(-2, 2),
-              },
-              cp1: {
-                x: cx + (catX - cx) * 0.15 + bundleJitter,
-                y: h * 0.18 + rand(-10, 10),
-              },
-              cp2: {
-                x: catX + (endX - catX) * 0.5 + catJitter,
-                y: h * 0.58 + rand(-10, 10),
-              },
-              p3: { x: endX, y: endY },
-              width: 0.4 + activity * 1.2 + rand(0, 0.3),
-              endDots: si === 0 ? endDots : [], // only first strand carries dots
-            });
-          }
-
-          repoCounter++;
-        });
-      });
-
-      strandsRef.current = strands;
-
-      // Build dust particles
-      const dust: DustParticle[] = [];
-      for (let i = 0; i < DUST_COUNT; i++) {
-        dust.push({
-          strandIdx: Math.floor(Math.random() * strands.length),
+    // Build stream particles
+    const particles: StreamParticle[] = [];
+    const perCat = Math.floor(STREAM_PARTICLES / categories.length);
+    categories.forEach((_, ci) => {
+      for (let i = 0; i < perCat; i++) {
+        particles.push({
+          catIdx: ci, x: 0, y: 0,
           t: Math.random(),
-          offset: rand(-12, 12),
-          speed: 0.001 + Math.random() * 0.003,
-          size: rand(0.5, 2.5),
-          alpha: rand(0.2, 0.8),
+          speed: rand(0.0015, 0.006),
+          size: rand(1.2, 3.8),
+          alpha: rand(0.3, 1.0),
+          offset: rand(-35, 35),
         });
       }
-      dustRef.current = dust;
+    });
+    streamRef.current = particles;
 
-      // Build text particles from "TOKAMAK" text
-      buildTextParticles(w, h * TOP_Y, strands);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [categories]
-  );
+    // Build rain curtain particles (from full text width, straight down)
+    const rain: RainParticle[] = [];
+    for (let i = 0; i < RAIN_PARTICLES; i++) {
+      const rx = textLeft + Math.random() * textW;
+      rain.push({
+        x: rx,
+        y: textBottom + Math.random() * (h - textBottom),
+        speed: rand(0.5, 2.5),
+        size: rand(0.8, 2.5),
+        alpha: rand(0.06, 0.35),
+        startX: rx,
+      });
+    }
+    rainRef.current = rain;
 
-  /* ── Text to particles ──────────────────────────── */
+    setTick((t) => t + 1);
+  }, [categories]);
 
-  const buildTextParticles = useCallback(
-    (canvasW: number, centerY: number, strands: FlowStrand[]) => {
-      const offscreen = document.createElement("canvas");
-      const oscW = 600;
-      const oscH = 120;
-      offscreen.width = oscW;
-      offscreen.height = oscH;
-      const octx = offscreen.getContext("2d");
-      if (!octx) return;
+  /* ── Load hero video ─────────────────────────── */
 
-      // Render text onto offscreen canvas
-      octx.fillStyle = "#fff";
-      octx.font = `900 ${TEXT_FONT_SIZE}px 'Orbitron', sans-serif`;
-      octx.textAlign = "center";
-      octx.textBaseline = "middle";
-      octx.fillText("TOKAMAK", oscW / 2, oscH / 2);
-
-      // Scan pixels to extract particle positions
-      const imageData = octx.getImageData(0, 0, oscW, oscH);
-      const data = imageData.data;
-      const particles: TextParticle[] = [];
-
-      const offsetX = canvasW / 2 - oscW / 2;
-      const offsetY = centerY - oscH / 2;
-
-      for (let y = 0; y < oscH; y += TEXT_PARTICLE_DENSITY) {
-        for (let x = 0; x < oscW; x += TEXT_PARTICLE_DENSITY) {
-          const idx = (y * oscW + x) * 4;
-          const alpha = data[idx + 3]; // alpha channel
-          if (alpha > 128) {
-            const tx = x + offsetX;
-            const ty = y + offsetY;
-            particles.push({
-              tx,
-              ty,
-              // Start from random scattered positions
-              x: tx + rand(-300, 300),
-              y: ty + rand(-200, 200),
-              vx: 0,
-              vy: 0,
-              size: rand(1, 2.5),
-              alpha: rand(0.5, 1),
-              dripping: false,
-              dripT: 0,
-              dripStrandIdx: Math.floor(Math.random() * Math.max(1, strands.length)),
-            });
-          }
-        }
-      }
-
-      textParticlesRef.current = particles;
-      textBuiltRef.current = true;
-    },
-    []
-  );
+  useEffect(() => {
+    const video = document.createElement("video");
+    video.src = "/hero-video.mp4";
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.addEventListener("canplay", () => {
+      videoRef.current = video;
+      videoReadyRef.current = true;
+      video.play().catch(() => {});
+    });
+    video.load();
+    return () => { video.pause(); video.src = ""; };
+  }, []);
 
   /* ── Render frame ──────────────────────────────── */
 
@@ -369,461 +227,274 @@ export default function FlowCanvas({
     const w = canvas.width / dpr;
     const h = canvas.height / dpr;
     const progress = progressRef.current;
-    const strands = strandsRef.current;
-    const dust = dustRef.current;
-    const mouse = mouseRef.current;
     const time = Date.now() * 0.001;
+    const orbs = orbsRef.current;
+    const paths = pathsRef.current;
+    const stream = streamRef.current;
+    const rain = rainRef.current;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.scale(dpr, dpr);
 
-    // Determine hovered category
-    let hoveredCat = -1;
-    const catCenterY = h * CAT_Y;
-    if (
-      Math.abs(mouse.y - catCenterY) < h * 0.2 &&
-      mouse.x > 0 &&
-      mouse.x < w
-    ) {
-      let minDist = Infinity;
-      const catCenters = new Map<number, number[]>();
-      strands.forEach((s) => {
-        const pt = bezier(s.p0, s.cp1, s.cp2, s.p3, 0.4);
-        if (!catCenters.has(s.catIdx)) catCenters.set(s.catIdx, []);
-        catCenters.get(s.catIdx)!.push(pt.x);
-      });
-      catCenters.forEach((xs, idx) => {
-        const avgX = xs.reduce((a, b) => a + b, 0) / xs.length;
-        const d = Math.abs(mouse.x - avgX);
-        if (d < minDist && d < 120) {
-          minDist = d;
-          hoveredCat = idx;
-        }
-      });
-    }
-    hoveredCatRef.current = hoveredCat;
-
     const revealT = Math.min(progress * 1.5, 1);
+    const textCenterY = h * TEXT_Y;
+    const cx = w / 2;
 
-    // ── Draw strands with glow ─────────────────────
+    // ── Font sizing (single line) ──
+    const maxTextWidth = w * 0.88;
+    ctx.font = `900 100px 'Orbitron', sans-serif`;
+    const fullMeasure = ctx.measureText("TOKAMAK NETWORK").width;
+    const mainFontSize = Math.min(90, Math.floor((maxTextWidth / fullMeasure) * 100));
+    const textBottom = textCenterY + mainFontSize * 0.35;
 
-    strands.forEach((strand) => {
-      const isHovered = hoveredCat === -1 || hoveredCat === strand.catIdx;
-      const baseAlpha = isHovered ? 0.6 : 0.04;
-      const [r1, g1, b1] = hexToRgb(strand.color);
-      const [r2, g2, b2] = hexToRgb(strand.secondaryColor);
-
-      const steps = 80;
-      const maxStep = Math.floor(revealT * steps);
-      if (maxStep < 2) return;
-
-      // Draw glow layer first (wider, softer)
-      if (isHovered && strand.isActive) {
-        ctx.beginPath();
-        const gFirst = bezier(strand.p0, strand.cp1, strand.cp2, strand.p3, 0);
-        ctx.moveTo(gFirst.x, gFirst.y);
-        for (let s = 1; s <= maxStep; s++) {
-          const t = s / steps;
-          const pt = bezier(strand.p0, strand.cp1, strand.cp2, strand.p3, t);
-          ctx.lineTo(pt.x, pt.y);
-        }
-        ctx.strokeStyle = `rgba(${r1}, ${g1}, ${b1}, ${baseAlpha * 0.15})`;
-        ctx.lineWidth = strand.width + 4;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.stroke();
-      }
-
-      // Draw the main strand with gradient color shift along path
-      // Use small segments for color transition
-      for (let s = 0; s < maxStep - 1; s++) {
-        const t1 = s / steps;
-        const t2 = (s + 1) / steps;
-        const pt1 = bezier(strand.p0, strand.cp1, strand.cp2, strand.p3, t1);
-        const pt2 = bezier(strand.p0, strand.cp1, strand.cp2, strand.p3, t2);
-
-        // Color shifts from primary to secondary along the path
-        const colorT = t1;
-        const [cr, cg, cb] = lerpColor([r1, g1, b1], [r2, g2, b2], colorT * 0.6);
-
-        // Fade alpha near start (bundled) and at tip
-        let segAlpha = baseAlpha;
-        if (t1 < 0.1) segAlpha *= t1 / 0.1;
-        if (t1 > 0.9) segAlpha *= (1 - t1) / 0.1;
-
-        ctx.beginPath();
-        ctx.moveTo(pt1.x, pt1.y);
-        ctx.lineTo(pt2.x, pt2.y);
-        ctx.strokeStyle = `rgba(${cr}, ${cg}, ${cb}, ${segAlpha})`;
-        ctx.lineWidth = strand.width;
-        ctx.lineCap = "round";
-        ctx.stroke();
-      }
+    // Hovered orb
+    const mouse = mouseRef.current;
+    let hoveredOrb = -1;
+    orbs.forEach((orb, i) => {
+      const dx = mouse.x - orb.x, dy = mouse.y - orb.y;
+      if (Math.sqrt(dx * dx + dy * dy) < orb.radius + 20) hoveredOrb = i;
     });
 
-    // ── Draw endpoint scatter dots ───────────────────
-
-    if (revealT > 0.75) {
-      const dotAlpha = Math.min((revealT - 0.75) / 0.25, 1);
-
-      strands.forEach((strand) => {
-        const isHovered = hoveredCat === -1 || hoveredCat === strand.catIdx;
-        if (!isHovered && hoveredCat !== -1) return;
-
-        const [r, g, b] = hexToRgb(strand.color);
-        const [r2, g2, b2] = hexToRgb(strand.secondaryColor);
-
-        // Scatter dots at endpoint
-        strand.endDots.forEach((dot) => {
-          const pulse = Math.sin(time * 2 + dot.x * 0.1) * 0.3 + 0.7;
-          const a = dot.alpha * dotAlpha * pulse * (isHovered ? 1 : 0.3);
-          const useSecondary = Math.random() > 0.5;
-          const [dr, dg, db] = useSecondary ? [r2, g2, b2] : [r, g, b];
-
-          // Glow
-          ctx.beginPath();
-          ctx.arc(dot.x, dot.y, dot.r + 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${dr}, ${dg}, ${db}, ${a * 0.15})`;
-          ctx.fill();
-
-          // Core dot
-          ctx.beginPath();
-          ctx.arc(dot.x, dot.y, dot.r, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${dr}, ${dg}, ${db}, ${a})`;
-          ctx.fill();
-        });
-
-        // Active endpoint core glow
-        if (strand.isActive && strand.endDots.length > 0) {
-          const pulse = Math.sin(time * 3 + strand.p3.x * 0.05) * 0.3 + 0.7;
-          const a = dotAlpha * pulse * (isHovered ? 1 : 0.2);
-
-          // Large outer glow
-          ctx.beginPath();
-          ctx.arc(strand.p3.x, strand.p3.y, 8, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a * 0.08})`;
-          ctx.fill();
-
-          // Core bright dot
-          ctx.beginPath();
-          ctx.arc(strand.p3.x, strand.p3.y, 2, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${a * 0.6})`;
-          ctx.fill();
-        }
-      });
-    }
-
-    // ── Draw category labels ────────────────────────
-
-    if (revealT > 0.35) {
-      const labelAlpha = Math.min((revealT - 0.35) / 0.2, 1);
-      const drawnCats = new Set<number>();
-
-      strands.forEach((strand) => {
-        if (drawnCats.has(strand.catIdx)) return;
-        drawnCats.add(strand.catIdx);
-
-        const pt = bezier(strand.p0, strand.cp1, strand.cp2, strand.p3, 0.42);
-        const catStrands = strands.filter(
-          (s) => s.catIdx === strand.catIdx
-        );
-        const avgX =
-          catStrands.reduce(
-            (s, l) => s + bezier(l.p0, l.cp1, l.cp2, l.p3, 0.42).x,
-            0
-          ) / catStrands.length;
-
-        const isHovered =
-          hoveredCat === -1 || hoveredCat === strand.catIdx;
-        const a = isHovered ? labelAlpha : labelAlpha * 0.15;
-        const [r, g, b] = hexToRgb(strand.color);
-
-        // Convergence node glow
-        const nodeGlow = Math.sin(time * 2 + strand.catIdx) * 0.2 + 0.8;
-        if (isHovered) {
-          ctx.beginPath();
-          ctx.arc(avgX, pt.y, 18 * nodeGlow, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a * 0.06})`;
-          ctx.fill();
-
-          ctx.beginPath();
-          ctx.arc(avgX, pt.y, 10, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a * 0.12})`;
-          ctx.fill();
-        }
-
-        // Core node dot
-        ctx.beginPath();
-        ctx.arc(avgX, pt.y, isHovered ? 5 : 3, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a * 0.9})`;
-        ctx.fill();
-
-        // Bright center
-        if (isHovered) {
-          ctx.beginPath();
-          ctx.arc(avgX, pt.y, 2, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${a * 0.9})`;
-          ctx.fill();
-        }
-
-        // Category name
-        ctx.font = "700 15px 'Orbitron', sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
-        ctx.fillText(strand.catName.toUpperCase(), avgX, pt.y - 20);
-
-        // Repo count
-        const uniqueRepos = new Set(
-          catStrands.map((s) => s.repoName)
-        ).size;
-        ctx.font = "400 13px sans-serif";
-        ctx.fillStyle = `rgba(200, 200, 200, ${a * 0.5})`;
-        ctx.fillText(`${uniqueRepos} repos`, avgX, pt.y + 26);
-      });
-    }
-
-    // ── Draw repo labels at bottom ───────────────────
-
-    if (revealT > 0.8) {
-      const labelAlpha = Math.min((revealT - 0.8) / 0.2, 1);
-
-      // Collect unique repos with their positions
-      const repoPositions = new Map<
-        string,
-        { x: number; y: number; color: string; lc: number; catIdx: number; isActive: boolean }
-      >();
-
-      strands.forEach((strand) => {
-        if (repoPositions.has(strand.repoName)) return;
-        repoPositions.set(strand.repoName, {
-          x: strand.p3.x,
-          y: strand.p3.y,
-          color: strand.color,
-          lc: strand.linesChanged,
-          catIdx: strand.catIdx,
-          isActive: strand.isActive,
-        });
-      });
-
-      repoPositions.forEach((info, name) => {
-        const isHovered =
-          hoveredCat === -1 || hoveredCat === info.catIdx;
-
-        // Show all labels when hovering, or only active top repos when not hovering
-        if (hoveredCat === -1 && !info.isActive) return;
-
-        const a = isHovered ? labelAlpha : labelAlpha * 0.08;
-        if (a < 0.05) return;
-
-        const [r, g, b] = hexToRgb(info.color);
-
-        ctx.save();
-        ctx.translate(info.x, info.y + 18);
-        ctx.rotate(Math.PI / 5.5);
-        ctx.font = "600 12px 'Orbitron', sans-serif";
-        ctx.textAlign = "left";
-        ctx.fillStyle = `rgba(255, 255, 255, ${a * 0.85})`;
-        ctx.fillText(name, 0, 0);
-        if (info.lc > 0) {
-          ctx.font = "400 11px sans-serif";
-          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a * 0.6})`;
-          ctx.fillText(
-            ` ${formatNum(info.lc)}`,
-            ctx.measureText(name).width + 4,
-            0
-          );
-        }
-        ctx.restore();
-      });
-    }
-
-    // ── Draw particle typography origin ─────────────
-
-    if (textBuiltRef.current && strands.length > 0) {
-      const topPt = strands[0].p0;
-      const textParts = textParticlesRef.current;
-
-      // Background glow behind text area
-      const glowGrad = ctx.createRadialGradient(
-        topPt.x, topPt.y, 0,
-        topPt.x, topPt.y, 180
-      );
-      glowGrad.addColorStop(0, "rgba(0, 119, 255, 0.08)");
-      glowGrad.addColorStop(0.5, "rgba(0, 60, 180, 0.03)");
-      glowGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
-      ctx.beginPath();
-      ctx.arc(topPt.x, topPt.y, 180, 0, Math.PI * 2);
-      ctx.fillStyle = glowGrad;
-      ctx.fill();
-
-      // Update and render each text particle
-      textParts.forEach((p) => {
-        if (p.dripping) {
-          // Particle is dripping down into a strand
-          const strand = strands[p.dripStrandIdx];
-          if (!strand) return;
-          p.dripT += 0.008;
-          if (p.dripT > 1) {
-            // Reset: return to text
-            p.dripping = false;
-            p.dripT = 0;
-            p.x = p.tx + rand(-200, 200);
-            p.y = p.ty + rand(-150, 150);
-            return;
-          }
-          const pt = bezier(strand.p0, strand.cp1, strand.cp2, strand.p3, p.dripT * 0.3);
-          const [sr, sg, sb] = hexToRgb(strand.color);
-          const da = (1 - p.dripT) * 0.7;
-
-          ctx.beginPath();
-          ctx.arc(pt.x, pt.y, p.size * 0.8, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${sr}, ${sg}, ${sb}, ${da})`;
-          ctx.fill();
-          return;
-        }
-
-        // Mouse repulsion
-        const mdx = p.x - mouse.x;
-        const mdy = p.y - mouse.y;
-        const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
-        if (mDist < MOUSE_REPEL_RADIUS && mDist > 0) {
-          const force = (MOUSE_REPEL_RADIUS - mDist) / MOUSE_REPEL_RADIUS * MOUSE_REPEL_FORCE;
-          p.vx += (mdx / mDist) * force;
-          p.vy += (mdy / mDist) * force;
-        }
-
-        // Return to target position (spring)
-        const dxT = p.tx - p.x;
-        const dyT = p.ty - p.y;
-        p.vx += dxT * PARTICLE_RETURN_SPEED;
-        p.vy += dyT * PARTICLE_RETURN_SPEED;
-
-        // Friction
-        p.vx *= 0.85;
-        p.vy *= 0.85;
-
-        // Update position
-        p.x += p.vx;
-        p.y += p.vy;
-
-        // Random drip: particle falls into a strand
-        if (Math.random() < DRIP_CHANCE && revealT > 0.3) {
-          p.dripping = true;
-          p.dripT = 0;
-          p.dripStrandIdx = Math.floor(Math.random() * strands.length);
-        }
-
-        // Distance from target (for glow intensity)
-        const distFromTarget = Math.sqrt(dxT * dxT + dyT * dyT);
-        const isDisplaced = distFromTarget > 5;
-
-        // Neon glow layer (multiple shadow passes)
-        if (!isDisplaced) {
-          // Settled particles: blue neon glow
-          const flicker = Math.sin(time * 3 + p.tx * 0.05 + p.ty * 0.07) * 0.15 + 0.85;
-          const a = p.alpha * flicker * 0.9;
-
-          // Outer glow
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size + 2, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(0, 150, 255, ${a * 0.1})`;
-          ctx.fill();
-
-          // Core
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(100, 200, 255, ${a})`;
-          ctx.fill();
-
-          // Bright center
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 0.4, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(220, 240, 255, ${a * 0.8})`;
-          ctx.fill();
-        } else {
-          // Displaced particles: whiter, scattered look
-          const a = p.alpha * 0.6;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 0.8, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(150, 210, 255, ${a})`;
-          ctx.fill();
-        }
-      });
-
-      // Subtitle below the text
-      ctx.font = "400 13px 'Orbitron', sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillStyle = "rgba(100, 160, 220, 0.5)";
-      ctx.fillText("N E T W O R K", topPt.x, topPt.y + TEXT_FONT_SIZE / 2 + 20);
-    }
-
-    // ── Draw dust particles ──────────────────────────
-
+    // ── ECOSYSTEM label ──
     if (revealT > 0.05) {
-      dust.forEach((p) => {
-        if (p.t > revealT) return;
+      const ecoA = Math.min((revealT - 0.05) / 0.15, 1);
+      const ecoY = textCenterY - mainFontSize * 0.45 - 22;
+      ctx.save();
+      ctx.font = "600 12px 'Orbitron', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.letterSpacing = "0.2em";
+      const ecoW = ctx.measureText("ECOSYSTEM").width;
+      ctx.strokeStyle = `rgba(0,119,255,${0.25 * ecoA})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(cx - ecoW / 2 - 45, ecoY); ctx.lineTo(cx - ecoW / 2 - 10, ecoY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx + ecoW / 2 + 10, ecoY); ctx.lineTo(cx + ecoW / 2 + 45, ecoY); ctx.stroke();
+      ctx.fillStyle = `rgba(0,119,255,${0.55 * ecoA})`;
+      ctx.fillText("ECOSYSTEM", cx, ecoY);
+      ctx.letterSpacing = "0px";
+      ctx.font = "400 11px sans-serif";
+      ctx.fillStyle = `rgba(140,150,170,${0.45 * ecoA})`;
+      ctx.fillText(`${totalRepos} repositories · ${totalCommits.toLocaleString("en-US")} commits`, cx, ecoY + 18);
+      ctx.restore();
+    }
 
-        const strand = strands[p.strandIdx];
-        if (!strand) return;
+    // ── Video-masked "TOKAMAK NETWORK" (single line) ──
+    if (videoReadyRef.current && videoRef.current) {
+      const video = videoRef.current;
+      if (!offscreenRef.current) offscreenRef.current = document.createElement("canvas");
+      const osc = offscreenRef.current;
+      if (osc.width !== canvas.width || osc.height !== canvas.height) {
+        osc.width = canvas.width;
+        osc.height = canvas.height;
+      }
+      const octx = osc.getContext("2d");
+      if (octx) {
+        octx.clearRect(0, 0, osc.width, osc.height);
+        octx.save();
+        octx.scale(dpr, dpr);
+        octx.textAlign = "center";
+        octx.textBaseline = "middle";
+        octx.fillStyle = "white";
+        octx.font = `900 ${mainFontSize}px 'Orbitron', sans-serif`;
+        octx.fillText("TOKAMAK NETWORK", cx, textCenterY);
+        octx.globalCompositeOperation = "source-in";
+        const vAspect = video.videoWidth / (video.videoHeight || 1);
+        const vw = w * 1.6;
+        const vh = vw / vAspect;
+        octx.drawImage(video, cx - vw / 2, textCenterY - vh / 2, vw, vh);
+        octx.globalCompositeOperation = "source-over";
+        octx.restore();
+        ctx.drawImage(osc, 0, 0, w, h);
+      }
 
-        const isHovered =
-          hoveredCat === -1 || hoveredCat === strand.catIdx;
-        if (!isHovered && hoveredCat !== -1) return;
+      // Neon glow
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = `900 ${mainFontSize}px 'Orbitron', sans-serif`;
+      ctx.strokeStyle = "rgba(0,119,255,0.25)";
+      ctx.lineWidth = 1.5;
+      ctx.shadowColor = "rgba(0,150,255,0.6)";
+      ctx.shadowBlur = 30;
+      ctx.strokeText("TOKAMAK NETWORK", cx, textCenterY);
+      ctx.shadowBlur = 0;
+      ctx.restore();
+    }
 
-        const pt = bezier(strand.p0, strand.cp1, strand.cp2, strand.p3, p.t);
-        const tan = bezierTangent(
-          strand.p0,
-          strand.cp1,
-          strand.cp2,
-          strand.p3,
-          p.t
-        );
+    // ── Background rain curtain ──
+    if (revealT > 0.1) {
+      const rainA = Math.min((revealT - 0.1) / 0.2, 1);
+      rain.forEach((p) => {
+        p.y += p.speed;
+        // Slight horizontal drift
+        p.x += Math.sin(time * 0.5 + p.startX * 0.01) * 0.15;
+        if (p.y > h + 10) {
+          p.y = textBottom + rand(-5, 5);
+          p.x = p.startX + rand(-3, 3);
+        }
+        const fadeTop = Math.min((p.y - textBottom) / 40, 1);
+        const fadeBot = Math.max(1 - (p.y - (h - 60)) / 60, 0);
+        const a = p.alpha * rainA * fadeTop * (p.y > h - 60 ? fadeBot : 1);
+        if (a < 0.01) return;
 
-        // Perpendicular offset
-        const len = Math.sqrt(tan.x * tan.x + tan.y * tan.y) || 1;
-        const nx = -tan.y / len;
-        const ny = tan.x / len;
-
-        const px = pt.x + nx * p.offset;
-        const py = pt.y + ny * p.offset;
-
-        const [r1, g1, b1] = hexToRgb(strand.color);
-        const [r2, g2, b2] = hexToRgb(strand.secondaryColor);
-        const colorMix = p.t;
-        const [cr, cg, cb] = lerpColor(
-          [r1, g1, b1],
-          [r2, g2, b2],
-          colorMix * 0.5
-        );
-
-        const flicker = Math.sin(time * 4 + p.t * 20 + p.offset) * 0.3 + 0.7;
-        const a = p.alpha * flicker * (isHovered ? 0.7 : 0.15);
-
+        // Soft glow
         ctx.beginPath();
-        ctx.arc(px, py, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${a})`;
+        ctx.arc(p.x, p.y, p.size + 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(180,200,220,${a * 0.1})`;
         ctx.fill();
+        // Core
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200,215,235,${a})`;
+        ctx.fill();
+      });
+    }
 
-        // Update particle position
+    // ── Stream particles (colored, bezier paths) ──
+    if (revealT > 0.15 && paths.length > 0) {
+      const sA = Math.min((revealT - 0.15) / 0.2, 1);
+      const whiteRgb: [number, number, number] = [180, 220, 255];
+
+      stream.forEach((p) => {
+        const path = paths[p.catIdx];
+        const cat = categories[p.catIdx];
+        if (!path || !cat) return;
+
         p.t += p.speed;
-        if (p.t > revealT) {
-          p.t = 0;
-          p.strandIdx = Math.floor(Math.random() * strands.length);
-          p.offset = rand(-12, 12);
+        if (p.t > 1) {
+          p.t = rand(-0.15, 0.05);
+          p.offset = rand(-20, 20);
+          p.alpha = rand(0.35, 1.0);
+          p.size = rand(1.0, 3.2);
+        }
+        if (p.t < 0) return;
+
+        const pt = bezier(path.p0, path.cp1, path.cp2, path.p3, p.t);
+        // Perpendicular offset
+        const eps = 0.01;
+        const pt2 = bezier(path.p0, path.cp1, path.cp2, path.p3, Math.min(p.t + eps, 1));
+        const dx = pt2.x - pt.x, dy = pt2.y - pt.y;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        const nx = -dy / len, ny = dx / len;
+        const offFade = 1 - p.t * p.t * 0.6;
+        p.x = pt.x + nx * p.offset * offFade;
+        p.y = pt.y + ny * p.offset * offFade;
+
+        // Color: white→category
+        const catRgb = hexToRgb(cat.color);
+        const cT = Math.min(p.t * 1.8, 1);
+        const [cr, cg, cb] = lerpColor(whiteRgb, catRgb, cT);
+
+        let a = p.alpha * sA;
+        if (p.t < 0.05) a *= p.t / 0.05;
+        if (p.t > 0.7) a *= 0.7 + (p.t - 0.7) / 0.3 * 0.8;
+
+        // Outer glow (much larger for thick stream look)
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size + 5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${cr},${cg},${cb},${a * 0.06})`;
+        ctx.fill();
+        // Mid glow
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size + 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${cr},${cg},${cb},${a * 0.18})`;
+        ctx.fill();
+        // Core
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${cr},${cg},${cb},${a})`;
+        ctx.fill();
+        // Hot center
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * 0.4, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${a * 0.45})`;
+        ctx.fill();
+      });
+    }
+
+    // ── Orbs ──
+    if (revealT > 0.3 && orbs.length > 0) {
+      const oA = Math.min((revealT - 0.3) / 0.3, 1);
+
+      orbs.forEach((orb, i) => {
+        const [r, g, b] = hexToRgb(orb.color);
+        const isH = hoveredOrb === i;
+        const pulse = Math.sin(time * 2 + i * 0.7) * 0.08 + 0.92;
+        const dR = orb.radius * pulse * (isH ? 1.15 : 1);
+
+        // L1: large ambient
+        const aR = dR * 5.5;
+        const ag = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, aR);
+        ag.addColorStop(0, `rgba(${r},${g},${b},${0.25 * oA})`);
+        ag.addColorStop(0.2, `rgba(${r},${g},${b},${0.12 * oA})`);
+        ag.addColorStop(0.5, `rgba(${r},${g},${b},${0.04 * oA})`);
+        ag.addColorStop(1, `rgba(${r},${g},${b},0)`);
+        ctx.beginPath(); ctx.arc(orb.x, orb.y, aR, 0, Math.PI * 2); ctx.fillStyle = ag; ctx.fill();
+
+        // L2: mid glow
+        const mR = dR * 2;
+        const mg = ctx.createRadialGradient(orb.x, orb.y, dR * 0.5, orb.x, orb.y, mR);
+        mg.addColorStop(0, `rgba(${r},${g},${b},${0.3 * oA})`);
+        mg.addColorStop(0.5, `rgba(${r},${g},${b},${0.1 * oA})`);
+        mg.addColorStop(1, `rgba(${r},${g},${b},0)`);
+        ctx.beginPath(); ctx.arc(orb.x, orb.y, mR, 0, Math.PI * 2); ctx.fillStyle = mg; ctx.fill();
+
+        // L3: body
+        const bg = ctx.createRadialGradient(orb.x - dR * 0.3, orb.y - dR * 0.3, dR * 0.1, orb.x + dR * 0.1, orb.y + dR * 0.1, dR * 1.1);
+        bg.addColorStop(0, `rgba(255,255,255,${0.5 * oA})`);
+        bg.addColorStop(0.15, `rgba(${Math.min(r + 80, 255)},${Math.min(g + 80, 255)},${Math.min(b + 80, 255)},${0.75 * oA})`);
+        bg.addColorStop(0.4, `rgba(${r},${g},${b},${0.9 * oA})`);
+        bg.addColorStop(0.7, `rgba(${r >> 1},${g >> 1},${b >> 1},${0.7 * oA})`);
+        bg.addColorStop(1, `rgba(${r >> 2},${g >> 2},${b >> 2},${0.4 * oA})`);
+        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2); ctx.fillStyle = bg; ctx.fill();
+
+        // L4: specular
+        const sg = ctx.createRadialGradient(orb.x - dR * 0.35, orb.y - dR * 0.35, 0, orb.x - dR * 0.15, orb.y - dR * 0.15, dR * 0.6);
+        sg.addColorStop(0, `rgba(255,255,255,${0.65 * oA})`);
+        sg.addColorStop(0.4, `rgba(255,255,255,${0.15 * oA})`);
+        sg.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2); ctx.fillStyle = sg; ctx.fill();
+
+        // L5: rim
+        const rg = ctx.createRadialGradient(orb.x + dR * 0.3, orb.y + dR * 0.3, 0, orb.x + dR * 0.2, orb.y + dR * 0.2, dR * 0.5);
+        rg.addColorStop(0, `rgba(${Math.min(r + 60, 255)},${Math.min(g + 60, 255)},${Math.min(b + 60, 255)},${0.22 * oA})`);
+        rg.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2); ctx.fillStyle = rg; ctx.fill();
+
+        // L6: edge ring
+        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${Math.min(r + 40, 255)},${Math.min(g + 40, 255)},${Math.min(b + 40, 255)},${0.35 * oA})`;
+        ctx.lineWidth = 1.5;
+        ctx.shadowColor = `rgba(${r},${g},${b},${0.6 * oA})`;
+        ctx.shadowBlur = 18;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Labels
+        const lY = orb.y + dR + 20;
+        ctx.font = "700 11px 'Orbitron', sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "top";
+        ctx.fillStyle = `rgba(${Math.min(r + 40, 255)},${Math.min(g + 40, 255)},${Math.min(b + 40, 255)},${oA * 0.95})`;
+        ctx.fillText(orb.name, orb.x, lY);
+        ctx.font = "500 10px 'Orbitron', sans-serif";
+        ctx.fillStyle = `rgba(220,220,220,${oA * 0.7})`;
+        ctx.fillText(formatNum(orb.totalLines), orb.x, lY + 16);
+        if (isH) {
+          ctx.font = "400 10px sans-serif";
+          ctx.fillStyle = `rgba(255,255,255,${oA * 0.55})`;
+          ctx.fillText(`${orb.repoCount} repos`, orb.x, lY + 30);
         }
       });
     }
 
     ctx.restore();
-  }, []);
+  }, [categories, totalRepos, totalCommits]);
 
   /* ── Animation loop ────────────────────────────── */
 
   const loop = useCallback(() => {
-    if (visibleRef.current) {
-      render();
-    }
+    if (visibleRef.current) render();
     rafRef.current = requestAnimationFrame(loop);
   }, [render]);
 
@@ -834,87 +505,57 @@ export default function FlowCanvas({
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
 
-    const motionQuery = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    );
+    const motionQ = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const resize = () => {
       const dpr = window.devicePixelRatio || 1;
       const w = container.clientWidth;
       const h = CANVAS_HEIGHT;
-
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
-
-      setCanvasWidth(w);
       buildLayout(w, h);
-
-      if (motionQuery.matches) {
-        progressRef.current = 1;
-        render();
-      }
+      if (motionQ.matches) { progressRef.current = 1; render(); }
     };
 
     resize();
-    const resizeObserver = new ResizeObserver(resize);
-    resizeObserver.observe(container);
+    const ro = new ResizeObserver(resize);
+    ro.observe(container);
 
-    // Visibility
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        visibleRef.current = entry.isIntersecting;
-      },
-      { threshold: 0.05 }
-    );
+    const io = new IntersectionObserver(([e]) => { visibleRef.current = e.isIntersecting; }, { threshold: 0.05 });
     io.observe(container);
 
-    // Scroll progress
-    const handleScroll = () => {
+    const onScroll = () => {
       const rect = container.getBoundingClientRect();
-      const viewH = window.innerHeight;
-      const raw = (viewH - rect.top) / (viewH + rect.height);
-      progressRef.current = Math.max(0, Math.min(1, raw));
+      const vH = window.innerHeight;
+      progressRef.current = Math.max(0, Math.min(1, (vH - rect.top) / (vH + rect.height)));
     };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
 
-    // Mouse
-    const handleMouse = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouseRef.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      };
+    const onMouse = (e: MouseEvent) => {
+      const r = canvas.getBoundingClientRect();
+      mouseRef.current = { x: e.clientX - r.left, y: e.clientY - r.top };
     };
-    const handleMouseLeave = () => {
-      mouseRef.current = { x: -9999, y: -9999 };
-    };
-    canvas.addEventListener("mousemove", handleMouse);
-    canvas.addEventListener("mouseleave", handleMouseLeave);
+    const onLeave = () => { mouseRef.current = { x: -9999, y: -9999 }; };
+    canvas.addEventListener("mousemove", onMouse);
+    canvas.addEventListener("mouseleave", onLeave);
 
-    if (!motionQuery.matches) {
-      rafRef.current = requestAnimationFrame(loop);
-    }
+    if (!motionQ.matches) rafRef.current = requestAnimationFrame(loop);
 
     return () => {
-      resizeObserver.disconnect();
-      io.disconnect();
-      window.removeEventListener("scroll", handleScroll);
-      canvas.removeEventListener("mousemove", handleMouse);
-      canvas.removeEventListener("mouseleave", handleMouseLeave);
+      ro.disconnect(); io.disconnect();
+      window.removeEventListener("scroll", onScroll);
+      canvas.removeEventListener("mousemove", onMouse);
+      canvas.removeEventListener("mouseleave", onLeave);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [buildLayout, render, loop]);
 
   return (
     <div ref={containerRef} className="w-full max-w-[1280px] px-6">
-      <canvas
-        ref={canvasRef}
-        className="w-full cursor-crosshair"
-        style={{ height: CANVAS_HEIGHT }}
-      />
+      <canvas ref={canvasRef} className="w-full cursor-crosshair" style={{ height: CANVAS_HEIGHT }} />
     </div>
   );
 }

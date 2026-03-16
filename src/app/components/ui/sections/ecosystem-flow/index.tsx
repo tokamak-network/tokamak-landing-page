@@ -69,22 +69,13 @@ export default function EcosystemFlow() {
   return (
     <section
       id="ecosystem-flow"
-      className="relative z-10 w-full flex flex-col items-center bg-black"
+      className="relative z-10 w-full flex flex-col items-center bg-black pt-[80px]"
     >
-      {/* Section header */}
-      <div className="pt-[120px] pb-[40px] px-6 text-center">
-        <h2 className="text-[38px] md:text-[48px] font-[900] text-white tracking-[0.06em] uppercase mb-3">
-          Ecosystem
-        </h2>
-        <div className="w-10 h-[3px] bg-primary mx-auto mb-5" />
-        <p className="text-[16px] text-[#929298] max-w-[500px] mx-auto">
-          {totalRepos} repositories across {categories.length} categories —{" "}
-          {totalCommits.toLocaleString("en-US")} commits and counting
-        </p>
-      </div>
-
-      {/* Flow visualization */}
-      <FlowCanvas categories={categories} />
+      <FlowCanvas
+        categories={categories}
+        totalRepos={totalRepos}
+        totalCommits={totalCommits}
+      />
     </section>
   );
 }

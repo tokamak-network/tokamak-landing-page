@@ -81,6 +81,25 @@ export default function AnimatedCounter({
     };
   }, [target, duration, delay, signPrefix, decimals]);
 
+  // Split large numbers: show trailing ",000" groups smaller
+  // Triggers for numbers >= 1,000,000 (has at least two comma groups)
+  const commaGroups = display.replace(/^[+-]/, "").split(",");
+  const shouldFade = commaGroups.length >= 3 && decimals === 0;
+
+  if (shouldFade) {
+    // Keep all but last comma group as "main", last group as "trail"
+    const mainPart = commaGroups.slice(0, -1).join(",");
+    const trailPart = "," + commaGroups[commaGroups.length - 1];
+    const prefix = display.match(/^[+-]/)?.[0] ?? "";
+
+    return (
+      <span ref={ref} className={className}>
+        {prefix}{mainPart}
+        <span className="text-[0.55em] font-[700] opacity-35 tracking-tight">{trailPart}</span>
+      </span>
+    );
+  }
+
   return (
     <span ref={ref} className={className}>
       {display}

@@ -44,9 +44,8 @@ export function createTorusRenderer(): Object3DRenderer {
       const { ctx, card, time, hoverT } = rc;
       const cx = card.x + card.w / 2;
       const cy = card.y + card.h / 2;
-      const sc = Math.min(card.w, card.h) / 120;
-      const speed = 0.3 + hoverT * 0.5;
-      const angleY = time * speed;
+      const sc = (Math.min(card.w, card.h) / 120) * (1 + hoverT * 0.15);
+      const angleY = time * 0.3;
       const angleX = 0.4;
       const alpha = 0.4 + hoverT * 0.15;
 

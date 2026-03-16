@@ -75,7 +75,7 @@ export default function LatestFeedClient({
   }
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center w-full">
       <div
         className="grid gap-[30px] w-full
           [@media(min-width:1280px)]:grid-cols-4

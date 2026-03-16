@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { FileText, Newspaper, BarChart3, GitPullRequest } from "lucide-react";
+import { FileText, Newspaper, BarChart3, GitPullRequest, ArrowUpRight } from "lucide-react";
 import DefaultThumbnail from "@/assets/images/insight/default-thumnail.svg";
 import type { FeedItem } from "./types";
 
@@ -66,83 +66,115 @@ export function FeedCard({ item }: { readonly item: FeedItem }) {
   return (
     <Wrapper
       {...linkProps}
-      className="flex flex-col w-full max-w-[360px] text-white cursor-pointer group"
+      className="relative w-full cursor-pointer group block overflow-hidden rounded-lg"
+      style={{
+        border: `1px solid ${cfg.color}20`,
+      }}
     >
-      {/* Thumbnail */}
-      <div
-        className="relative w-full h-[198px] overflow-hidden mb-4 rounded-lg border transition-colors duration-300 group-hover:border-opacity-60"
-        style={{ borderColor: cfg.color + "30" }}
-      >
+      {/* Full-card thumbnail */}
+      <div className="relative w-full h-[300px] overflow-hidden">
         <Image
           src={imageSrc}
           alt={item.title}
           fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
           onError={() => setImgError(true)}
         />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-        {/* Badge */}
-        <span
-          className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-[700] uppercase tracking-[0.06em] backdrop-blur-sm"
+        {/* Permanent dark gradient from bottom */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+
+        {/* Top row: badge + time */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-3 z-10">
+          <span
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-[700] uppercase tracking-[0.06em] backdrop-blur-md"
+            style={{
+              backgroundColor: cfg.color + "25",
+              color: cfg.color,
+              border: `1px solid ${cfg.color}40`,
+            }}
+          >
+            {cfg.icon}
+            {cfg.label}
+          </span>
+          <span className="px-2 py-0.5 text-[9px] font-[600] text-white/60 bg-black/40 backdrop-blur-md rounded">
+            {relativeDays(item.date)}
+          </span>
+        </div>
+
+        {/* Glass overlay — default: bottom ~40%, hover: expands to ~65% */}
+        <div
+          className="absolute left-0 right-0 bottom-0 backdrop-blur-sm transition-all duration-500 ease-out flex flex-col justify-end"
           style={{
-            backgroundColor: cfg.color + "20",
-            color: cfg.color,
-            border: `1px solid ${cfg.color}40`,
+            background: `linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0.35))`,
+            borderTop: `1px solid ${cfg.color}15`,
           }}
         >
-          {cfg.icon}
-          {cfg.label}
-        </span>
+          <div className="px-4 pt-3 pb-3">
+            {/* Date */}
+            <span className="text-[11px] text-[#888] font-[400] block mb-1.5">
+              {formatDate(item.date)}
+            </span>
 
-        {/* Relative time pill */}
-        <span className="absolute top-3 right-3 px-2 py-0.5 text-[9px] font-[600] text-white/60 bg-black/40 backdrop-blur-sm rounded">
-          {relativeDays(item.date)}
-        </span>
-      </div>
+            {/* Title */}
+            <h3 className="text-[16px] font-[700] text-white leading-snug line-clamp-2 group-hover:text-primary transition-colors duration-300 mb-0">
+              {item.title}
+            </h3>
 
-      {/* Meta row */}
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-[12px] text-[#929298] font-[400]">
-          {formatDate(item.date)}
-        </span>
-      </div>
+            {/* Expandable detail area */}
+            <div className="overflow-hidden transition-all duration-500 ease-out max-h-0 group-hover:max-h-[120px] opacity-0 group-hover:opacity-100">
+              {/* Stats for reports */}
+              {item.type === "report" && item.statsSummary && (
+                <div className="flex items-center gap-2 mt-3 flex-wrap">
+                  {item.statsSummary.split(" · ").map((stat) => {
+                    const isRepo = stat.includes("repo");
+                    return (
+                      <span
+                        key={stat}
+                        className="inline-flex items-center gap-1 text-[10px] font-[600] px-2 py-0.5 rounded"
+                        style={{
+                          backgroundColor: cfg.color + "15",
+                          color: cfg.color,
+                          border: `1px solid ${cfg.color}25`,
+                        }}
+                      >
+                        {isRepo ? <GitPullRequest size={10} /> : <BarChart3 size={10} />}
+                        {stat}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
 
-      {/* Title */}
-      <span className="text-[18px] font-[700] text-white line-clamp-2 group-hover:text-primary transition-colors duration-300 leading-snug">
-        {item.title}
-      </span>
+              {/* Excerpt for blogs */}
+              {item.type === "blog" && item.excerpt && (
+                <p className="text-[12px] text-[#999] mt-3 leading-relaxed line-clamp-2">
+                  {item.excerpt}
+                </p>
+              )}
 
-      {/* Stats preview for reports */}
-      {item.type === "report" && item.statsSummary && (
-        <div className="flex items-center gap-3 mt-2">
-          {item.statsSummary.split(" · ").map((stat) => {
-            const isRepo = stat.includes("repo");
-            return (
-              <span
-                key={stat}
-                className="inline-flex items-center gap-1 text-[11px] font-[600] px-2 py-0.5 rounded"
-                style={{
-                  backgroundColor: "#0077ff10",
-                  color: "#0077ff",
-                  border: "1px solid #0077ff20",
-                }}
-              >
-                {isRepo ? <GitPullRequest size={10} /> : <BarChart3 size={10} />}
-                {stat}
-              </span>
-            );
-          })}
+              {/* CTA */}
+              <div className="flex items-center gap-1 mt-3">
+                <span
+                  className="text-[11px] font-[700] uppercase tracking-[0.06em]"
+                  style={{ color: cfg.color }}
+                >
+                  {item.type === "report" ? "Open Report" : "Read More"}
+                </span>
+                <ArrowUpRight size={12} style={{ color: cfg.color }} />
+              </div>
+            </div>
+          </div>
         </div>
-      )}
 
-      {/* Excerpt for blog posts */}
-      {item.type === "blog" && item.excerpt && (
-        <p className="text-[13px] text-[#777] mt-2 leading-relaxed line-clamp-2">
-          {item.excerpt}
-        </p>
-      )}
+        {/* Top edge glow on hover */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${cfg.color}, transparent)`,
+          }}
+        />
+      </div>
     </Wrapper>
   );
 }

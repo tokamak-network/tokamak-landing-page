@@ -15,6 +15,7 @@ interface StreamParticle {
   size: number;
   alpha: number;
   offset: number;   // perpendicular offset
+  startOff: number; // random x-offset at start (spread around center)
 }
 
 /** Background curtain particle — white/gray, falls straight down */
@@ -24,6 +25,15 @@ interface RainParticle {
   size: number;
   alpha: number;
   startX: number;   // original x (reset target)
+}
+
+/** Particle on the orb surface — tightly packed for solid globe look */
+interface OrbParticle {
+  theta: number;      // longitude 0..2PI (rotates)
+  phi: number;        // latitude 0..PI (fixed, uniform sphere distribution)
+  dist: number;       // 0.92..1.08 — very tight to surface
+  size: number;
+  baseAlpha: number;
 }
 
 interface OrbData {
@@ -64,9 +74,9 @@ function formatNum(n: number): string {
 
 /* ── Constants ─────────────────────────────────────── */
 
-const CANVAS_HEIGHT = 1000;
-const TEXT_Y = 0.11;
-const ORB_Y = 0.78;
+const CANVAS_HEIGHT = 1100;
+const TEXT_Y = 0.10;
+const ORB_Y = 0.76;
 const STREAM_PARTICLES = 6000;
 const RAIN_PARTICLES = 3000;    // background curtain
 
@@ -84,6 +94,7 @@ export default function FlowCanvas({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const orbsRef = useRef<OrbData[]>([]);
+  const orbParticlesRef = useRef<OrbParticle[][]>([]);
   const streamRef = useRef<StreamParticle[]>([]);
   const rainRef = useRef<RainParticle[]>([]);
   const pathsRef = useRef<{ p0: Pt; cp1: Pt; cp2: Pt; p3: Pt }[]>([]);
@@ -116,7 +127,6 @@ export default function FlowCanvas({
     textWidthRef.current = textW;
 
     const textLeft = cx - textW / 2;
-    const textRight = cx + textW / 2;
     const textBottom = textY + fontSize * 0.35;
 
     // Sort categories by total lines
@@ -140,28 +150,46 @@ export default function FlowCanvas({
       const xNorm = (t - 0.5) * 2;
       const orbY = orbCY + xNorm * xNorm * h * 0.025;
       const activity = total / maxTotal;
-      const radius = 42 + activity * 35;
+      const radius = 32 + activity * 25;
 
       orbs.push({ x: orbX, y: orbY, radius, color: cat.color, name: cat.name, totalLines: total, repoCount: cat.repos.length });
 
-      // Bezier: start spread across full text width, smoothly curve toward orbs
-      // Start X: distribute across text proportionally
-      const startT = count <= 1 ? 0.5 : sortedIdx / (count - 1);
-      const startX = textLeft + startT * textW;
+      // Bezier: ALL streams start from center gap between "MAK" and "NET"
+      // Then go straight down, fan out, and land on TOP of orb sphere
+      const startX = cx;
       const startY = textBottom;
+      const orbTopY = orbY - radius * 0.7; // land on top of the sphere, not center
 
-      // cp1: gentle pull, keep near starting x to avoid over-convergence
-      const cp1x = startX + (orbX - startX) * 0.15;
-      const cp1y = startY + (orbY - startY) * 0.25;
-      // cp2: approach orb more directly
-      const cp2x = orbX + (startX - orbX) * 0.08;
-      const cp2y = startY + (orbY - startY) * 0.7;
+      // cp1: go straight down from center (keep x near center)
+      const cp1x = cx + (orbX - cx) * 0.03;
+      const cp1y = startY + (orbTopY - startY) * 0.4;
+      // cp2: then curve strongly toward the orb top
+      const cp2x = orbX;
+      const cp2y = startY + (orbTopY - startY) * 0.78;
 
-      paths[ci] = { p0: { x: startX, y: startY }, cp1: { x: cp1x, y: cp1y }, cp2: { x: cp2x, y: cp2y }, p3: { x: orbX, y: orbY } };
+      paths[ci] = { p0: { x: startX, y: startY }, cp1: { x: cp1x, y: cp1y }, cp2: { x: cp2x, y: cp2y }, p3: { x: orbX, y: orbTopY } };
     });
 
     orbsRef.current = orbs;
     pathsRef.current = paths;
+
+    // Build orb surface particles — very dense, tiny particles for smooth sphere
+    const PARTICLES_PER_ORB = 1200;
+    const orbParts: OrbParticle[][] = orbs.map(() => {
+      const parts: OrbParticle[] = [];
+      for (let i = 0; i < PARTICLES_PER_ORB; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        parts.push({
+          theta, phi,
+          dist: rand(0.96, 1.04),   // extremely tight to surface
+          size: rand(0.6, 1.4),     // small particles for smooth look
+          baseAlpha: rand(0.45, 1.0),
+        });
+      }
+      return parts;
+    });
+    orbParticlesRef.current = orbParts;
 
     // Build stream particles
     const particles: StreamParticle[] = [];
@@ -175,6 +203,7 @@ export default function FlowCanvas({
           size: rand(1.2, 3.8),
           alpha: rand(0.3, 1.0),
           offset: rand(-35, 35),
+          startOff: rand(-40, 40),
         });
       }
     });
@@ -364,9 +393,10 @@ export default function FlowCanvas({
         p.t += p.speed;
         if (p.t > 1) {
           p.t = rand(-0.15, 0.05);
-          p.offset = rand(-20, 20);
-          p.alpha = rand(0.35, 1.0);
-          p.size = rand(1.0, 3.2);
+          p.offset = rand(-35, 35);
+          p.startOff = rand(-40, 40);
+          p.alpha = rand(0.3, 1.0);
+          p.size = rand(1.2, 3.8);
         }
         if (p.t < 0) return;
 
@@ -377,9 +407,14 @@ export default function FlowCanvas({
         const dx = pt2.x - pt.x, dy = pt2.y - pt.y;
         const len = Math.sqrt(dx * dx + dy * dy) || 1;
         const nx = -dy / len, ny = dx / len;
-        const offFade = 1 - p.t * p.t * 0.6;
-        p.x = pt.x + nx * p.offset * offFade;
-        p.y = pt.y + ny * p.offset * offFade;
+        // Offset narrows in middle, widens again at end to spread over orb top
+        const midNarrow = 1 - Math.sin(p.t * Math.PI) * 0.5;
+        const endSpread = p.t > 0.8 ? (p.t - 0.8) / 0.2 : 0; // widen at end
+        const offScale = midNarrow + endSpread * 0.8;
+        // startOff: strong at t=0, fades as particle follows the path
+        const startFade = Math.max(0, 1 - p.t * 2.5);
+        p.x = pt.x + nx * p.offset * offScale + p.startOff * startFade;
+        p.y = pt.y + ny * p.offset * offScale;
 
         // Color: white→category
         const catRgb = hexToRgb(cat.color);
@@ -413,66 +448,134 @@ export default function FlowCanvas({
       });
     }
 
-    // ── Orbs ──
+    // ── Orbs (solid rotating globe) ──
     if (revealT > 0.3 && orbs.length > 0) {
       const oA = Math.min((revealT - 0.3) / 0.3, 1);
+      const orbParts = orbParticlesRef.current;
+      // Light direction (upper-left)
+      const lightX = -0.5, lightY = -0.6, lightZ = 0.6;
+      const lightLen = Math.sqrt(lightX * lightX + lightY * lightY + lightZ * lightZ);
+      const lx = lightX / lightLen, ly = lightY / lightLen, lz = lightZ / lightLen;
 
       orbs.forEach((orb, i) => {
         const [r, g, b] = hexToRgb(orb.color);
         const isH = hoveredOrb === i;
-        const pulse = Math.sin(time * 2 + i * 0.7) * 0.08 + 0.92;
-        const dR = orb.radius * pulse * (isH ? 1.15 : 1);
+        const pulse = Math.sin(time * 2 + i * 0.7) * 0.04 + 0.96;
+        const dR = orb.radius * pulse * (isH ? 1.1 : 1);
 
-        // L1: large ambient
-        const aR = dR * 5.5;
-        const ag = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, aR);
-        ag.addColorStop(0, `rgba(${r},${g},${b},${0.25 * oA})`);
-        ag.addColorStop(0.2, `rgba(${r},${g},${b},${0.12 * oA})`);
-        ag.addColorStop(0.5, `rgba(${r},${g},${b},${0.04 * oA})`);
+        // Rotation: each orb spins at slightly different speed
+        const rotSpeed = 0.3 + i * 0.05;
+        const rotAngle = time * rotSpeed;
+
+        // L0: large ambient glow
+        const aR = dR * 3.5;
+        const ag = ctx.createRadialGradient(orb.x, orb.y, dR * 0.3, orb.x, orb.y, aR);
+        ag.addColorStop(0, `rgba(${r},${g},${b},${0.18 * oA})`);
+        ag.addColorStop(0.4, `rgba(${r},${g},${b},${0.06 * oA})`);
         ag.addColorStop(1, `rgba(${r},${g},${b},0)`);
         ctx.beginPath(); ctx.arc(orb.x, orb.y, aR, 0, Math.PI * 2); ctx.fillStyle = ag; ctx.fill();
 
-        // L2: mid glow
-        const mR = dR * 2;
-        const mg = ctx.createRadialGradient(orb.x, orb.y, dR * 0.5, orb.x, orb.y, mR);
-        mg.addColorStop(0, `rgba(${r},${g},${b},${0.3 * oA})`);
-        mg.addColorStop(0.5, `rgba(${r},${g},${b},${0.1 * oA})`);
-        mg.addColorStop(1, `rgba(${r},${g},${b},0)`);
-        ctx.beginPath(); ctx.arc(orb.x, orb.y, mR, 0, Math.PI * 2); ctx.fillStyle = mg; ctx.fill();
+        // L1: solid dark sphere base (gives the globe its round silhouette)
+        const baseG = ctx.createRadialGradient(
+          orb.x - dR * 0.2, orb.y - dR * 0.25, dR * 0.1,
+          orb.x + dR * 0.05, orb.y + dR * 0.05, dR
+        );
+        baseG.addColorStop(0, `rgba(${Math.min(r + 60, 255)},${Math.min(g + 60, 255)},${Math.min(b + 60, 255)},${0.55 * oA})`);
+        baseG.addColorStop(0.35, `rgba(${r},${g},${b},${0.45 * oA})`);
+        baseG.addColorStop(0.7, `rgba(${r >> 1},${g >> 1},${b >> 1},${0.3 * oA})`);
+        baseG.addColorStop(1, `rgba(${r >> 2},${g >> 2},${b >> 2},${0.18 * oA})`);
+        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2); ctx.fillStyle = baseG; ctx.fill();
 
-        // L3: body
-        const bg = ctx.createRadialGradient(orb.x - dR * 0.3, orb.y - dR * 0.3, dR * 0.1, orb.x + dR * 0.1, orb.y + dR * 0.1, dR * 1.1);
-        bg.addColorStop(0, `rgba(255,255,255,${0.5 * oA})`);
-        bg.addColorStop(0.15, `rgba(${Math.min(r + 80, 255)},${Math.min(g + 80, 255)},${Math.min(b + 80, 255)},${0.75 * oA})`);
-        bg.addColorStop(0.4, `rgba(${r},${g},${b},${0.9 * oA})`);
-        bg.addColorStop(0.7, `rgba(${r >> 1},${g >> 1},${b >> 1},${0.7 * oA})`);
-        bg.addColorStop(1, `rgba(${r >> 2},${g >> 2},${b >> 2},${0.4 * oA})`);
-        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2); ctx.fillStyle = bg; ctx.fill();
+        // NO explicit stroke rings — rim glow comes from particle accumulation
 
-        // L4: specular
-        const sg = ctx.createRadialGradient(orb.x - dR * 0.35, orb.y - dR * 0.35, 0, orb.x - dR * 0.15, orb.y - dR * 0.15, dR * 0.6);
-        sg.addColorStop(0, `rgba(255,255,255,${0.65 * oA})`);
-        sg.addColorStop(0.4, `rgba(255,255,255,${0.15 * oA})`);
-        sg.addColorStop(1, "rgba(255,255,255,0)");
-        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2); ctx.fillStyle = sg; ctx.fill();
+        // Surface particles — draw back-to-front for correct depth
+        const parts = orbParts[i];
+        if (parts) {
+          const sorted = parts.map((sp) => {
+            const sinPhi = Math.sin(sp.phi);
+            const cosPhi = Math.cos(sp.phi);
+            const thetaR = sp.theta + rotAngle;
+            const nx = sinPhi * Math.cos(thetaR);
+            const ny = cosPhi;
+            const nz = sinPhi * Math.sin(thetaR);
+            return { nx, ny, nz, sp };
+          }).sort((a, b) => a.nz - b.nz);
 
-        // L5: rim
-        const rg = ctx.createRadialGradient(orb.x + dR * 0.3, orb.y + dR * 0.3, 0, orb.x + dR * 0.2, orb.y + dR * 0.2, dR * 0.5);
-        rg.addColorStop(0, `rgba(${Math.min(r + 60, 255)},${Math.min(g + 60, 255)},${Math.min(b + 60, 255)},${0.22 * oA})`);
-        rg.addColorStop(1, "rgba(255,255,255,0)");
-        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2); ctx.fillStyle = rg; ctx.fill();
+          sorted.forEach(({ nx, ny, nz, sp }) => {
+            const screenX = orb.x + nx * dR * sp.dist;
+            const screenY = orb.y - ny * dR * sp.dist;
 
-        // L6: edge ring
-        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(${Math.min(r + 40, 255)},${Math.min(g + 40, 255)},${Math.min(b + 40, 255)},${0.35 * oA})`;
-        ctx.lineWidth = 1.5;
-        ctx.shadowColor = `rgba(${r},${g},${b},${0.6 * oA})`;
-        ctx.shadowBlur = 18;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
+            // How close to the silhouette edge?
+            const absNz = Math.abs(nz);
+
+            // Skip deep back-face only
+            if (nz < -0.25) return;
+
+            // Lambertian front lighting
+            const ndotl = Math.max(0, nx * lx + (-ny) * ly + nz * lz);
+
+            // Rim factor: particles near edge (nz ≈ 0) get boosted
+            // This is what makes the edge GLOW from particle accumulation
+            const rimFactor = absNz < 0.3 ? Math.pow(1 - absNz / 0.3, 1.5) : 0;
+
+            // Front brightness + rim boost
+            const frontLight = 0.12 + ndotl * 0.65;
+            const brightness = Math.min(1, frontLight + rimFactor * 0.85);
+
+            // Depth: back-face dims, but rim stays bright
+            let depthFade = 1.0;
+            if (nz < 0) depthFade = rimFactor > 0.2 ? 0.5 + rimFactor * 0.5 : Math.max(0, (nz + 0.25) / 0.25) * 0.4;
+
+            const pAlpha = sp.baseAlpha * oA * brightness * depthFade;
+            if (pAlpha < 0.02) return;
+
+            // Brighter color at rim — the key to the glowing edge
+            const rimBoost = rimFactor * 130;
+            const lr = Math.min(Math.round(r + brightness * 80 + rimBoost), 255);
+            const lg = Math.min(Math.round(g + brightness * 80 + rimBoost), 255);
+            const lb = Math.min(Math.round(b + brightness * 80 + rimBoost), 255);
+            const pSize = sp.size * (0.55 + brightness * 0.45);
+
+            // Rim particles: soft glow — many tiny glows stack up for smooth edge
+            if (rimFactor > 0.15) {
+              const glowR = pSize + 2 + rimFactor * 2.5;
+              ctx.beginPath();
+              ctx.arc(screenX, screenY, glowR, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(${lr},${lg},${lb},${pAlpha * rimFactor * 0.08})`;
+              ctx.fill();
+            }
+            // Mid glow
+            ctx.beginPath();
+            ctx.arc(screenX, screenY, pSize + 1, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${lr},${lg},${lb},${pAlpha * 0.12})`;
+            ctx.fill();
+            // Core
+            ctx.beginPath();
+            ctx.arc(screenX, screenY, pSize, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${lr},${lg},${lb},${pAlpha})`;
+            ctx.fill();
+            // White specular on bright front particles
+            if (ndotl > 0.5 && nz > 0.15) {
+              ctx.beginPath();
+              ctx.arc(screenX, screenY, pSize * 0.35, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(255,255,255,${pAlpha * (ndotl - 0.5) * 1.0})`;
+              ctx.fill();
+            }
+          });
+        }
+
+        // Subtle specular highlight (upper-left)
+        const spG = ctx.createRadialGradient(
+          orb.x - dR * 0.3, orb.y - dR * 0.3, 0,
+          orb.x - dR * 0.05, orb.y - dR * 0.05, dR * 0.45
+        );
+        spG.addColorStop(0, `rgba(255,255,255,${0.2 * oA})`);
+        spG.addColorStop(0.5, `rgba(255,255,255,${0.04 * oA})`);
+        spG.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2); ctx.fillStyle = spG; ctx.fill();
 
         // Labels
-        const lY = orb.y + dR + 20;
+        const lY = orb.y + dR + 22;
         ctx.font = "700 11px 'Orbitron', sans-serif";
         ctx.textAlign = "center"; ctx.textBaseline = "top";
         ctx.fillStyle = `rgba(${Math.min(r + 40, 255)},${Math.min(g + 40, 255)},${Math.min(b + 40, 255)},${oA * 0.95})`;

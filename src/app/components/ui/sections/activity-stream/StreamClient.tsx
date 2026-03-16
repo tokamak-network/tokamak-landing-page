@@ -22,32 +22,32 @@ const TYPE_CONFIG: Record<
   feat: {
     label: "Feature",
     color: "#22c55e",
-    icon: <Sparkles size={11} />,
+    icon: <Sparkles size={13} />,
   },
   fix: {
     label: "Fix",
     color: "#ef4444",
-    icon: <Bug size={11} />,
+    icon: <Bug size={13} />,
   },
   refactor: {
     label: "Refactor",
     color: "#f59e0b",
-    icon: <RefreshCw size={11} />,
+    icon: <RefreshCw size={13} />,
   },
   test: {
     label: "Test",
     color: "#8b5cf6",
-    icon: <FlaskConical size={11} />,
+    icon: <FlaskConical size={13} />,
   },
   docs: {
     label: "Docs",
     color: "#0ea5e9",
-    icon: <FileText size={11} />,
+    icon: <FileText size={13} />,
   },
   infra: {
     label: "Infra",
     color: "#64748b",
-    icon: <Server size={11} />,
+    icon: <Server size={13} />,
   },
 };
 
@@ -66,7 +66,7 @@ function TimelineItem({
     <div className="flex gap-0 group">
       {/* Left: time */}
       <div className="w-[72px] shrink-0 pt-[3px] text-right pr-4">
-        <span className="text-[10px] text-[#555] font-mono tabular-nums">
+        <span className="text-[12px] text-[#555] font-mono tabular-nums">
           {item.time}
         </span>
       </div>
@@ -96,7 +96,7 @@ function TimelineItem({
             {item.repoName}
           </span>
           <span
-            className="inline-flex items-center gap-1 px-1.5 py-[1px] rounded text-[9px] font-[700] uppercase tracking-[0.06em]"
+            className="inline-flex items-center gap-1 px-2 py-[2px] rounded text-[11px] font-[700] uppercase tracking-[0.06em]"
             style={{
               backgroundColor: cfg.color + "18",
               color: cfg.color,
@@ -215,21 +215,21 @@ export default function StreamClient({ items }: StreamClientProps) {
               >
                 <span style={{ color: cfg.color }}>{cfg.icon}</span>
                 <span
-                  className="text-[11px] font-[700]"
+                  className="text-[13px] font-[700]"
                   style={{ color: cfg.color }}
                 >
                   {count}
                 </span>
-                <span className="text-[11px] text-[#666]">{cfg.label}</span>
+                <span className="text-[13px] text-[#666]">{cfg.label}</span>
               </div>
             );
           })}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#1a1a1a]">
-            <GitCommit size={11} className="text-[#666]" />
-            <span className="text-[11px] font-[700] text-white">
+            <GitCommit size={13} className="text-[#666]" />
+            <span className="text-[13px] font-[700] text-white">
               {items.length}
             </span>
-            <span className="text-[11px] text-[#666]">Total</span>
+            <span className="text-[13px] text-[#666]">Total</span>
           </div>
         </motion.div>
 

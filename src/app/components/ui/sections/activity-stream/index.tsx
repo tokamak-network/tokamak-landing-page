@@ -1,3 +1,4 @@
+import { fetchGitHubActivity, GitHubCommit } from "@/app/lib/github";
 import { listReports, getReportPath } from "@/app/lib/reports/listReports";
 import { parseReportDetail } from "@/app/lib/reports/parseReport";
 import StreamClient from "./StreamClient";
@@ -24,6 +25,32 @@ function inferType(text: string): StreamItem["type"] {
   return "feat";
 }
 
+// ── Relative time label from ISO date ───────────────────────────────
+
+function relativeDateLabel(isoDate: string): string {
+  const diff = Date.now() - new Date(isoDate).getTime();
+  const minutes = Math.floor(diff / 60_000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+// ── GitHub commits → StreamItem[] ───────────────────────────────────
+
+function commitsToStreamItems(commits: GitHubCommit[]): StreamItem[] {
+  return commits.map((c) => ({
+    time: relativeDateLabel(c.committedDate),
+    repoName: c.repoName,
+    text: c.message.split("\n")[0], // first line only
+    type: inferType(c.message),
+  }));
+}
+
+// ── Fallback: existing report-based data ────────────────────────────
+
 function generateTimeLabel(index: number): string {
   const minutes = index * 12 + Math.floor(Math.random() * 10);
   if (minutes < 60) return `${minutes}m ago`;
@@ -32,7 +59,7 @@ function generateTimeLabel(index: number): string {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
-function getStreamData(): StreamItem[] {
+function getReportStreamData(): StreamItem[] {
   const metas = listReports();
   if (metas.length === 0) return [];
 
@@ -60,8 +87,17 @@ function getStreamData(): StreamItem[] {
   }));
 }
 
-export default function ActivityStream() {
-  const items = getStreamData();
+// ── Server component ────────────────────────────────────────────────
+
+export default async function ActivityStream() {
+  // Try GitHub API first, fall back to report data
+  const commits = await fetchGitHubActivity().catch(() => null);
+
+  const items =
+    commits && commits.length > 0
+      ? commitsToStreamItems(commits)
+      : getReportStreamData();
+
   if (items.length === 0) return null;
   return <StreamClient items={items} />;
 }

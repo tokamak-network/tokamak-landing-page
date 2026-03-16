@@ -2,6 +2,7 @@ import { listReports, getReportPath } from "@/app/lib/reports/listReports";
 import { parseReportSummary } from "@/app/lib/reports/parseReport";
 import { fetchPriceDatas } from "@/app/api/price";
 import MetricCard from "../dashboard/MetricCard";
+import MetricBackdrop from "./MetricBackdrop";
 
 interface PriceMetrics {
   tonPrice: string;
@@ -114,8 +115,9 @@ export default async function EcosystemMetrics() {
   return (
     <section id="ecosystem-metrics" className="relative z-10 w-full flex justify-center px-6 pt-[40px] pb-[160px] [@media(max-width:640px)]:py-[60px]">
       <div className="w-full max-w-[1280px] flex flex-col items-center">
-        <div className="grid grid-cols-3 gap-[1px] w-full [@media(max-width:800px)]:grid-cols-1">
-          {metrics.map((metric) => (
+        <div className="relative grid grid-cols-3 gap-[1px] w-full [@media(max-width:800px)]:grid-cols-1">
+          <MetricBackdrop />
+          {metrics.map((metric, i) => (
             <MetricCard
               key={metric.label}
               label={metric.label}
@@ -125,6 +127,7 @@ export default async function EcosystemMetrics() {
               suffix={metric.suffix}
               decimals={metric.decimals}
               delay={metric.delay}
+              metricIndex={i}
             />
           ))}
         </div>

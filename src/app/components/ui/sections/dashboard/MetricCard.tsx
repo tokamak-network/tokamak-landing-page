@@ -11,6 +11,7 @@ interface MetricCardProps {
   readonly prefix?: string;
   readonly suffix?: string;
   readonly decimals?: number;
+  readonly metricIndex?: number;
 }
 
 export default function MetricCard({
@@ -21,6 +22,7 @@ export default function MetricCard({
   prefix,
   suffix,
   decimals,
+  metricIndex,
 }: MetricCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -44,8 +46,9 @@ export default function MetricCard({
   return (
     <div
       ref={ref}
+      data-metric-index={metricIndex}
       style={{ transitionDelay: `${delay}ms` }}
-      className={`flex flex-col items-center justify-center p-10 bg-surface border-t-2 border-primary shadow-[0_24px_65px_rgba(0,0,0,0.64)] transition-all duration-700 ${
+      className={`relative z-10 flex flex-col items-center justify-center p-10 bg-surface/55 hover:bg-surface/40 border-t-2 border-primary shadow-[0_24px_65px_rgba(0,0,0,0.64)] transition-all duration-700 ${
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
       }`}
     >

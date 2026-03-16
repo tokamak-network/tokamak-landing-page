@@ -35,7 +35,7 @@ function getFlowData(): {
 
   const landscape = detail.ecosystemLandscape;
 
-  const categories: FlowCategory[] = landscape.categories.map((cat) => ({
+  const rawCategories: FlowCategory[] = landscape.categories.map((cat) => ({
     name: cat.name,
     color: cat.color || "#0077ff",
     repos: cat.repos.map((repo) => {
@@ -54,6 +54,22 @@ function getFlowData(): {
       };
     }),
   }));
+
+  // Always exactly 10 categories — pad with "Other" if fewer
+  const SLOT_COUNT = 10;
+  const fillerColors = [
+    "#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981",
+    "#06b6d4", "#3b82f6", "#ef4444", "#84cc16", "#f97316",
+  ];
+  const categories: FlowCategory[] = rawCategories.slice(0, SLOT_COUNT);
+  while (categories.length < SLOT_COUNT) {
+    const idx = categories.length;
+    categories.push({
+      name: `Other ${idx - rawCategories.length + 1}`,
+      color: fillerColors[idx % fillerColors.length],
+      repos: [{ name: "—", linesChanged: 0, netGrowth: 0, isActive: false }],
+    });
+  }
 
   return {
     categories,

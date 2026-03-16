@@ -6,4 +6,5 @@ export interface FeedItem {
   readonly href: string;
   readonly thumbnail?: string;
   readonly statsSummary?: string;
+  readonly excerpt?: string;
 }

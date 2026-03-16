@@ -8,7 +8,16 @@ import type { MediumPost } from "../insight/types";
 
 const MAX_ITEMS = 4;
 
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, "").replace(/&[^;]+;/g, " ").trim();
+}
+
 function blogPostToFeedItem(post: MediumPost): FeedItem {
+  const plainText = post.content ? stripHtml(post.content) : "";
+  const excerpt = plainText.length > 120
+    ? plainText.slice(0, 120).trim() + "..."
+    : plainText || undefined;
+
   return {
     id: `blog-${post.link}`,
     title: post.title,
@@ -16,6 +25,7 @@ function blogPostToFeedItem(post: MediumPost): FeedItem {
     type: "blog",
     href: post.link,
     thumbnail: post.thumbnail,
+    excerpt,
   };
 }
 

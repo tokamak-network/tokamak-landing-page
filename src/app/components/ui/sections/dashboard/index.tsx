@@ -1,19 +1,20 @@
 import { listReports, getReportPath } from "@/app/lib/reports/listReports";
 import { parseReportSummary } from "@/app/lib/reports/parseReport";
+import { FALLBACK_REPORT } from "@/app/lib/reports/constants";
 import { fetchPriceDatas } from "@/app/api/price";
 import MetricCard from "./MetricCard";
 
 interface PriceMetrics {
   tonPrice: string;
   marketCap: string;
-  circulatingSupply: string;
+  volume24h: string;
   tvl: string;
 }
 
 const FALLBACK_PRICE: PriceMetrics = {
   tonPrice: "1.20",
   marketCap: "70,000,000",
-  circulatingSupply: "55,800,000",
+  volume24h: "500,000",
   tvl: "28,500,000",
 };
 
@@ -23,7 +24,7 @@ async function fetchPriceMetrics(): Promise<PriceMetrics> {
     return {
       tonPrice: data.tonPrice.current.usd.toFixed(2),
       marketCap: Math.floor(data.marketCap).toLocaleString("en-US"),
-      circulatingSupply: Math.floor(data.circulatingSupply).toLocaleString("en-US"),
+      volume24h: Math.floor(data.tradingVolumeUSD).toLocaleString("en-US"),
       tvl: Math.floor(data.stakedVolume).toLocaleString("en-US"),
     };
   } catch {
@@ -82,28 +83,28 @@ export default async function EcosystemDashboard() {
       delay: 100,
     },
     {
-      label: "Total Staked",
-      value: priceMetrics.tvl,
-      description: "TON staked across the network",
-      suffix: "TON",
+      label: "24h Volume",
+      value: priceMetrics.volume24h,
+      description: "Trading volume on Upbit (24h)",
+      prefix: "$",
       delay: 200,
     },
     {
-      label: "Circulating Supply",
-      value: priceMetrics.circulatingSupply,
-      description: "Tokens in circulation",
+      label: "Total Staked",
+      value: priceMetrics.tvl,
+      description: "TON staked across the network",
       suffix: "TON",
       delay: 300,
     },
     {
       label: "Active Projects",
-      value: reportStats?.activeRepos ?? "42",
+      value: reportStats?.activeRepos ?? FALLBACK_REPORT.activeProjects,
       description: `Repositories tracked in ${reportLabel}`,
       delay: 400,
     },
     {
       label: "Code Changes",
-      value: reportStats?.linesChanged ?? "4,898,658",
+      value: reportStats?.linesChanged ?? FALLBACK_REPORT.codeChanges,
       description: `Lines changed in ${reportLabel}`,
       delay: 500,
     },

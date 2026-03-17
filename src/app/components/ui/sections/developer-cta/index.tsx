@@ -107,7 +107,7 @@ function StepCard({
         href={step.href}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative flex flex-col h-full overflow-hidden rounded-lg border transition-all duration-300"
+        className="cursor-pointer relative flex flex-col h-full overflow-hidden rounded-lg border transition-all duration-300"
         style={{
           borderColor: isActive ? step.color + "60" : "#1a1a1a",
           backgroundColor: isActive ? step.color + "08" : "#0a0a0a",
@@ -285,7 +285,7 @@ export default function DeveloperCta() {
           {STEPS.map((step, i) => (
             <button
               key={step.num}
-              className="flex items-center gap-2"
+              className="cursor-pointer flex items-center gap-2"
               onClick={() => setActiveIndex(i)}
             >
               <div

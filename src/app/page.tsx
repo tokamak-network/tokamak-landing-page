@@ -11,13 +11,14 @@ import Footer from "./components/ui/footer";
 import PulseSpine from "./components/ui/pulse-spine/PulseSpine";
 import { listReports, getReportPath } from "./lib/reports/listReports";
 import { parseReportSummary } from "./lib/reports/parseReport";
+import { FALLBACK_REPORT } from "./lib/reports/constants";
 import { fetchPriceDatas } from "./api/price";
 
 export default async function Home() {
   // Fetch data for hero
-  let codeChanges = 4898658;
-  let netGrowth = 2979570;
-  let activeProjects = 67;
+  let codeChanges = parseInt(FALLBACK_REPORT.codeChanges.replace(/,/g, ""));
+  let netGrowth = parseInt(FALLBACK_REPORT.netGrowth.replace(/,/g, ""));
+  let activeProjects = parseInt(FALLBACK_REPORT.activeProjects);
   let totalStaked = 28500000;
 
   try {

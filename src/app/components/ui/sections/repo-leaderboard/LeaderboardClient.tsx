@@ -574,12 +574,14 @@ function Legend() {
 
 interface LeaderboardClientProps {
   categories: TreemapCategory[];
+  activeRepos: string;
   reportLabel: string;
   reportHref: string;
 }
 
 export default function LeaderboardClient({
   categories,
+  activeRepos,
   reportLabel,
   reportHref,
 }: LeaderboardClientProps) {
@@ -627,11 +629,6 @@ export default function LeaderboardClient({
     return max;
   }, [categories]);
 
-  const totalRepos = useMemo(
-    () => categories.reduce((s, c) => s + c.repos.length, 0),
-    [categories],
-  );
-
   const totalLines = useMemo(
     () =>
       categories.reduce(
@@ -675,10 +672,10 @@ export default function LeaderboardClient({
         >
           <div className="text-center">
             <div className="text-[24px] font-orbitron font-[900] text-white">
-              {totalRepos}
+              {activeRepos}
             </div>
             <div className="text-[10px] text-[#666] uppercase tracking-[0.1em] font-[600] mt-1">
-              Active Repos
+              Active Projects
             </div>
           </div>
           <div className="w-px bg-[#1a1a1a]" />

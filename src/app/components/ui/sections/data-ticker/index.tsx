@@ -1,5 +1,6 @@
 import { listReports, getReportPath } from "@/app/lib/reports/listReports";
 import { parseReportSummary } from "@/app/lib/reports/parseReport";
+import { FALLBACK_REPORT } from "@/app/lib/reports/constants";
 import { fetchPriceDatas } from "@/app/api/price";
 import TickerClient from "./TickerClient";
 
@@ -51,8 +52,8 @@ async function getTickerData(): Promise<TickerItem[]> {
         { label: "TON", value: "1.20", prefix: "$" },
         { label: "MARKET CAP", value: "$70M" },
         { label: "TVL", value: "28.5M", suffix: "TON" },
-        { label: "CODE", value: "4,898,658", suffix: "lines" },
-        { label: "PROJECTS", value: "67" },
+        { label: "CODE", value: FALLBACK_REPORT.codeChanges, suffix: "lines" },
+        { label: "PROJECTS", value: FALLBACK_REPORT.activeProjects },
       ];
     }
 
@@ -62,8 +63,8 @@ async function getTickerData(): Promise<TickerItem[]> {
       { label: "TON", value: "1.20", prefix: "$" },
       { label: "MARKET CAP", value: "$70M" },
       { label: "TVL", value: "28.5M", suffix: "TON" },
-      { label: "CODE", value: "4,898,658", suffix: "lines" },
-      { label: "PROJECTS", value: "67" },
+      { label: "CODE", value: FALLBACK_REPORT.codeChanges, suffix: "lines" },
+      { label: "PROJECTS", value: FALLBACK_REPORT.activeProjects },
     ];
   }
 }

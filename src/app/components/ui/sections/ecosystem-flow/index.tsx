@@ -18,19 +18,19 @@ export interface FlowCategory {
 
 function getFlowData(): {
   categories: FlowCategory[];
-  totalRepos: number;
-  totalCommits: number;
+  activeProjects: number;
+  codeChanges: number;
 } {
   const metas = listReports();
-  if (metas.length === 0) return { categories: [], totalRepos: 0, totalCommits: 0 };
+  if (metas.length === 0) return { categories: [], activeProjects: 0, codeChanges: 0 };
 
   const latest = metas[0];
   const filePath = getReportPath(latest.slug);
-  if (!filePath) return { categories: [], totalRepos: 0, totalCommits: 0 };
+  if (!filePath) return { categories: [], activeProjects: 0, codeChanges: 0 };
 
   const detail = parseReportDetail(filePath, latest);
   if (!detail.ecosystemLandscape) {
-    return { categories: [], totalRepos: 0, totalCommits: 0 };
+    return { categories: [], activeProjects: 0, codeChanges: 0 };
   }
 
   const landscape = detail.ecosystemLandscape;
@@ -73,13 +73,13 @@ function getFlowData(): {
 
   return {
     categories,
-    totalRepos: landscape.totalRepos,
-    totalCommits: landscape.totalCommits,
+    activeProjects: parseNum(detail.stats.activeRepos),
+    codeChanges: parseNum(detail.stats.linesChanged),
   };
 }
 
 export default function EcosystemFlow() {
-  const { categories, totalRepos, totalCommits } = getFlowData();
+  const { categories, activeProjects, codeChanges } = getFlowData();
   if (categories.length === 0) return null;
 
   return (
@@ -89,8 +89,8 @@ export default function EcosystemFlow() {
     >
       <FlowCanvas
         categories={categories}
-        totalRepos={totalRepos}
-        totalCommits={totalCommits}
+        activeProjects={activeProjects}
+        codeChanges={codeChanges}
       />
     </section>
   );

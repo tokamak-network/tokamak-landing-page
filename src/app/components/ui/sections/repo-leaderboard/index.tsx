@@ -6,23 +6,24 @@ import type { TreemapCategory, TreemapRepo } from "./treemapLayout";
 
 function getLeaderboardData(): {
   categories: TreemapCategory[];
+  activeRepos: string;
   reportLabel: string;
   reportHref: string;
 } {
   const metas = listReports();
   if (metas.length === 0) {
-    return { categories: [], reportLabel: "", reportHref: "/about/reports" };
+    return { categories: [], activeRepos: "0", reportLabel: "", reportHref: "/about/reports" };
   }
 
   const latest = metas[0];
   const filePath = getReportPath(latest.slug);
   if (!filePath) {
-    return { categories: [], reportLabel: "", reportHref: "/about/reports" };
+    return { categories: [], activeRepos: "0", reportLabel: "", reportHref: "/about/reports" };
   }
 
   const detail = parseReportDetail(filePath, latest);
   if (!detail.ecosystemLandscape) {
-    return { categories: [], reportLabel: "", reportHref: "/about/reports" };
+    return { categories: [], activeRepos: detail.stats.activeRepos, reportLabel: "", reportHref: "/about/reports" };
   }
 
   const landscape = detail.ecosystemLandscape;
@@ -67,17 +68,19 @@ function getLeaderboardData(): {
 
   return {
     categories,
+    activeRepos: detail.stats.activeRepos,
     reportLabel,
     reportHref: `/about/reports/${latest.slug}`,
   };
 }
 
 export default function RepoLeaderboard() {
-  const { categories, reportLabel, reportHref } = getLeaderboardData();
+  const { categories, activeRepos, reportLabel, reportHref } = getLeaderboardData();
 
   return (
     <LeaderboardClient
       categories={categories}
+      activeRepos={activeRepos}
       reportLabel={reportLabel}
       reportHref={reportHref}
     />

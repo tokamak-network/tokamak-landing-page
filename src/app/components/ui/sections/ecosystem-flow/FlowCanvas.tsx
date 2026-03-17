@@ -67,12 +67,12 @@ const END_Y = 0.78;
 
 export default function FlowCanvas({
   categories,
-  totalRepos,
-  totalCommits,
+  activeProjects,
+  codeChanges,
 }: {
   categories: FlowCategory[];
-  totalRepos: number;
-  totalCommits: number;
+  activeProjects: number;
+  codeChanges: number;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -265,7 +265,7 @@ export default function FlowCanvas({
       ctx.letterSpacing = "0px";
       ctx.font = "400 11px sans-serif";
       ctx.fillStyle = `rgba(140,150,170,${0.45 * ecoA})`;
-      ctx.fillText(`${totalRepos} repositories · ${totalCommits.toLocaleString("en-US")} commits`, cx, ecoY + 18);
+      ctx.fillText(`${activeProjects} active projects · ${codeChanges.toLocaleString("en-US")} code changes`, cx, ecoY + 18);
       ctx.restore();
     }
 
@@ -529,7 +529,7 @@ export default function FlowCanvas({
     }
 
     ctx.restore();
-  }, [totalRepos, totalCommits]);
+  }, [activeProjects, codeChanges]);
 
   /* ── Animation loop ────────────────────────────── */
 

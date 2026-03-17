@@ -88,11 +88,7 @@ export default function EcosystemFlow() {
       id="ecosystem-flow"
       className="relative z-10 w-full flex flex-col items-center bg-black pt-[80px]"
     >
-      <FlowCanvas
-        categories={categories}
-        totalRepos={totalRepos}
-        totalCommits={totalCommits}
-      />
+      <FlowCanvas categories={categories} />
 
       {/* 3D Ecosystem Globe — Shopify-style interactive sphere */}
       <GlobeWrapper categories={categories} totalRepos={totalRepos} />

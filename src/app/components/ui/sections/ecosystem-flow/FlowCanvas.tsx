@@ -118,7 +118,7 @@ export default function FlowCanvas({
       .sort((a, b) => b.total - a.total);
 
     const maxTotal = Math.max(1, ...catEntries.map((e) => e.total));
-    const spread = w * 0.85;
+    const spread = w * 0.95;
     const count = catEntries.length;
     // Two-segment paths: upper (text → junction) + lower (junction → endpoint)
     const paths: { upper: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt }; lower: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt } }[] = [];
@@ -193,7 +193,7 @@ export default function FlowCanvas({
 
   useEffect(() => {
     const video = document.createElement("video");
-    video.src = "/hero-video.mp4";
+    video.src = "/flow-video.mp4";
     video.muted = true;
     video.loop = true;
     video.playsInline = true;
@@ -254,7 +254,7 @@ export default function FlowCanvas({
     // ── ECOSYSTEM label ──
     if (revealT > 0.05) {
       const ecoA = Math.min((revealT - 0.05) / 0.15, 1);
-      const ecoY = textCenterY - mainFontSize * 0.45 - 22;
+      const ecoY = textCenterY - mainFontSize * 0.45 - 40;
       ctx.save();
       ctx.font = "600 12px 'Orbitron', sans-serif";
       ctx.textAlign = "center";
@@ -407,87 +407,128 @@ export default function FlowCanvas({
       });
     }
 
-    // ── Category labels at strand endpoints ──
+    // ── Category dots + hover labels at strand endpoints ──
     {
-      const labelAlpha = 1;
-      const drawnCats = new Set<number>();
+      // First pass: collect per-category info
+      const catMap = new Map<number, {
+        catIdx: number; catName: string; color: string;
+        avgX: number; avgY: number;
+        repoCount: number; totalLines: number; activeCount: number;
+      }>();
 
       strands.forEach((strand) => {
-        if (drawnCats.has(strand.catIdx)) return;
-        drawnCats.add(strand.catIdx);
-
-        // Collect all strands in this category to compute average endpoint
+        if (catMap.has(strand.catIdx)) return;
         const catStrands = strands
           .map((s, i) => ({ s, i }))
           .filter(({ s }) => s.catIdx === strand.catIdx);
 
-        // Average endpoint position
         let sumX = 0, sumY = 0;
         catStrands.forEach(({ i }) => {
           const p = paths[i];
           if (p) { sumX += p.lower.p3.x; sumY += p.lower.p3.y; }
         });
-        const avgX = sumX / catStrands.length;
-        const avgY = sumY / catStrands.length;
 
-        // Stats
-        const repoCount = new Set(catStrands.map(({ s }) => s.repoName)).size;
-        const totalLines = catStrands.reduce((sum, { s }) => sum + s.linesChanged, 0);
-        const activeCount = catStrands.filter(({ s }) => s.isActive).length;
+        catMap.set(strand.catIdx, {
+          catIdx: strand.catIdx,
+          catName: strand.catName,
+          color: strand.color,
+          avgX: sumX / catStrands.length,
+          avgY: sumY / catStrands.length,
+          repoCount: new Set(catStrands.map(({ s }) => s.repoName)).size,
+          totalLines: catStrands.reduce((sum, { s }) => sum + s.linesChanged, 0),
+          activeCount: catStrands.filter(({ s }) => s.isActive).length,
+        });
+      });
 
-        const isHovered = hoveredCat === -1 || hoveredCat === strand.catIdx;
-        const a = isHovered ? labelAlpha : labelAlpha * 0.25;
-        const [r, g, b] = hexToRgb(strand.color);
+      const cats = Array.from(catMap.values()).sort((a, b) => a.avgX - b.avgX);
 
-        // Node glow
-        const nodeGlow = Math.sin(time * 2 + strand.catIdx) * 0.2 + 0.8;
-        if (isHovered) {
-          ctx.beginPath();
-          ctx.arc(avgX, avgY, 20 * nodeGlow, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${r},${g},${b},${a * 0.06})`;
-          ctx.fill();
-          ctx.beginPath();
-          ctx.arc(avgX, avgY, 10, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${r},${g},${b},${a * 0.12})`;
-          ctx.fill();
+      // Collision-aware label Y offsets (push apart if too close on X)
+      const LABEL_H = 65;       // approx height of a full label block
+      const MIN_X_GAP = 90;     // min horizontal distance before offset kicks in
+      const labelOffsets: number[] = new Array(cats.length).fill(0);
+
+      for (let i = 1; i < cats.length; i++) {
+        const dx = Math.abs(cats[i].avgX - cats[i - 1].avgX);
+        if (dx < MIN_X_GAP) {
+          // Alternate: push current one down if previous was up (or vice versa)
+          labelOffsets[i] = labelOffsets[i - 1] <= 0 ? LABEL_H : -LABEL_H * 0.5;
         }
+      }
 
-        // Core node dot
+      // Draw all categories
+      cats.forEach((cat, ci) => {
+        const [r, g, b] = hexToRgb(cat.color);
+        const isHovered = hoveredCat === cat.catIdx;
+        const isNoneHovered = hoveredCat === -1;
+
+        // Always draw: colored dot with subtle pulse
+        const pulse = Math.sin(time * 2 + cat.catIdx) * 0.2 + 0.8;
+        const dotR = isHovered ? 6 : 4;
+        const dotA = isHovered ? 1 : (isNoneHovered ? 0.7 : 0.2);
+
+        // Outer glow (always, subtle)
         ctx.beginPath();
-        ctx.arc(avgX, avgY, isHovered ? 5 : 3, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${r},${g},${b},${a * 0.9})`;
+        ctx.arc(cat.avgX, cat.avgY, dotR + 8 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r},${g},${b},${dotA * 0.06})`;
         ctx.fill();
-        if (isHovered) {
-          ctx.beginPath();
-          ctx.arc(avgX, avgY, 2, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255,255,255,${a * 0.9})`;
-          ctx.fill();
-        }
+
+        // Core dot
+        ctx.beginPath();
+        ctx.arc(cat.avgX, cat.avgY, dotR, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r},${g},${b},${dotA * 0.9})`;
+        ctx.fill();
+
+        // Bright center
+        ctx.beginPath();
+        ctx.arc(cat.avgX, cat.avgY, 2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${dotA * 0.7})`;
+        ctx.fill();
 
         // Category name
-        const labelY = avgY + 18;
-        ctx.font = "700 13px 'Orbitron', sans-serif";
+        ctx.font = "700 12px 'Orbitron', sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
-        ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
-        ctx.fillText(strand.catName.toUpperCase(), avgX, labelY);
+        const nameA = isHovered ? 1 : (isNoneHovered ? 0.8 : 0.15);
+        ctx.fillStyle = `rgba(${r},${g},${b},${nameA})`;
+        ctx.fillText(cat.catName.toUpperCase(), cat.avgX, cat.avgY + 14);
 
-        // Repo count + lines changed
-        ctx.font = "500 11px 'Orbitron', sans-serif";
-        ctx.fillStyle = `rgba(220,220,220,${a * 0.65})`;
-        ctx.fillText(`${repoCount} repos`, avgX, labelY + 18);
+        // Detail label with collision offset
+        const fade = isHovered ? 1 : (isNoneHovered ? 0.7 : 0.1);
+        const offsetY = labelOffsets[ci];
+        const labelY = cat.avgY + 34 + offsetY;
 
-        if (totalLines > 0) {
-          ctx.font = "400 10px sans-serif";
-          ctx.fillStyle = `rgba(${r},${g},${b},${a * 0.5})`;
-          ctx.fillText(`${formatNum(totalLines)} lines`, avgX, labelY + 33);
+        // Background pill
+        const pillW = 130;
+        const pillH = 60;
+        const pillX = cat.avgX - pillW / 2;
+        const pillY = labelY - 4;
+        ctx.beginPath();
+        ctx.roundRect(pillX, pillY, pillW, pillH, 6);
+        ctx.fillStyle = `rgba(${r},${g},${b},${0.08 * fade})`;
+        ctx.fill();
+        ctx.strokeStyle = `rgba(${r},${g},${b},${0.2 * fade})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Repo count
+        ctx.font = "600 15px 'Orbitron', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.fillStyle = `rgba(255,255,255,${0.9 * fade})`;
+        ctx.fillText(`${cat.repoCount} repos`, cat.avgX, labelY + 2);
+
+        // Lines changed
+        if (cat.totalLines > 0) {
+          ctx.font = "400 14px sans-serif";
+          ctx.fillStyle = `rgba(${r},${g},${b},${0.7 * fade})`;
+          ctx.fillText(`${formatNum(cat.totalLines)} lines`, cat.avgX, labelY + 22);
         }
 
-        // Active indicator
-        if (isHovered && activeCount > 0) {
-          ctx.font = "400 10px sans-serif";
-          ctx.fillStyle = `rgba(34,197,94,${a * 0.6})`;
-          ctx.fillText(`${activeCount} active`, avgX, labelY + 47);
+        // Active count
+        if (cat.activeCount > 0) {
+          ctx.font = "400 12px sans-serif";
+          ctx.fillStyle = `rgba(34,197,94,${0.7 * fade})`;
+          ctx.fillText(`${cat.activeCount} active`, cat.avgX, labelY + 40);
         }
       });
     }
@@ -558,7 +599,7 @@ export default function FlowCanvas({
   }, [buildLayout, render, loop]);
 
   return (
-    <div ref={containerRef} className="w-full max-w-[1280px] px-6">
+    <div ref={containerRef} className="w-full max-w-[1440px] px-2">
       <canvas ref={canvasRef} className="w-full cursor-crosshair" style={{ height: CANVAS_HEIGHT }} />
     </div>
   );

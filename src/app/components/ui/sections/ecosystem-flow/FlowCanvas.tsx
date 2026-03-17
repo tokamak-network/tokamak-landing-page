@@ -7,37 +7,17 @@ import type { FlowCategory } from "./index";
 
 interface Pt { x: number; y: number; }
 
-interface StreamParticle {
+interface StrandInfo {
   catIdx: number;
-  x: number; y: number;
-  t: number;        // bezier progress 0→1
-  speed: number;
-  size: number;
-  alpha: number;
-  offset: number;   // perpendicular offset
-}
-
-/** Background curtain particle — white/gray, falls straight down */
-interface RainParticle {
-  x: number; y: number;
-  speed: number;
-  size: number;
-  alpha: number;
-  startX: number;   // original x (reset target)
-}
-
-interface OrbData {
-  x: number; y: number;
-  radius: number;
+  catName: string;
+  repoName: string;
   color: string;
-  name: string;
-  totalLines: number;
-  repoCount: number;
+  linesChanged: number;
+  isActive: boolean;
+  width: number;
 }
 
 /* ── Helpers ───────────────────────────────────────── */
-
-function rand(a: number, b: number) { return a + Math.random() * (b - a); }
 
 function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
@@ -56,6 +36,20 @@ function bezier(p0: Pt, p1: Pt, p2: Pt, p3: Pt, t: number): Pt {
   };
 }
 
+/** Evaluate a point along a two-segment (upper+lower) bezier path. t: 0→1 */
+function evalTwoSeg(
+  p: { upper: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt }; lower: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt } },
+  t: number,
+): Pt {
+  const SPLIT = 0.35; // upper segment occupies 0→35%, lower 35%→100%
+  if (t <= SPLIT) {
+    const localT = t / SPLIT;
+    return bezier(p.upper.p0, p.upper.cp1, p.upper.cp2, p.upper.p3, localT);
+  }
+  const localT = (t - SPLIT) / (1 - SPLIT);
+  return bezier(p.lower.p0, p.lower.cp1, p.lower.cp2, p.lower.p3, localT);
+}
+
 function formatNum(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
@@ -67,9 +61,7 @@ function formatNum(n: number): string {
 const CANVAS_HEIGHT = 1000;
 const TEXT_Y = 0.11;
 const JUNCTION_Y = 0.38;       // convergence point
-const ORB_Y = 0.78;
-const STREAM_PARTICLES = 6000;
-const RAIN_PARTICLES = 3000;    // background curtain
+const END_Y = 0.78;
 
 /* ── Component ─────────────────────────────────────── */
 
@@ -84,9 +76,7 @@ export default function FlowCanvas({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const orbsRef = useRef<OrbData[]>([]);
-  const streamRef = useRef<StreamParticle[]>([]);
-  const rainRef = useRef<RainParticle[]>([]);
+  const strandsRef = useRef<StrandInfo[]>([]);
   const pathsRef = useRef<{ upper: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt }; lower: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt } }[]>([]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const videoReadyRef = useRef(false);
@@ -103,9 +93,9 @@ export default function FlowCanvas({
   const buildLayout = useCallback((w: number, h: number) => {
     const cx = w / 2;
     const textY = h * TEXT_Y;
-    const orbCY = h * ORB_Y;
+    const endCY = h * END_Y;
 
-    // Measure text width for rain curtain
+    // Measure text width
     const tmpCanvas = document.createElement("canvas");
     const tmpCtx = tmpCanvas.getContext("2d")!;
     const maxW = w * 0.88;
@@ -117,7 +107,6 @@ export default function FlowCanvas({
     textWidthRef.current = textW;
 
     const textLeft = cx - textW / 2;
-    const textRight = cx + textW / 2;
     const textBottom = textY + fontSize * 0.35;
 
     // Sort categories by total lines
@@ -129,83 +118,73 @@ export default function FlowCanvas({
       .sort((a, b) => b.total - a.total);
 
     const maxTotal = Math.max(1, ...catEntries.map((e) => e.total));
-    const orbSpread = w * 0.85;
+    const spread = w * 0.85;
     const count = catEntries.length;
-    const orbs: OrbData[] = [];
-    // Two-segment paths: upper (text → junction) + lower (junction → orb)
-    const paths: { upper: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt }; lower: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt } }[] = new Array(categories.length);
+    // Two-segment paths: upper (text → junction) + lower (junction → endpoint)
+    const paths: { upper: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt }; lower: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt } }[] = [];
+    const strands: StrandInfo[] = [];
 
     const junctionX = cx;
     const junctionY = h * JUNCTION_Y;
 
+    // Build one strand per repo, grouped by category
+    let strandIdx = 0;
     catEntries.forEach((entry, sortedIdx) => {
-      const { cat, idx: ci, total } = entry;
-      const t = count <= 1 ? 0.5 : sortedIdx / (count - 1);
-      const orbX = cx - orbSpread / 2 + t * orbSpread;
-      const xNorm = (t - 0.5) * 2;
-      const orbY = orbCY + xNorm * xNorm * h * 0.025;
-      const activity = total / maxTotal;
-      const radius = 42 + activity * 35;
+      const { cat, idx: ci } = entry;
+      const catRepos = cat.repos;
+      const repoCount = catRepos.length;
 
-      orbs.push({ x: orbX, y: orbY, radius, color: cat.color, name: cat.name, totalLines: total, repoCount: cat.repos.length });
+      catRepos.forEach((repo, ri) => {
+        const activity = repo.linesChanged / maxTotal;
+        const width = 0.6 + activity * 2.5;
 
-      // Start X: distribute across text proportionally
-      const startT = count <= 1 ? 0.5 : sortedIdx / (count - 1);
-      const startX = textLeft + startT * textW;
-      const startY = textBottom;
+        // Start X: distribute proportionally along text width
+        const globalT = count <= 1 ? 0.5 : (strandIdx / Math.max(1, categories.reduce((s, c) => s + c.repos.length, 0) - 1));
+        const startX = textLeft + globalT * textW;
+        const startY = textBottom;
 
-      // Upper segment: text spread → junction (converge)
-      const u_cp1x = startX;
-      const u_cp1y = startY + (junctionY - startY) * 0.45;
-      const u_cp2x = junctionX + (startX - junctionX) * 0.15;
-      const u_cp2y = startY + (junctionY - startY) * 0.75;
+        // End X: fan out by category, then sub-spread within category
+        const catT = count <= 1 ? 0.5 : sortedIdx / (count - 1);
+        const catCenterX = cx - spread / 2 + catT * spread;
+        const repoSpreadW = spread / count * 0.7;
+        const repoT = repoCount <= 1 ? 0 : (ri / (repoCount - 1) - 0.5);
+        const endX = catCenterX + repoT * repoSpreadW;
+        const xNorm = ((catT + repoT * 0.05) - 0.5) * 2;
+        const endY = endCY + xNorm * xNorm * h * 0.025;
 
-      // Lower segment: junction → orb (fan out)
-      const l_cp1x = junctionX + (orbX - junctionX) * 0.1;
-      const l_cp1y = junctionY + (orbY - junctionY) * 0.3;
-      const l_cp2x = orbX + (junctionX - orbX) * 0.08;
-      const l_cp2y = junctionY + (orbY - junctionY) * 0.7;
+        // Upper segment: text spread → junction (converge)
+        const u_cp1x = startX;
+        const u_cp1y = startY + (junctionY - startY) * 0.45;
+        const u_cp2x = junctionX + (startX - junctionX) * 0.15;
+        const u_cp2y = startY + (junctionY - startY) * 0.75;
 
-      paths[ci] = {
-        upper: { p0: { x: startX, y: startY }, cp1: { x: u_cp1x, y: u_cp1y }, cp2: { x: u_cp2x, y: u_cp2y }, p3: { x: junctionX, y: junctionY } },
-        lower: { p0: { x: junctionX, y: junctionY }, cp1: { x: l_cp1x, y: l_cp1y }, cp2: { x: l_cp2x, y: l_cp2y }, p3: { x: orbX, y: orbY } },
-      };
-    });
+        // Lower segment: junction → endpoint (fan out)
+        const l_cp1x = junctionX + (endX - junctionX) * 0.1;
+        const l_cp1y = junctionY + (endY - junctionY) * 0.3;
+        const l_cp2x = endX + (junctionX - endX) * 0.08;
+        const l_cp2y = junctionY + (endY - junctionY) * 0.7;
 
-    orbsRef.current = orbs;
-    pathsRef.current = paths;
-
-    // Build stream particles
-    const particles: StreamParticle[] = [];
-    const perCat = Math.floor(STREAM_PARTICLES / categories.length);
-    categories.forEach((_, ci) => {
-      for (let i = 0; i < perCat; i++) {
-        particles.push({
-          catIdx: ci, x: 0, y: 0,
-          t: Math.random(),
-          speed: rand(0.0015, 0.006),
-          size: rand(1.2, 3.8),
-          alpha: rand(0.3, 1.0),
-          offset: rand(-35, 35),
+        paths.push({
+          upper: { p0: { x: startX, y: startY }, cp1: { x: u_cp1x, y: u_cp1y }, cp2: { x: u_cp2x, y: u_cp2y }, p3: { x: junctionX, y: junctionY } },
+          lower: { p0: { x: junctionX, y: junctionY }, cp1: { x: l_cp1x, y: l_cp1y }, cp2: { x: l_cp2x, y: l_cp2y }, p3: { x: endX, y: endY } },
         });
-      }
-    });
-    streamRef.current = particles;
 
-    // Build rain curtain particles (from full text width, straight down)
-    const rain: RainParticle[] = [];
-    for (let i = 0; i < RAIN_PARTICLES; i++) {
-      const rx = textLeft + Math.random() * textW;
-      rain.push({
-        x: rx,
-        y: textBottom + Math.random() * (h - textBottom),
-        speed: rand(0.5, 2.5),
-        size: rand(0.8, 2.5),
-        alpha: rand(0.06, 0.35),
-        startX: rx,
+        strands.push({
+          catIdx: ci,
+          catName: cat.name,
+          repoName: repo.name,
+          color: cat.color,
+          linesChanged: repo.linesChanged,
+          isActive: repo.isActive,
+          width: Math.max(0.6, width),
+        });
+
+        strandIdx++;
       });
-    }
-    rainRef.current = rain;
+    });
+
+    pathsRef.current = paths;
+    strandsRef.current = strands;
 
     setTick((t) => t + 1);
   }, [categories]);
@@ -240,10 +219,8 @@ export default function FlowCanvas({
     const h = canvas.height / dpr;
     const progress = progressRef.current;
     const time = Date.now() * 0.001;
-    const orbs = orbsRef.current;
     const paths = pathsRef.current;
-    const stream = streamRef.current;
-    const rain = rainRef.current;
+    const strands = strandsRef.current;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
@@ -258,15 +235,21 @@ export default function FlowCanvas({
     ctx.font = `900 100px 'Orbitron', sans-serif`;
     const fullMeasure = ctx.measureText("TOKAMAK NETWORK").width;
     const mainFontSize = Math.min(90, Math.floor((maxTextWidth / fullMeasure) * 100));
-    const textBottom = textCenterY + mainFontSize * 0.35;
 
-    // Hovered orb
+    // Hovered category (nearest strand endpoint)
     const mouse = mouseRef.current;
-    let hoveredOrb = -1;
-    orbs.forEach((orb, i) => {
-      const dx = mouse.x - orb.x, dy = mouse.y - orb.y;
-      if (Math.sqrt(dx * dx + dy * dy) < orb.radius + 20) hoveredOrb = i;
-    });
+    let hoveredCat = -1;
+    if (mouse.x > 0 && mouse.y > 0) {
+      let minDist = 120;
+      strands.forEach((strand, si) => {
+        const p = paths[si];
+        if (!p) return;
+        const ep = p.lower.p3;
+        const dx = mouse.x - ep.x, dy = mouse.y - ep.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < minDist) { minDist = d; hoveredCat = strand.catIdx; }
+      });
+    }
 
     // ── ECOSYSTEM label ──
     if (revealT > 0.05) {
@@ -291,9 +274,13 @@ export default function FlowCanvas({
       ctx.restore();
     }
 
-    // ── Video-masked "TOKAMAK NETWORK" (single line) ──
-    if (videoReadyRef.current && videoRef.current) {
-      const video = videoRef.current;
+    // ── Video-masked text + strands ──
+    const STEPS = 80;
+    const maxStep = STEPS;
+    const hasVideo = videoReadyRef.current && videoRef.current;
+
+    if (hasVideo) {
+      const video = videoRef.current!;
       if (!offscreenRef.current) offscreenRef.current = document.createElement("canvas");
       const osc = offscreenRef.current;
       if (osc.width !== canvas.width || osc.height !== canvas.height) {
@@ -305,22 +292,57 @@ export default function FlowCanvas({
         octx.clearRect(0, 0, osc.width, osc.height);
         octx.save();
         octx.scale(dpr, dpr);
+
+        // 1) Draw text as white mask shape
         octx.textAlign = "center";
         octx.textBaseline = "middle";
         octx.fillStyle = "white";
         octx.font = `900 ${mainFontSize}px 'Orbitron', sans-serif`;
         octx.fillText("TOKAMAK NETWORK", cx, textCenterY);
+
+        // 2) Draw strands as white mask shapes (so video fills them too)
+        if (maxStep >= 2 && paths.length > 0) {
+          strands.forEach((strand, si) => {
+            const pathData = paths[si];
+            if (!pathData) return;
+            const isHovered = hoveredCat === -1 || hoveredCat === strand.catIdx;
+            const alpha = isHovered ? 0.9 : 0.12;
+
+            for (let s = 0; s < maxStep - 1; s++) {
+              const t1 = s / STEPS;
+              const t2 = (s + 1) / STEPS;
+              const pt1 = evalTwoSeg(pathData, t1);
+              const pt2 = evalTwoSeg(pathData, t2);
+
+              let segAlpha = alpha;
+              if (t1 < 0.1) segAlpha *= t1 / 0.1;
+              if (t1 > 0.9) segAlpha *= (1 - t1) / 0.1;
+
+              octx.beginPath();
+              octx.moveTo(pt1.x, pt1.y);
+              octx.lineTo(pt2.x, pt2.y);
+              octx.strokeStyle = `rgba(255,255,255,${segAlpha})`;
+              octx.lineWidth = strand.width + 1;
+              octx.lineCap = "round";
+              octx.stroke();
+            }
+          });
+        }
+
+        // 3) Apply video as texture via source-in
         octx.globalCompositeOperation = "source-in";
         const vAspect = video.videoWidth / (video.videoHeight || 1);
         const vw = w * 1.6;
         const vh = vw / vAspect;
-        octx.drawImage(video, cx - vw / 2, textCenterY - vh / 2, vw, vh);
+        // Center video vertically across full canvas for strand coverage
+        const vCenterY = h * 0.4;
+        octx.drawImage(video, cx - vw / 2, vCenterY - vh / 2, vw, vh);
         octx.globalCompositeOperation = "source-over";
         octx.restore();
         ctx.drawImage(osc, 0, 0, w, h);
       }
 
-      // Neon glow
+      // Neon glow on text
       ctx.save();
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -334,189 +356,144 @@ export default function FlowCanvas({
       ctx.restore();
     }
 
-    // ── Background rain curtain ──
-    if (revealT > 0.1) {
-      const rainA = Math.min((revealT - 0.1) / 0.2, 1);
-      rain.forEach((p) => {
-        p.y += p.speed;
-        // Slight horizontal drift
-        p.x += Math.sin(time * 0.5 + p.startX * 0.01) * 0.15;
-        if (p.y > h + 10) {
-          p.y = textBottom + rand(-5, 5);
-          p.x = p.startX + rand(-3, 3);
-        }
-        const fadeTop = Math.min((p.y - textBottom) / 40, 1);
-        const fadeBot = Math.max(1 - (p.y - (h - 60)) / 60, 0);
-        const a = p.alpha * rainA * fadeTop * (p.y > h - 60 ? fadeBot : 1);
-        if (a < 0.01) return;
+    // ── Strand color tint overlay (on top of video texture) ──
+    if (maxStep >= 2 && paths.length > 0) {
+      strands.forEach((strand, si) => {
+        const pathData = paths[si];
+        if (!pathData) return;
 
-        // Soft glow
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size + 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(180,200,220,${a * 0.1})`;
-        ctx.fill();
-        // Core
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(200,215,235,${a})`;
-        ctx.fill();
+        const isHovered = hoveredCat === -1 || hoveredCat === strand.catIdx;
+        const [r1, g1, b1] = hexToRgb(strand.color);
+
+        // Glow layer for hovered active strands
+        if (isHovered && strand.isActive) {
+          ctx.beginPath();
+          const gFirst = evalTwoSeg(pathData, 0);
+          ctx.moveTo(gFirst.x, gFirst.y);
+          for (let s = 1; s <= maxStep; s++) {
+            const pt = evalTwoSeg(pathData, s / STEPS);
+            ctx.lineTo(pt.x, pt.y);
+          }
+          ctx.strokeStyle = `rgba(${r1},${g1},${b1},0.08)`;
+          ctx.lineWidth = strand.width + 4;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.stroke();
+        }
+
+        // Subtle color tint over the video-textured strands
+        const tintAlpha = isHovered ? 0.18 : 0.02;
+        for (let s = 0; s < maxStep - 1; s++) {
+          const t1 = s / STEPS;
+          const t2 = (s + 1) / STEPS;
+          const pt1 = evalTwoSeg(pathData, t1);
+          const pt2 = evalTwoSeg(pathData, t2);
+
+          const colorT = t1;
+          const [cr, cg, cb] = lerpColor([180, 220, 255], [r1, g1, b1], colorT * 0.8);
+
+          let segAlpha = tintAlpha;
+          if (t1 < 0.1) segAlpha *= t1 / 0.1;
+          if (t1 > 0.9) segAlpha *= (1 - t1) / 0.1;
+
+          ctx.beginPath();
+          ctx.moveTo(pt1.x, pt1.y);
+          ctx.lineTo(pt2.x, pt2.y);
+          ctx.strokeStyle = `rgba(${cr},${cg},${cb},${segAlpha})`;
+          ctx.lineWidth = strand.width;
+          ctx.lineCap = "round";
+          ctx.stroke();
+        }
       });
     }
 
-    // ── Stream particles (colored, bezier paths) ──
-    if (revealT > 0.15 && paths.length > 0) {
-      const sA = Math.min((revealT - 0.15) / 0.2, 1);
-      const whiteRgb: [number, number, number] = [180, 220, 255];
+    // ── Category labels at strand endpoints ──
+    {
+      const labelAlpha = 1;
+      const drawnCats = new Set<number>();
 
-      stream.forEach((p) => {
-        const pathData = paths[p.catIdx];
-        const cat = categories[p.catIdx];
-        if (!pathData || !cat) return;
+      strands.forEach((strand) => {
+        if (drawnCats.has(strand.catIdx)) return;
+        drawnCats.add(strand.catIdx);
 
-        p.t += p.speed;
-        if (p.t > 1) {
-          p.t = rand(-0.15, 0.05);
-          p.offset = rand(-20, 20);
-          p.alpha = rand(0.35, 1.0);
-          p.size = rand(1.0, 3.2);
+        // Collect all strands in this category to compute average endpoint
+        const catStrands = strands
+          .map((s, i) => ({ s, i }))
+          .filter(({ s }) => s.catIdx === strand.catIdx);
+
+        // Average endpoint position
+        let sumX = 0, sumY = 0;
+        catStrands.forEach(({ i }) => {
+          const p = paths[i];
+          if (p) { sumX += p.lower.p3.x; sumY += p.lower.p3.y; }
+        });
+        const avgX = sumX / catStrands.length;
+        const avgY = sumY / catStrands.length;
+
+        // Stats
+        const repoCount = new Set(catStrands.map(({ s }) => s.repoName)).size;
+        const totalLines = catStrands.reduce((sum, { s }) => sum + s.linesChanged, 0);
+        const activeCount = catStrands.filter(({ s }) => s.isActive).length;
+
+        const isHovered = hoveredCat === -1 || hoveredCat === strand.catIdx;
+        const a = isHovered ? labelAlpha : labelAlpha * 0.25;
+        const [r, g, b] = hexToRgb(strand.color);
+
+        // Node glow
+        const nodeGlow = Math.sin(time * 2 + strand.catIdx) * 0.2 + 0.8;
+        if (isHovered) {
+          ctx.beginPath();
+          ctx.arc(avgX, avgY, 20 * nodeGlow, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${r},${g},${b},${a * 0.06})`;
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(avgX, avgY, 10, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${r},${g},${b},${a * 0.12})`;
+          ctx.fill();
         }
-        if (p.t < 0) return;
 
-        // Two-segment interpolation: t=0..0.35 → upper, t=0.35..1 → lower
-        const SPLIT = 0.35;
-        let pt: Pt, pt2: Pt;
-        if (p.t <= SPLIT) {
-          const localT = p.t / SPLIT;
-          const seg = pathData.upper;
-          pt = bezier(seg.p0, seg.cp1, seg.cp2, seg.p3, localT);
-          const localT2 = Math.min(localT + 0.02, 1);
-          pt2 = bezier(seg.p0, seg.cp1, seg.cp2, seg.p3, localT2);
-        } else {
-          const localT = (p.t - SPLIT) / (1 - SPLIT);
-          const seg = pathData.lower;
-          pt = bezier(seg.p0, seg.cp1, seg.cp2, seg.p3, localT);
-          const localT2 = Math.min(localT + 0.02, 1);
-          pt2 = bezier(seg.p0, seg.cp1, seg.cp2, seg.p3, localT2);
+        // Core node dot
+        ctx.beginPath();
+        ctx.arc(avgX, avgY, isHovered ? 5 : 3, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r},${g},${b},${a * 0.9})`;
+        ctx.fill();
+        if (isHovered) {
+          ctx.beginPath();
+          ctx.arc(avgX, avgY, 2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,255,${a * 0.9})`;
+          ctx.fill();
         }
 
-        // Perpendicular offset — tighten near junction
-        const dx = pt2.x - pt.x, dy = pt2.y - pt.y;
-        const len = Math.sqrt(dx * dx + dy * dy) || 1;
-        const nx = -dy / len, ny = dx / len;
-        const distToJunction = 1 - Math.exp(-Math.abs(p.t - SPLIT) * 8);
-        const offFade = distToJunction * (1 - p.t * p.t * 0.4);
-        p.x = pt.x + nx * p.offset * offFade;
-        p.y = pt.y + ny * p.offset * offFade;
+        // Category name
+        const labelY = avgY + 18;
+        ctx.font = "700 13px 'Orbitron', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
+        ctx.fillText(strand.catName.toUpperCase(), avgX, labelY);
 
-        // Color: white→category
-        const catRgb = hexToRgb(cat.color);
-        const cT = Math.min(p.t * 1.8, 1);
-        const [cr, cg, cb] = lerpColor(whiteRgb, catRgb, cT);
+        // Repo count + lines changed
+        ctx.font = "500 11px 'Orbitron', sans-serif";
+        ctx.fillStyle = `rgba(220,220,220,${a * 0.65})`;
+        ctx.fillText(`${repoCount} repos`, avgX, labelY + 18);
 
-        let a = p.alpha * sA;
-        if (p.t < 0.05) a *= p.t / 0.05;
-        if (p.t > 0.7) a *= 0.7 + (p.t - 0.7) / 0.3 * 0.8;
-
-        // Outer glow (much larger for thick stream look)
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size + 5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${cr},${cg},${cb},${a * 0.06})`;
-        ctx.fill();
-        // Mid glow
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size + 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${cr},${cg},${cb},${a * 0.18})`;
-        ctx.fill();
-        // Core
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${cr},${cg},${cb},${a})`;
-        ctx.fill();
-        // Hot center
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * 0.4, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${a * 0.45})`;
-        ctx.fill();
-      });
-    }
-
-    // ── Orbs ──
-    if (revealT > 0.3 && orbs.length > 0) {
-      const oA = Math.min((revealT - 0.3) / 0.3, 1);
-
-      orbs.forEach((orb, i) => {
-        const [r, g, b] = hexToRgb(orb.color);
-        const isH = hoveredOrb === i;
-        const pulse = Math.sin(time * 2 + i * 0.7) * 0.08 + 0.92;
-        const dR = orb.radius * pulse * (isH ? 1.15 : 1);
-
-        // L1: large ambient
-        const aR = dR * 5.5;
-        const ag = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, aR);
-        ag.addColorStop(0, `rgba(${r},${g},${b},${0.25 * oA})`);
-        ag.addColorStop(0.2, `rgba(${r},${g},${b},${0.12 * oA})`);
-        ag.addColorStop(0.5, `rgba(${r},${g},${b},${0.04 * oA})`);
-        ag.addColorStop(1, `rgba(${r},${g},${b},0)`);
-        ctx.beginPath(); ctx.arc(orb.x, orb.y, aR, 0, Math.PI * 2); ctx.fillStyle = ag; ctx.fill();
-
-        // L2: mid glow
-        const mR = dR * 2;
-        const mg = ctx.createRadialGradient(orb.x, orb.y, dR * 0.5, orb.x, orb.y, mR);
-        mg.addColorStop(0, `rgba(${r},${g},${b},${0.3 * oA})`);
-        mg.addColorStop(0.5, `rgba(${r},${g},${b},${0.1 * oA})`);
-        mg.addColorStop(1, `rgba(${r},${g},${b},0)`);
-        ctx.beginPath(); ctx.arc(orb.x, orb.y, mR, 0, Math.PI * 2); ctx.fillStyle = mg; ctx.fill();
-
-        // L3: body
-        const bg = ctx.createRadialGradient(orb.x - dR * 0.3, orb.y - dR * 0.3, dR * 0.1, orb.x + dR * 0.1, orb.y + dR * 0.1, dR * 1.1);
-        bg.addColorStop(0, `rgba(255,255,255,${0.5 * oA})`);
-        bg.addColorStop(0.15, `rgba(${Math.min(r + 80, 255)},${Math.min(g + 80, 255)},${Math.min(b + 80, 255)},${0.75 * oA})`);
-        bg.addColorStop(0.4, `rgba(${r},${g},${b},${0.9 * oA})`);
-        bg.addColorStop(0.7, `rgba(${r >> 1},${g >> 1},${b >> 1},${0.7 * oA})`);
-        bg.addColorStop(1, `rgba(${r >> 2},${g >> 2},${b >> 2},${0.4 * oA})`);
-        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2); ctx.fillStyle = bg; ctx.fill();
-
-        // L4: specular
-        const sg = ctx.createRadialGradient(orb.x - dR * 0.35, orb.y - dR * 0.35, 0, orb.x - dR * 0.15, orb.y - dR * 0.15, dR * 0.6);
-        sg.addColorStop(0, `rgba(255,255,255,${0.65 * oA})`);
-        sg.addColorStop(0.4, `rgba(255,255,255,${0.15 * oA})`);
-        sg.addColorStop(1, "rgba(255,255,255,0)");
-        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2); ctx.fillStyle = sg; ctx.fill();
-
-        // L5: rim
-        const rg = ctx.createRadialGradient(orb.x + dR * 0.3, orb.y + dR * 0.3, 0, orb.x + dR * 0.2, orb.y + dR * 0.2, dR * 0.5);
-        rg.addColorStop(0, `rgba(${Math.min(r + 60, 255)},${Math.min(g + 60, 255)},${Math.min(b + 60, 255)},${0.22 * oA})`);
-        rg.addColorStop(1, "rgba(255,255,255,0)");
-        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2); ctx.fillStyle = rg; ctx.fill();
-
-        // L6: edge ring
-        ctx.beginPath(); ctx.arc(orb.x, orb.y, dR, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(${Math.min(r + 40, 255)},${Math.min(g + 40, 255)},${Math.min(b + 40, 255)},${0.35 * oA})`;
-        ctx.lineWidth = 1.5;
-        ctx.shadowColor = `rgba(${r},${g},${b},${0.6 * oA})`;
-        ctx.shadowBlur = 18;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-
-        // Labels
-        const lY = orb.y + dR + 20;
-        ctx.font = "700 11px 'Orbitron', sans-serif";
-        ctx.textAlign = "center"; ctx.textBaseline = "top";
-        ctx.fillStyle = `rgba(${Math.min(r + 40, 255)},${Math.min(g + 40, 255)},${Math.min(b + 40, 255)},${oA * 0.95})`;
-        ctx.fillText(orb.name, orb.x, lY);
-        ctx.font = "500 10px 'Orbitron', sans-serif";
-        ctx.fillStyle = `rgba(220,220,220,${oA * 0.7})`;
-        ctx.fillText(formatNum(orb.totalLines), orb.x, lY + 16);
-        if (isH) {
+        if (totalLines > 0) {
           ctx.font = "400 10px sans-serif";
-          ctx.fillStyle = `rgba(255,255,255,${oA * 0.55})`;
-          ctx.fillText(`${orb.repoCount} repos`, orb.x, lY + 30);
+          ctx.fillStyle = `rgba(${r},${g},${b},${a * 0.5})`;
+          ctx.fillText(`${formatNum(totalLines)} lines`, avgX, labelY + 33);
+        }
+
+        // Active indicator
+        if (isHovered && activeCount > 0) {
+          ctx.font = "400 10px sans-serif";
+          ctx.fillStyle = `rgba(34,197,94,${a * 0.6})`;
+          ctx.fillText(`${activeCount} active`, avgX, labelY + 47);
         }
       });
     }
 
     ctx.restore();
-  }, [categories, totalRepos, totalCommits]);
+  }, [totalRepos, totalCommits]);
 
   /* ── Animation loop ────────────────────────────── */
 

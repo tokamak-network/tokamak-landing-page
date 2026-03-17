@@ -160,7 +160,7 @@ export default function StreamClient({ items }: StreamClientProps) {
   return (
     <section
       id="activity-stream"
-      className="relative z-10 w-full flex justify-center px-6 py-[80px]"
+      className="relative z-10 w-full flex justify-center bg-surface px-6 py-[80px]"
     >
       <div ref={ref} className="w-full max-w-[1280px] flex flex-col items-center">
         {/* Section header */}

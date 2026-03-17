@@ -2,7 +2,6 @@ import { listReports, getReportPath } from "@/app/lib/reports/listReports";
 import { parseReportDetail } from "@/app/lib/reports/parseReport";
 import { parseNum } from "@/app/lib/utils/format";
 import FlowCanvas from "./FlowCanvas";
-import GlobeWrapper from "./GlobeWrapper";
 
 export interface FlowRepo {
   name: string;
@@ -93,9 +92,6 @@ export default function EcosystemFlow() {
         totalRepos={totalRepos}
         totalCommits={totalCommits}
       />
-
-      {/* 3D Ecosystem Globe — Shopify-style interactive sphere */}
-      <GlobeWrapper categories={categories} totalRepos={totalRepos} />
     </section>
   );
 }

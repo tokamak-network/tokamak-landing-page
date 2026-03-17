@@ -5,6 +5,24 @@ import { motion } from "framer-motion";
 import Roller from "@/app/components/shared/roller/Roller";
 import MiniSparkline from "./MiniSparkline";
 
+function useCompact(breakpoint = 1280) {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${breakpoint}px)`);
+    setCompact(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setCompact(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, [breakpoint]);
+  return compact;
+}
+
+function abbreviate(n: number): { value: number; suffix: string } {
+  if (n >= 1_000_000) return { value: Math.round(n / 100_000) / 10, suffix: "M" };
+  if (n >= 1_000) return { value: Math.round(n / 100) / 10, suffix: "K" };
+  return { value: n, suffix: "" };
+}
+
 interface HeroContentProps {
   codeChanges: number;
   netGrowth: number;
@@ -22,6 +40,7 @@ export default function HeroContent({
   const [netGrowth, setNetGrowth] = useState(initialNetGrowth);
   const [activeProjects, setActiveProjects] = useState(initialActiveProjects);
   const [totalStaked, setTotalStaked] = useState(initialTotalStaked);
+  const compact = useCompact();
 
   // Periodic micro-increments
   useEffect(() => {
@@ -132,17 +151,15 @@ export default function HeroContent({
       {/* Bottom: 4 counters in a row */}
       <motion.div
         variants={itemVariants}
-        className="grid grid-cols-2 lg:grid-cols-4 gap-[1px] bg-[#1a1a1d]"
+        className="grid grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1.4fr] gap-[1px] bg-[#1a1a1d]"
       >
         {/* Counter 1: Code Changes */}
         <div className="bg-black p-6 space-y-2">
           <div className="font-orbitron text-white">
-            <Roller
-              value={codeChanges}
-              fontSize={36}
-              align="left"
-              rollDuration={0.8}
-            />
+            {(() => {
+              const { value, suffix } = compact ? abbreviate(codeChanges) : { value: codeChanges, suffix: "" };
+              return <Roller value={value} suffix={suffix} suffixPosition="back" fontSize={36} align="left" rollDuration={0.8} />;
+            })()}
           </div>
           <div className="text-[#929298] text-[11px] font-[700] uppercase tracking-[0.12em]">
             Code Changes
@@ -153,12 +170,10 @@ export default function HeroContent({
         {/* Counter 2: Net Growth */}
         <div className="bg-black p-6 space-y-2">
           <div className="font-orbitron text-white">
-            <Roller
-              value={netGrowth}
-              fontSize={36}
-              align="left"
-              rollDuration={0.8}
-            />
+            {(() => {
+              const { value, suffix } = compact ? abbreviate(netGrowth) : { value: netGrowth, suffix: "" };
+              return <Roller value={value} suffix={suffix} suffixPosition="back" fontSize={36} align="left" rollDuration={0.8} />;
+            })()}
           </div>
           <div className="text-[#929298] text-[11px] font-[700] uppercase tracking-[0.12em]">
             Net Growth
@@ -185,14 +200,10 @@ export default function HeroContent({
         {/* Counter 4: Total Staked */}
         <div className="bg-black p-6 space-y-2">
           <div className="font-orbitron text-white">
-            <Roller
-              value={totalStaked}
-              suffix=" TON"
-              suffixPosition="back"
-              fontSize={36}
-              align="left"
-              rollDuration={0.8}
-            />
+            {(() => {
+              const { value, suffix } = compact ? abbreviate(totalStaked) : { value: totalStaked, suffix: "" };
+              return <Roller value={value} suffix={suffix + " TON"} suffixPosition="back" fontSize={36} align="left" rollDuration={0.8} />;
+            })()}
           </div>
           <div className="text-[#929298] text-[11px] font-[700] uppercase tracking-[0.12em]">
             Total Staked

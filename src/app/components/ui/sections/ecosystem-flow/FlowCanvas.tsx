@@ -58,7 +58,7 @@ function formatNum(n: number): string {
 
 /* ── Constants ─────────────────────────────────────── */
 
-const CANVAS_HEIGHT = 1000;
+const MOBILE_BP = 640;
 const TEXT_Y = 0.11;
 const JUNCTION_Y = 0.38;       // convergence point
 const END_Y = 0.78;
@@ -92,16 +92,17 @@ export default function FlowCanvas({
 
   const buildLayout = useCallback((w: number, h: number) => {
     const cx = w / 2;
+    const isMobile = w < MOBILE_BP;
     const textY = h * TEXT_Y;
     const endCY = h * END_Y;
 
     // Measure text width
     const tmpCanvas = document.createElement("canvas");
     const tmpCtx = tmpCanvas.getContext("2d")!;
-    const maxW = w * 0.88;
+    const maxW = w * (isMobile ? 0.94 : 0.88);
     tmpCtx.font = "900 100px 'Orbitron', sans-serif";
     const measured = tmpCtx.measureText("TOKAMAK NETWORK").width;
-    const fontSize = Math.min(90, Math.floor((maxW / measured) * 100));
+    const fontSize = Math.min(isMobile ? 60 : 90, Math.floor((maxW / measured) * 100));
     tmpCtx.font = `900 ${fontSize}px 'Orbitron', sans-serif`;
     const textW = tmpCtx.measureText("TOKAMAK NETWORK").width;
     textWidthRef.current = textW;
@@ -110,55 +111,45 @@ export default function FlowCanvas({
     const textBottom = textY + fontSize * 0.35;
 
     // Sort categories by total lines
-    const catEntries = categories
+    const allCatEntries = categories
       .map((cat, i) => ({
         cat, idx: i,
         total: cat.repos.reduce((s, r) => s + r.linesChanged, 0),
       }))
       .sort((a, b) => b.total - a.total);
 
+    // Mobile: top 5 categories, 1 strand per category
+    const catEntries = isMobile ? allCatEntries.slice(0, 5) : allCatEntries;
+
     const maxTotal = Math.max(1, ...catEntries.map((e) => e.total));
-    const spread = w * 0.95;
+    const spread = w * (isMobile ? 0.88 : 0.95);
     const count = catEntries.length;
-    // Two-segment paths: upper (text → junction) + lower (junction → endpoint)
     const paths: { upper: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt }; lower: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt } }[] = [];
     const strands: StrandInfo[] = [];
 
     const junctionX = cx;
     const junctionY = h * JUNCTION_Y;
 
-    // Build one strand per repo, grouped by category
-    let strandIdx = 0;
-    catEntries.forEach((entry, sortedIdx) => {
-      const { cat, idx: ci } = entry;
-      const catRepos = cat.repos;
-      const repoCount = catRepos.length;
+    if (isMobile) {
+      // Mobile: one strand per category (aggregated)
+      catEntries.forEach((entry, sortedIdx) => {
+        const { cat, idx: ci, total } = entry;
+        const activity = total / maxTotal;
+        const width = 1 + activity * 3;
 
-      catRepos.forEach((repo, ri) => {
-        const activity = repo.linesChanged / maxTotal;
-        const width = 0.6 + activity * 2.5;
-
-        // Start X: distribute proportionally along text width
-        const globalT = count <= 1 ? 0.5 : (strandIdx / Math.max(1, categories.reduce((s, c) => s + c.repos.length, 0) - 1));
-        const startX = textLeft + globalT * textW;
+        const startT = count <= 1 ? 0.5 : sortedIdx / (count - 1);
+        const startX = textLeft + startT * textW;
         const startY = textBottom;
 
-        // End X: fan out by category, then sub-spread within category
         const catT = count <= 1 ? 0.5 : sortedIdx / (count - 1);
-        const catCenterX = cx - spread / 2 + catT * spread;
-        const repoSpreadW = spread / count * 0.7;
-        const repoT = repoCount <= 1 ? 0 : (ri / (repoCount - 1) - 0.5);
-        const endX = catCenterX + repoT * repoSpreadW;
-        const xNorm = ((catT + repoT * 0.05) - 0.5) * 2;
-        const endY = endCY + xNorm * xNorm * h * 0.025;
+        const endX = cx - spread / 2 + catT * spread;
+        const xNorm = (catT - 0.5) * 2;
+        const endY = endCY + xNorm * xNorm * h * 0.015;
 
-        // Upper segment: text spread → junction (converge)
         const u_cp1x = startX;
         const u_cp1y = startY + (junctionY - startY) * 0.45;
         const u_cp2x = junctionX + (startX - junctionX) * 0.15;
         const u_cp2y = startY + (junctionY - startY) * 0.75;
-
-        // Lower segment: junction → endpoint (fan out)
         const l_cp1x = junctionX + (endX - junctionX) * 0.1;
         const l_cp1y = junctionY + (endY - junctionY) * 0.3;
         const l_cp2x = endX + (junctionX - endX) * 0.08;
@@ -172,16 +163,66 @@ export default function FlowCanvas({
         strands.push({
           catIdx: ci,
           catName: cat.name,
-          repoName: repo.name,
+          repoName: cat.name,
           color: cat.color,
-          linesChanged: repo.linesChanged,
-          isActive: repo.isActive,
-          width: Math.max(0.6, width),
+          linesChanged: total,
+          isActive: cat.repos.some((r) => r.isActive),
+          width: Math.max(1, width),
         });
-
-        strandIdx++;
       });
-    });
+    } else {
+      // Desktop: one strand per repo
+      let strandIdx = 0;
+      const totalStrands = catEntries.reduce((s, e) => s + e.cat.repos.length, 0);
+      catEntries.forEach((entry, sortedIdx) => {
+        const { cat, idx: ci } = entry;
+        const catRepos = cat.repos;
+        const repoCount = catRepos.length;
+
+        catRepos.forEach((repo, ri) => {
+          const activity = repo.linesChanged / maxTotal;
+          const width = 0.6 + activity * 2.5;
+
+          const globalT = count <= 1 ? 0.5 : (strandIdx / Math.max(1, totalStrands - 1));
+          const startX = textLeft + globalT * textW;
+          const startY = textBottom;
+
+          const catT = count <= 1 ? 0.5 : sortedIdx / (count - 1);
+          const catCenterX = cx - spread / 2 + catT * spread;
+          const repoSpreadW = spread / count * 0.7;
+          const repoT = repoCount <= 1 ? 0 : (ri / (repoCount - 1) - 0.5);
+          const endX = catCenterX + repoT * repoSpreadW;
+          const xNorm = ((catT + repoT * 0.05) - 0.5) * 2;
+          const endY = endCY + xNorm * xNorm * h * 0.025;
+
+          const u_cp1x = startX;
+          const u_cp1y = startY + (junctionY - startY) * 0.45;
+          const u_cp2x = junctionX + (startX - junctionX) * 0.15;
+          const u_cp2y = startY + (junctionY - startY) * 0.75;
+          const l_cp1x = junctionX + (endX - junctionX) * 0.1;
+          const l_cp1y = junctionY + (endY - junctionY) * 0.3;
+          const l_cp2x = endX + (junctionX - endX) * 0.08;
+          const l_cp2y = junctionY + (endY - junctionY) * 0.7;
+
+          paths.push({
+            upper: { p0: { x: startX, y: startY }, cp1: { x: u_cp1x, y: u_cp1y }, cp2: { x: u_cp2x, y: u_cp2y }, p3: { x: junctionX, y: junctionY } },
+            lower: { p0: { x: junctionX, y: junctionY }, cp1: { x: l_cp1x, y: l_cp1y }, cp2: { x: l_cp2x, y: l_cp2y }, p3: { x: endX, y: endY } },
+          });
+
+          strands.push({
+            catIdx: ci,
+            catName: cat.name,
+            repoName: repo.name,
+            color: cat.color,
+            linesChanged: repo.linesChanged,
+            isActive: repo.isActive,
+            width: Math.max(0.6, width),
+          });
+
+          strandIdx++;
+        });
+      });
+    }
 
     pathsRef.current = paths;
     strandsRef.current = strands;
@@ -229,9 +270,10 @@ export default function FlowCanvas({
     const revealT = Math.min(progress * 1.5, 1);
     const textCenterY = h * TEXT_Y;
     const cx = w / 2;
+    const isMobile = w < MOBILE_BP;
 
     // ── Font sizing (single line) ──
-    const maxTextWidth = w * 0.88;
+    const maxTextWidth = w * (isMobile ? 0.94 : 0.88);
     ctx.font = `900 100px 'Orbitron', sans-serif`;
     const fullMeasure = ctx.measureText("TOKAMAK NETWORK").width;
     const mainFontSize = Math.min(90, Math.floor((maxTextWidth / fullMeasure) * 100));
@@ -254,9 +296,9 @@ export default function FlowCanvas({
     // ── ECOSYSTEM label ──
     if (revealT > 0.05) {
       const ecoA = Math.min((revealT - 0.05) / 0.15, 1);
-      const ecoY = textCenterY - mainFontSize * 0.45 - 40;
+      const ecoY = textCenterY - mainFontSize * 0.45 - (isMobile ? 25 : 40);
       ctx.save();
-      ctx.font = "600 12px 'Orbitron', sans-serif";
+      ctx.font = `600 ${isMobile ? 10 : 12}px 'Orbitron', sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.letterSpacing = "0.2em";
@@ -443,8 +485,8 @@ export default function FlowCanvas({
       const cats = Array.from(catMap.values()).sort((a, b) => a.avgX - b.avgX);
 
       // Collision-aware label Y offsets (push apart if too close on X)
-      const LABEL_H = 65;       // approx height of a full label block
-      const MIN_X_GAP = 90;     // min horizontal distance before offset kicks in
+      const LABEL_H = isMobile ? 55 : 65;
+      const MIN_X_GAP = isMobile ? 60 : 90;
       const labelOffsets: number[] = new Array(cats.length).fill(0);
 
       for (let i = 1; i < cats.length; i++) {
@@ -485,7 +527,7 @@ export default function FlowCanvas({
         ctx.fill();
 
         // Category name
-        ctx.font = "700 12px 'Orbitron', sans-serif";
+        ctx.font = `700 ${isMobile ? 9 : 12}px 'Orbitron', sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         const nameA = isHovered ? 1 : (isNoneHovered ? 0.8 : 0.15);
@@ -495,11 +537,11 @@ export default function FlowCanvas({
         // Detail label with collision offset
         const fade = isHovered ? 1 : (isNoneHovered ? 0.7 : 0.1);
         const offsetY = labelOffsets[ci];
-        const labelY = cat.avgY + 34 + offsetY;
+        const labelY = cat.avgY + (isMobile ? 30 : 34) + offsetY;
 
         // Background pill
-        const pillW = 130;
-        const pillH = 60;
+        const pillW = isMobile ? 100 : 130;
+        const pillH = isMobile ? 48 : 60;
         const pillX = cat.avgX - pillW / 2;
         const pillY = labelY - 4;
         ctx.beginPath();
@@ -511,7 +553,7 @@ export default function FlowCanvas({
         ctx.stroke();
 
         // Repo count
-        ctx.font = "600 15px 'Orbitron', sans-serif";
+        ctx.font = `600 ${isMobile ? 12 : 15}px 'Orbitron', sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         ctx.fillStyle = `rgba(255,255,255,${0.9 * fade})`;
@@ -519,16 +561,16 @@ export default function FlowCanvas({
 
         // Lines changed
         if (cat.totalLines > 0) {
-          ctx.font = "400 14px sans-serif";
+          ctx.font = `400 ${isMobile ? 11 : 14}px sans-serif`;
           ctx.fillStyle = `rgba(${r},${g},${b},${0.7 * fade})`;
-          ctx.fillText(`${formatNum(cat.totalLines)} lines`, cat.avgX, labelY + 22);
+          ctx.fillText(`${formatNum(cat.totalLines)} lines`, cat.avgX, labelY + (isMobile ? 18 : 22));
         }
 
         // Active count
         if (cat.activeCount > 0) {
-          ctx.font = "400 12px sans-serif";
+          ctx.font = `400 ${isMobile ? 10 : 12}px sans-serif`;
           ctx.fillStyle = `rgba(34,197,94,${0.7 * fade})`;
-          ctx.fillText(`${cat.activeCount} active`, cat.avgX, labelY + 40);
+          ctx.fillText(`${cat.activeCount} active`, cat.avgX, labelY + (isMobile ? 32 : 40));
         }
       });
     }
@@ -555,7 +597,7 @@ export default function FlowCanvas({
     const resize = () => {
       const dpr = window.devicePixelRatio || 1;
       const w = container.clientWidth;
-      const h = CANVAS_HEIGHT;
+      const h = w < MOBILE_BP ? 700 : 1000;
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       canvas.style.width = `${w}px`;
@@ -599,8 +641,8 @@ export default function FlowCanvas({
   }, [buildLayout, render, loop]);
 
   return (
-    <div ref={containerRef} className="w-full max-w-[1440px] px-2">
-      <canvas ref={canvasRef} className="w-full cursor-crosshair" style={{ height: CANVAS_HEIGHT }} />
+    <div ref={containerRef} className="w-full max-w-[1440px] px-0 sm:px-2">
+      <canvas ref={canvasRef} className="w-full cursor-crosshair" />
     </div>
   );
 }

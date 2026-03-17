@@ -81,14 +81,14 @@ export default function PulseSpine({ codeChanges, netGrowth, activeProjects, tot
       const scrollProgress = Math.min(scrollY / docHeight, 1);
       setProgress(scrollProgress);
 
-      // Find the last tracked section's bottom edge
-      const lastSec = document.getElementById(SECTIONS[SECTIONS.length - 1]?.id ?? "");
-      const lastBottom = lastSec
-        ? lastSec.getBoundingClientRect().bottom + scrollY
+      // Hide once the footer enters the viewport
+      const footer = document.querySelector("footer");
+      const footerTop = footer
+        ? footer.getBoundingClientRect().top
         : Infinity;
 
-      // Show spine only between hero (300px) and last section bottom
-      setIsVisible(scrollY > 300 && scrollY + window.innerHeight * 0.5 < lastBottom);
+      const atBottom = scrollY + window.innerHeight >= document.documentElement.scrollHeight - 10;
+      setIsVisible(scrollY > 300 && footerTop > window.innerHeight * 0.5 && !atBottom);
 
       // Find which section is in center of viewport
       const viewCenter = scrollY + window.innerHeight * 0.5;

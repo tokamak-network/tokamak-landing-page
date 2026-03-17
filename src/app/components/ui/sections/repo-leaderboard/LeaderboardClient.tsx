@@ -686,7 +686,15 @@ export default function LeaderboardClient({
           transition={{ delay: 0.3, duration: 0.6 }}
         >
           <div className="text-center">
-            <div className="text-[24px] font-orbitron font-[900] text-white">
+            <div
+              className="text-[24px] font-orbitron font-[900]"
+              style={{
+                background: "linear-gradient(135deg, #0077ff, #00c3ff)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                filter: "drop-shadow(0 0 12px rgba(0, 119, 255, 0.3))",
+              }}
+            >
               {activeRepos}
             </div>
             <div className="text-[10px] text-[#666] uppercase tracking-[0.1em] font-[600] mt-1">
@@ -695,7 +703,15 @@ export default function LeaderboardClient({
           </div>
           <div className="w-px bg-[#1a1a1a]" />
           <div className="text-center">
-            <div className="text-[24px] font-orbitron font-[900] text-white">
+            <div
+              className="text-[24px] font-orbitron font-[900]"
+              style={{
+                background: "linear-gradient(135deg, #a78bfa, #818cf8)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                filter: "drop-shadow(0 0 12px rgba(167, 139, 250, 0.3))",
+              }}
+            >
               {categories.length}
             </div>
             <div className="text-[10px] text-[#666] uppercase tracking-[0.1em] font-[600] mt-1">
@@ -704,7 +720,15 @@ export default function LeaderboardClient({
           </div>
           <div className="w-px bg-[#1a1a1a]" />
           <div className="text-center">
-            <div className="text-[24px] font-orbitron font-[900] text-white">
+            <div
+              className="text-[24px] font-orbitron font-[900]"
+              style={{
+                background: "linear-gradient(135deg, #22c55e, #4ade80)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                filter: "drop-shadow(0 0 12px rgba(34, 197, 94, 0.3))",
+              }}
+            >
               {formatCompact(totalLines).replace("+", "")}
             </div>
             <div className="text-[10px] text-[#666] uppercase tracking-[0.1em] font-[600] mt-1">

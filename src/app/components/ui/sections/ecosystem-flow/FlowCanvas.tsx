@@ -693,7 +693,8 @@ export default function FlowCanvas({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.96 }}
               transition={{ duration: 0.15 }}
-              className="absolute z-50 w-[280px] rounded-lg border bg-[#0a0a0a]/95 backdrop-blur-md shadow-2xl pointer-events-none"
+              className="absolute z-50 w-[280px] rounded-lg border bg-[#0a0a0a]/95 backdrop-blur-md shadow-2xl pointer-events-auto"
+              onMouseLeave={() => setPopup(null)}
               style={{
                 left: Math.min(
                   Math.max(8, popup.x - 140),
@@ -701,7 +702,6 @@ export default function FlowCanvas({
                 ),
                 bottom: (canvasRef.current?.clientHeight ?? 800) - popup.y + 12,
                 borderColor: popup.color + "40",
-                maxHeight: 320,
               }}
             >
               {/* Header */}
@@ -727,14 +727,14 @@ export default function FlowCanvas({
                 </span>
               </div>
 
-              {/* Repo list (max 8 visible) */}
-              <div className="flex flex-col overflow-hidden">
-                {popup.repos.slice(0, 8).map((repo) => {
+              {/* Repo list — grows upward */}
+              <div className="flex flex-col">
+                {popup.repos.map((repo) => {
                   const isPositive = repo.netGrowth >= 0;
                   return (
                     <div
                       key={repo.name}
-                      className="flex items-center justify-between px-4 py-2 border-b border-white/5"
+                      className="flex items-center justify-between px-4 py-2 border-b border-white/5 shrink-0"
                     >
                       <div className="min-w-0 flex-1 mr-3">
                         <p className="text-[12px] font-[600] text-white/80 truncate">
@@ -759,11 +759,6 @@ export default function FlowCanvas({
                     </div>
                   );
                 })}
-                {popup.repos.length > 8 && (
-                  <div className="px-4 py-2 text-[10px] text-white/30 text-center">
-                    +{popup.repos.length - 8} more
-                  </div>
-                )}
               </div>
             </motion.div>
           )}

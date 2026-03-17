@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Roller from "@/app/components/shared/roller/Roller";
 import MiniSparkline from "./MiniSparkline";
+import { LINKS } from "@/app/constants/links";
 
 function useCompact(breakpoint = 1280) {
   const [compact, setCompact] = useState(false);
@@ -38,21 +39,15 @@ export default function HeroContent({
 }: HeroContentProps) {
   const [codeChanges, setCodeChanges] = useState(initialCodeChanges);
   const [netGrowth, setNetGrowth] = useState(initialNetGrowth);
-  const [activeProjects, setActiveProjects] = useState(initialActiveProjects);
+  const [activeProjects] = useState(initialActiveProjects);
   const [totalStaked, setTotalStaked] = useState(initialTotalStaked);
   const compact = useCompact();
 
-  // Periodic micro-increments
+  // Periodic micro-increments (activeProjects excluded — single source from report)
   useEffect(() => {
     const interval = setInterval(() => {
       setCodeChanges((prev) => prev + Math.floor(Math.random() * 3) + 1);
       setNetGrowth((prev) => prev + Math.floor(Math.random() * 3) + 1);
-      setActiveProjects((prev) => {
-        const change = Math.random();
-        if (change < 0.3) return prev + 1;
-        if (change > 0.7) return Math.max(1, prev - 1);
-        return prev;
-      });
       setTotalStaked((prev) => prev + Math.floor(Math.random() * 3) + 1);
     }, 5000);
 
@@ -110,16 +105,26 @@ export default function HeroContent({
             variants={itemVariants}
             className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2"
           >
-            <button className="px-8 py-4 bg-[#0077ff] text-white font-semibold text-[15px] hover:bg-[#0066dd] transition-colors duration-200 flex items-center justify-center gap-2 group">
-              Explore Ecosystem
+            <a
+              href={LINKS.ROLLUP_HUB}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cursor-pointer px-8 py-4 bg-[#0077ff] text-white font-semibold text-[15px] hover:bg-[#0066dd] transition-colors duration-200 flex items-center justify-center gap-2 group"
+            >
+              Launch Your App
               <span className="inline-block transition-transform group-hover:translate-x-1">
                 &rarr;
               </span>
-            </button>
+            </a>
 
-            <button className="px-8 py-4 border border-[#333] text-[#c5c5ca] font-semibold text-[15px] hover:border-[#0077ff] hover:text-white transition-all duration-200">
+            <a
+              href={LINKS.DOCS}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cursor-pointer px-8 py-4 border border-[#333] text-[#c5c5ca] font-semibold text-[15px] hover:border-[#0077ff] hover:text-white transition-all duration-200 flex items-center justify-center"
+            >
               Read Docs
-            </button>
+            </a>
           </motion.div>
         </div>
 

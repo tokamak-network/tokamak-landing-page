@@ -117,7 +117,8 @@ export default function SimulatorHero() {
                 </p>
                 <div className="grid grid-cols-4 gap-1.5">
                   {PRESETS.map((p) => {
-                    const Icon = p.icon;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const Icon = p.icon as any;
                     const isSelected = preset === p.value;
                     return (
                       <button

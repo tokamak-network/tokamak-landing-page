@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
+    "@types/three": "^0.183.1",
     "axios": "^1.7.9",
     "cheerio": "^1.0.0",
     "date-fns": "^4.1.0",
@@ -23,7 +26,8 @@
     "puppeteer": "^24.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "rss-parser": "^3.13.0"
+    "rss-parser": "^3.13.0",
+    "three": "^0.183.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

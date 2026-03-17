@@ -51,7 +51,7 @@ function getLeaderboardData(): {
             isActive: linesChanged > 0,
           };
         })
-        .filter((r) => r.linesChanged > 0);
+        .filter((r) => r.linesChanged > 0 && r.netGrowth >= 0);
 
       return {
         name: cat.name,

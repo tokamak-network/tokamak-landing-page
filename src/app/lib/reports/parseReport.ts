@@ -124,7 +124,8 @@ function findStatValue(
 ): Record<string, string> {
   const entries: Record<string, string> = {};
 
-  container.find("div").each((_: number, el: AnyNode) => {
+  // Search both div>div and td>div pairs (some reports use tables for stats)
+  container.find("div, td").each((_: number, el: AnyNode) => {
     const children = $(el).children("div");
     if (children.length < 2) return;
 

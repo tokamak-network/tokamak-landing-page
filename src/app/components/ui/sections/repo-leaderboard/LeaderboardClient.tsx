@@ -84,44 +84,14 @@ function Tooltip({
         </div>
 
         <div className="space-y-2 text-[11px]">
-          {/* Lines bar */}
-          <div>
-            <div className="flex justify-between mb-1">
-              <span className="text-[#666]">Added / Deleted</span>
-              <span className="font-[600]">
-                <span className="text-[#22c55e]">+{formatNumber(repo.linesAdded)}</span>
-                <span className="text-[#444] mx-1">/</span>
-                <span className="text-[#ef4444]">-{formatNumber(repo.linesDeleted)}</span>
-              </span>
-            </div>
-            {/* Mini bar chart */}
-            <div className="flex h-[3px] rounded-full overflow-hidden bg-[#1a1a1a]">
-              <div
-                className="h-full rounded-l-full"
-                style={{
-                  width: `${(repo.linesAdded / (repo.linesAdded + repo.linesDeleted || 1)) * 100}%`,
-                  backgroundColor: "#22c55e",
-                }}
-              />
-              <div
-                className="h-full rounded-r-full"
-                style={{
-                  width: `${(repo.linesDeleted / (repo.linesAdded + repo.linesDeleted || 1)) * 100}%`,
-                  backgroundColor: "#ef4444",
-                }}
-              />
-            </div>
+          <div className="flex justify-between">
+            <span className="text-[#666]">Lines Added</span>
+            <span className="text-[#22c55e] font-[700]">+{formatNumber(repo.linesAdded)}</span>
           </div>
-
-          <div className="flex justify-between pt-1">
+          <div className="flex justify-between">
             <span className="text-[#666]">Net Growth</span>
-            <span
-              className={`font-[700] ${
-                repo.netGrowth >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"
-              }`}
-            >
-              {repo.netGrowth >= 0 ? "+" : ""}
-              {formatNumber(repo.netGrowth)}
+            <span className="text-[#22c55e] font-[700]">
+              +{formatNumber(repo.netGrowth)}
             </span>
           </div>
           <div className="flex justify-between">
@@ -585,13 +555,7 @@ function Legend() {
       <div className="flex items-center gap-2">
         <div className="w-3 h-3 rounded-sm bg-[#22c55e]/30 border border-[#22c55e]/50" />
         <span className="text-[10px] text-[#929298] uppercase tracking-[0.08em] font-[600]">
-          Positive Growth
-        </span>
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="w-3 h-3 rounded-sm bg-[#ef4444]/30 border border-[#ef4444]/50" />
-        <span className="text-[10px] text-[#929298] uppercase tracking-[0.08em] font-[600]">
-          Negative Growth
+          Growth
         </span>
       </div>
       <div className="flex items-center gap-2">

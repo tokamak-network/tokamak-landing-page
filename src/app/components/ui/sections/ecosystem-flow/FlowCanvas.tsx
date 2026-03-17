@@ -66,6 +66,7 @@ function formatNum(n: number): string {
 
 const CANVAS_HEIGHT = 1000;
 const TEXT_Y = 0.11;
+const JUNCTION_Y = 0.38;       // convergence point
 const ORB_Y = 0.78;
 const STREAM_PARTICLES = 6000;
 const RAIN_PARTICLES = 3000;    // background curtain
@@ -86,7 +87,7 @@ export default function FlowCanvas({
   const orbsRef = useRef<OrbData[]>([]);
   const streamRef = useRef<StreamParticle[]>([]);
   const rainRef = useRef<RainParticle[]>([]);
-  const pathsRef = useRef<{ p0: Pt; cp1: Pt; cp2: Pt; p3: Pt }[]>([]);
+  const pathsRef = useRef<{ upper: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt }; lower: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt } }[]>([]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const videoReadyRef = useRef(false);
   const offscreenRef = useRef<HTMLCanvasElement | null>(null);
@@ -131,7 +132,11 @@ export default function FlowCanvas({
     const orbSpread = w * 0.85;
     const count = catEntries.length;
     const orbs: OrbData[] = [];
-    const paths: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt }[] = new Array(categories.length);
+    // Two-segment paths: upper (text → junction) + lower (junction → orb)
+    const paths: { upper: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt }; lower: { p0: Pt; cp1: Pt; cp2: Pt; p3: Pt } }[] = new Array(categories.length);
+
+    const junctionX = cx;
+    const junctionY = h * JUNCTION_Y;
 
     catEntries.forEach((entry, sortedIdx) => {
       const { cat, idx: ci, total } = entry;
@@ -144,20 +149,27 @@ export default function FlowCanvas({
 
       orbs.push({ x: orbX, y: orbY, radius, color: cat.color, name: cat.name, totalLines: total, repoCount: cat.repos.length });
 
-      // Bezier: start spread across full text width, smoothly curve toward orbs
       // Start X: distribute across text proportionally
       const startT = count <= 1 ? 0.5 : sortedIdx / (count - 1);
       const startX = textLeft + startT * textW;
       const startY = textBottom;
 
-      // cp1: gentle pull, keep near starting x to avoid over-convergence
-      const cp1x = startX + (orbX - startX) * 0.15;
-      const cp1y = startY + (orbY - startY) * 0.25;
-      // cp2: approach orb more directly
-      const cp2x = orbX + (startX - orbX) * 0.08;
-      const cp2y = startY + (orbY - startY) * 0.7;
+      // Upper segment: text spread → junction (converge)
+      const u_cp1x = startX;
+      const u_cp1y = startY + (junctionY - startY) * 0.45;
+      const u_cp2x = junctionX + (startX - junctionX) * 0.15;
+      const u_cp2y = startY + (junctionY - startY) * 0.75;
 
-      paths[ci] = { p0: { x: startX, y: startY }, cp1: { x: cp1x, y: cp1y }, cp2: { x: cp2x, y: cp2y }, p3: { x: orbX, y: orbY } };
+      // Lower segment: junction → orb (fan out)
+      const l_cp1x = junctionX + (orbX - junctionX) * 0.1;
+      const l_cp1y = junctionY + (orbY - junctionY) * 0.3;
+      const l_cp2x = orbX + (junctionX - orbX) * 0.08;
+      const l_cp2y = junctionY + (orbY - junctionY) * 0.7;
+
+      paths[ci] = {
+        upper: { p0: { x: startX, y: startY }, cp1: { x: u_cp1x, y: u_cp1y }, cp2: { x: u_cp2x, y: u_cp2y }, p3: { x: junctionX, y: junctionY } },
+        lower: { p0: { x: junctionX, y: junctionY }, cp1: { x: l_cp1x, y: l_cp1y }, cp2: { x: l_cp2x, y: l_cp2y }, p3: { x: orbX, y: orbY } },
+      };
     });
 
     orbsRef.current = orbs;
@@ -357,9 +369,9 @@ export default function FlowCanvas({
       const whiteRgb: [number, number, number] = [180, 220, 255];
 
       stream.forEach((p) => {
-        const path = paths[p.catIdx];
+        const pathData = paths[p.catIdx];
         const cat = categories[p.catIdx];
-        if (!path || !cat) return;
+        if (!pathData || !cat) return;
 
         p.t += p.speed;
         if (p.t > 1) {
@@ -370,14 +382,29 @@ export default function FlowCanvas({
         }
         if (p.t < 0) return;
 
-        const pt = bezier(path.p0, path.cp1, path.cp2, path.p3, p.t);
-        // Perpendicular offset
-        const eps = 0.01;
-        const pt2 = bezier(path.p0, path.cp1, path.cp2, path.p3, Math.min(p.t + eps, 1));
+        // Two-segment interpolation: t=0..0.35 → upper, t=0.35..1 → lower
+        const SPLIT = 0.35;
+        let pt: Pt, pt2: Pt;
+        if (p.t <= SPLIT) {
+          const localT = p.t / SPLIT;
+          const seg = pathData.upper;
+          pt = bezier(seg.p0, seg.cp1, seg.cp2, seg.p3, localT);
+          const localT2 = Math.min(localT + 0.02, 1);
+          pt2 = bezier(seg.p0, seg.cp1, seg.cp2, seg.p3, localT2);
+        } else {
+          const localT = (p.t - SPLIT) / (1 - SPLIT);
+          const seg = pathData.lower;
+          pt = bezier(seg.p0, seg.cp1, seg.cp2, seg.p3, localT);
+          const localT2 = Math.min(localT + 0.02, 1);
+          pt2 = bezier(seg.p0, seg.cp1, seg.cp2, seg.p3, localT2);
+        }
+
+        // Perpendicular offset — tighten near junction
         const dx = pt2.x - pt.x, dy = pt2.y - pt.y;
         const len = Math.sqrt(dx * dx + dy * dy) || 1;
         const nx = -dy / len, ny = dx / len;
-        const offFade = 1 - p.t * p.t * 0.6;
+        const distToJunction = 1 - Math.exp(-Math.abs(p.t - SPLIT) * 8);
+        const offFade = distToJunction * (1 - p.t * p.t * 0.4);
         p.x = pt.x + nx * p.offset * offFade;
         p.y = pt.y + ny * p.offset * offFade;
 

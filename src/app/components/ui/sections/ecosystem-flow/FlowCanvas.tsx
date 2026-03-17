@@ -479,23 +479,37 @@ export default function FlowCanvas({
         ctx.fillStyle = `rgba(255,255,255,${dotA * 0.7})`;
         ctx.fill();
 
-        // Category name
-        ctx.font = "700 14px 'Orbitron', sans-serif";
+        // Background pill width (used for label truncation + pill rendering)
+        const pillW = 130;
+
+        // Clamp label X so pill doesn't go outside canvas
+        const labelX = Math.max(pillW / 2 + 4, Math.min(w - pillW / 2 - 4, cat.avgX));
+
+        // Category name — use shorter word if full name overflows
+        ctx.font = "700 18px 'Orbitron', sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         const nameA = isHovered ? 1 : (isNoneHovered ? 0.8 : 0.15);
         ctx.fillStyle = `rgba(${r},${g},${b},${nameA})`;
-        ctx.fillText(cat.catName.toUpperCase(), cat.avgX, cat.avgY + 14);
+        const fullName = cat.catName.toUpperCase();
+        const maxLabelW = pillW - 12;
+        let displayName = fullName;
+        if (ctx.measureText(fullName).width > maxLabelW) {
+          const parts = fullName.split(/\s*&\s*/);
+          if (parts.length >= 2) {
+            displayName = parts[0].length <= parts[1].length ? parts[0] : parts[1];
+          } else {
+            displayName = fullName.split(/\s+/)[0];
+          }
+        }
+        ctx.fillText(displayName, labelX, cat.avgY + 14);
 
         // Detail label with collision offset
         const fade = isHovered ? 1 : (isNoneHovered ? 0.7 : 0.1);
         const offsetY = labelOffsets[ci];
-        const labelY = cat.avgY + 36 + offsetY;
-
-        // Background pill
-        const pillW = 145;
-        const pillH = 68;
-        const pillX = cat.avgX - pillW / 2;
+        const labelY = cat.avgY + 34 + offsetY;
+        const pillH = 60;
+        const pillX = labelX - pillW / 2;
         const pillY = labelY - 4;
         ctx.beginPath();
         ctx.roundRect(pillX, pillY, pillW, pillH, 6);
@@ -506,24 +520,24 @@ export default function FlowCanvas({
         ctx.stroke();
 
         // Repo count
-        ctx.font = "600 17px 'Orbitron', sans-serif";
+        ctx.font = "600 15px 'Orbitron', sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         ctx.fillStyle = `rgba(255,255,255,${0.9 * fade})`;
-        ctx.fillText(`${cat.repoCount} repos`, cat.avgX, labelY + 2);
+        ctx.fillText(`${cat.repoCount} repos`, labelX, labelY + 2);
 
         // Lines changed
         if (cat.totalLines > 0) {
-          ctx.font = "400 15px sans-serif";
+          ctx.font = "400 16px sans-serif";
           ctx.fillStyle = `rgba(${r},${g},${b},${0.7 * fade})`;
-          ctx.fillText(`${formatNum(cat.totalLines)} lines`, cat.avgX, labelY + 24);
+          ctx.fillText(`${formatNum(cat.totalLines)} lines`, labelX, labelY + 22);
         }
 
         // Active count
         if (cat.activeCount > 0) {
-          ctx.font = "400 13px sans-serif";
+          ctx.font = "400 14px sans-serif";
           ctx.fillStyle = `rgba(34,197,94,${0.7 * fade})`;
-          ctx.fillText(`${cat.activeCount} active`, cat.avgX, labelY + 44);
+          ctx.fillText(`${cat.activeCount} active`, labelX, labelY + 40);
         }
       });
     }

@@ -205,7 +205,7 @@ function TreemapDesktop({
                 style={{
                   maxWidth: "100%",
                   padding: isNarrow ? "2px 5px" : "3px 10px",
-                  fontSize: isNarrow ? 8 : 9,
+                  fontSize: isNarrow ? 12 : 13,
                   fontWeight: 800,
                   textTransform: "uppercase",
                   letterSpacing: "0.08em",

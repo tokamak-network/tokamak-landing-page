@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useEffect, useCallback, useState } from "react";
-import type { FlowCategory } from "./index";
+import { AnimatePresence, motion } from "framer-motion";
+import type { FlowCategory, FlowRepo } from "./index";
 
 /* ── Types ─────────────────────────────────────────── */
 
@@ -86,7 +87,16 @@ export default function FlowCanvas({
   const rafRef = useRef<number | undefined>(undefined);
   const visibleRef = useRef(false);
   const textWidthRef = useRef(0);
+  const catLabelsRef = useRef<{ catIdx: number; x: number; y: number; w: number; h: number; dotX: number; dotY: number }[]>([]);
   const [, setTick] = useState(0);
+  const [popup, setPopup] = useState<{
+    catIdx: number;
+    catName: string;
+    color: string;
+    repos: FlowRepo[];
+    x: number;
+    y: number;
+  } | null>(null);
 
   /* ── Build layout ─────────────────────────────────── */
 
@@ -450,6 +460,25 @@ export default function FlowCanvas({
         }
       }
 
+      // Store label hit areas for click detection
+      const pillW = 130;
+      catLabelsRef.current = cats.map((cat, ci) => {
+        const lx = Math.max(pillW / 2 + 4, Math.min(w - pillW / 2 - 4, cat.avgX));
+        const ly = cat.avgY + 14;
+        const pillH = 60;
+        const offsetY = labelOffsets[ci];
+        const pillY = cat.avgY + 34 + offsetY - 4;
+        return {
+          catIdx: cat.catIdx,
+          x: lx - pillW / 2,
+          y: Math.min(ly - 4, pillY),
+          w: pillW,
+          h: Math.max(pillY + pillH, ly + 22) - Math.min(ly - 4, pillY),
+          dotX: cat.avgX,
+          dotY: cat.avgY,
+        };
+      });
+
       // Draw all categories
       cats.forEach((cat, ci) => {
         const [r, g, b] = hexToRgb(cat.color);
@@ -590,9 +619,42 @@ export default function FlowCanvas({
 
     const onMouse = (e: MouseEvent) => {
       const r = canvas.getBoundingClientRect();
-      mouseRef.current = { x: e.clientX - r.left, y: e.clientY - r.top };
+      const mx = e.clientX - r.left;
+      const my = e.clientY - r.top;
+      mouseRef.current = { x: mx, y: my };
+
+      // Hit-test category labels for hover popup
+      const scaleX = (canvas.width / (window.devicePixelRatio || 1)) / r.width;
+      const scaleY = (canvas.height / (window.devicePixelRatio || 1)) / r.height;
+      const cx = mx * scaleX;
+      const cy = my * scaleY;
+
+      const hit = catLabelsRef.current.find(
+        (l) => cx >= l.x && cx <= l.x + l.w && cy >= l.y && cy <= l.y + l.h,
+      );
+      if (hit) {
+        const cat = categories[hit.catIdx];
+        if (cat && popup?.catIdx !== hit.catIdx) {
+          // Convert dot canvas coords to CSS pixel coords
+          const dotCssX = hit.dotX / scaleX;
+          const dotCssY = hit.dotY / scaleY;
+          setPopup({
+            catIdx: hit.catIdx,
+            catName: cat.name,
+            color: cat.color,
+            repos: [...cat.repos].sort((a, b) => b.linesChanged - a.linesChanged),
+            x: dotCssX,
+            y: dotCssY,
+          });
+        }
+      } else if (popup) {
+        setPopup(null);
+      }
     };
-    const onLeave = () => { mouseRef.current = { x: -9999, y: -9999 }; };
+    const onLeave = () => {
+      mouseRef.current = { x: -9999, y: -9999 };
+      setPopup(null);
+    };
     canvas.addEventListener("mousemove", onMouse);
     canvas.addEventListener("mouseleave", onLeave);
 
@@ -605,7 +667,7 @@ export default function FlowCanvas({
       canvas.removeEventListener("mouseleave", onLeave);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [buildLayout, render, loop]);
+  }, [buildLayout, render, loop, categories, popup]);
 
   // Pre-compute category stats for mobile HTML cards
   const catStats = categories
@@ -618,7 +680,95 @@ export default function FlowCanvas({
 
   return (
     <div ref={containerRef} className="w-full max-w-[1440px] px-0 sm:px-2">
-      <canvas ref={canvasRef} className="w-full cursor-crosshair" />
+      <div className="relative">
+        <canvas ref={canvasRef} className="w-full cursor-crosshair" />
+
+        {/* Category detail popup (hover) */}
+        <AnimatePresence>
+          {popup && (
+            <motion.div
+              data-flow-popup
+              key={popup.catIdx}
+              initial={{ opacity: 0, y: 8, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.96 }}
+              transition={{ duration: 0.15 }}
+              className="absolute z-50 w-[280px] rounded-lg border bg-[#0a0a0a]/95 backdrop-blur-md shadow-2xl pointer-events-none"
+              style={{
+                left: Math.min(
+                  Math.max(8, popup.x - 140),
+                  (containerRef.current?.clientWidth ?? 600) - 288,
+                ),
+                bottom: (canvasRef.current?.clientHeight ?? 800) - popup.y + 12,
+                borderColor: popup.color + "40",
+                maxHeight: 320,
+              }}
+            >
+              {/* Header */}
+              <div
+                className="flex items-center gap-2.5 px-4 py-3 border-b"
+                style={{
+                  borderColor: popup.color + "30",
+                  background: popup.color + "0c",
+                }}
+              >
+                <div
+                  className="h-2.5 w-2.5 shrink-0 rounded-full"
+                  style={{ background: popup.color, boxShadow: `0 0 8px ${popup.color}80` }}
+                />
+                <span
+                  className="text-[13px] font-[800] uppercase tracking-[0.06em] text-white/90"
+                  style={{ fontFamily: "'Orbitron', sans-serif" }}
+                >
+                  {popup.catName}
+                </span>
+                <span className="ml-auto text-[11px] text-white/40">
+                  {popup.repos.length} repos
+                </span>
+              </div>
+
+              {/* Repo list (max 8 visible) */}
+              <div className="flex flex-col overflow-hidden">
+                {popup.repos.slice(0, 8).map((repo) => {
+                  const isPositive = repo.netGrowth >= 0;
+                  return (
+                    <div
+                      key={repo.name}
+                      className="flex items-center justify-between px-4 py-2 border-b border-white/5"
+                    >
+                      <div className="min-w-0 flex-1 mr-3">
+                        <p className="text-[12px] font-[600] text-white/80 truncate">
+                          {repo.name}
+                        </p>
+                        <p className="text-[10px] text-white/40 mt-0.5">
+                          {formatNum(repo.linesChanged)} lines
+                          {repo.isActive && (
+                            <span className="text-green-400/60 ml-1">&bull; active</span>
+                          )}
+                        </p>
+                      </div>
+                      <span
+                        className="text-[12px] font-[800] shrink-0"
+                        style={{
+                          fontFamily: "'Orbitron', sans-serif",
+                          color: isPositive ? "#22c55e" : "#ef4444",
+                        }}
+                      >
+                        {isPositive ? "+" : ""}{formatNum(repo.netGrowth)}
+                      </span>
+                    </div>
+                  );
+                })}
+                {popup.repos.length > 8 && (
+                  <div className="px-4 py-2 text-[10px] text-white/30 text-center">
+                    +{popup.repos.length - 8} more
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Mobile: category cards below canvas */}
       <div className="grid grid-cols-2 gap-2 px-4 pt-2 pb-4 sm:hidden">

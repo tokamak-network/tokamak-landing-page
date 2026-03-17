@@ -44,6 +44,7 @@ function getLeaderboardData(): {
           return {
             repoName: repo.name,
             githubUrl: repo.githubUrl,
+            description: repoCard?.description || undefined,
             linesChanged,
             linesAdded: added,
             linesDeleted: deleted,

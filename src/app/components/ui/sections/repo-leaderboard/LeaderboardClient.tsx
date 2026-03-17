@@ -46,15 +46,18 @@ function Tooltip({
   readonly anchorY: number;
   readonly containerW: number;
 }) {
+  const [descExpanded, setDescExpanded] = useState(false);
   const flipX = anchorX > containerW * 0.6;
 
   return (
     <motion.div
-      className="pointer-events-none absolute z-50"
+      className="absolute z-50"
       style={{
         left: flipX ? undefined : anchorX + 16,
         right: flipX ? containerW - anchorX + 16 : undefined,
         top: Math.max(8, anchorY - 40),
+        pointerEvents: repo.description ? "auto" : "none",
+        maxWidth: 280,
       }}
       initial={{ opacity: 0, scale: 0.9, y: 6 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -64,15 +67,16 @@ function Tooltip({
         className="rounded-lg border px-5 py-4 shadow-2xl backdrop-blur-md"
         style={{
           minWidth: 220,
+          maxWidth: 280,
           backgroundColor: "rgba(10, 10, 10, 0.92)",
           borderColor: hexToRgba(categoryColor, 0.3),
           boxShadow: `0 0 30px ${hexToRgba(categoryColor, 0.15)}, 0 20px 40px rgba(0,0,0,0.5)`,
         }}
       >
         {/* Header with glow dot */}
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-2">
           <div
-            className="w-2 h-2 rounded-full"
+            className="w-2 h-2 rounded-full shrink-0"
             style={{
               backgroundColor: categoryColor,
               boxShadow: `0 0 8px ${categoryColor}`,
@@ -83,18 +87,29 @@ function Tooltip({
           </div>
         </div>
 
+        {repo.description && (
+          <p
+            className={`text-[11px] text-[#999] leading-[1.4] mb-3 cursor-pointer hover:text-[#bbb] transition-colors ${
+              descExpanded ? "" : "line-clamp-3"
+            }`}
+            onClick={() => setDescExpanded((v) => !v)}
+          >
+            {repo.description}
+          </p>
+        )}
+
         <div className="space-y-2 text-[11px]">
-          <div className="flex justify-between">
+          <div className="flex justify-between gap-4">
             <span className="text-[#666]">Lines Added</span>
             <span className="text-[#22c55e] font-[700]">+{formatNumber(repo.linesAdded)}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between gap-4">
             <span className="text-[#666]">Net Growth</span>
             <span className="text-[#22c55e] font-[700]">
               +{formatNumber(repo.netGrowth)}
             </span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between gap-4">
             <span className="text-[#666]">Commits</span>
             <span className="text-white font-[700]">{repo.commits}</span>
           </div>

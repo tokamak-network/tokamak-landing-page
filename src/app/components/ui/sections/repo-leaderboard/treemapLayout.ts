@@ -14,6 +14,7 @@
 export interface TreemapRepo {
   repoName: string;
   githubUrl: string;
+  description?: string;
   linesChanged: number;
   linesAdded: number;
   linesDeleted: number;

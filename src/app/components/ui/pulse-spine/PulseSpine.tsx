@@ -12,56 +12,58 @@ interface SpineSection {
   id: string;
   label: string;
   value: string;
-  color: string; // tailwind-compatible hex
-  glowColor: string; // rgba for box-shadow
+  color: string;
+  glowColor: string;
 }
 
-const SECTIONS: SpineSection[] = [
-  {
-    id: "hero-visual",
-    label: "CODE CHANGES",
-    value: "4,898,658",
-    color: "#0077ff",
-    glowColor: "rgba(0, 119, 255, 0.6)",
-  },
-  {
-    id: "ecosystem-flow",
-    label: "ECOSYSTEM",
-    value: "67 repos",
-    color: "#0077ff",
-    glowColor: "rgba(0, 119, 255, 0.5)",
-  },
-  {
-    id: "ecosystem-metrics",
-    label: "TOTAL STAKED",
-    value: "28.5M",
-    color: "#22c55e",
-    glowColor: "rgba(34, 197, 94, 0.5)",
-  },
-  {
-    id: "repo-leaderboard",
-    label: "TOP RANK",
-    value: "#1",
-    color: "#ffd700",
-    glowColor: "rgba(255, 215, 0, 0.5)",
-  },
-  {
-    id: "developer-cta",
-    label: "ECOSYSTEM",
-    value: "67",
-    color: "#0077ff",
-    glowColor: "rgba(0, 119, 255, 0.4)",
-  },
-  {
-    id: "activity-stream",
-    label: "LIVE EVENTS",
-    value: "LIVE",
-    color: "#22c55e",
-    glowColor: "rgba(34, 197, 94, 0.6)",
-  },
-];
+interface PulseSpineProps {
+  codeChanges: number;
+  netGrowth: number;
+  activeProjects: number;
+  totalStaked: number;
+}
 
-export default function PulseSpine() {
+function formatCompact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return n.toLocaleString("en-US");
+}
+
+function buildSections(props: PulseSpineProps): SpineSection[] {
+  return [
+    {
+      id: "hero-visual",
+      label: "CODE CHANGES",
+      value: formatCompact(props.codeChanges),
+      color: "#0077ff",
+      glowColor: "rgba(0, 119, 255, 0.6)",
+    },
+    {
+      id: "ecosystem-flow",
+      label: "NET GROWTH",
+      value: `+${formatCompact(props.netGrowth)}`,
+      color: "#22c55e",
+      glowColor: "rgba(34, 197, 94, 0.5)",
+    },
+    {
+      id: "ecosystem-metrics",
+      label: "TOTAL STAKED",
+      value: `${formatCompact(props.totalStaked)} TON`,
+      color: "#22c55e",
+      glowColor: "rgba(34, 197, 94, 0.5)",
+    },
+    {
+      id: "developer-cta",
+      label: "ACTIVE PROJECTS",
+      value: String(props.activeProjects),
+      color: "#0077ff",
+      glowColor: "rgba(0, 119, 255, 0.4)",
+    },
+  ];
+}
+
+export default function PulseSpine({ codeChanges, netGrowth, activeProjects, totalStaked }: PulseSpineProps) {
+  const SECTIONS = buildSections({ codeChanges, netGrowth, activeProjects, totalStaked });
   const [activeIndex, setActiveIndex] = useState(0);
   const [progress, setProgress] = useState(0); // 0-1 overall scroll progress
   const [isVisible, setIsVisible] = useState(false);
@@ -79,8 +81,14 @@ export default function PulseSpine() {
       const scrollProgress = Math.min(scrollY / docHeight, 1);
       setProgress(scrollProgress);
 
-      // Show spine only after hero area (past first 300px)
-      setIsVisible(scrollY > 300);
+      // Find the last tracked section's bottom edge
+      const lastSec = document.getElementById(SECTIONS[SECTIONS.length - 1]?.id ?? "");
+      const lastBottom = lastSec
+        ? lastSec.getBoundingClientRect().bottom + scrollY
+        : Infinity;
+
+      // Show spine only between hero (300px) and last section bottom
+      setIsVisible(scrollY > 300 && scrollY + window.innerHeight * 0.5 < lastBottom);
 
       // Find which section is in center of viewport
       const viewCenter = scrollY + window.innerHeight * 0.5;

@@ -480,7 +480,7 @@ export default function FlowCanvas({
         ctx.fill();
 
         // Category name
-        ctx.font = "700 12px 'Orbitron', sans-serif";
+        ctx.font = "700 14px 'Orbitron', sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         const nameA = isHovered ? 1 : (isNoneHovered ? 0.8 : 0.15);
@@ -490,11 +490,11 @@ export default function FlowCanvas({
         // Detail label with collision offset
         const fade = isHovered ? 1 : (isNoneHovered ? 0.7 : 0.1);
         const offsetY = labelOffsets[ci];
-        const labelY = cat.avgY + 34 + offsetY;
+        const labelY = cat.avgY + 36 + offsetY;
 
         // Background pill
-        const pillW = 130;
-        const pillH = 60;
+        const pillW = 145;
+        const pillH = 68;
         const pillX = cat.avgX - pillW / 2;
         const pillY = labelY - 4;
         ctx.beginPath();
@@ -506,7 +506,7 @@ export default function FlowCanvas({
         ctx.stroke();
 
         // Repo count
-        ctx.font = "600 15px 'Orbitron', sans-serif";
+        ctx.font = "600 17px 'Orbitron', sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         ctx.fillStyle = `rgba(255,255,255,${0.9 * fade})`;
@@ -514,16 +514,16 @@ export default function FlowCanvas({
 
         // Lines changed
         if (cat.totalLines > 0) {
-          ctx.font = "400 14px sans-serif";
+          ctx.font = "400 15px sans-serif";
           ctx.fillStyle = `rgba(${r},${g},${b},${0.7 * fade})`;
-          ctx.fillText(`${formatNum(cat.totalLines)} lines`, cat.avgX, labelY + 22);
+          ctx.fillText(`${formatNum(cat.totalLines)} lines`, cat.avgX, labelY + 24);
         }
 
         // Active count
         if (cat.activeCount > 0) {
-          ctx.font = "400 12px sans-serif";
+          ctx.font = "400 13px sans-serif";
           ctx.fillStyle = `rgba(34,197,94,${0.7 * fade})`;
-          ctx.fillText(`${cat.activeCount} active`, cat.avgX, labelY + 40);
+          ctx.fillText(`${cat.activeCount} active`, cat.avgX, labelY + 44);
         }
       });
     }

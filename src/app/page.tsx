@@ -47,7 +47,12 @@ export default async function Home() {
   return (
     <div className="flex flex-col items-center w-full font-display bg-black relative grain-overlay">
       <Header />
-      <PulseSpine />
+      <PulseSpine
+        codeChanges={codeChanges}
+        netGrowth={netGrowth}
+        activeProjects={activeProjects}
+        totalStaked={totalStaked}
+      />
       <HeroVisual
         codeChanges={codeChanges}
         netGrowth={netGrowth}

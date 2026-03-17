@@ -88,6 +88,8 @@ export default function FlowCanvas({
   const visibleRef = useRef(false);
   const textWidthRef = useRef(0);
   const catLabelsRef = useRef<{ catIdx: number; x: number; y: number; w: number; h: number; dotX: number; dotY: number }[]>([]);
+  const popupHoverRef = useRef(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [, setTick] = useState(0);
   const [popup, setPopup] = useState<{
     catIdx: number;
@@ -633,9 +635,10 @@ export default function FlowCanvas({
         (l) => cx >= l.x && cx <= l.x + l.w && cy >= l.y && cy <= l.y + l.h,
       );
       if (hit) {
+        // Cancel any pending close
+        if (closeTimerRef.current) { clearTimeout(closeTimerRef.current); closeTimerRef.current = null; }
         const cat = categories[hit.catIdx];
         if (cat && popup?.catIdx !== hit.catIdx) {
-          // Convert dot canvas coords to CSS pixel coords
           const dotCssX = hit.dotX / scaleX;
           const dotCssY = hit.dotY / scaleY;
           setPopup({
@@ -647,13 +650,24 @@ export default function FlowCanvas({
             y: dotCssY,
           });
         }
-      } else if (popup) {
-        setPopup(null);
+      } else if (popup && !popupHoverRef.current) {
+        // Delay close so user can move mouse to popup
+        if (!closeTimerRef.current) {
+          closeTimerRef.current = setTimeout(() => {
+            if (!popupHoverRef.current) setPopup(null);
+            closeTimerRef.current = null;
+          }, 200);
+        }
       }
     };
     const onLeave = () => {
       mouseRef.current = { x: -9999, y: -9999 };
-      setPopup(null);
+      if (!popupHoverRef.current) {
+        closeTimerRef.current = setTimeout(() => {
+          if (!popupHoverRef.current) setPopup(null);
+          closeTimerRef.current = null;
+        }, 200);
+      }
     };
     canvas.addEventListener("mousemove", onMouse);
     canvas.addEventListener("mouseleave", onLeave);
@@ -666,6 +680,7 @@ export default function FlowCanvas({
       canvas.removeEventListener("mousemove", onMouse);
       canvas.removeEventListener("mouseleave", onLeave);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     };
   }, [buildLayout, render, loop, categories, popup]);
 
@@ -694,7 +709,14 @@ export default function FlowCanvas({
               exit={{ opacity: 0, y: 8, scale: 0.96 }}
               transition={{ duration: 0.15 }}
               className="absolute z-50 w-[280px] rounded-lg border bg-[#0a0a0a]/95 backdrop-blur-md shadow-2xl pointer-events-auto"
-              onMouseLeave={() => setPopup(null)}
+              onMouseEnter={() => {
+                popupHoverRef.current = true;
+                if (closeTimerRef.current) { clearTimeout(closeTimerRef.current); closeTimerRef.current = null; }
+              }}
+              onMouseLeave={() => {
+                popupHoverRef.current = false;
+                setPopup(null);
+              }}
               style={{
                 left: Math.min(
                   Math.max(8, popup.x - 140),
@@ -732,12 +754,15 @@ export default function FlowCanvas({
                 {popup.repos.map((repo) => {
                   const isPositive = repo.netGrowth >= 0;
                   return (
-                    <div
+                    <a
                       key={repo.name}
-                      className="flex items-center justify-between px-4 py-2 border-b border-white/5 shrink-0"
+                      href={`https://github.com/tokamak-network/${repo.name}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between px-4 py-2 border-b border-white/5 shrink-0 cursor-pointer transition-colors hover:bg-white/[0.06]"
                     >
                       <div className="min-w-0 flex-1 mr-3">
-                        <p className="text-[12px] font-[600] text-white/80 truncate">
+                        <p className="text-[12px] font-[600] text-white/80 truncate group-hover:text-white">
                           {repo.name}
                         </p>
                         <p className="text-[10px] text-white/40 mt-0.5">
@@ -756,7 +781,7 @@ export default function FlowCanvas({
                       >
                         {isPositive ? "+" : ""}{formatNum(repo.netGrowth)}
                       </span>
-                    </div>
+                    </a>
                   );
                 })}
               </div>

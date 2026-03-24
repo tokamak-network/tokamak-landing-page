@@ -21,8 +21,8 @@ function createHelicalStripeTexture(): CanvasTexture {
   canvas.height = size;
   const ctx = canvas.getContext("2d")!;
 
-  // Dark base
-  ctx.fillStyle = "#0a1a2a";
+  // White base
+  ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, size, size);
 
   // Cyan helical stripes
@@ -178,16 +178,17 @@ export default function TorusScene({
         onCreated={handleCreated}
       >
         <ResizeHelper />
-        <ambientLight intensity={0.4} />
+        <ambientLight intensity={0.5} />
         <directionalLight position={[2, 8, 5]} intensity={0.8} />
-        <pointLight position={[0, 1.5, 0]} intensity={4} color="#2A72E5" distance={20} />
-        <pointLight position={[0, 0, 0]} intensity={2} color="#1a4a8a" distance={15} />
+        {/* Blue light from above — directional to avoid visible orb behind torus */}
+        <directionalLight position={[0, 5, 2]} intensity={1.2} color="#2A72E5" />
+        <directionalLight position={[0, 3, -2]} intensity={0.6} color="#1a4a8a" />
         <TokamakTorus scrollProgress={scrollProgress} />
         <EffectComposer>
           <Bloom
-            luminanceThreshold={0.3}
+            luminanceThreshold={0.5}
             luminanceSmoothing={0.9}
-            intensity={1.5}
+            intensity={1.2}
             mipmapBlur
           />
         </EffectComposer>

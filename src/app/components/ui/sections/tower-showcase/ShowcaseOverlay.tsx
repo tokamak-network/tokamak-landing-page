@@ -216,14 +216,14 @@ export default function ShowcaseOverlay({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="absolute flex flex-col"
+            className="fixed flex flex-col"
             style={{
               left: "50%",
               top: "50%",
               transform: "translate(-50%, -50%)",
-              width: "clamp(340px, 55%, 640px)",
-              maxHeight: "70%",
-              zIndex: 10,
+              width: "clamp(340px, 55vw, 640px)",
+              maxHeight: "70vh",
+              zIndex: 60,
               background:
                 "linear-gradient(180deg, rgba(8, 20, 50, 0.95) 0%, rgba(5, 12, 30, 0.98) 100%)",
               borderRadius: "12px",
@@ -410,8 +410,8 @@ export default function ShowcaseOverlay({
       {/* Background overlay to close panel on outside click */}
       {selectedIdx !== null && (
         <div
-          className="absolute inset-0"
-          style={{ zIndex: 9 }}
+          className="fixed inset-0"
+          style={{ zIndex: 59, background: "rgba(0, 0, 0, 0.6)" }}
           onClick={() => setSelectedIdx(null)}
         />
       )}

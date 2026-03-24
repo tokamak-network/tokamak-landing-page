@@ -124,8 +124,18 @@ body {
   50% { opacity: 0.8; }
 }
 
-/* Torus hero: light curtain rotation synced with 3D torus (0.15 rad/s → ~41.89s per revolution) */
-@keyframes torusCurtainSpin {
-  0% { transform: rotateX(12deg) rotateY(0deg); }
-  100% { transform: rotateX(12deg) rotateY(360deg); }
+
+@keyframes chevronBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+
+@keyframes scanDown {
+  0% { top: -2%; }
+  100% { top: 102%; }
+}
+
+@keyframes neonPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }

@@ -12,7 +12,9 @@ interface TickerItem {
   change?: string; // e.g. "+2.3%"
 }
 
-async function getTickerData(): Promise<TickerItem[]> {
+export { type TickerItem };
+
+export async function getTickerData(): Promise<TickerItem[]> {
   try {
     const [priceData, reportStats] = await Promise.all([
       fetchPriceDatas().catch(() => null),

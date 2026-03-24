@@ -6,7 +6,7 @@ import TowerFloor from "./components/ui/sections/tower-floor";
 import FloorIndicator from "./components/ui/sections/tower-floor/FloorIndicator";
 import TowerShowcase from "./components/ui/sections/tower-showcase";
 import DataConsoleContent from "./components/ui/sections/data-ticker/DataConsoleContent";
-import EcosystemMetrics from "./components/ui/sections/ecosystem-metrics";
+import ThanosL2Overlay from "./components/ui/sections/thanos-l2";
 import EcosystemFlow from "./components/ui/sections/ecosystem-flow";
 import ActivityStream from "./components/ui/sections/activity-stream";
 import RepoLeaderboard from "./components/ui/sections/repo-leaderboard";
@@ -47,15 +47,15 @@ export default function Home() {
       </TowerFloor>
 
       {/* Floor transition indicator */}
-      <FloorIndicator floor={3} label="Ecosystem Metrics" />
+      <FloorIndicator floor={3} label="Thanos L2" />
 
-      {/* Tower Floor 3: Ecosystem Metrics */}
+      {/* Tower Floor 3: Thanos L2 Infrastructure */}
       <TowerFloor
-        bgImage="/tower/floor-3-metrics.png"
-        bgAlt="Tower floor 3 — ecosystem metrics display"
+        bgImage="/tower/floor-3-thanos.png"
+        bgAlt="Tower floor 3 — Thanos L2 infrastructure launch platform"
         isLast
       >
-        <EcosystemMetrics />
+        <ThanosL2Overlay />
       </TowerFloor>
 
       <EcosystemFlow />

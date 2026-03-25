@@ -149,6 +149,7 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
     if (phase === "video" && videoRef.current) {
       videoRef.current.pause();
     }
+    window.dispatchEvent(new CustomEvent("intro-fadeout"));
     setPhase("done");
     document.body.style.overflow = "";
   };

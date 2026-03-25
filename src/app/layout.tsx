@@ -43,6 +43,7 @@ export default function RootLayout({
         className="font-display antialiased bg-black text-[#c5c5ca]"
         suppressHydrationWarning
       >
+        <script dangerouslySetInnerHTML={{ __html: `window.history.scrollRestoration="manual";window.scrollTo(0,0);` }} />
         <FocusProvider>{children}</FocusProvider>
       </body>
     </html>

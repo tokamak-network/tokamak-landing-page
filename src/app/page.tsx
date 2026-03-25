@@ -6,9 +6,6 @@ import TowerFloor from "./components/ui/sections/tower-floor";
 import FloorIndicator from "./components/ui/sections/tower-floor/FloorIndicator";
 import TowerShowcase from "./components/ui/sections/tower-showcase";
 import DataConsoleContent from "./components/ui/sections/data-ticker/DataConsoleContent";
-import ThanosL2Overlay from "./components/ui/sections/thanos-l2";
-
-
 export default function Home() {
   return (
     <main className="bg-black min-h-screen">
@@ -40,20 +37,9 @@ export default function Home() {
       <TowerFloor
         bgImage="/tower/floor-2-dataconsole.png"
         bgAlt="Tower floor 2 — live data console command center"
-      >
-        <DataConsoleContent />
-      </TowerFloor>
-
-      {/* Floor transition indicator */}
-      <FloorIndicator floor={1} label="Thanos L2" />
-
-      {/* Tower Floor 1 (Bottom): Thanos L2 Infrastructure */}
-      <TowerFloor
-        bgImage=""
-        bgAlt="Tower floor 3 — Thanos L2 infrastructure launch platform"
         isLast
       >
-        <ThanosL2Overlay />
+        <DataConsoleContent />
       </TowerFloor>
     </main>
   );

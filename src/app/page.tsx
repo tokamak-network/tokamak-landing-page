@@ -7,13 +7,7 @@ import FloorIndicator from "./components/ui/sections/tower-floor/FloorIndicator"
 import TowerShowcase from "./components/ui/sections/tower-showcase";
 import DataConsoleContent from "./components/ui/sections/data-ticker/DataConsoleContent";
 import ThanosL2Overlay from "./components/ui/sections/thanos-l2";
-// ── Future sections (commented out for concept preview) ──
-// import EcosystemFlow from "./components/ui/sections/ecosystem-flow";
-// import ActivityStream from "./components/ui/sections/activity-stream";
-// import RepoLeaderboard from "./components/ui/sections/repo-leaderboard";
-// import DeveloperCta from "./components/ui/sections/developer-cta";
-// import LatestFeed from "./components/ui/sections/latest-feed";
-// import Footer from "./components/ui/footer";
+
 
 export default function Home() {
   return (
@@ -61,15 +55,6 @@ export default function Home() {
       >
         <ThanosL2Overlay />
       </TowerFloor>
-
-      {/* ── Future sections (uncomment when ready) ──
-      <EcosystemFlow />
-      <ActivityStream />
-      <RepoLeaderboard />
-      <DeveloperCta />
-      <LatestFeed />
-      <Footer />
-      */}
     </main>
   );
 }

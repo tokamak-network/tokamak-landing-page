@@ -23,10 +23,6 @@ export default function EnergyConduit({
   animated = true,
   thickness = 2,
 }: Props) {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  const len = Math.sqrt(dx * dx + dy * dy);
-
   return (
     <svg
       className="absolute inset-0 w-full h-full pointer-events-none"

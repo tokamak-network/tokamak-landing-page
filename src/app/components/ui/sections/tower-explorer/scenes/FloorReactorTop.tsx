@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import IsometricBase from "./IsometricBase";
 import TorusReactor from "./TorusReactor";
 import HoloScreen from "./HoloScreen";
@@ -11,8 +10,6 @@ import EnergyConduit from "./EnergyConduit";
  * Central torus reactor dome + 5 monitor screens + light beams + antennas.
  */
 export default function FloorReactorTop() {
-  const [coreActive, setCoreActive] = useState(true);
-
   return (
     <div className="absolute inset-0">
       <IsometricBase accent="#00e5ff" />

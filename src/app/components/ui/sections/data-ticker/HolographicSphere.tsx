@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, useState, useEffect, useCallback } from "react";
+import { useRef, useMemo, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import {
@@ -13,12 +13,6 @@ import {
   CanvasTexture,
   DoubleSide,
   RepeatWrapping,
-  SphereGeometry,
-  EdgesGeometry,
-  LineSegments,
-  LineBasicMaterial,
-  Vector3,
-  Color,
 } from "three";
 
 /* ══════════════════════════════════════════════
@@ -33,8 +27,10 @@ function ResizeHelper() {
       for (const e of entries) {
         const { width, height } = e.contentRect;
         gl.setSize(width, height);
-        (camera as any).aspect = width / height;
-        (camera as any).updateProjectionMatrix();
+        if ('aspect' in camera && 'updateProjectionMatrix' in camera) {
+          (camera as unknown as { aspect: number; updateProjectionMatrix: () => void }).aspect = width / height;
+          (camera as unknown as { aspect: number; updateProjectionMatrix: () => void }).updateProjectionMatrix();
+        }
       }
     });
     obs.observe(parent);
@@ -167,45 +163,8 @@ function EquatorRing() {
 /* ══════════════════════════════════════════════
    Orbital rings (multiple concentric, with tick marks texture)
    ══════════════════════════════════════════════ */
-function createRingTexture(): CanvasTexture {
-  const w = 1024;
-  const h = 16;
-  const c = document.createElement("canvas");
-  c.width = w;
-  c.height = h;
-  const ctx = c.getContext("2d")!;
-  ctx.clearRect(0, 0, w, h);
-
-  // Main line
-  ctx.strokeStyle = "rgba(0, 229, 255, 0.4)";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(0, h / 2);
-  ctx.lineTo(w, h / 2);
-  ctx.stroke();
-
-  // Tick marks
-  ctx.strokeStyle = "rgba(0, 229, 255, 0.6)";
-  ctx.lineWidth = 1;
-  const tickCount = 120;
-  for (let i = 0; i < tickCount; i++) {
-    const x = (i / tickCount) * w;
-    const isMajor = i % 10 === 0;
-    const tickH = isMajor ? 6 : 3;
-    ctx.beginPath();
-    ctx.moveTo(x, h / 2 - tickH);
-    ctx.lineTo(x, h / 2 + tickH);
-    ctx.stroke();
-  }
-
-  const tex = new CanvasTexture(c);
-  tex.wrapS = RepeatWrapping;
-  return tex;
-}
-
 function OrbitalRings() {
   const groupRef = useRef<Group>(null);
-  const ringTex = useMemo(() => createRingTexture(), []);
 
   useFrame((_, delta) => {
     if (groupRef.current) {

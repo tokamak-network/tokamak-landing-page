@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, CSSProperties, ReactNode } from "react";
+import { useEffect, useState, useRef, CSSProperties } from "react";
 
 /* ═══════════════ TYPES ═══════════════ */
 interface PriceData {
@@ -71,7 +71,7 @@ function MiniChart() {
       ctx.strokeStyle = "#39ff14"; ctx.lineWidth = 2;
       ctx.shadowColor = "#39ff14"; ctx.shadowBlur = 8;
       ctx.beginPath();
-      data.current.forEach((v, i) => { const x = (i / 59) * w, y = h - (v / 100) * h; i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+      data.current.forEach((v, i) => { const x = (i / 59) * w; const y = h - (v / 100) * h; if (i === 0) { ctx.moveTo(x, y); } else { ctx.lineTo(x, y); } });
       ctx.stroke(); ctx.shadowBlur = 0;
       ctx.lineTo((data.current.length - 1) / 59 * w, h); ctx.lineTo(0, h); ctx.closePath();
       const g = ctx.createLinearGradient(0, 0, 0, h);

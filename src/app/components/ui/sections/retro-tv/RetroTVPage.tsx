@@ -20,21 +20,28 @@ export default function RetroTVPage() {
   const [showGuide, setShowGuide] = useState(false);
   const [channelContent, setChannelContent] = useState<string | null>(null);
   const [transitioning, setTransitioning] = useState(false);
-  const [heroReady, setHeroReady] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
   const handleBootComplete = useCallback(() => {
     setPhase("transition");
   }, []);
 
+  const handleChannelSelect = useCallback((index: number) => {
+    setTransitioning(true);
+    setActiveChannel(index);
+    setTimeout(() => {
+      setChannelContent(CHANNELS[index].id);
+      setShowGuide(false);
+      setTransitioning(false);
+    }, 400);
+  }, []);
+
   // Transition: fade from boot to hero
   useEffect(() => {
     if (phase !== "transition") return;
     // Brief black gap, then reveal hero
-    const t1 = setTimeout(() => setHeroReady(true), 200);
     const t2 = setTimeout(() => setPhase("hero"), 1800);
     return () => {
-      clearTimeout(t1);
       clearTimeout(t2);
     };
   }, [phase]);
@@ -56,17 +63,7 @@ export default function RetroTVPage() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [phase, activeChannel]);
-
-  const handleChannelSelect = useCallback((index: number) => {
-    setTransitioning(true);
-    setActiveChannel(index);
-    setTimeout(() => {
-      setChannelContent(CHANNELS[index].id);
-      setShowGuide(false);
-      setTransitioning(false);
-    }, 400);
-  }, []);
+  }, [phase, activeChannel, handleChannelSelect]);
 
   return (
     <div className="relative min-h-screen bg-[#0a0a08] overflow-hidden">
@@ -84,8 +81,8 @@ export default function RetroTVPage() {
               alt=""
               className="w-full h-full object-cover transition-all duration-[2000ms] ease-out"
               style={{
-                opacity: heroReady ? 1 : 0,
-                transform: heroReady ? "scale(1)" : "scale(1.05)",
+                opacity: phase === "hero" ? 1 : 0,
+                transform: phase === "hero" ? "scale(1)" : "scale(1.05)",
               }}
             />
             {/* Subtle dark overlay for text readability */}
@@ -94,7 +91,7 @@ export default function RetroTVPage() {
               style={{
                 background:
                   "linear-gradient(180deg, rgba(10,10,8,0.2) 0%, rgba(10,10,8,0.1) 40%, rgba(10,10,8,0.3) 100%)",
-                opacity: heroReady ? 1 : 0,
+                opacity: phase === "hero" ? 1 : 0,
               }}
             />
           </div>
@@ -103,7 +100,6 @@ export default function RetroTVPage() {
           {/* Positioned to exactly cover the TV screen in hero-room.png */}
           <TVScreenOverlay
             phase={phase}
-            heroReady={heroReady}
             transitioning={transitioning}
             showGuide={showGuide}
             channelContent={channelContent}
@@ -182,7 +178,7 @@ export default function RetroTVPage() {
               className="fixed inset-0 z-30 pointer-events-none transition-opacity duration-[1500ms]"
               style={{
                 background: "#0a0a08",
-                opacity: heroReady ? 0 : 1,
+                opacity: 1,
               }}
             />
           )}
@@ -197,7 +193,6 @@ export default function RetroTVPage() {
 // Uses percentage-based positioning relative to the viewport.
 function TVScreenOverlay({
   phase,
-  heroReady,
   transitioning,
   showGuide,
   channelContent,
@@ -206,7 +201,6 @@ function TVScreenOverlay({
   onShowGuide,
 }: {
   phase: Phase;
-  heroReady: boolean;
   transitioning: boolean;
   showGuide: boolean;
   channelContent: string | null;
@@ -343,135 +337,135 @@ function ChannelScreen({
   );
 }
 
+const CONTENT_MAP = {
+  overview: [
+    "$ tokamak --architecture",
+    "",
+    "  TOKAMAK NETWORK STACK",
+    "  ═════════════════════",
+    "",
+    "        ╭──○──╮       ← TON TORUS",
+    "        ╰─────╯         Fusion Core",
+    "     ┌───────────┐",
+    "     │ ■ ■ ■ ■ ■ │    ← L2: THANOS",
+    "     │ ■ ■ ■ ■ ■ │      OP Stack Rollup",
+    "     └─────┬─────┘",
+    "   ┌───────┴───────┐",
+    "   │  ◇ Staking    │  ← MIDDLEWARE",
+    "   │  ◇ Bridge     │    SeigManager",
+    "   │  ◇ Governance │    DepositManager",
+    "   └───────┬───────┘",
+    "  ┌────────┴────────┐",
+    "  │  ◆ TONStarter   │ ← SERVICES",
+    "  │  ◆ L2 Factory   │   DApps & Tools",
+    "  │  ◆ Gemstone     │",
+    "  └────────┬────────┘",
+    " ┌─────────┴─────────┐",
+    " │   ◈  ETHEREUM L1  │ ← SETTLEMENT",
+    " │   Data Availability│   Base Layer",
+    " └───────────────────┘",
+    "",
+    "> STACK: ALL LAYERS ACTIVE_",
+  ],
+  staking: [
+    "$ tokamak stake --status",
+    "",
+    "╔══════════════════════════════════╗",
+    "║     SEIGNIORAGE STAKING          ║",
+    "╚══════════════════════════════════╝",
+    "",
+    "TOTAL STAKED .... 42,391,582 TON",
+    "YOUR STAKE ...... 12,500 TON",
+    "APR ............. 15.2%",
+    "VALIDATORS ...... 124 active",
+    "EPOCH ........... 1,247",
+    "",
+    "REWARDS (7d):",
+    "  ████████████████░░░░ 82%",
+    "  EST. +142.5 TON",
+    "",
+    "> STATUS: EARNING_",
+  ],
+  bridge: [
+    "$ tokamak bridge --monitor",
+    "",
+    "CROSS-CHAIN BRIDGE v2.0",
+    "═══════════════════════",
+    "",
+    "L1 (Ethereum) ←→ L2 (Thanos)",
+    "",
+    "RECENT TRANSFERS:",
+    "  → 0x4a2f.. 1,200 TON  [CONFIRMED]",
+    "  ← 0xb7e1..   850 TON  [CONFIRMED]",
+    "  → 0x1c8d.. 3,400 TON  [PENDING..]",
+    "",
+    "TVL: $2.4M  |  AVG TIME: 2.4 min",
+    "24H VOL: $1.2M",
+    "",
+    "> BRIDGE: OPERATIONAL_",
+  ],
+  governance: [
+    "$ tokamak gov --proposals",
+    "",
+    "DAO GOVERNANCE COUNCIL",
+    "══════════════════════",
+    "",
+    "ACTIVE PROPOSALS:",
+    "",
+    "TIP-42  Protocol Upgrade    [78% YES]",
+    "  ████████████████░░░░",
+    "",
+    "TIP-43  Treasury Alloc.     [45% YES]",
+    "  █████████░░░░░░░░░░░",
+    "",
+    "TIP-44  Bridge v2 Launch    [92% YES]",
+    "  ██████████████████░░",
+    "",
+    "> QUORUM: REACHED_",
+  ],
+  ecosystem: [
+    "$ tokamak eco --list",
+    "",
+    "ECOSYSTEM PROJECTS",
+    "══════════════════",
+    "",
+    "  Titan ........... DeFi Hub     [LIVE]",
+    "  Gemstone ........ DEX          [LIVE]",
+    "  Dooropen ........ Bridge       [LIVE]",
+    "  TONStarter ...... Launchpad    [LIVE]",
+    "  L2 Factory ...... Rollup Tool  [BETA]",
+    "",
+    "TOTAL PROJECTS: 14",
+    "MONTHLY ACTIVE: 8,247 wallets",
+    "",
+    "> NETWORK: GROWING_",
+  ],
+  developer: [
+    "$ tokamak dev --quick-start",
+    "",
+    "DEVELOPER TOOLKIT",
+    "═════════════════",
+    "",
+    "npx create-tokamak-app my-l2",
+    "",
+    "STACK:",
+    "  Runtime ....... OP Stack (Bedrock)",
+    "  Consensus ..... Optimistic Rollup",
+    "  DA ............ Ethereum L1",
+    "  RPC ........... https://rpc.thanos.io",
+    "",
+    "DOCS: docs.tokamak.network",
+    "GITHUB: github.com/tokamak-network",
+    "",
+    "> BUILD: READY_",
+  ],
+} as const;
+
 function TerminalContent({ channelId }: { channelId: string }) {
   const [lines, setLines] = useState<string[]>([]);
 
-  const contentMap: Record<string, string[]> = {
-    overview: [
-      "$ tokamak --architecture",
-      "",
-      "  TOKAMAK NETWORK STACK",
-      "  ═════════════════════",
-      "",
-      "        ╭──○──╮       ← TON TORUS",
-      "        ╰─────╯         Fusion Core",
-      "     ┌───────────┐",
-      "     │ ■ ■ ■ ■ ■ │    ← L2: THANOS",
-      "     │ ■ ■ ■ ■ ■ │      OP Stack Rollup",
-      "     └─────┬─────┘",
-      "   ┌───────┴───────┐",
-      "   │  ◇ Staking    │  ← MIDDLEWARE",
-      "   │  ◇ Bridge     │    SeigManager",
-      "   │  ◇ Governance │    DepositManager",
-      "   └───────┬───────┘",
-      "  ┌────────┴────────┐",
-      "  │  ◆ TONStarter   │ ← SERVICES",
-      "  │  ◆ L2 Factory   │   DApps & Tools",
-      "  │  ◆ Gemstone     │",
-      "  └────────┬────────┘",
-      " ┌─────────┴─────────┐",
-      " │   ◈  ETHEREUM L1  │ ← SETTLEMENT",
-      " │   Data Availability│   Base Layer",
-      " └───────────────────┘",
-      "",
-      "> STACK: ALL LAYERS ACTIVE_",
-    ],
-    staking: [
-      "$ tokamak stake --status",
-      "",
-      "╔══════════════════════════════════╗",
-      "║     SEIGNIORAGE STAKING          ║",
-      "╚══════════════════════════════════╝",
-      "",
-      "TOTAL STAKED .... 42,391,582 TON",
-      "YOUR STAKE ...... 12,500 TON",
-      "APR ............. 15.2%",
-      "VALIDATORS ...... 124 active",
-      "EPOCH ........... 1,247",
-      "",
-      "REWARDS (7d):",
-      "  ████████████████░░░░ 82%",
-      "  EST. +142.5 TON",
-      "",
-      "> STATUS: EARNING_",
-    ],
-    bridge: [
-      "$ tokamak bridge --monitor",
-      "",
-      "CROSS-CHAIN BRIDGE v2.0",
-      "═══════════════════════",
-      "",
-      "L1 (Ethereum) ←→ L2 (Thanos)",
-      "",
-      "RECENT TRANSFERS:",
-      "  → 0x4a2f.. 1,200 TON  [CONFIRMED]",
-      "  ← 0xb7e1..   850 TON  [CONFIRMED]",
-      "  → 0x1c8d.. 3,400 TON  [PENDING..]",
-      "",
-      "TVL: $2.4M  |  AVG TIME: 2.4 min",
-      "24H VOL: $1.2M",
-      "",
-      "> BRIDGE: OPERATIONAL_",
-    ],
-    governance: [
-      "$ tokamak gov --proposals",
-      "",
-      "DAO GOVERNANCE COUNCIL",
-      "══════════════════════",
-      "",
-      "ACTIVE PROPOSALS:",
-      "",
-      "TIP-42  Protocol Upgrade    [78% YES]",
-      "  ████████████████░░░░",
-      "",
-      "TIP-43  Treasury Alloc.     [45% YES]",
-      "  █████████░░░░░░░░░░░",
-      "",
-      "TIP-44  Bridge v2 Launch    [92% YES]",
-      "  ██████████████████░░",
-      "",
-      "> QUORUM: REACHED_",
-    ],
-    ecosystem: [
-      "$ tokamak eco --list",
-      "",
-      "ECOSYSTEM PROJECTS",
-      "══════════════════",
-      "",
-      "  Titan ........... DeFi Hub     [LIVE]",
-      "  Gemstone ........ DEX          [LIVE]",
-      "  Dooropen ........ Bridge       [LIVE]",
-      "  TONStarter ...... Launchpad    [LIVE]",
-      "  L2 Factory ...... Rollup Tool  [BETA]",
-      "",
-      "TOTAL PROJECTS: 14",
-      "MONTHLY ACTIVE: 8,247 wallets",
-      "",
-      "> NETWORK: GROWING_",
-    ],
-    developer: [
-      "$ tokamak dev --quick-start",
-      "",
-      "DEVELOPER TOOLKIT",
-      "═════════════════",
-      "",
-      "npx create-tokamak-app my-l2",
-      "",
-      "STACK:",
-      "  Runtime ....... OP Stack (Bedrock)",
-      "  Consensus ..... Optimistic Rollup",
-      "  DA ............ Ethereum L1",
-      "  RPC ........... https://rpc.thanos.io",
-      "",
-      "DOCS: docs.tokamak.network",
-      "GITHUB: github.com/tokamak-network",
-      "",
-      "> BUILD: READY_",
-    ],
-  };
-
   useEffect(() => {
-    const content = contentMap[channelId] || ["No data."];
+    const content = CONTENT_MAP[channelId as keyof typeof CONTENT_MAP] || ["No data."];
     let idx = 0;
     setLines([]);
     const interval = setInterval(() => {

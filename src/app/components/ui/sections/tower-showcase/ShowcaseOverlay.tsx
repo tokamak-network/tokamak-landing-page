@@ -190,7 +190,7 @@ export default function ShowcaseOverlay({
                   fontFamily: "'Orbitron', 'Share Tech Mono', monospace",
                 }}
               >
-                {"//"}
+                {"//"} {/* Comments inside children section should be in braces */}
               </span>
             )}
             <span

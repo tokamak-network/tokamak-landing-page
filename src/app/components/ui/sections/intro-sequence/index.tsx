@@ -20,20 +20,22 @@ import { motion, AnimatePresence } from "framer-motion";
 
 type Phase = "video" | "black" | "title" | "fadeout" | "done";
 
-/** Typewriter — reveals text one character at a time with a cursor */
-function Typewriter({
+/** GradientSweep — reveals text with a left-to-right holographic light sweep */
+function GradientSweep({
   text,
   delay = 0,
-  speed = 35,
+  duration = 1200,
   className,
 }: {
   text: string;
   delay?: number;
-  speed?: number;
+  duration?: number;
   className?: string;
 }) {
-  const [count, setCount] = useState(0);
+  const [progress, setProgress] = useState(0);
   const [started, setStarted] = useState(false);
+  const rafRef = useRef<number>(0);
+  const startTimeRef = useRef<number>(0);
 
   useEffect(() => {
     const t = setTimeout(() => setStarted(true), delay);
@@ -41,26 +43,52 @@ function Typewriter({
   }, [delay]);
 
   useEffect(() => {
-    if (!started || count >= text.length) return;
-    const t = setTimeout(() => setCount((c) => c + 1), speed);
-    return () => clearTimeout(t);
-  }, [started, count, text.length, speed]);
+    if (!started) return;
+    startTimeRef.current = performance.now();
 
-  if (!started) return <span className={className} style={{ visibility: "hidden" }}>{text}</span>;
+    const animate = (now: number) => {
+      const elapsed = now - startTimeRef.current;
+      const p = Math.min(elapsed / duration, 1);
+      // Ease-out cubic for smooth deceleration
+      const eased = 1 - Math.pow(1 - p, 3);
+      setProgress(eased * 110); // overshoot to 110% to fully reveal
+      if (p < 1) {
+        rafRef.current = requestAnimationFrame(animate);
+      }
+    };
+    rafRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [started, duration]);
+
+  const maskGradient = `linear-gradient(90deg, #000 0%, #000 ${progress - 8}%, transparent ${progress}%, transparent 100%)`;
 
   return (
-    <span className={className}>
-      {text.slice(0, count)}
-      {count < text.length && (
+    <span className={className} style={{ position: "relative", display: "inline-block" }}>
+      {/* Revealed text via mask */}
+      <span
+        style={{
+          WebkitMaskImage: maskGradient,
+          maskImage: maskGradient,
+          display: "inline",
+        }}
+      >
+        {text}
+      </span>
+
+      {/* Glowing sweep edge */}
+      {started && progress < 105 && (
         <span
           style={{
-            display: "inline-block",
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: `${Math.min(progress, 100)}%`,
             width: "2px",
-            height: "1em",
-            background: "rgba(0, 119, 255, 0.8)",
-            marginLeft: "2px",
-            verticalAlign: "text-bottom",
-            animation: "blink 0.6s step-end infinite",
+            background: "rgba(0, 119, 255, 0.9)",
+            boxShadow:
+              "0 0 8px rgba(0, 119, 255, 0.8), 0 0 20px rgba(0, 119, 255, 0.4), 0 0 40px rgba(0, 119, 255, 0.2)",
+            transform: "translateX(-50%)",
+            pointerEvents: "none",
           }}
         />
       )}
@@ -183,12 +211,12 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
                 <span className="text-[#0077ff]">NETWORK</span>
               </motion.h1>
 
-              {/* Tagline — typewriter after title is visible */}
+              {/* Tagline — gradient sweep reveal after title is visible */}
               <p className="mt-5 text-[16px] sm:text-[18px] md:text-[20px] text-[#929298] max-w-[520px] mx-auto">
-                <Typewriter
+                <GradientSweep
                   text="Every application deserves its own Layer 2"
                   delay={2200}
-                  speed={25}
+                  duration={1200}
                 />
               </p>
 

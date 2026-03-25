@@ -4,20 +4,21 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 /**
- * Intro sequence: B+D hybrid
+ * Intro sequence
  *
  * Timeline (no video):
  *   0.0s  black
- *   0.6s  pulse phase — cyan dot appears, beats twice
- *   3.0s  title phase — glow expands, text reveals
- *   5.0s  fadeout — cyan-out fills screen
- *   5.8s  done — overlay unmounts, hero visible
+ *   0.8s  title phase — "TOKAMAK NETWORK" slow fade-in
+ *   ~3.0s typewriter subtitle begins
+ *   ~4.1s typewriter done
+ *   5.6s  fadeout — overlay fades, hero appears
+ *   6.6s  done — overlay unmounts
  *
  * When a `videoSrc` is provided the video plays first; after it ends
- * the same pulse→title→fadeout sequence runs.
+ * the same black→title→fadeout sequence runs.
  */
 
-type Phase = "video" | "black" | "pulse" | "title" | "fadeout" | "done";
+type Phase = "video" | "black" | "title" | "fadeout" | "done";
 
 /** Typewriter — reveals text one character at a time with a cursor */
 function Typewriter({
@@ -86,75 +87,28 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
     };
   }, [phase]);
 
-  /* ── Timeline driver ── */
-  useEffect(() => {
-    if (phase === "video" || phase === "done") return;
-
-    const schedule: [Phase, number][] =
-      phase === "black"
-        ? [
-            ["pulse", 600],
-            ["title", 3000],
-            ["fadeout", 5000],
-            ["done", 5800],
-          ]
-        : phase === "pulse"
-        ? [
-            ["title", 2400],
-            ["fadeout", 4400],
-            ["done", 5200],
-          ]
-        : phase === "title"
-        ? [
-            ["fadeout", 2000],
-            ["done", 2800],
-          ]
-        : phase === "fadeout"
-        ? [["done", 800]]
-        : [];
-
-    const timers = schedule.map(([p, ms]) =>
-      setTimeout(() => setPhase(p), ms)
-    );
-    return () => timers.forEach(clearTimeout);
-    // Only re-run when entering a "root" phase
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase === "black" ? "black" : undefined]);
-
-  /* ── Auto-start timeline after black phase ── */
+  /* ── Phase timers ── */
   useEffect(() => {
     if (phase !== "black") return;
-    const timers = [
-      setTimeout(() => setPhase("pulse"), 600),
-    ];
-    return () => timers.forEach(clearTimeout);
-  }, [phase]);
-
-  useEffect(() => {
-    if (phase !== "pulse") return;
-    const timers = [
-      setTimeout(() => setPhase("title"), 2400),
-    ];
-    return () => timers.forEach(clearTimeout);
+    // Brief black, then straight to title (no pulse)
+    const t = setTimeout(() => setPhase("title"), 800);
+    return () => clearTimeout(t);
   }, [phase]);
 
   useEffect(() => {
     if (phase !== "title") return;
-    // Typewriter: 800ms delay + 44 chars × 25ms = ~1900ms, + 500ms pause
-    const timers = [
-      setTimeout(() => setPhase("fadeout"), 2400),
-    ];
-    return () => timers.forEach(clearTimeout);
+    // Title fade-in: 2.2s | Typewriter: starts 2.2s, 44 chars × 25ms = 1.1s, done ~3.3s
+    // + 1.5s breathing room after typewriter → fadeout at 4.8s
+    const t = setTimeout(() => setPhase("fadeout"), 4800);
+    return () => clearTimeout(t);
   }, [phase]);
 
   useEffect(() => {
     if (phase !== "fadeout") return;
     // Notify hero to start fade-in simultaneously
     window.dispatchEvent(new CustomEvent("intro-fadeout"));
-    const timers = [
-      setTimeout(() => setPhase("done"), 1000),
-    ];
-    return () => timers.forEach(clearTimeout);
+    const t = setTimeout(() => setPhase("done"), 1000);
+    return () => clearTimeout(t);
   }, [phase]);
 
   /* ── Video ended handler ── */
@@ -204,112 +158,7 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
         />
       )}
 
-      {/* ── Pulse phase — cyan dot with heartbeat ── */}
-      <AnimatePresence>
-        {(phase === "pulse" || phase === "title") && (
-          <motion.div
-            key="pulse-container"
-            className="absolute inset-0 flex items-center justify-center"
-            style={{ zIndex: 2 }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            {/* Radial glow — expands during title phase */}
-            <motion.div
-              className="absolute"
-              style={{
-                width: 600,
-                height: 600,
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle, rgba(42, 114, 229, 0.12) 0%, rgba(42, 114, 229, 0.03) 40%, transparent 70%)",
-                filter: "blur(40px)",
-              }}
-              animate={{
-                scale: phase === "title" ? 3 : 1,
-                opacity: phase === "title" ? 0.8 : 0.4,
-              }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-            />
-
-            {/* The dot */}
-            <motion.div
-              className="relative"
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                background: "#2A72E5",
-                boxShadow:
-                  "0 0 20px rgba(42, 114, 229, 0.8), 0 0 60px rgba(42, 114, 229, 0.4), 0 0 120px rgba(42, 114, 229, 0.2)",
-              }}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={
-                phase === "pulse"
-                  ? {
-                      scale: [0, 1, 1.8, 1, 1.8, 1],
-                      opacity: [0, 1, 0.6, 1, 0.6, 1],
-                    }
-                  : {
-                      scale: 0,
-                      opacity: 0,
-                    }
-              }
-              transition={
-                phase === "pulse"
-                  ? {
-                      duration: 2.0,
-                      times: [0, 0.15, 0.3, 0.5, 0.65, 0.8],
-                      ease: "easeInOut",
-                    }
-                  : { duration: 0.4 }
-              }
-            />
-
-            {/* Pulse rings (heartbeat ripple) */}
-            {phase === "pulse" && (
-              <>
-                <motion.div
-                  className="absolute"
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: "50%",
-                    border: "1px solid rgba(42, 114, 229, 0.6)",
-                  }}
-                  initial={{ scale: 1, opacity: 0.6 }}
-                  animate={{ scale: 12, opacity: 0 }}
-                  transition={{
-                    duration: 1.2,
-                    delay: 0.3,
-                    ease: "easeOut",
-                  }}
-                />
-                <motion.div
-                  className="absolute"
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: "50%",
-                    border: "1px solid rgba(42, 114, 229, 0.6)",
-                  }}
-                  initial={{ scale: 1, opacity: 0.6 }}
-                  animate={{ scale: 12, opacity: 0 }}
-                  transition={{
-                    duration: 1.2,
-                    delay: 1.1,
-                    ease: "easeOut",
-                  }}
-                />
-              </>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── Title phase — matches HeroOverlay exactly ── */}
+      {/* ── Title phase ── */}
       <AnimatePresence>
         {(phase === "title" || phase === "fadeout") && (
           <motion.div
@@ -319,26 +168,26 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: phase === "fadeout" ? 0 : 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: phase === "fadeout" ? 0.6 : 0.8 }}
+            transition={{ duration: phase === "fadeout" ? 0.6 : 0.3 }}
           >
             <div className="text-center">
-              {/* Main title — identical to HeroOverlay h1 */}
+              {/* Main title — slow dramatic fade-in */}
               <motion.h1
                 className="font-orbitron text-[40px] sm:text-[56px] md:text-[72px] lg:text-[88px] font-[900] text-white uppercase leading-[0.95] tracking-tight"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 2.2, ease: [0.25, 0.1, 0.25, 1] }}
               >
                 TOKAMAK
                 <br />
                 <span className="text-[#0077ff]">NETWORK</span>
               </motion.h1>
 
-              {/* Tagline — typewriter reveal after title settles */}
+              {/* Tagline — typewriter after title is visible */}
               <p className="mt-5 text-[16px] sm:text-[18px] md:text-[20px] text-[#929298] max-w-[520px] mx-auto">
                 <Typewriter
                   text="Every application deserves its own Layer 2"
-                  delay={800}
+                  delay={2200}
                   speed={25}
                 />
               </p>
@@ -354,7 +203,7 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
         )}
       </AnimatePresence>
 
-      {/* ── Fadeout: cyan light flood ── */}
+      {/* ── Fadeout: subtle light flood ── */}
       <AnimatePresence>
         {phase === "fadeout" && (
           <motion.div

@@ -26,9 +26,9 @@ export default function Home() {
         <VolumetricLight />
 
         {/* Floor transition indicator */}
-        <FloorIndicator floor={1} label="Ecosystem Showcase" />
+        <FloorIndicator floor={3} label="Ecosystem Showcase" />
 
-        {/* Tower Floor 1 (Top): Ecosystem Showcase — illuminated by torus */}
+        {/* Tower Floor 3 (Top): Ecosystem Showcase — illuminated by torus */}
         <TowerFloor
           bgImage="/tower/floor-1-showcase.png"
           bgAlt="Tower top floor — ecosystem showcase with 10 category pedestals"
@@ -41,7 +41,7 @@ export default function Home() {
       {/* Floor transition indicator */}
       <FloorIndicator floor={2} label="Live Data Console" />
 
-      {/* Tower Floor 2: Live Data Console */}
+      {/* Tower Floor 2 (Mid): Live Data Console */}
       <TowerFloor
         bgImage="/tower/floor-2-dataconsole.png"
         bgAlt="Tower floor 2 — live data console command center"
@@ -50,9 +50,9 @@ export default function Home() {
       </TowerFloor>
 
       {/* Floor transition indicator */}
-      <FloorIndicator floor={3} label="Thanos L2" />
+      <FloorIndicator floor={1} label="Thanos L2" />
 
-      {/* Tower Floor 3: Thanos L2 Infrastructure */}
+      {/* Tower Floor 1 (Bottom): Thanos L2 Infrastructure */}
       <TowerFloor
         bgImage="/tower/floor-3-thanos.png"
         bgAlt="Tower floor 3 — Thanos L2 infrastructure launch platform"

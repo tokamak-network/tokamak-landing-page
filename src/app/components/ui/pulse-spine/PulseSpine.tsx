@@ -115,7 +115,7 @@ export default function PulseSpine({ codeChanges, netGrowth, activeProjects, tot
       }
       setActiveIndex(bestIdx);
     });
-  }, []);
+  }, [SECTIONS]);
 
   useEffect(() => {
     // Check prefers-reduced-motion

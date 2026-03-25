@@ -190,7 +190,7 @@ export default function ShowcaseOverlay({
                   fontFamily: "'Orbitron', 'Share Tech Mono', monospace",
                 }}
               >
-                //
+                {"//"}
               </span>
             )}
             <span

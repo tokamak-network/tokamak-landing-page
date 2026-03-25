@@ -4,7 +4,6 @@ import { useRef, useMemo, useEffect, useCallback } from "react";
 import { Canvas, useFrame, useThree, RootState } from "@react-three/fiber";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import {
-  Mesh,
   CanvasTexture,
   RepeatWrapping,
   Group,
@@ -92,7 +91,6 @@ function ResizeHelper() {
 
 function TokamakTorus({ scrollProgress }: { scrollProgress: number }) {
   const groupRef = useRef<Group>(null!);
-  const meshRef = useRef<Mesh>(null!);
 
   const stripeTexture = useMemo(() => {
     if (typeof document === "undefined") return null;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import HeroOverlay from "./HeroOverlay";
 import ScrollIndicator from "./ScrollIndicator";
 import TorusScene from "./TorusScene";
@@ -15,18 +15,20 @@ export default function TorusHero() {
     setMounted(true);
   }, []);
 
-  /* Detect intro unmount → trigger fade-in */
-  const checkIntro = useCallback(() => {
-    if (document.querySelector("[data-intro]")) {
-      requestAnimationFrame(checkIntro);
-    } else {
-      setHeroVisible(true);
-    }
-  }, []);
-
+  /* Start fade-in when intro begins its fadeout, or if no intro exists */
   useEffect(() => {
-    requestAnimationFrame(checkIntro);
-  }, [checkIntro]);
+    const show = () => setHeroVisible(true);
+
+    // Listen for intro fadeout event
+    window.addEventListener("intro-fadeout", show);
+
+    // Fallback: if intro already gone (e.g. skip or no intro), show immediately
+    if (!document.querySelector("[data-intro]")) {
+      show();
+    }
+
+    return () => window.removeEventListener("intro-fadeout", show);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,7 +47,7 @@ export default function TorusHero() {
       ref={sectionRef}
       className="relative w-full h-screen overflow-hidden bg-black"
     >
-      {/* 3D Torus — full screen canvas, fades in after intro ends */}
+      {/* 3D Torus — full screen canvas, fades in when intro starts fadeout */}
       <div
         className="absolute inset-0"
         style={{

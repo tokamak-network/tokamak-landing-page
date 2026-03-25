@@ -19,6 +19,54 @@ import { motion, AnimatePresence } from "framer-motion";
 
 type Phase = "video" | "black" | "pulse" | "title" | "fadeout" | "done";
 
+/** Typewriter — reveals text one character at a time with a cursor */
+function Typewriter({
+  text,
+  delay = 0,
+  speed = 35,
+  className,
+}: {
+  text: string;
+  delay?: number;
+  speed?: number;
+  className?: string;
+}) {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setStarted(true), delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+
+  useEffect(() => {
+    if (!started || count >= text.length) return;
+    const t = setTimeout(() => setCount((c) => c + 1), speed);
+    return () => clearTimeout(t);
+  }, [started, count, text.length, speed]);
+
+  if (!started) return <span className={className} style={{ visibility: "hidden" }}>{text}</span>;
+
+  return (
+    <span className={className}>
+      {text.slice(0, count)}
+      {count < text.length && (
+        <span
+          style={{
+            display: "inline-block",
+            width: "2px",
+            height: "1em",
+            background: "rgba(0, 119, 255, 0.8)",
+            marginLeft: "2px",
+            verticalAlign: "text-bottom",
+            animation: "blink 0.6s step-end infinite",
+          }}
+        />
+      )}
+    </span>
+  );
+}
+
 interface IntroSequenceProps {
   /** Optional intro video — plays before the title sequence */
   videoSrc?: string;
@@ -92,16 +140,19 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
 
   useEffect(() => {
     if (phase !== "title") return;
+    // Typewriter: 800ms delay + 44 chars × 25ms = ~1900ms, + 500ms pause
     const timers = [
-      setTimeout(() => setPhase("fadeout"), 2000),
+      setTimeout(() => setPhase("fadeout"), 2400),
     ];
     return () => timers.forEach(clearTimeout);
   }, [phase]);
 
   useEffect(() => {
     if (phase !== "fadeout") return;
+    // Notify hero to start fade-in simultaneously
+    window.dispatchEvent(new CustomEvent("intro-fadeout"));
     const timers = [
-      setTimeout(() => setPhase("done"), 800),
+      setTimeout(() => setPhase("done"), 1000),
     ];
     return () => timers.forEach(clearTimeout);
   }, [phase]);
@@ -283,19 +334,14 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
                 <span className="text-[#0077ff]">NETWORK</span>
               </motion.h1>
 
-              {/* Tagline — identical to HeroOverlay p */}
-              <motion.p
-                className="mt-5 text-[16px] sm:text-[18px] md:text-[20px] text-[#929298] max-w-[520px] mx-auto"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.8,
-                  delay: 0.18,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-              >
-                Every application deserves its own Layer 2
-              </motion.p>
+              {/* Tagline — typewriter reveal after title settles */}
+              <p className="mt-5 text-[16px] sm:text-[18px] md:text-[20px] text-[#929298] max-w-[520px] mx-auto">
+                <Typewriter
+                  text="Every application deserves its own Layer 2"
+                  delay={800}
+                  speed={25}
+                />
+              </p>
 
               {/* Invisible spacer matching HeroOverlay CTA buttons height
                   so the title text aligns at the same vertical position */}

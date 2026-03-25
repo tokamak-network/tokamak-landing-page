@@ -17,13 +17,16 @@ import Footer from "./components/ui/footer";
 export default function Home() {
   return (
     <main className="bg-black min-h-screen">
-      <IntroSequence />
+      <IntroSequence videoSrc="/intro-video.mp4" />
       <Header />
 
       {/* Tower upper section — light curtain spans hero + showcase floor */}
       <div className="relative overflow-visible">
         <TorusHero />
         <VolumetricLight />
+
+        {/* Floor transition indicator */}
+        <FloorIndicator floor={1} label="Ecosystem Showcase" />
 
         {/* Tower Floor 1 (Top): Ecosystem Showcase — illuminated by torus */}
         <TowerFloor

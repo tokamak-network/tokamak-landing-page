@@ -39,6 +39,8 @@ export default function ShowcaseOverlay({
   netGrowth,
 }: ShowcaseOverlayProps) {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 10;
 
   const formatNum = (n: number) => {
     if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -48,6 +50,7 @@ export default function ShowcaseOverlay({
 
   const handlePedestalClick = useCallback((idx: number) => {
     setSelectedIdx((prev) => (prev === idx ? null : idx));
+    setPage(0);
   }, []);
 
   const selectedCat = selectedIdx !== null ? categories[selectedIdx] : null;
@@ -216,13 +219,10 @@ export default function ShowcaseOverlay({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed flex flex-col"
+            className="fixed inset-0 flex flex-col m-auto"
             style={{
-              left: "50%",
-              top: "50%",
-              transform: "translate(-50%, -50%)",
               width: "clamp(340px, 55vw, 640px)",
-              maxHeight: "70vh",
+              height: "fit-content",
               zIndex: 60,
               background:
                 "linear-gradient(180deg, rgba(8, 20, 50, 0.95) 0%, rgba(5, 12, 30, 0.98) 100%)",
@@ -284,14 +284,7 @@ export default function ShowcaseOverlay({
             </div>
 
             {/* Repo list */}
-            <div
-              className="overflow-y-auto px-4 py-2"
-              style={{
-                flex: 1,
-                scrollbarWidth: "thin",
-                scrollbarColor: "rgba(42, 114, 229, 0.3) transparent",
-              }}
-            >
+            <div className="px-4 py-2">
               {selectedCat.repos.length === 0 ? (
                 <div
                   className="py-4 text-center"
@@ -304,103 +297,168 @@ export default function ShowcaseOverlay({
                   No project data available
                 </div>
               ) : (
-                selectedCat.repos
-                  .sort(
+                (() => {
+                  const sorted = [...selectedCat.repos].sort(
                     (a, b) =>
                       b.linesAdded + b.linesDeleted - (a.linesAdded + a.linesDeleted)
-                  )
-                  .map((repo) => {
-                    const net = repo.linesAdded - repo.linesDeleted;
-                    return (
-                      <a
-                        key={repo.name}
-                        href={
-                          repo.githubUrl ||
-                          `https://github.com/tokamak-network/${repo.name}`
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between py-2 group"
-                        style={{
-                          borderBottom: "1px solid rgba(42, 114, 229, 0.1)",
-                          textDecoration: "none",
-                        }}
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          {/* Activity indicator */}
-                          <div
-                            className="shrink-0 rounded-full"
+                  );
+                  const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
+                  const paged = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+                  return (
+                    <>
+                      {paged.map((repo) => {
+                        const net = repo.linesAdded - repo.linesDeleted;
+                        return (
+                          <a
+                            key={repo.name}
+                            href={
+                              repo.githubUrl ||
+                              `https://github.com/tokamak-network/${repo.name}`
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between py-2 group"
                             style={{
-                              width: 6,
-                              height: 6,
-                              background:
-                                repo.activity === "high"
-                                  ? "#00ff88"
-                                  : repo.activity === "medium"
-                                  ? "#ffaa00"
-                                  : "#555",
-                              boxShadow:
-                                repo.activity === "high"
-                                  ? "0 0 6px rgba(0, 255, 136, 0.5)"
-                                  : undefined,
+                              borderBottom: "1px solid rgba(42, 114, 229, 0.1)",
+                              textDecoration: "none",
                             }}
-                          />
-                          <div className="min-w-0">
-                            <span
-                              className="block truncate font-semibold group-hover:text-cyan-300 transition-colors"
-                              style={{
-                                color: "rgba(200, 225, 255, 0.95)",
-                                fontSize: "clamp(10px, 0.9vw, 14px)",
-                                fontFamily: "'Share Tech Mono', monospace",
-                              }}
-                            >
-                              {repo.name}
-                            </span>
-                            {repo.description && (
-                              <span
-                                className="block truncate"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div
+                                className="shrink-0 rounded-full"
                                 style={{
-                                  color: "rgba(140, 170, 210, 0.6)",
-                                  fontSize: "clamp(8px, 0.7vw, 11px)",
+                                  width: 6,
+                                  height: 6,
+                                  background:
+                                    repo.activity === "high"
+                                      ? "#00ff88"
+                                      : repo.activity === "medium"
+                                      ? "#ffaa00"
+                                      : "#555",
+                                  boxShadow:
+                                    repo.activity === "high"
+                                      ? "0 0 6px rgba(0, 255, 136, 0.5)"
+                                      : undefined,
+                                }}
+                              />
+                              <div className="min-w-0">
+                                <span
+                                  className="block truncate font-semibold group-hover:text-cyan-300 transition-colors"
+                                  style={{
+                                    color: "rgba(200, 225, 255, 0.95)",
+                                    fontSize: "clamp(10px, 0.9vw, 14px)",
+                                    fontFamily: "'Share Tech Mono', monospace",
+                                  }}
+                                >
+                                  {repo.name}
+                                </span>
+                                {repo.description && (
+                                  <span
+                                    className="block truncate"
+                                    style={{
+                                      color: "rgba(140, 170, 210, 0.6)",
+                                      fontSize: "clamp(8px, 0.7vw, 11px)",
+                                      fontFamily: "'Share Tech Mono', monospace",
+                                      marginTop: 1,
+                                    }}
+                                  >
+                                    {repo.description}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 shrink-0 ml-3">
+                              <span
+                                style={{
+                                  color: "rgba(140, 200, 255, 0.7)",
+                                  fontSize: "clamp(9px, 0.75vw, 12px)",
                                   fontFamily: "'Share Tech Mono', monospace",
-                                  marginTop: 1,
                                 }}
                               >
-                                {repo.description}
+                                {formatLines(repo.linesAdded + repo.linesDeleted)}
                               </span>
-                            )}
-                          </div>
-                        </div>
+                              <span
+                                className="font-semibold"
+                                style={{
+                                  color: net >= 0 ? "#00ff88" : "#ff5555",
+                                  fontSize: "clamp(9px, 0.75vw, 12px)",
+                                  fontFamily: "'Share Tech Mono', monospace",
+                                  minWidth: "clamp(40px, 4vw, 60px)",
+                                  textAlign: "right",
+                                }}
+                              >
+                                {net >= 0 ? "+" : ""}
+                                {formatLines(net)}
+                              </span>
+                            </div>
+                          </a>
+                        );
+                      })}
 
-                        <div className="flex items-center gap-3 shrink-0 ml-3">
-                          {/* Lines changed */}
-                          <span
+                      {/* Pagination */}
+                      {totalPages > 1 && (
+                        <div
+                          className="flex items-center justify-center gap-3 pt-3 mt-1"
+                          style={{
+                            borderTop: "1px solid rgba(42, 114, 229, 0.15)",
+                          }}
+                        >
+                          <button
+                            onClick={() => setPage((p) => Math.max(0, p - 1))}
+                            disabled={page === 0}
                             style={{
-                              color: "rgba(140, 200, 255, 0.7)",
-                              fontSize: "clamp(9px, 0.75vw, 12px)",
-                              fontFamily: "'Share Tech Mono', monospace",
+                              background: "none",
+                              border: "none",
+                              cursor: page === 0 ? "default" : "pointer",
+                              color: page === 0 ? "rgba(100, 140, 180, 0.3)" : "#00e5ff",
+                              fontSize: "clamp(10px, 0.9vw, 14px)",
+                              fontFamily: "'Orbitron', monospace",
+                              padding: "2px 8px",
                             }}
                           >
-                            {formatLines(repo.linesAdded + repo.linesDeleted)}
-                          </span>
-                          {/* Net growth */}
-                          <span
-                            className="font-semibold"
+                            &lt;
+                          </button>
+                          {Array.from({ length: totalPages }, (_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setPage(i)}
+                              style={{
+                                background: i === page ? "rgba(42, 114, 229, 0.4)" : "none",
+                                border: i === page ? "1px solid rgba(42, 114, 229, 0.6)" : "1px solid transparent",
+                                borderRadius: 4,
+                                cursor: "pointer",
+                                color: i === page ? "#00e5ff" : "rgba(140, 200, 255, 0.5)",
+                                fontSize: "clamp(9px, 0.8vw, 12px)",
+                                fontFamily: "'Orbitron', monospace",
+                                padding: "2px 8px",
+                                minWidth: 28,
+                              }}
+                            >
+                              {i + 1}
+                            </button>
+                          ))}
+                          <button
+                            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                            disabled={page === totalPages - 1}
                             style={{
-                              color: net >= 0 ? "#00ff88" : "#ff5555",
-                              fontSize: "clamp(9px, 0.75vw, 12px)",
-                              fontFamily: "'Share Tech Mono', monospace",
-                              minWidth: "clamp(40px, 4vw, 60px)",
-                              textAlign: "right",
+                              background: "none",
+                              border: "none",
+                              cursor: page === totalPages - 1 ? "default" : "pointer",
+                              color: page === totalPages - 1 ? "rgba(100, 140, 180, 0.3)" : "#00e5ff",
+                              fontSize: "clamp(10px, 0.9vw, 14px)",
+                              fontFamily: "'Orbitron', monospace",
+                              padding: "2px 8px",
                             }}
                           >
-                            {net >= 0 ? "+" : ""}
-                            {formatLines(net)}
-                          </span>
+                            &gt;
+                          </button>
                         </div>
-                      </a>
-                    );
-                  })
+                      )}
+                    </>
+                  );
+                })()
               )}
             </div>
           </motion.div>

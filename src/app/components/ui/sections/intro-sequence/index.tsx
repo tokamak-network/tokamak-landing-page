@@ -124,6 +124,7 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
 
   return (
     <div
+      data-intro
       className="fixed inset-0 select-none"
       style={{ zIndex: 9999 }}
       onClick={handleSkip}
@@ -172,7 +173,7 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
                 height: 600,
                 borderRadius: "50%",
                 background:
-                  "radial-gradient(circle, rgba(0, 229, 255, 0.12) 0%, rgba(0, 229, 255, 0.03) 40%, transparent 70%)",
+                  "radial-gradient(circle, rgba(42, 114, 229, 0.12) 0%, rgba(42, 114, 229, 0.03) 40%, transparent 70%)",
                 filter: "blur(40px)",
               }}
               animate={{
@@ -189,9 +190,9 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
                 width: 8,
                 height: 8,
                 borderRadius: "50%",
-                background: "#00e5ff",
+                background: "#2A72E5",
                 boxShadow:
-                  "0 0 20px rgba(0, 229, 255, 0.8), 0 0 60px rgba(0, 229, 255, 0.4), 0 0 120px rgba(0, 229, 255, 0.2)",
+                  "0 0 20px rgba(42, 114, 229, 0.8), 0 0 60px rgba(42, 114, 229, 0.4), 0 0 120px rgba(42, 114, 229, 0.2)",
               }}
               initial={{ scale: 0, opacity: 0 }}
               animate={
@@ -225,7 +226,7 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
                     width: 8,
                     height: 8,
                     borderRadius: "50%",
-                    border: "1px solid rgba(0, 229, 255, 0.6)",
+                    border: "1px solid rgba(42, 114, 229, 0.6)",
                   }}
                   initial={{ scale: 1, opacity: 0.6 }}
                   animate={{ scale: 12, opacity: 0 }}
@@ -241,7 +242,7 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
                     width: 8,
                     height: 8,
                     borderRadius: "50%",
-                    border: "1px solid rgba(0, 229, 255, 0.6)",
+                    border: "1px solid rgba(42, 114, 229, 0.6)",
                   }}
                   initial={{ scale: 1, opacity: 0.6 }}
                   animate={{ scale: 12, opacity: 0 }}
@@ -295,6 +296,13 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
               >
                 Every application deserves its own Layer 2
               </motion.p>
+
+              {/* Invisible spacer matching HeroOverlay CTA buttons height
+                  so the title text aligns at the same vertical position */}
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center invisible" aria-hidden="true">
+                <span className="px-8 py-4 text-[15px]">&nbsp;</span>
+                <span className="px-8 py-4 text-[15px]">&nbsp;</span>
+              </div>
             </div>
           </motion.div>
         )}
@@ -309,7 +317,7 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
             style={{
               zIndex: 4,
               background:
-                "radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.15) 0%, transparent 60%)",
+                "radial-gradient(circle at 50% 50%, rgba(42, 114, 229, 0.15) 0%, transparent 60%)",
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 1, 0] }}
@@ -336,7 +344,7 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
             style={{
               fontFamily: "'Share Tech Mono', monospace",
               fontSize: "clamp(9px, 0.8vw, 11px)",
-              color: "rgba(140, 200, 255, 0.5)",
+              color: "rgba(42, 114, 229, 0.5)",
               letterSpacing: "0.15em",
               textTransform: "uppercase",
             }}

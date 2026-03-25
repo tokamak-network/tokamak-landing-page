@@ -201,7 +201,7 @@ function HoloSphere() {
    ═══════════════════════════════════════════════ */
 
 const CHAMFER = 14;
-const CORNER_SIZE = 8; // FUI corner bracket length
+const DOT_SIZE = 4;
 
 function MetricPanel({
   item,
@@ -222,85 +222,148 @@ function MetricPanel({
         width: "clamp(170px, 16vw, 240px)",
         padding: "clamp(14px, 1.4vw, 22px) clamp(16px, 1.5vw, 22px)",
         background:
-          "linear-gradient(180deg, rgba(4, 14, 28, 0.75) 0%, rgba(2, 8, 18, 0.7) 100%)",
-        clipPath: `polygon(0 0, calc(100% - ${CHAMFER}px) 0, 100% ${CHAMFER}px, 100% 100%, 0 100%)`,
+          "linear-gradient(180deg, rgba(4, 14, 28, 0.85) 0%, rgba(2, 8, 18, 0.8) 100%)",
+        clipPath: `polygon(0 0, calc(100% - ${CHAMFER}px) 0, 100% ${CHAMFER}px, 100% 100%, ${CHAMFER}px 100%, 0 calc(100% - ${CHAMFER}px))`,
         backdropFilter: "blur(12px)",
         boxShadow:
-          "0 4px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 229, 255, 0.06), inset 0 1px 0 rgba(0, 229, 255, 0.15)",
+          "0 8px 32px rgba(0, 0, 0, 0.6), 0 0 24px rgba(42, 114, 229, 0.1), inset 0 2px 10px rgba(42, 114, 229, 0.2), inset 0 -2px 10px rgba(0, 0, 0, 0.5)",
       }}
     >
-      {/* SVG border + corner brackets + chamfer outline */}
+      {/* ── SVG beveled frame — bright on top, dark on bottom ── */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none"
         preserveAspectRatio="none"
         style={{ zIndex: 1 }}
       >
-        {/* Full border following chamfer shape */}
+        <defs>
+          {/* Directional bevel gradient — top bright, bottom dark */}
+          <linearGradient id={`bevel-${index}-${side}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(42, 114, 229, 0.7)" />
+            <stop offset="40%" stopColor="rgba(42, 114, 229, 0.35)" />
+            <stop offset="100%" stopColor="rgba(42, 114, 229, 0.1)" />
+          </linearGradient>
+          {/* Inner frame gradient — subtler */}
+          <linearGradient id={`inner-${index}-${side}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(42, 114, 229, 0.25)" />
+            <stop offset="100%" stopColor="rgba(42, 114, 229, 0.05)" />
+          </linearGradient>
+        </defs>
+
+        {/* Outer beveled border (3px) */}
         <polygon
-          points={`1,1 calc(100% - ${CHAMFER}px),1 100%,${CHAMFER + 1} 100%,100% 1,100%`}
+          points={`1,1 calc(100% - ${CHAMFER}px),1 calc(100% - 1px),${CHAMFER} calc(100% - 1px),calc(100% - 1px) ${CHAMFER}px,calc(100% - 1px) 1,calc(100% - ${CHAMFER}px)`}
           fill="none"
-          stroke="rgba(0, 229, 255, 0.25)"
-          strokeWidth="1"
+          stroke={`url(#bevel-${index}-${side})`}
+          strokeWidth="2.5"
           vectorEffect="non-scaling-stroke"
         />
-        {/* Bright top edge with glow */}
-        <line
-          x1="0"
-          y1="1"
-          x2={`calc(100% - ${CHAMFER}px)`}
-          y2="1"
-          stroke="rgba(0, 229, 255, 0.7)"
-          strokeWidth="1.5"
-          vectorEffect="non-scaling-stroke"
-        />
-        {/* Chamfer diagonal bright edge */}
-        <line
-          x1={`calc(100% - ${CHAMFER}px)`}
-          y1="1"
-          x2="100%"
-          y2={`${CHAMFER + 1}`}
-          stroke="rgba(0, 229, 255, 0.5)"
-          strokeWidth="1"
-          vectorEffect="non-scaling-stroke"
-        />
-        {/* Corner brackets — bottom-left */}
-        <polyline
-          points={`1,calc(100% - ${CORNER_SIZE}px) 1,100% ${CORNER_SIZE + 1},100%`}
+
+        {/* Inner frame (1px, inset 4px) */}
+        <polygon
+          points={`5,5 calc(100% - ${CHAMFER}px - 2px),5 calc(100% - 5px),${CHAMFER + 2} calc(100% - 5px),calc(100% - 5px) ${CHAMFER + 2}px,calc(100% - 5px) 5,calc(100% - ${CHAMFER}px - 2px)`}
           fill="none"
-          stroke="rgba(0, 229, 255, 0.5)"
-          strokeWidth="1.5"
-          vectorEffect="non-scaling-stroke"
-        />
-        {/* Corner brackets — bottom-right */}
-        <polyline
-          points={`calc(100% - ${CORNER_SIZE}px),100% 100%,100% 100%,calc(100% - ${CORNER_SIZE}px)`}
-          fill="none"
-          stroke="rgba(0, 229, 255, 0.5)"
-          strokeWidth="1.5"
-          vectorEffect="non-scaling-stroke"
-        />
-        {/* Corner brackets — top-left */}
-        <polyline
-          points={`${CORNER_SIZE + 1},1 1,1 1,${CORNER_SIZE + 1}`}
-          fill="none"
-          stroke="rgba(0, 229, 255, 0.5)"
-          strokeWidth="1.5"
+          stroke={`url(#inner-${index}-${side})`}
+          strokeWidth="0.5"
           vectorEffect="non-scaling-stroke"
         />
       </svg>
 
-      {/* Top edge glow line (visible bloom above card) */}
+      {/* ── Corner accent dots ── */}
+      {/* Top-left */}
       <div
         className="absolute pointer-events-none"
         style={{
-          top: -1,
+          top: -DOT_SIZE / 2,
+          left: -DOT_SIZE / 2,
+          width: DOT_SIZE,
+          height: DOT_SIZE,
+          borderRadius: "50%",
+          background: "#2A72E5",
+          boxShadow: "0 0 6px rgba(42, 114, 229, 0.8), 0 0 12px rgba(42, 114, 229, 0.4)",
+          zIndex: 3,
+        }}
+      />
+      {/* Top-right (at chamfer start) */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: -DOT_SIZE / 2,
+          right: CHAMFER - DOT_SIZE / 2,
+          width: DOT_SIZE,
+          height: DOT_SIZE,
+          borderRadius: "50%",
+          background: "#2A72E5",
+          boxShadow: "0 0 6px rgba(42, 114, 229, 0.8), 0 0 12px rgba(42, 114, 229, 0.4)",
+          zIndex: 3,
+        }}
+      />
+      {/* Bottom-right */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          bottom: -DOT_SIZE / 2,
+          right: -DOT_SIZE / 2,
+          width: DOT_SIZE,
+          height: DOT_SIZE,
+          borderRadius: "50%",
+          background: "rgba(42, 114, 229, 0.5)",
+          boxShadow: "0 0 4px rgba(42, 114, 229, 0.4)",
+          zIndex: 3,
+        }}
+      />
+      {/* Bottom-left (at chamfer start) */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          bottom: CHAMFER - DOT_SIZE / 2,
+          left: -DOT_SIZE / 2,
+          width: DOT_SIZE,
+          height: DOT_SIZE,
+          borderRadius: "50%",
+          background: "rgba(42, 114, 229, 0.5)",
+          boxShadow: "0 0 4px rgba(42, 114, 229, 0.4)",
+          zIndex: 3,
+        }}
+      />
+
+      {/* ── Top edge glow (bright, directional light source) ── */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: 0,
           left: 0,
           right: CHAMFER,
           height: 2,
-          background: "rgba(0, 229, 255, 0.5)",
+          background: "rgba(42, 114, 229, 0.7)",
           boxShadow:
-            "0 0 8px rgba(0, 229, 255, 0.5), 0 0 20px rgba(0, 229, 255, 0.2)",
+            "0 0 8px rgba(42, 114, 229, 0.6), 0 0 24px rgba(42, 114, 229, 0.25)",
           zIndex: 3,
+        }}
+      />
+
+      {/* ── Chamfer diagonal glow ── */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: 0,
+          right: 0,
+          width: Math.round(CHAMFER * 1.42),
+          height: 2,
+          transformOrigin: "top right",
+          transform: "rotate(45deg) translateX(1px)",
+          background: "rgba(42, 114, 229, 0.5)",
+          boxShadow: "0 0 6px rgba(42, 114, 229, 0.4)",
+          zIndex: 3,
+        }}
+      />
+
+      {/* ── Inner glow fill (top bright → bottom dark depth) ── */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(42, 114, 229, 0.06) 0%, transparent 40%, rgba(0, 0, 0, 0.15) 100%)",
+          zIndex: 1,
         }}
       />
 
@@ -309,15 +372,15 @@ function MetricPanel({
         className="uppercase font-bold tracking-wider"
         style={{
           fontSize: "clamp(9px, 0.8vw, 13px)",
-          color: "rgba(0, 229, 255, 0.8)",
+          color: "rgba(42, 114, 229, 0.9)",
           fontFamily: "'Share Tech Mono', monospace",
           letterSpacing: "0.16em",
           paddingBottom: "clamp(6px, 0.6vw, 10px)",
           marginBottom: "clamp(6px, 0.6vw, 10px)",
-          borderBottom: "1px solid rgba(0, 229, 255, 0.12)",
+          borderBottom: "1px solid rgba(42, 114, 229, 0.15)",
           position: "relative",
           zIndex: 2,
-          textShadow: "0 0 6px rgba(0, 229, 255, 0.3)",
+          textShadow: "0 0 6px rgba(42, 114, 229, 0.3)",
         }}
       >
         {item.label}
@@ -333,7 +396,7 @@ function MetricPanel({
           letterSpacing: "0.02em",
           lineHeight: 1.1,
           textShadow:
-            "0 0 20px rgba(0, 229, 255, 0.2), 0 0 40px rgba(0, 229, 255, 0.08)",
+            "0 0 20px rgba(42, 114, 229, 0.2), 0 0 40px rgba(42, 114, 229, 0.08)",
           position: "relative",
           zIndex: 2,
         }}
@@ -342,7 +405,7 @@ function MetricPanel({
         {item.value}
       </div>
 
-      {/* Change indicator in brackets */}
+      {/* Change indicator */}
       {item.change && (
         <div
           className="font-bold"
@@ -363,7 +426,7 @@ function MetricPanel({
       )}
 
       {/* Scan line effect */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 2 }}>
         <div
           style={{
             position: "absolute",
@@ -371,7 +434,7 @@ function MetricPanel({
             right: 0,
             height: 1,
             background:
-              "linear-gradient(90deg, transparent 5%, rgba(0, 229, 255, 0.06) 50%, transparent 95%)",
+              "linear-gradient(90deg, transparent 5%, rgba(42, 114, 229, 0.08) 50%, transparent 95%)",
             animation: "scanDown 8s linear infinite",
           }}
         />

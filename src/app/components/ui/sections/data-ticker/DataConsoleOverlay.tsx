@@ -197,11 +197,8 @@ function HoloSphere() {
 }
 
 /* ═══════════════════════════════════════════════
-   2. Metric Panel — concept shot style
+   2. Metric Panel — Plasma Core style
    ═══════════════════════════════════════════════ */
-
-const CHAMFER = 14;
-const DOT_SIZE = 4;
 
 function MetricPanel({
   item,
@@ -217,186 +214,80 @@ function MetricPanel({
       initial={{ opacity: 0, x: side === "left" ? -24 : 24 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.3 + index * 0.1, ease: "easeOut" }}
-      className="relative"
+      className="relative flex flex-col items-center justify-center overflow-hidden"
       style={{
-        width: "clamp(170px, 16vw, 240px)",
-        padding: "clamp(14px, 1.4vw, 22px) clamp(16px, 1.5vw, 22px)",
+        width: "clamp(200px, 18vw, 260px)",
+        height: "clamp(140px, 14vw, 180px)",
         background:
-          "linear-gradient(180deg, rgba(4, 14, 28, 0.85) 0%, rgba(2, 8, 18, 0.8) 100%)",
-        clipPath: `polygon(0 0, calc(100% - ${CHAMFER}px) 0, 100% ${CHAMFER}px, 100% 100%, ${CHAMFER}px 100%, 0 calc(100% - ${CHAMFER}px))`,
-        backdropFilter: "blur(12px)",
-        boxShadow:
-          "0 8px 32px rgba(0, 0, 0, 0.6), 0 0 24px rgba(42, 114, 229, 0.1), inset 0 2px 10px rgba(42, 114, 229, 0.2), inset 0 -2px 10px rgba(0, 0, 0, 0.5)",
+          "radial-gradient(ellipse at center, rgba(42, 114, 229, 0.25) 0%, rgba(42, 114, 229, 0.04) 40%, transparent 70%)",
+        borderRadius: 16,
+        animation: "plasmaBreathe 3s ease-in-out infinite",
       }}
     >
-      {/* ── SVG beveled frame — bright on top, dark on bottom ── */}
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        preserveAspectRatio="none"
-        style={{ zIndex: 1 }}
-      >
-        <defs>
-          {/* Directional bevel gradient — top bright, bottom dark */}
-          <linearGradient id={`bevel-${index}-${side}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(42, 114, 229, 0.7)" />
-            <stop offset="40%" stopColor="rgba(42, 114, 229, 0.35)" />
-            <stop offset="100%" stopColor="rgba(42, 114, 229, 0.1)" />
-          </linearGradient>
-          {/* Inner frame gradient — subtler */}
-          <linearGradient id={`inner-${index}-${side}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(42, 114, 229, 0.25)" />
-            <stop offset="100%" stopColor="rgba(42, 114, 229, 0.05)" />
-          </linearGradient>
-        </defs>
-
-        {/* Outer beveled border (3px) */}
-        <polygon
-          points={`1,1 calc(100% - ${CHAMFER}px),1 calc(100% - 1px),${CHAMFER} calc(100% - 1px),calc(100% - 1px) ${CHAMFER}px,calc(100% - 1px) 1,calc(100% - ${CHAMFER}px)`}
-          fill="none"
-          stroke={`url(#bevel-${index}-${side})`}
-          strokeWidth="2.5"
-          vectorEffect="non-scaling-stroke"
-        />
-
-        {/* Inner frame (1px, inset 4px) */}
-        <polygon
-          points={`5,5 calc(100% - ${CHAMFER}px - 2px),5 calc(100% - 5px),${CHAMFER + 2} calc(100% - 5px),calc(100% - 5px) ${CHAMFER + 2}px,calc(100% - 5px) 5,calc(100% - ${CHAMFER}px - 2px)`}
-          fill="none"
-          stroke={`url(#inner-${index}-${side})`}
-          strokeWidth="0.5"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
-
-      {/* ── Corner accent dots ── */}
-      {/* Top-left */}
+      {/* Rotating conic glow ring */}
       <div
         className="absolute pointer-events-none"
         style={{
-          top: -DOT_SIZE / 2,
-          left: -DOT_SIZE / 2,
-          width: DOT_SIZE,
-          height: DOT_SIZE,
-          borderRadius: "50%",
-          background: "#2A72E5",
-          boxShadow: "0 0 6px rgba(42, 114, 229, 0.8), 0 0 12px rgba(42, 114, 229, 0.4)",
-          zIndex: 3,
-        }}
-      />
-      {/* Top-right (at chamfer start) */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: -DOT_SIZE / 2,
-          right: CHAMFER - DOT_SIZE / 2,
-          width: DOT_SIZE,
-          height: DOT_SIZE,
-          borderRadius: "50%",
-          background: "#2A72E5",
-          boxShadow: "0 0 6px rgba(42, 114, 229, 0.8), 0 0 12px rgba(42, 114, 229, 0.4)",
-          zIndex: 3,
-        }}
-      />
-      {/* Bottom-right */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          bottom: -DOT_SIZE / 2,
-          right: -DOT_SIZE / 2,
-          width: DOT_SIZE,
-          height: DOT_SIZE,
-          borderRadius: "50%",
-          background: "rgba(42, 114, 229, 0.5)",
-          boxShadow: "0 0 4px rgba(42, 114, 229, 0.4)",
-          zIndex: 3,
-        }}
-      />
-      {/* Bottom-left (at chamfer start) */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          bottom: CHAMFER - DOT_SIZE / 2,
-          left: -DOT_SIZE / 2,
-          width: DOT_SIZE,
-          height: DOT_SIZE,
-          borderRadius: "50%",
-          background: "rgba(42, 114, 229, 0.5)",
-          boxShadow: "0 0 4px rgba(42, 114, 229, 0.4)",
-          zIndex: 3,
-        }}
-      />
-
-      {/* ── Top edge glow (bright, directional light source) ── */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: 0,
-          left: 0,
-          right: CHAMFER,
-          height: 2,
-          background: "rgba(42, 114, 229, 0.7)",
-          boxShadow:
-            "0 0 8px rgba(42, 114, 229, 0.6), 0 0 24px rgba(42, 114, 229, 0.25)",
-          zIndex: 3,
-        }}
-      />
-
-      {/* ── Chamfer diagonal glow ── */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: 0,
-          right: 0,
-          width: Math.round(CHAMFER * 1.42),
-          height: 2,
-          transformOrigin: "top right",
-          transform: "rotate(45deg) translateX(1px)",
-          background: "rgba(42, 114, 229, 0.5)",
-          boxShadow: "0 0 6px rgba(42, 114, 229, 0.4)",
-          zIndex: 3,
-        }}
-      />
-
-      {/* ── Inner glow fill (top bright → bottom dark depth) ── */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
+          inset: -2,
           background:
-            "linear-gradient(180deg, rgba(42, 114, 229, 0.06) 0%, transparent 40%, rgba(0, 0, 0, 0.15) 100%)",
+            "conic-gradient(from 0deg, #2A72E5, #00e5ff, #2A72E5)",
+          borderRadius: 16,
+          zIndex: 0,
+          opacity: 0.35,
+          filter: "blur(8px)",
+          animation: "plasmaRotate 4s linear infinite",
+        }}
+      />
+
+      {/* Dark inner fill */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          inset: 2,
+          background: "#050a14",
+          borderRadius: 14,
+          zIndex: 0,
+        }}
+      />
+
+      {/* Radial inner glow */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          inset: 2,
+          borderRadius: 14,
+          background:
+            "radial-gradient(ellipse at center, rgba(42, 114, 229, 0.12) 0%, transparent 60%)",
           zIndex: 1,
         }}
       />
 
       {/* Label */}
       <div
-        className="uppercase font-bold tracking-wider"
         style={{
-          fontSize: "clamp(9px, 0.8vw, 13px)",
-          color: "rgba(42, 114, 229, 0.9)",
+          fontSize: "clamp(8px, 0.7vw, 11px)",
+          color: "rgba(140, 200, 255, 0.6)",
           fontFamily: "'Share Tech Mono', monospace",
-          letterSpacing: "0.16em",
-          paddingBottom: "clamp(6px, 0.6vw, 10px)",
-          marginBottom: "clamp(6px, 0.6vw, 10px)",
-          borderBottom: "1px solid rgba(42, 114, 229, 0.15)",
+          letterSpacing: "0.2em",
+          textTransform: "uppercase",
+          marginBottom: "clamp(4px, 0.4vw, 8px)",
           position: "relative",
           zIndex: 2,
-          textShadow: "0 0 6px rgba(42, 114, 229, 0.3)",
         }}
       >
         {item.label}
       </div>
 
-      {/* Value */}
+      {/* Value — hero element */}
       <div
-        className="font-bold"
         style={{
-          fontSize: "clamp(24px, 2.8vw, 42px)",
-          color: "#fff",
           fontFamily: "'Orbitron', sans-serif",
-          letterSpacing: "0.02em",
+          fontSize: "clamp(26px, 2.8vw, 36px)",
+          fontWeight: 900,
+          color: "#fff",
           lineHeight: 1.1,
           textShadow:
-            "0 0 20px rgba(42, 114, 229, 0.2), 0 0 40px rgba(42, 114, 229, 0.08)",
+            "0 0 10px rgba(42, 114, 229, 1), 0 0 20px rgba(42, 114, 229, 0.8), 0 0 40px rgba(42, 114, 229, 0.5), 0 0 60px rgba(42, 114, 229, 0.3)",
           position: "relative",
           zIndex: 2,
         }}
@@ -408,37 +299,22 @@ function MetricPanel({
       {/* Change indicator */}
       {item.change && (
         <div
-          className="font-bold"
           style={{
-            marginTop: "clamp(5px, 0.5vw, 8px)",
-            fontSize: "clamp(10px, 0.9vw, 14px)",
-            color: item.change.startsWith("+") ? "#22c55e" : "#ef4444",
+            marginTop: "clamp(4px, 0.4vw, 6px)",
+            fontSize: "clamp(10px, 0.85vw, 13px)",
+            fontWeight: 700,
+            color: item.change.startsWith("+") ? "#00ff88" : "#ef4444",
             fontFamily: "'Share Tech Mono', monospace",
             position: "relative",
             zIndex: 2,
             textShadow: item.change.startsWith("+")
-              ? "0 0 8px rgba(34, 197, 94, 0.4)"
+              ? "0 0 8px rgba(0, 255, 136, 0.4)"
               : "0 0 8px rgba(239, 68, 68, 0.4)",
           }}
         >
-          [{item.change}]
+          {item.change}
         </div>
       )}
-
-      {/* Scan line effect */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 2 }}>
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            height: 1,
-            background:
-              "linear-gradient(90deg, transparent 5%, rgba(42, 114, 229, 0.08) 50%, transparent 95%)",
-            animation: "scanDown 8s linear infinite",
-          }}
-        />
-      </div>
     </motion.div>
   );
 }
@@ -582,12 +458,9 @@ function BottomTicker({ items }: { items: TickerItem[] }) {
       transition={{ duration: 0.5, delay: 0.8 }}
       className="absolute z-20"
       style={{
-        bottom: "clamp(30px, 6vh, 70px)",
-        left: 0,
-        right: 0,
-        marginLeft: "auto",
-        marginRight: "auto",
-        width: "clamp(500px, 70vw, 1000px)",
+        bottom: "clamp(20px, 4vh, 50px)",
+        left: "clamp(20px, 8vw, 120px)",
+        right: "clamp(20px, 8vw, 120px)",
       }}
     >
       {/* Main ticker row */}
@@ -667,7 +540,7 @@ export default function DataConsoleOverlay({ items }: { items: TickerItem[] }) {
         className="absolute z-10 flex flex-col"
         style={{
           left: "clamp(20px, 8vw, 120px)",
-          top: "50%",
+          top: "46%",
           transform: "translateY(-50%)",
           gap: "clamp(8px, 1vw, 14px)",
         }}
@@ -682,7 +555,7 @@ export default function DataConsoleOverlay({ items }: { items: TickerItem[] }) {
         className="absolute z-10 flex flex-col"
         style={{
           right: "clamp(20px, 8vw, 120px)",
-          top: "50%",
+          top: "46%",
           transform: "translateY(-50%)",
           gap: "clamp(8px, 1vw, 14px)",
         }}

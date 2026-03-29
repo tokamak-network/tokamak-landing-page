@@ -146,7 +146,7 @@ function AmbientMotes() {
 
     for (let i = 0; i < MOTE_COUNT; i++) {
       phases[i] = Math.random() * Math.PI * 2;
-      radii[i] = 2.0 + Math.random() * 3.0;
+      radii[i] = 1.0 + Math.random() * 1.5;
       speeds[i] = 0.1 + Math.random() * 0.2;
       yOffsets[i] = (Math.random() - 0.5) * 2.5;
     }
@@ -283,13 +283,13 @@ function TorusCore() {
   });
 
   return (
-    <group ref={groupRef} position={[0, 0, 0]}>
+    <group ref={groupRef} position={[0, 0.5, 0]}>
       {/* Lay flat */}
       <group rotation={[Math.PI / 2, 0, 0]}>
         {/* Primary wireframe — cyan, dense mesh */}
         <WireframeTorus
-          radius={2.2}
-          tube={0.6}
+          radius={1.4}
+          tube={0.38}
           radialSegments={24}
           tubularSegments={64}
           color="#00e5ff"
@@ -298,8 +298,8 @@ function TorusCore() {
 
         {/* Secondary wireframe — finer detail, slightly larger */}
         <WireframeTorus
-          radius={2.22}
-          tube={0.62}
+          radius={1.42}
+          tube={0.4}
           radialSegments={12}
           tubularSegments={48}
           color="#2A72E5"
@@ -308,9 +308,9 @@ function TorusCore() {
       </group>
 
       {/* Orbiting energy rings */}
-      <OrbitRing radius={3.0} tilt={[0.3, 0.2, 0]} speed={0.2} color="#00e5ff" opacity={0.25} />
-      <OrbitRing radius={3.2} tilt={[0.8, -0.3, 0.4]} speed={-0.15} color="#2A72E5" opacity={0.18} />
-      <OrbitRing radius={2.8} tilt={[1.2, 0.5, -0.2]} speed={0.12} color="#f59e0b" opacity={0.12} />
+      <OrbitRing radius={2.0} tilt={[0.3, 0.2, 0]} speed={0.2} color="#00e5ff" opacity={0.25} />
+      <OrbitRing radius={2.2} tilt={[0.8, -0.3, 0.4]} speed={-0.15} color="#2A72E5" opacity={0.18} />
+      <OrbitRing radius={1.9} tilt={[1.2, 0.5, -0.2]} speed={0.12} color="#f59e0b" opacity={0.12} />
 
       {/* Particles */}
       <AmbientMotes />

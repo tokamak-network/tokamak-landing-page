@@ -149,3 +149,13 @@ body {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+@keyframes plasmaBreathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@keyframes plasmaRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -1,9 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+
+const TokamakGate = dynamic(() => import("./TokamakGate"), { ssr: false });
 
 /* ═══════════════════════════════════════════════
-   Pipeline Node
+   Pipeline Node — Sequencer → Batcher → Proposer → L1
    ═══════════════════════════════════════════════ */
 
 const PIPELINE_STEPS = [
@@ -13,46 +16,29 @@ const PIPELINE_STEPS = [
   { id: "l1", label: "L1" },
 ] as const;
 
-function PipelineNode({
-  label,
-  index,
-}: {
-  label: string;
-  index: number;
-}) {
+function PipelineNode({ label, index }: { label: string; index: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4, delay: 0.5 + index * 0.12 }}
+      transition={{ duration: 0.4, delay: 0.8 + index * 0.12 }}
       className="flex items-center gap-0"
     >
-      {/* Node */}
       <div className="relative flex items-center justify-center">
-        {/* Hexagon shape via clip-path */}
         <div
           className="flex items-center justify-center"
           style={{
-            width: "clamp(56px, 6vw, 80px)",
-            height: "clamp(48px, 5vw, 68px)",
+            width: "clamp(50px, 5.5vw, 74px)",
+            height: "clamp(42px, 4.5vw, 62px)",
             background:
               "linear-gradient(180deg, rgba(0, 229, 255, 0.15) 0%, rgba(0, 229, 255, 0.05) 100%)",
             clipPath:
               "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-            border: "none",
           }}
         >
-          <div
-            className="absolute inset-0"
-            style={{
-              clipPath:
-                "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-              boxShadow: "inset 0 0 20px rgba(0, 229, 255, 0.2)",
-            }}
-          />
           <span
             style={{
-              fontSize: "clamp(7px, 0.7vw, 10px)",
+              fontSize: "clamp(6px, 0.6vw, 9px)",
               color: "#00e5ff",
               fontFamily: "'Share Tech Mono', monospace",
               letterSpacing: "0.1em",
@@ -65,8 +51,6 @@ function PipelineNode({
             {label}
           </span>
         </div>
-
-        {/* Hex border overlay (SVG) */}
         <svg
           className="absolute inset-0 w-full h-full pointer-events-none"
           viewBox="0 0 100 86.6"
@@ -82,14 +66,13 @@ function PipelineNode({
         </svg>
       </div>
 
-      {/* Arrow connector (except after last node) */}
       {index < PIPELINE_STEPS.length - 1 && (
         <motion.div
           initial={{ opacity: 0, scaleX: 0 }}
           animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ duration: 0.3, delay: 0.7 + index * 0.12 }}
+          transition={{ duration: 0.3, delay: 1.0 + index * 0.12 }}
           className="flex items-center"
-          style={{ width: "clamp(24px, 3vw, 48px)", originX: 0 }}
+          style={{ width: "clamp(20px, 2.5vw, 40px)", originX: 0 }}
         >
           <div
             style={{
@@ -117,7 +100,7 @@ function PipelineNode({
 }
 
 /* ═══════════════════════════════════════════════
-   Metric Panel — FUI style
+   Metric Panel — FUI chamfered card
    ═══════════════════════════════════════════════ */
 
 function MetricPanel({
@@ -140,17 +123,16 @@ function MetricPanel({
       transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
       className="relative"
       style={{
-        width: "clamp(130px, 12vw, 180px)",
-        padding: "clamp(10px, 1vw, 16px) clamp(12px, 1.2vw, 18px)",
+        width: "clamp(120px, 11vw, 170px)",
+        padding: "clamp(10px, 1vw, 14px) clamp(12px, 1.1vw, 16px)",
         background:
-          "linear-gradient(180deg, rgba(4, 14, 28, 0.8) 0%, rgba(2, 8, 18, 0.75) 100%)",
+          "linear-gradient(180deg, rgba(4, 14, 28, 0.85) 0%, rgba(2, 8, 18, 0.8) 100%)",
         clipPath: `polygon(0 0, calc(100% - ${CHAMFER}px) 0, 100% ${CHAMFER}px, 100% 100%, 0 100%)`,
         backdropFilter: "blur(10px)",
         boxShadow:
           "0 2px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 229, 255, 0.06), inset 0 1px 0 rgba(0, 229, 255, 0.15)",
       }}
     >
-      {/* Top glow line */}
       <div
         className="absolute pointer-events-none"
         style={{
@@ -159,11 +141,10 @@ function MetricPanel({
           right: CHAMFER,
           height: 2,
           background: "rgba(0, 229, 255, 0.4)",
-          boxShadow: "0 0 8px rgba(0, 229, 255, 0.4), 0 0 16px rgba(0, 229, 255, 0.15)",
+          boxShadow:
+            "0 0 8px rgba(0, 229, 255, 0.4), 0 0 16px rgba(0, 229, 255, 0.15)",
         }}
       />
-
-      {/* SVG border */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none"
         preserveAspectRatio="none"
@@ -176,17 +157,15 @@ function MetricPanel({
           vectorEffect="non-scaling-stroke"
         />
       </svg>
-
-      {/* Label */}
       <div
         className="uppercase font-bold tracking-wider"
         style={{
-          fontSize: "clamp(8px, 0.65vw, 11px)",
+          fontSize: "clamp(7px, 0.6vw, 10px)",
           color: "rgba(0, 229, 255, 0.7)",
           fontFamily: "'Share Tech Mono', monospace",
           letterSpacing: "0.14em",
-          paddingBottom: "clamp(4px, 0.4vw, 8px)",
-          marginBottom: "clamp(4px, 0.4vw, 8px)",
+          paddingBottom: "clamp(4px, 0.4vw, 6px)",
+          marginBottom: "clamp(4px, 0.4vw, 6px)",
           borderBottom: "1px solid rgba(0, 229, 255, 0.1)",
           position: "relative",
           zIndex: 2,
@@ -195,12 +174,10 @@ function MetricPanel({
       >
         {label}
       </div>
-
-      {/* Value */}
       <div
         className="font-bold"
         style={{
-          fontSize: "clamp(18px, 2vw, 30px)",
+          fontSize: "clamp(16px, 1.8vw, 28px)",
           color: "#fff",
           fontFamily: "'Orbitron', sans-serif",
           letterSpacing: "0.02em",
@@ -213,27 +190,12 @@ function MetricPanel({
       >
         {value}
       </div>
-
-      {/* Scan line effect */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            height: 1,
-            background:
-              "linear-gradient(90deg, transparent 5%, rgba(0, 229, 255, 0.05) 50%, transparent 95%)",
-            animation: "scanDown 8s linear infinite",
-          }}
-        />
-      </div>
     </motion.div>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   CTA Button
+   Launch CTA Button
    ═══════════════════════════════════════════════ */
 
 function LaunchCTA() {
@@ -244,15 +206,15 @@ function LaunchCTA() {
       rel="noopener noreferrer"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1.0 }}
+      transition={{ duration: 0.5, delay: 1.2 }}
       className="relative inline-flex items-center justify-center group cursor-pointer"
       style={{
-        padding: "clamp(10px, 1vw, 16px) clamp(28px, 3vw, 48px)",
+        padding: "clamp(10px, 1vw, 14px) clamp(28px, 3vw, 48px)",
         background:
           "linear-gradient(180deg, rgba(0, 229, 255, 0.12) 0%, rgba(0, 229, 255, 0.04) 100%)",
         border: "1px solid rgba(0, 229, 255, 0.4)",
         fontFamily: "'Share Tech Mono', monospace",
-        fontSize: "clamp(11px, 1vw, 15px)",
+        fontSize: "clamp(10px, 0.9vw, 14px)",
         color: "#00e5ff",
         letterSpacing: "0.2em",
         fontWeight: 700,
@@ -269,7 +231,6 @@ function LaunchCTA() {
         borderColor: "rgba(0, 229, 255, 0.7)",
       }}
     >
-      {/* Corner brackets */}
       <span
         className="absolute top-0 left-0 w-2 h-2 pointer-events-none"
         style={{
@@ -314,11 +275,7 @@ function HeaderBar() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.2 }}
       className="absolute z-20 flex items-center justify-center gap-4"
-      style={{
-        top: "clamp(30px, 6vh, 60px)",
-        left: 0,
-        right: 0,
-      }}
+      style={{ top: "clamp(30px, 6vh, 60px)", left: 0, right: 0 }}
     >
       <span
         style={{
@@ -346,32 +303,17 @@ function HeaderBar() {
 export default function ThanosL2Overlay() {
   return (
     <div className="absolute inset-0">
-      {/* Header */}
       <HeaderBar />
 
-      {/* Pipeline — centered */}
-      <div
-        className="absolute z-10 flex items-center justify-center"
-        style={{
-          left: 0,
-          right: 0,
-          top: "50%",
-          transform: "translateY(-65%)",
-        }}
-      >
-        <div className="flex items-center">
-          {PIPELINE_STEPS.map((step, i) => (
-            <PipelineNode key={step.id} label={step.label} index={i} />
-          ))}
-        </div>
-      </div>
+      {/* Central Tokamak Gate — 3D rotating rings */}
+      <TokamakGate />
 
       {/* Left metrics */}
       <div
         className="absolute z-10 flex flex-col"
         style={{
-          left: "clamp(16px, 6vw, 100px)",
-          top: "50%",
+          left: "clamp(16px, 6vw, 90px)",
+          top: "46%",
           transform: "translateY(-50%)",
           gap: "clamp(8px, 1vw, 14px)",
         }}
@@ -384,32 +326,38 @@ export default function ThanosL2Overlay() {
       <div
         className="absolute z-10 flex flex-col"
         style={{
-          right: "clamp(16px, 6vw, 100px)",
-          top: "50%",
+          right: "clamp(16px, 6vw, 90px)",
+          top: "46%",
           transform: "translateY(-50%)",
           gap: "clamp(8px, 1vw, 14px)",
         }}
       >
         <MetricPanel label="Block Time" value="1.2s" index={2} side="right" />
-        <MetricPanel
-          label="On-Demand"
-          value="DEPLOY"
-          index={3}
-          side="right"
-        />
+        <MetricPanel label="On-Demand" value="DEPLOY" index={3} side="right" />
       </div>
 
-      {/* CTA — bottom center */}
+      {/* Launch CTA — below the gate */}
       <div
         className="absolute z-10 flex justify-center"
-        style={{
-          left: 0,
-          right: 0,
-          bottom: "clamp(30px, 8vh, 80px)",
-        }}
+        style={{ left: 0, right: 0, bottom: "clamp(70px, 14vh, 130px)" }}
       >
         <LaunchCTA />
       </div>
+
+      {/* Pipeline — bottom */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.7 }}
+        className="absolute z-10 flex items-center justify-center"
+        style={{ left: 0, right: 0, bottom: "clamp(24px, 5vh, 55px)" }}
+      >
+        <div className="flex items-center">
+          {PIPELINE_STEPS.map((step, i) => (
+            <PipelineNode key={step.id} label={step.label} index={i} />
+          ))}
+        </div>
+      </motion.div>
     </div>
   );
 }

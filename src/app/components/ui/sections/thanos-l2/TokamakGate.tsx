@@ -2,7 +2,6 @@
 
 import { useRef, useMemo, useEffect, useCallback } from "react";
 import { Canvas, useFrame, useThree, RootState } from "@react-three/fiber";
-import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import {
   Group,
   AdditiveBlending,
@@ -56,41 +55,6 @@ function ResizeHelper() {
 
   return null;
 }
-
-/* ═══════════════════════════════════════════════
-   Wireframe Torus — full mesh wireframe (complete donut)
-   ═══════════════════════════════════════════════ */
-
-function WireframeTorus({
-  radius,
-  tube,
-  radialSegments,
-  tubularSegments,
-  color,
-  opacity,
-}: {
-  radius: number;
-  tube: number;
-  radialSegments: number;
-  tubularSegments: number;
-  color: string;
-  opacity: number;
-}) {
-  return (
-    <mesh>
-      <torusGeometry args={[radius, tube, radialSegments, tubularSegments]} />
-      <meshBasicMaterial
-        color={color}
-        transparent
-        opacity={opacity}
-        wireframe
-        blending={AdditiveBlending}
-        depthWrite={false}
-      />
-    </mesh>
-  );
-}
-
 
 /* ═══════════════════════════════════════════════
    Orbiting energy ring — thin line ring
@@ -283,34 +247,11 @@ function TorusCore() {
   });
 
   return (
-    <group ref={groupRef} position={[0, 0.5, 0]}>
-      {/* Lay flat */}
-      <group rotation={[Math.PI / 2, 0, 0]}>
-        {/* Primary wireframe — cyan, dense mesh */}
-        <WireframeTorus
-          radius={1.4}
-          tube={0.38}
-          radialSegments={24}
-          tubularSegments={64}
-          color="#00e5ff"
-          opacity={0.7}
-        />
-
-        {/* Secondary wireframe — finer detail, slightly larger */}
-        <WireframeTorus
-          radius={1.42}
-          tube={0.4}
-          radialSegments={12}
-          tubularSegments={48}
-          color="#2A72E5"
-          opacity={0.3}
-        />
-      </group>
-
-      {/* Orbiting energy rings */}
-      <OrbitRing radius={2.0} tilt={[0.3, 0.2, 0]} speed={0.2} color="#00e5ff" opacity={0.25} />
-      <OrbitRing radius={2.2} tilt={[0.8, -0.3, 0.4]} speed={-0.15} color="#2A72E5" opacity={0.18} />
-      <OrbitRing radius={1.9} tilt={[1.2, 0.5, -0.2]} speed={0.12} color="#f59e0b" opacity={0.12} />
+    <group ref={groupRef} position={[0, 0.6, 0]}>
+      {/* Orbiting energy rings only — torus visual comes from image */}
+      <OrbitRing radius={1.9} tilt={[0.3, 0.2, 0]} speed={0.2} color="#00e5ff" opacity={0.25} />
+      <OrbitRing radius={2.1} tilt={[0.7, -0.25, 0.35]} speed={-0.15} color="#2A72E5" opacity={0.18} />
+      <OrbitRing radius={2.0} tilt={[1.1, 0.4, -0.15]} speed={0.12} color="#f59e0b" opacity={0.12} />
 
       {/* Particles */}
       <AmbientMotes />
@@ -325,6 +266,7 @@ function TorusCore() {
 
 export default function TokamakGate() {
   const handleCreated = useCallback((state: RootState) => {
+    state.gl.setClearColor(0x000000, 0);
     const canvas = state.gl.domElement;
     const wrapper = canvas.parentElement;
     if (wrapper) {
@@ -341,18 +283,19 @@ export default function TokamakGate() {
 
   return (
     <div
+      id="tokamak-gate"
       className="absolute"
       style={{
         left: "50%",
-        top: "42%",
+        top: "38%",
         transform: "translate(-50%, -50%)",
-        width: "clamp(320px, 50vw, 640px)",
-        height: "clamp(320px, 50vw, 640px)",
+        width: "clamp(280px, 42vw, 560px)",
+        height: "clamp(200px, 30vw, 400px)",
         zIndex: 5,
       }}
     >
       <Canvas
-        camera={{ position: [0, 1.8, 6], fov: 38 }}
+        camera={{ position: [0, 2.2, 5], fov: 38 }}
         gl={{ alpha: true, antialias: true }}
         dpr={[1, 1.5]}
         style={{ background: "transparent" }}
@@ -360,14 +303,6 @@ export default function TokamakGate() {
       >
         <ResizeHelper />
         <TorusCore />
-        <EffectComposer>
-          <Bloom
-            luminanceThreshold={0.1}
-            luminanceSmoothing={0.9}
-            intensity={2.0}
-            mipmapBlur
-          />
-        </EffectComposer>
       </Canvas>
     </div>
   );

@@ -7,6 +7,7 @@ import FloorIndicator from "./components/ui/sections/tower-floor/FloorIndicator"
 import TowerShowcase from "./components/ui/sections/tower-showcase";
 import DataConsoleContent from "./components/ui/sections/data-ticker/DataConsoleContent";
 import ThanosL2Overlay from "./components/ui/sections/thanos-l2";
+import GovernanceStakingOverlay from "./components/ui/sections/governance-staking";
 export default function Home() {
   return (
     <main className="bg-black min-h-screen">
@@ -45,13 +46,24 @@ export default function Home() {
       {/* Floor transition indicator */}
       <FloorIndicator floor={1} label="Thanos L2" />
 
-      {/* Tower Floor 1 (Bottom): Thanos L2 Infrastructure */}
+      {/* Tower Floor 1: Thanos L2 Infrastructure */}
       <TowerFloor
         bgImage="/tower/floor-thanos-l2.png"
         bgAlt="Tower floor 1 — Thanos L2 infrastructure launch platform"
-        isLast
       >
         <ThanosL2Overlay />
+      </TowerFloor>
+
+      {/* Floor transition indicator */}
+      <FloorIndicator floor={0} label="Governance & Staking" />
+
+      {/* Tower Floor 0 (Bottom): Governance & Staking */}
+      <TowerFloor
+        bgImage="/tower/floor-governance-staking.png"
+        bgAlt="Tower floor 0 — governance voting chamber and staking crystal matrix"
+        isLast
+      >
+        <GovernanceStakingOverlay />
       </TowerFloor>
     </main>
   );

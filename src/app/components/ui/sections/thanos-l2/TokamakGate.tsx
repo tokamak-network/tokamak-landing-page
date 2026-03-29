@@ -3,13 +3,11 @@
 import { useRef, useMemo, useEffect, useCallback } from "react";
 import { Canvas, useFrame, useThree, RootState } from "@react-three/fiber";
 import {
-  Group,
   AdditiveBlending,
   BufferGeometry,
   Float32BufferAttribute,
   Points,
 } from "three";
-import type * as THREE from "three";
 
 /* ═══════════════════════════════════════════════
    Resize helper
@@ -57,46 +55,10 @@ function ResizeHelper() {
 }
 
 /* ═══════════════════════════════════════════════
-   Orbiting energy ring — thin line ring
+   Ambient particles — floating motes across section
    ═══════════════════════════════════════════════ */
 
-function OrbitRing({
-  radius,
-  tilt,
-  speed,
-  color,
-  opacity,
-}: {
-  radius: number;
-  tilt: [number, number, number];
-  speed: number;
-  color: string;
-  opacity: number;
-}) {
-  const meshRef = useRef<THREE.Mesh>(null!);
-
-  useFrame((_, delta) => {
-    if (meshRef.current) meshRef.current.rotation.z += speed * delta;
-  });
-
-  return (
-    <mesh ref={meshRef} rotation={tilt}>
-      <torusGeometry args={[radius, 0.006, 8, 128]} />
-      <meshBasicMaterial
-        color={color}
-        transparent
-        opacity={opacity}
-        blending={AdditiveBlending}
-      />
-    </mesh>
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   Ambient particles — floating motes
-   ═══════════════════════════════════════════════ */
-
-const MOTE_COUNT = 200;
+const MOTE_COUNT = 150;
 
 function AmbientMotes() {
   const pointsRef = useRef<Points>(null!);
@@ -110,9 +72,9 @@ function AmbientMotes() {
 
     for (let i = 0; i < MOTE_COUNT; i++) {
       phases[i] = Math.random() * Math.PI * 2;
-      radii[i] = 1.0 + Math.random() * 1.5;
-      speeds[i] = 0.1 + Math.random() * 0.2;
-      yOffsets[i] = (Math.random() - 0.5) * 2.5;
+      radii[i] = 2.0 + Math.random() * 4.0;
+      speeds[i] = 0.04 + Math.random() * 0.08;
+      yOffsets[i] = (Math.random() - 0.5) * 5.0;
     }
 
     return { positions, phases, radii, speeds, yOffsets };
@@ -126,12 +88,13 @@ function AmbientMotes() {
     for (let i = 0; i < MOTE_COUNT; i++) {
       const angle = t * speeds[i] + phases[i];
       const r = radii[i];
-      const x = Math.cos(angle) * r;
-      const y = yOffsets[i] + Math.sin(t * 0.5 + phases[i]) * 0.3;
-      const z = Math.sin(angle) * r;
-      posAttr.setXYZ(i, x, y, z);
+      posAttr.setXYZ(
+        i,
+        Math.cos(angle) * r,
+        yOffsets[i] + Math.sin(t * 0.3 + phases[i]) * 0.5,
+        Math.sin(angle) * r,
+      );
     }
-
     posAttr.needsUpdate = true;
   });
 
@@ -145,9 +108,9 @@ function AmbientMotes() {
     <points ref={pointsRef} geometry={geometry}>
       <pointsMaterial
         color="#00e5ff"
-        size={0.03}
+        size={0.04}
         transparent
-        opacity={0.5}
+        opacity={0.35}
         blending={AdditiveBlending}
         depthWrite={false}
         sizeAttenuation
@@ -157,111 +120,7 @@ function AmbientMotes() {
 }
 
 /* ═══════════════════════════════════════════════
-   Spark burst — particles shooting outward
-   ═══════════════════════════════════════════════ */
-
-const SPARK_COUNT = 60;
-
-function SparkBurst() {
-  const pointsRef = useRef<Points>(null!);
-
-  const { positions, velocities, lifetimes, maxLifetimes } = useMemo(() => {
-    const positions = new Float32Array(SPARK_COUNT * 3);
-    const velocities = new Float32Array(SPARK_COUNT * 3);
-    const lifetimes = new Float32Array(SPARK_COUNT);
-    const maxLifetimes = new Float32Array(SPARK_COUNT);
-
-    for (let i = 0; i < SPARK_COUNT; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const elevation = (Math.random() - 0.5) * 1.0;
-      const speed = 0.3 + Math.random() * 1.0;
-
-      velocities[i * 3] = Math.cos(angle) * speed;
-      velocities[i * 3 + 1] = elevation * speed * 0.4;
-      velocities[i * 3 + 2] = Math.sin(angle) * speed;
-
-      maxLifetimes[i] = 2.0 + Math.random() * 2.5;
-      lifetimes[i] = Math.random() * maxLifetimes[i];
-    }
-
-    return { positions, velocities, lifetimes, maxLifetimes };
-  }, []);
-
-  useFrame((_, delta) => {
-    if (!pointsRef.current) return;
-    const posAttr = pointsRef.current.geometry.getAttribute("position");
-
-    for (let i = 0; i < SPARK_COUNT; i++) {
-      lifetimes[i] += delta;
-
-      if (lifetimes[i] >= maxLifetimes[i]) {
-        lifetimes[i] = 0;
-        posAttr.setXYZ(i, 0, 0, 0);
-        continue;
-      }
-
-      const t = lifetimes[i];
-      const x = velocities[i * 3] * t;
-      const y = velocities[i * 3 + 1] * t;
-      const z = velocities[i * 3 + 2] * t;
-
-      posAttr.setXYZ(i, x, y, z);
-    }
-
-    posAttr.needsUpdate = true;
-  });
-
-  const geometry = useMemo(() => {
-    const geo = new BufferGeometry();
-    geo.setAttribute("position", new Float32BufferAttribute(positions, 3));
-    return geo;
-  }, [positions]);
-
-  return (
-    <points ref={pointsRef} geometry={geometry}>
-      <pointsMaterial
-        color="#f59e0b"
-        size={0.02}
-        transparent
-        opacity={0.6}
-        blending={AdditiveBlending}
-        depthWrite={false}
-        sizeAttenuation
-      />
-    </points>
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   Combined scene — rotating wireframe torus
-   with energy effects
-   ═══════════════════════════════════════════════ */
-
-function TorusCore() {
-  const groupRef = useRef<Group>(null!);
-
-  useFrame((_, delta) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y += 0.15 * delta;
-    }
-  });
-
-  return (
-    <group ref={groupRef} position={[0, 0.6, 0]}>
-      {/* Orbiting energy rings only — torus visual comes from image */}
-      <OrbitRing radius={1.9} tilt={[0.3, 0.2, 0]} speed={0.2} color="#00e5ff" opacity={0.25} />
-      <OrbitRing radius={2.1} tilt={[0.7, -0.25, 0.35]} speed={-0.15} color="#2A72E5" opacity={0.18} />
-      <OrbitRing radius={2.0} tilt={[1.1, 0.4, -0.15]} speed={0.12} color="#f59e0b" opacity={0.12} />
-
-      {/* Particles */}
-      <AmbientMotes />
-      <SparkBurst />
-    </group>
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   Main Export
+   Main Export — full section particle overlay
    ═══════════════════════════════════════════════ */
 
 export default function TokamakGate() {
@@ -284,25 +143,18 @@ export default function TokamakGate() {
   return (
     <div
       id="tokamak-gate"
-      className="absolute"
-      style={{
-        left: "50%",
-        top: "38%",
-        transform: "translate(-50%, -50%)",
-        width: "clamp(280px, 42vw, 560px)",
-        height: "clamp(200px, 30vw, 400px)",
-        zIndex: 5,
-      }}
+      className="absolute inset-0 pointer-events-none"
+      style={{ zIndex: 6 }}
     >
       <Canvas
-        camera={{ position: [0, 2.2, 5], fov: 38 }}
+        camera={{ position: [0, 0, 8], fov: 50 }}
         gl={{ alpha: true, antialias: true }}
         dpr={[1, 1.5]}
         style={{ background: "transparent" }}
         onCreated={handleCreated}
       >
         <ResizeHelper />
-        <TorusCore />
+        <AmbientMotes />
       </Canvas>
     </div>
   );

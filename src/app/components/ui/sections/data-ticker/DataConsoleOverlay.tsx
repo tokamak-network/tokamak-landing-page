@@ -693,6 +693,16 @@ export default function DataConsoleOverlay({ items }: { items: TickerItem[] }) {
           {/* Header bar */}
           <HeaderBar />
 
+          {/* Bottom fade — blend into black below */}
+          <div
+            className="absolute bottom-0 left-0 right-0 pointer-events-none z-30"
+            style={{
+              height: "22%",
+              background:
+                "linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.2) 70%, transparent 100%)",
+            }}
+          />
+
           {/* Central holographic sphere */}
           <LazyWebGL>
             <HoloSphere />

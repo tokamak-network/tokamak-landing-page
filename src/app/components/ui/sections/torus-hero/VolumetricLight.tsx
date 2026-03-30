@@ -183,6 +183,7 @@ export default function VolumetricLight() {
       }
       copies.sort((a, b) => b.depth - a.depth); // back first (painter's order)
 
+      ctx.globalCompositeOperation = "lighter";
       for (const copy of copies) {
         const { ex: emitX, ey: emitY, depth, ci } = copy;
 
@@ -237,18 +238,24 @@ export default function VolumetricLight() {
           const fadeInEnd = hideOffset / totalDrop; // fraction where emitY sits
           const grd = ctx.createLinearGradient(0, startY, 0, h);
           grd.addColorStop(0, "transparent");
-          grd.addColorStop(fadeInEnd * 0.5, `hsla(${wave.hue}, 80%, ${wave.lightness}%, ${wave.opacity * 0.5 * opMul})`);
-          grd.addColorStop(fadeInEnd, `hsla(${wave.hue}, 80%, ${wave.lightness}%, ${wave.opacity * 1.8 * opMul})`);
-          grd.addColorStop(fadeInEnd + 0.08, `hsla(${wave.hue}, 75%, ${wave.lightness}%, ${wave.opacity * 1.4 * opMul})`);
-          grd.addColorStop(Math.min(fadeInEnd + 0.25, 0.95), `hsla(${wave.hue}, 70%, ${wave.lightness}%, ${wave.opacity * opMul})`);
-          grd.addColorStop(Math.min(fadeInEnd + 0.5, 0.97), `hsla(${wave.hue}, 65%, ${wave.lightness}%, ${wave.opacity * 0.4 * opMul})`);
-          grd.addColorStop(Math.min(fadeInEnd + 0.75, 0.98), `hsla(${wave.hue}, 60%, ${wave.lightness}%, ${wave.opacity * 0.1 * opMul})`);
+          grd.addColorStop(fadeInEnd * 0.5, `hsla(${wave.hue}, 80%, ${wave.lightness}%, ${wave.opacity * 0.4 * opMul})`);
+          grd.addColorStop(fadeInEnd, `hsla(${wave.hue}, 80%, ${wave.lightness}%, ${wave.opacity * 1.0 * opMul})`);
+          grd.addColorStop(fadeInEnd + 0.08, `hsla(${wave.hue}, 75%, ${wave.lightness}%, ${wave.opacity * 0.9 * opMul})`);
+          // Sustain through showcase floor (~40-55% of canvas)
+          grd.addColorStop(0.25, `hsla(${wave.hue}, 75%, ${wave.lightness}%, ${wave.opacity * 0.85 * opMul})`);
+          grd.addColorStop(0.45, `hsla(${wave.hue}, 72%, ${wave.lightness}%, ${wave.opacity * 0.75 * opMul})`);
+          // Fade after showcase — data console region (~55-80%)
+          grd.addColorStop(0.55, `hsla(${wave.hue}, 70%, ${wave.lightness}%, ${wave.opacity * 0.5 * opMul})`);
+          grd.addColorStop(0.65, `hsla(${wave.hue}, 65%, ${wave.lightness}%, ${wave.opacity * 0.25 * opMul})`);
+          grd.addColorStop(0.75, `hsla(${wave.hue}, 60%, ${wave.lightness}%, ${wave.opacity * 0.1 * opMul})`);
+          grd.addColorStop(0.85, `hsla(${wave.hue}, 55%, ${wave.lightness}%, ${wave.opacity * 0.03 * opMul})`);
           grd.addColorStop(1, "transparent");
           ctx.fillStyle = grd;
           ctx.fill();
         }
       }
 
+      ctx.globalCompositeOperation = "source-over";
       // ── Soft light mist between curtain bundles ──
       // Draw blurred gradient blobs between adjacent emitter positions
       for (let ci = 0; ci < CURTAIN_COPIES; ci++) {
@@ -264,7 +271,7 @@ export default function VolumetricLight() {
 
         const depthDim = Math.min((refDepth / p.depth) ** 2, 1);
         const mistW = w * 0.08 * (refDepth / p.depth);
-        const mistH = vh * 0.5;
+        const mistH = vh * 0.7;
 
         // Slow vertical drift animation
         const yShift = Math.sin(t * 0.003 + ci * 2.1) * vh * 0.02;
@@ -300,7 +307,7 @@ export default function VolumetricLight() {
     <canvas
       ref={canvasRef}
       className="absolute inset-x-0 top-0 pointer-events-none"
-      style={{ width: "100%", height: "280vh", zIndex: 10 }}
+      style={{ width: "100%", height: "380vh", zIndex: 10 }}
     />
   );
 }

@@ -74,7 +74,7 @@ function SpiralStream({ direction }: { direction: 1 | -1 }) {
 
     for (let i = 0; i < SPIRAL_COUNT; i++) {
       angles[i] = Math.random() * Math.PI * 2;
-      radii[i] = 0.3 + Math.random() * 3.0;
+      radii[i] = 0.3 + Math.random() * 3.5;
       speeds[i] = 0.3 + Math.random() * 0.8;
       yOffsets[i] = (Math.random() - 0.5) * 2.5;
       phases[i] = Math.random() * Math.PI * 2;
@@ -118,7 +118,7 @@ function SpiralStream({ direction }: { direction: 1 | -1 }) {
   return (
     <points ref={pointsRef} geometry={geometry}>
       <pointsMaterial
-        color={direction === 1 ? "#6688ff" : "#00e5ff"}
+        color={direction === 1 ? "#4466ff" : "#00e5ff"}
         size={0.035}
         transparent
         opacity={0.65}
@@ -195,10 +195,10 @@ function CorePulse() {
   return (
     <points ref={pointsRef} geometry={geometry}>
       <pointsMaterial
-        color="#ffffff"
+        color="#00e5ff"
         size={0.06}
         transparent
-        opacity={0.8}
+        opacity={0.55}
         blending={AdditiveBlending}
         depthWrite={false}
         sizeAttenuation
@@ -271,10 +271,10 @@ function RewardEjection() {
   return (
     <points ref={pointsRef} geometry={geometry}>
       <pointsMaterial
-        color="#22ffaa"
+        color="#00e5ff"
         size={0.04}
         transparent
-        opacity={0.5}
+        opacity={0.4}
         blending={AdditiveBlending}
         depthWrite={false}
         sizeAttenuation
@@ -334,7 +334,7 @@ function OrbitalRing() {
         color="#00e5ff"
         size={0.025}
         transparent
-        opacity={0.45}
+        opacity={0.30}
         blending={AdditiveBlending}
         depthWrite={false}
         sizeAttenuation
@@ -359,7 +359,7 @@ function AmbientDust() {
 
     for (let i = 0; i < DUST_COUNT; i++) {
       basePositions[i * 3] = (Math.random() - 0.5) * 8;
-      basePositions[i * 3 + 1] = (Math.random() - 0.5) * 4;
+      basePositions[i * 3 + 1] = (Math.random() - 0.5) * 5;
       basePositions[i * 3 + 2] = (Math.random() - 0.5) * 3;
       phases[i] = Math.random() * Math.PI * 2;
       speeds[i] = 0.15 + Math.random() * 0.3;
@@ -458,15 +458,15 @@ export default function TokenVortex() {
     <div
       className="absolute pointer-events-none"
       style={{
-        left: "10%",
-        right: "10%",
-        top: "10%",
+        left: "5%",
+        right: "5%",
+        top: "5%",
         bottom: "10%",
         zIndex: 5,
       }}
     >
       <Canvas
-        camera={{ position: [0, 0, 4.5], fov: 50 }}
+        camera={{ position: [0, 0, 5.8], fov: 55 }}
         gl={{ alpha: true, antialias: true }}
         dpr={[1, 1.5]}
         style={{ background: "transparent" }}
@@ -476,9 +476,9 @@ export default function TokenVortex() {
         <VortexScene />
         <EffectComposer>
           <Bloom
-            luminanceThreshold={0.1}
+            luminanceThreshold={0.35}
             luminanceSmoothing={0.9}
-            intensity={1.5}
+            intensity={0.9}
             mipmapBlur
           />
         </EffectComposer>

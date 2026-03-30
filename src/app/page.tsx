@@ -2,7 +2,6 @@ import Header from "./components/ui/header";
 import IntroSequence from "./components/ui/sections/intro-sequence";
 import TorusHero from "./components/ui/sections/torus-hero";
 import VolumetricLight from "./components/ui/sections/torus-hero/VolumetricLight";
-import LazyWebGL from "./components/ui/LazyWebGL";
 import TowerFloor from "./components/ui/sections/tower-floor";
 import FloorIndicator from "./components/ui/sections/tower-floor/FloorIndicator";
 import TowerShowcase from "./components/ui/sections/tower-showcase";
@@ -22,9 +21,7 @@ export default function Home() {
       {/* Tower upper section — light curtain spans hero + showcase floor */}
       <div className="relative overflow-visible">
         <TorusHero />
-        <LazyWebGL>
-          <VolumetricLight />
-        </LazyWebGL>
+        <VolumetricLight />
 
         {/* Floor transition indicator */}
         <FloorIndicator floor={3} label="Ecosystem Showcase" />

@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import HeroOverlay from "./HeroOverlay";
 import ScrollIndicator from "./ScrollIndicator";
 import TorusScene from "./TorusScene";
+import LazyWebGL from "../../LazyWebGL";
 
 export default function TorusHero() {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -56,7 +57,11 @@ export default function TorusHero() {
           transition: "opacity 1.2s ease-out",
         }}
       >
-        {mounted && <TorusScene scrollProgress={scrollProgress} />}
+        {mounted && (
+          <LazyWebGL style={{ width: "100%", height: "100%" }}>
+            <TorusScene scrollProgress={scrollProgress} />
+          </LazyWebGL>
+        )}
       </div>
 
       {/* Hero text + CTA */}

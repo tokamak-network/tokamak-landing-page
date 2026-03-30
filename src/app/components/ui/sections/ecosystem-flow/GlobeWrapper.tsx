@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { FlowCategory } from "./index";
+import LazyWebGL from "../../LazyWebGL";
 
 const EcosystemGlobe = dynamic(() => import("./EcosystemGlobe"), {
   ssr: false,
@@ -23,5 +24,9 @@ export default function GlobeWrapper({
   categories,
   totalRepos,
 }: GlobeWrapperProps) {
-  return <EcosystemGlobe categories={categories} totalRepos={totalRepos} />;
+  return (
+    <LazyWebGL className="w-full max-w-[1200px] mx-auto h-[400px] md:h-[600px]">
+      <EcosystemGlobe categories={categories} totalRepos={totalRepos} />
+    </LazyWebGL>
+  );
 }

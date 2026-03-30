@@ -2,108 +2,34 @@
 
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
+import Image from "next/image";
+import LazyWebGL from "../../LazyWebGL";
 
 const TokenVortex = dynamic(() => import("./TokenVortex"), { ssr: false });
 
 /* ═══════════════════════════════════════════════
-   Header Bar
+   Keyframes — cascade pulse + CTA glow + scan sweep
    ═══════════════════════════════════════════════ */
 
-function HeaderBar() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.2 }}
-      className="absolute z-20 flex items-center justify-center gap-4"
-      style={{ top: "clamp(30px, 6vh, 60px)", left: 0, right: 0 }}
-    >
-      <span
-        style={{
-          fontSize: "clamp(8px, 0.7vw, 11px)",
-          color: "rgba(140, 200, 255, 0.5)",
-          fontFamily: "'Share Tech Mono', monospace",
-          letterSpacing: "0.18em",
-          textTransform: "uppercase",
-        }}
-      >
-        Governance & Staking
-        <span style={{ margin: "0 8px", opacity: 0.3 }}>|</span>
-        Network Security
-        <span style={{ margin: "0 8px", opacity: 0.3 }}>|</span>
-        Status: <span style={{ color: "#22c55e" }}>Active</span>
-      </span>
-    </motion.div>
-  );
+const GLOBAL_KEYFRAMES = `
+@keyframes cascadePulse {
+  0%, 100% { opacity: 0.12; transform: scaleX(0.35); }
+  50% { opacity: 0.75; transform: scaleX(1); }
 }
+@keyframes ctaGlowPulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+@keyframes headerScan {
+  0% { transform: translateX(-100%); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateX(300%); opacity: 0; }
+}
+`;
 
 /* ═══════════════════════════════════════════════
-   Section Label with animated scan line
-   ═══════════════════════════════════════════════ */
-
-function SectionLabel({
-  label,
-  side,
-}: {
-  label: string;
-  side: "left" | "right";
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6, delay: 0.4 }}
-      className="absolute z-20"
-      style={{
-        top: "clamp(60px, 13vh, 110px)",
-        ...(side === "left"
-          ? { left: "clamp(30px, 8vw, 120px)" }
-          : { right: "clamp(30px, 8vw, 120px)" }),
-      }}
-    >
-      <span
-        style={{
-          fontSize: "clamp(10px, 0.9vw, 14px)",
-          color: "rgba(0, 229, 255, 0.7)",
-          fontFamily: "'Orbitron', sans-serif",
-          letterSpacing: "0.25em",
-          textTransform: "uppercase",
-          fontWeight: 700,
-          textShadow: "0 0 12px rgba(0, 229, 255, 0.4)",
-        }}
-      >
-        {label}
-      </span>
-      {/* Animated scan line */}
-      <div
-        className="relative overflow-hidden"
-        style={{
-          marginTop: 6,
-          height: 1,
-          width: "clamp(60px, 8vw, 120px)",
-          background: "rgba(0, 229, 255, 0.15)",
-        }}
-      >
-        <motion.div
-          animate={{ x: ["-100%", "200%"] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 1 }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "50%",
-            height: "100%",
-            background:
-              "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.8), transparent)",
-          }}
-        />
-      </div>
-    </motion.div>
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   Floating Proposal Card — with hover bob animation
+   Proposal data & staking data
    ═══════════════════════════════════════════════ */
 
 const PROPOSALS = [
@@ -112,87 +38,172 @@ const PROPOSALS = [
   { id: "TIP-40", title: "Protocol Upgrade v3", status: "passed", votes: "94%" },
 ] as const;
 
-function ProposalCard({
+const STAKING_METRICS = [
+  { label: "Total Staked", value: "42.8M", suffix: "TON" },
+  { label: "Staking APR", value: "8.2", suffix: "%" },
+  { label: "Validators", value: "127", suffix: "" },
+] as const;
+
+const GOV_STATS = [
+  { label: "Active Props", value: "3" },
+  { label: "Total Voters", value: "2,841" },
+  { label: "Quorum", value: "45%" },
+] as const;
+
+/* ═══════════════════════════════════════════════
+   Header Bar — reactor control room style with scan line
+   ═══════════════════════════════════════════════ */
+
+function HeaderBar() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="absolute z-20 flex flex-col items-center"
+      style={{ top: "clamp(28px, 5.5vh, 55px)", left: 0, right: 0 }}
+    >
+      <style dangerouslySetInnerHTML={{ __html: GLOBAL_KEYFRAMES }} />
+      <div
+        style={{
+          fontSize: "clamp(8px, 0.65vw, 11px)",
+          color: "rgba(0, 229, 255, 0.5)",
+          fontFamily: "'Share Tech Mono', monospace",
+          letterSpacing: "0.25em",
+          textTransform: "uppercase",
+          marginBottom: "clamp(4px, 0.5vw, 8px)",
+        }}
+      >
+        Reactor Core · Governance &amp; Staking
+      </div>
+      <div
+        className="relative overflow-hidden"
+        style={{
+          fontSize: "clamp(14px, 1.4vw, 22px)",
+          color: "#fff",
+          fontFamily: "'Orbitron', sans-serif",
+          fontWeight: 700,
+          letterSpacing: "0.08em",
+          textShadow: "0 0 20px rgba(0, 229, 255, 0.6), 0 0 40px rgba(0, 229, 255, 0.2)",
+          textAlign: "center",
+          padding: "clamp(6px, 0.5vw, 10px) clamp(40px, 5vw, 80px)",
+          background: "linear-gradient(90deg, transparent, rgba(0, 8, 16, 0.7) 20%, rgba(0, 8, 16, 0.7) 80%, transparent)",
+        }}
+      >
+        Network Power &amp; Consensus Layer
+        {/* Scan sweep */}
+        <span
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "linear-gradient(90deg, transparent 0%, rgba(0, 229, 255, 0.30) 50%, transparent 100%)",
+            animation: "headerScan 4s ease-in-out infinite",
+            animationDelay: "1s",
+          }}
+        />
+      </div>
+      <div
+        style={{
+          fontSize: "clamp(7px, 0.55vw, 10px)",
+          color: "rgba(160, 210, 255, 0.5)",
+          fontFamily: "'Share Tech Mono', monospace",
+          letterSpacing: "0.12em",
+          marginTop: "clamp(3px, 0.3vw, 6px)",
+        }}
+      >
+        Secure · Decentralized · On-Chain
+      </div>
+    </motion.div>
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   Reactor Log Card — proposal styled as cascade card
+   ═══════════════════════════════════════════════ */
+
+function ReactorLogCard({
   proposal,
   index,
 }: {
   proposal: (typeof PROPOSALS)[number];
   index: number;
 }) {
-  const CHAMFER = 8;
   const isActive = proposal.status === "active";
+  const voteNum = parseInt(proposal.votes);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30, rotateZ: -4 + index * 4 }}
-      animate={{
-        opacity: 1,
-        y: [0, -4, 0],
-        rotateZ: -4 + index * 4,
-      }}
-      transition={{
-        opacity: { duration: 0.5, delay: 0.6 + index * 0.15 },
-        y: {
-          duration: 3 + index * 0.5,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: index * 0.3,
-        },
-        rotateZ: { duration: 0.5, delay: 0.6 + index * 0.15 },
-      }}
-      className="relative"
+      initial={{ opacity: 0, x: -16 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.4, delay: 0.5 + index * 0.12 }}
+      className="relative flex flex-col justify-between overflow-hidden"
       style={{
-        width: "clamp(130px, 12vw, 180px)",
-        padding: "clamp(10px, 1vw, 14px)",
+        width: "clamp(150px, 13vw, 205px)",
+        padding: "clamp(10px, 1vw, 14px) clamp(12px, 1.1vw, 16px)",
         background: isActive
-          ? "linear-gradient(180deg, rgba(0, 229, 255, 0.12) 0%, rgba(4, 14, 28, 0.9) 100%)"
-          : "linear-gradient(180deg, rgba(4, 14, 28, 0.85) 0%, rgba(2, 8, 18, 0.8) 100%)",
-        clipPath: `polygon(0 0, calc(100% - ${CHAMFER}px) 0, 100% ${CHAMFER}px, 100% 100%, ${CHAMFER}px 100%, 0 calc(100% - ${CHAMFER}px))`,
-        backdropFilter: "blur(10px)",
-        boxShadow: isActive
-          ? "0 2px 20px rgba(0, 229, 255, 0.15), inset 0 1px 0 rgba(0, 229, 255, 0.25)"
-          : "0 2px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(0, 229, 255, 0.1)",
+          ? "rgba(0, 10, 20, 0.80)"
+          : "rgba(5, 10, 20, 0.80)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+        border: isActive
+          ? "1px solid rgba(0, 229, 255, 0.35)"
+          : "1px solid rgba(42, 114, 229, 0.25)",
+        borderRadius: 6,
       }}
     >
-      {/* Pulsing top accent line for active proposals */}
-      <motion.div
-        className="absolute pointer-events-none"
-        animate={
-          isActive
-            ? { opacity: [0.4, 0.8, 0.4] }
-            : {}
-        }
-        transition={
-          isActive
-            ? { duration: 2, repeat: Infinity, ease: "easeInOut" }
-            : {}
-        }
+      {/* Cascade pulse bars */}
+      {[0, 1, 2, 3].map((i) => (
+        <div
+          key={i}
+          className="absolute left-0 right-0 pointer-events-none"
+          style={{
+            top: `${18 + i * 18}%`,
+            height: 2,
+            background: isActive
+              ? "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.65), transparent)"
+              : "linear-gradient(90deg, transparent, rgba(42, 114, 229, 0.5), transparent)",
+            boxShadow: isActive
+              ? "0 0 10px rgba(0, 229, 255, 0.4)"
+              : "0 0 8px rgba(42, 114, 229, 0.3)",
+            animation: "cascadePulse 2.2s ease-in-out infinite",
+            animationDelay: `${i * 0.22}s`,
+          }}
+        />
+      ))}
+
+      {/* Top accent */}
+      <div
+        className="absolute top-0 left-0 right-0 pointer-events-none"
         style={{
-          top: -1,
-          left: 0,
-          right: CHAMFER,
           height: 2,
           background: isActive
-            ? "rgba(0, 229, 255, 0.6)"
-            : "rgba(0, 229, 255, 0.25)",
-          boxShadow: isActive
-            ? "0 0 12px rgba(0, 229, 255, 0.5)"
-            : "0 0 6px rgba(0, 229, 255, 0.2)",
+            ? "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.8), transparent)"
+            : "linear-gradient(90deg, transparent, rgba(42, 114, 229, 0.5), transparent)",
+          boxShadow: isActive ? "0 0 12px rgba(0, 229, 255, 0.5)" : "none",
         }}
       />
 
-      {/* ID */}
+      {/* Proposal ID */}
       <div
         style={{
           fontSize: "clamp(7px, 0.55vw, 9px)",
-          color: isActive ? "#00e5ff" : "rgba(0, 229, 255, 0.5)",
+          color: isActive ? "#00e5ff" : "rgba(0, 229, 255, 0.45)",
           fontFamily: "'Share Tech Mono', monospace",
-          letterSpacing: "0.15em",
+          letterSpacing: "0.18em",
           fontWeight: 700,
-          textShadow: isActive ? "0 0 8px rgba(0, 229, 255, 0.4)" : "none",
+          zIndex: 1,
+          textShadow: isActive ? "0 0 8px rgba(0, 229, 255, 0.5)" : "none",
         }}
       >
         {proposal.id}
+        <span
+          style={{
+            marginLeft: 8,
+            color: isActive ? "#22c55e" : "rgba(140, 200, 255, 0.35)",
+            textShadow: "none",
+          }}
+        >
+          ▸ {proposal.status.toUpperCase()}
+        </span>
       </div>
 
       {/* Title */}
@@ -201,414 +212,214 @@ function ProposalCard({
           fontSize: "clamp(9px, 0.75vw, 12px)",
           color: "rgba(255, 255, 255, 0.85)",
           fontFamily: "'Share Tech Mono', monospace",
-          marginTop: 4,
+          marginTop: "clamp(4px, 0.4vw, 6px)",
           lineHeight: 1.3,
+          zIndex: 1,
         }}
       >
         {proposal.title}
       </div>
 
-      {/* Status + Votes */}
-      <div
-        className="flex items-center justify-between"
-        style={{ marginTop: 8 }}
-      >
-        <span
-          style={{
-            fontSize: "clamp(6px, 0.5vw, 8px)",
-            color: isActive ? "#22c55e" : "rgba(140, 200, 255, 0.4)",
-            fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-          }}
-        >
-          {proposal.status}
-        </span>
-        <span
-          style={{
-            fontSize: "clamp(10px, 0.85vw, 14px)",
-            color: "#fff",
-            fontFamily: "'Orbitron', sans-serif",
-            fontWeight: 700,
-            textShadow: "0 0 8px rgba(0, 229, 255, 0.3)",
-          }}
-        >
-          {proposal.votes}
-        </span>
-      </div>
-
-      {/* Animated vote bar */}
-      <div
-        style={{
-          marginTop: 6,
-          height: 2,
-          background: "rgba(0, 229, 255, 0.1)",
-          borderRadius: 1,
-        }}
-      >
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: proposal.votes }}
-          transition={{ duration: 1.5, delay: 0.8 + index * 0.15, ease: "easeOut" }}
-          style={{
-            height: "100%",
-            background: isActive
-              ? "linear-gradient(90deg, #00e5ff, #2A72E5)"
-              : "rgba(0, 229, 255, 0.3)",
-            borderRadius: 1,
-            boxShadow: isActive
-              ? "0 0 8px rgba(0, 229, 255, 0.4)"
-              : "none",
-          }}
-        />
-      </div>
-    </motion.div>
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   Governance Seal — rotating mandala beneath cards
-   ═══════════════════════════════════════════════ */
-
-function GovernanceSeal() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.8, delay: 0.3 }}
-      className="absolute z-[3] pointer-events-none"
-      style={{
-        left: "clamp(20px, 5vw, 80px)",
-        top: "50%",
-        transform: "translateY(-50%)",
-        width: "clamp(180px, 18vw, 280px)",
-        height: "clamp(180px, 18vw, 280px)",
-      }}
-    >
-      {/* Outer rotating ring */}
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-        className="absolute inset-0 rounded-full"
-        style={{
-          border: "1px solid rgba(0, 229, 255, 0.15)",
-          boxShadow: "0 0 20px rgba(0, 229, 255, 0.05)",
-        }}
-      />
-
-      {/* Middle counter-rotating ring */}
-      <motion.div
-        animate={{ rotate: -360 }}
-        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        className="absolute rounded-full"
-        style={{
-          inset: "12%",
-          border: "1px solid rgba(0, 229, 255, 0.12)",
-        }}
-      >
-        {/* Tick marks */}
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute"
+      {/* Vote bar + percentage */}
+      <div style={{ marginTop: "clamp(8px, 0.8vw, 12px)", zIndex: 1 }}>
+        <div className="flex items-center justify-between" style={{ marginBottom: 4 }}>
+          <span
             style={{
-              top: "50%",
-              left: "50%",
-              width: 1,
-              height: "8%",
-              background: `rgba(0, 229, 255, ${i % 3 === 0 ? 0.4 : 0.15})`,
-              transformOrigin: "50% 0",
-              transform: `translate(-50%, 0) rotate(${i * 30}deg) translateY(-${50}%)`,
-            }}
-          />
-        ))}
-      </motion.div>
-
-      {/* Inner pulsing ring */}
-      <motion.div
-        animate={{
-          opacity: [0.1, 0.3, 0.1],
-          scale: [0.98, 1.02, 0.98],
-        }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute rounded-full"
-        style={{
-          inset: "25%",
-          border: "1px solid rgba(0, 229, 255, 0.2)",
-          boxShadow:
-            "0 0 30px rgba(0, 229, 255, 0.08), inset 0 0 30px rgba(0, 229, 255, 0.04)",
-        }}
-      />
-
-      {/* Center dot */}
-      <motion.div
-        animate={{ opacity: [0.3, 0.7, 0.3] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute rounded-full"
-        style={{
-          inset: "46%",
-          background: "rgba(0, 229, 255, 0.5)",
-          boxShadow: "0 0 15px rgba(0, 229, 255, 0.4)",
-        }}
-      />
-    </motion.div>
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   Crystal Hex Cell — pulsing staking indicator
-   ═══════════════════════════════════════════════ */
-
-function CrystalHexCell({
-  index,
-  brightness,
-}: {
-  index: number;
-  brightness: "high" | "medium" | "low";
-}) {
-  const colors = {
-    high: { bg: "rgba(0, 229, 255, 0.25)", border: "rgba(0, 229, 255, 0.5)", glow: "rgba(0, 229, 255, 0.3)" },
-    medium: { bg: "rgba(0, 139, 158, 0.15)", border: "rgba(0, 139, 158, 0.35)", glow: "rgba(0, 139, 158, 0.15)" },
-    low: { bg: "rgba(10, 20, 35, 0.6)", border: "rgba(0, 229, 255, 0.1)", glow: "none" },
-  };
-  const c = colors[brightness];
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.5 }}
-      animate={{
-        opacity: 1,
-        scale: [1, brightness === "high" ? 1.05 : 1.02, 1],
-      }}
-      transition={{
-        opacity: { duration: 0.4, delay: 0.4 + index * 0.06 },
-        scale: {
-          duration: 2 + index * 0.3,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: index * 0.2,
-        },
-      }}
-      style={{
-        width: "clamp(32px, 3vw, 46px)",
-        height: "clamp(36px, 3.4vw, 52px)",
-        background: c.bg,
-        clipPath:
-          "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-        position: "relative",
-        boxShadow: brightness !== "low" ? `0 0 12px ${c.glow}` : "none",
-      }}
-    >
-      {/* Inner crystal glow */}
-      {brightness !== "low" && (
-        <motion.div
-          animate={{ opacity: [0.4, 0.8, 0.4] }}
-          transition={{
-            duration: 1.5 + index * 0.2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: index * 0.15,
-          }}
-          className="absolute"
-          style={{
-            inset: "15%",
-            background: `radial-gradient(ellipse at center, ${c.border}, transparent)`,
-            clipPath:
-              "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-          }}
-        />
-      )}
-    </motion.div>
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   Crystal Matrix — honeycomb grid
-   ═══════════════════════════════════════════════ */
-
-const CRYSTAL_GRID: ("high" | "medium" | "low")[][] = [
-  ["high", "medium", "high", "low", "high"],
-  ["medium", "high", "low", "high", "medium"],
-  ["high", "low", "high", "medium", "high"],
-  ["low", "high", "medium", "high", "low"],
-];
-
-function CrystalMatrix() {
-  return (
-    <div
-      className="absolute z-10"
-      style={{
-        right: "clamp(20px, 5vw, 80px)",
-        top: "50%",
-        transform: "translateY(-50%)",
-      }}
-    >
-      <div className="flex flex-col items-end" style={{ gap: "clamp(2px, 0.2vw, 4px)" }}>
-        {CRYSTAL_GRID.map((row, rowIdx) => (
-          <div
-            key={rowIdx}
-            className="flex"
-            style={{
-              gap: "clamp(2px, 0.2vw, 4px)",
-              marginRight: rowIdx % 2 === 1 ? "clamp(16px, 1.5vw, 23px)" : 0,
+              fontSize: "clamp(6px, 0.5vw, 8px)",
+              color: "rgba(122, 140, 168, 0.8)",
+              fontFamily: "'Share Tech Mono', monospace",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
             }}
           >
-            {row.map((brightness, colIdx) => (
-              <CrystalHexCell
-                key={`${rowIdx}-${colIdx}`}
-                index={rowIdx * 5 + colIdx}
-                brightness={brightness}
-              />
-            ))}
-          </div>
-        ))}
+            Votes
+          </span>
+          <span
+            style={{
+              fontSize: "clamp(12px, 1.1vw, 18px)",
+              color: "#fff",
+              fontFamily: "'Orbitron', sans-serif",
+              fontWeight: 900,
+              textShadow: isActive
+                ? "0 0 12px rgba(0, 229, 255, 1), 0 0 24px rgba(0, 229, 255, 0.6)"
+                : "0 0 8px rgba(0, 229, 255, 0.3)",
+            }}
+          >
+            {proposal.votes}
+          </span>
+        </div>
+        {/* Animated vote bar */}
+        <div
+          style={{
+            height: 3,
+            background: "rgba(0, 229, 255, 0.08)",
+            borderRadius: 2,
+          }}
+        >
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${voteNum}%` }}
+            transition={{ duration: 1.5, delay: 0.9 + index * 0.15, ease: "easeOut" }}
+            style={{
+              height: "100%",
+              background: isActive
+                ? "linear-gradient(90deg, #00e5ff, #2A72E5)"
+                : "rgba(0, 229, 255, 0.3)",
+              borderRadius: 2,
+              boxShadow: isActive ? "0 0 8px rgba(0, 229, 255, 0.5)" : "none",
+            }}
+          />
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Staking Metric — with animated value counter
+   Power Output Card — staking metric as cascade card
    ═══════════════════════════════════════════════ */
 
-const STAKING_METRICS = [
-  { label: "Total Staked", value: "42.8M", suffix: "TON" },
-  { label: "Staking APR", value: "8.2", suffix: "%" },
-  { label: "Validators", value: "127", suffix: "" },
-] as const;
-
-function StakingMetric({
+function PowerOutputCard({
   metric,
   index,
 }: {
   metric: (typeof STAKING_METRICS)[number];
   index: number;
 }) {
-  const CHAMFER = 10;
-
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
+      initial={{ opacity: 0, x: 16 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
-      className="relative"
+      transition={{ duration: 0.4, delay: 0.5 + index * 0.12 }}
+      className="relative flex flex-col items-center justify-center overflow-hidden"
       style={{
-        width: "clamp(120px, 11vw, 170px)",
-        padding: "clamp(10px, 1vw, 14px) clamp(12px, 1.1vw, 16px)",
-        background:
-          "linear-gradient(180deg, rgba(4, 14, 28, 0.85) 0%, rgba(2, 8, 18, 0.8) 100%)",
-        clipPath: `polygon(0 0, calc(100% - ${CHAMFER}px) 0, 100% ${CHAMFER}px, 100% 100%, 0 100%)`,
-        backdropFilter: "blur(10px)",
-        boxShadow:
-          "0 2px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 229, 255, 0.06), inset 0 1px 0 rgba(0, 229, 255, 0.15)",
+        width: "clamp(140px, 12vw, 195px)",
+        height: "clamp(110px, 10vw, 150px)",
+        background: "rgba(5, 10, 20, 0.80)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+        border: "1px solid rgba(42, 114, 229, 0.3)",
+        borderRadius: 8,
       }}
     >
-      {/* Animated top accent with sweep */}
-      <div className="absolute pointer-events-none overflow-hidden" style={{ top: -1, left: 0, right: CHAMFER, height: 2 }}>
-        <div style={{ width: "100%", height: "100%", background: "rgba(0, 229, 255, 0.3)" }} />
-        <motion.div
-          animate={{ x: ["-100%", "200%"] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: index * 0.5 }}
+      {/* Cascade bars */}
+      {[0, 1, 2, 3, 4].map((i) => (
+        <div
+          key={i}
+          className="absolute left-0 right-0 pointer-events-none"
           style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "40%",
-            height: "100%",
-            background: "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.9), transparent)",
-            boxShadow: "0 0 10px rgba(0, 229, 255, 0.6)",
+            top: `${15 + i * 15}%`,
+            height: 3,
+            background: "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.7), transparent)",
+            boxShadow: "0 0 12px rgba(0, 229, 255, 0.5)",
+            animation: "cascadePulse 2s ease-in-out infinite",
+            animationDelay: `${i * 0.2}s`,
           }}
         />
-      </div>
+      ))}
 
-      {/* Label */}
+      {/* Top accent */}
       <div
-        className="uppercase font-bold tracking-wider"
+        className="absolute top-0 left-0 right-0 pointer-events-none"
         style={{
-          fontSize: "clamp(7px, 0.6vw, 10px)",
-          color: "rgba(0, 229, 255, 0.7)",
-          fontFamily: "'Share Tech Mono', monospace",
-          letterSpacing: "0.14em",
-          paddingBottom: "clamp(4px, 0.4vw, 6px)",
-          marginBottom: "clamp(4px, 0.4vw, 6px)",
-          borderBottom: "1px solid rgba(0, 229, 255, 0.1)",
-          textShadow: "0 0 6px rgba(0, 229, 255, 0.3)",
+          height: 2,
+          background: "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.6), transparent)",
         }}
-      >
-        {metric.label}
-      </div>
+      />
 
       {/* Value */}
-      <div className="flex items-baseline gap-1">
-        <motion.span
-          className="font-bold"
-          animate={{ textShadow: [
-            "0 0 16px rgba(0, 229, 255, 0.15)",
-            "0 0 24px rgba(0, 229, 255, 0.35)",
-            "0 0 16px rgba(0, 229, 255, 0.15)",
-          ]}}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: index * 0.4 }}
-          style={{
-            fontSize: "clamp(16px, 1.8vw, 28px)",
-            color: "#fff",
-            fontFamily: "'Orbitron', sans-serif",
-            letterSpacing: "0.02em",
-            lineHeight: 1.1,
-          }}
-        >
-          {metric.value}
-        </motion.span>
+      <div
+        style={{
+          fontSize: "clamp(20px, 2.2vw, 34px)",
+          fontFamily: "'Orbitron', sans-serif",
+          fontWeight: 900,
+          color: "#fff",
+          textShadow:
+            "0 0 12px rgba(0, 229, 255, 1), 0 0 24px rgba(0, 229, 255, 0.7), 0 0 36px rgba(0, 229, 255, 0.5)",
+          zIndex: 1,
+          marginBottom: 4,
+          letterSpacing: "0.02em",
+        }}
+      >
+        {metric.value}
         {metric.suffix && (
           <span
             style={{
-              fontSize: "clamp(8px, 0.7vw, 11px)",
-              color: "rgba(0, 229, 255, 0.5)",
-              fontFamily: "'Share Tech Mono', monospace",
-              letterSpacing: "0.1em",
+              fontSize: "0.45em",
+              color: "rgba(0, 229, 255, 0.7)",
+              marginLeft: 4,
+              letterSpacing: "0.08em",
             }}
           >
             {metric.suffix}
           </span>
         )}
       </div>
+
+      {/* Label */}
+      <div
+        style={{
+          fontSize: "clamp(8px, 0.65vw, 11px)",
+          textTransform: "uppercase",
+          letterSpacing: "0.15em",
+          color: "rgba(122, 140, 168, 0.9)",
+          fontFamily: "'Share Tech Mono', monospace",
+          zIndex: 1,
+        }}
+      >
+        {metric.label}
+      </div>
     </motion.div>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Governance Stats Row
+   Governance Stats Row — compact pillars
    ═══════════════════════════════════════════════ */
 
-function GovernanceStats() {
-  const stats = [
-    { label: "Active Proposals", value: "3" },
-    { label: "Total Voters", value: "2,841" },
-    { label: "Quorum", value: "45%" },
-  ];
-
+function GovernanceStatsRow() {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 1.0 }}
-      className="flex gap-4"
+      className="flex items-stretch justify-center"
+      style={{ gap: "clamp(4px, 0.5vw, 8px)" }}
     >
-      {stats.map((stat, i) => (
-        <div key={stat.label} className="flex flex-col items-center">
+      {GOV_STATS.map((stat, i) => (
+        <div
+          key={stat.label}
+          className="relative flex flex-col items-center justify-center"
+          style={{
+            padding: "clamp(8px, 0.8vw, 12px) clamp(10px, 1vw, 16px)",
+            background: "rgba(2, 10, 22, 0.9)",
+            border: "1px solid rgba(0, 229, 255, 0.2)",
+            minWidth: "clamp(60px, 5.5vw, 90px)",
+          }}
+        >
+          {/* Top accent */}
+          <div
+            className="absolute top-0 left-0 right-0 pointer-events-none"
+            style={{
+              height: 1,
+              background: "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.5), transparent)",
+            }}
+          />
           <motion.span
             animate={{
               textShadow: [
                 "0 0 6px rgba(0, 229, 255, 0.1)",
-                "0 0 14px rgba(0, 229, 255, 0.3)",
+                "0 0 14px rgba(0, 229, 255, 0.35)",
                 "0 0 6px rgba(0, 229, 255, 0.1)",
               ],
             }}
             transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
             style={{
-              fontSize: "clamp(14px, 1.4vw, 22px)",
+              fontSize: "clamp(13px, 1.3vw, 20px)",
               color: "#fff",
               fontFamily: "'Orbitron', sans-serif",
               fontWeight: 700,
+              lineHeight: 1,
             }}
           >
             {stat.value}
@@ -618,9 +429,11 @@ function GovernanceStats() {
               fontSize: "clamp(6px, 0.5vw, 9px)",
               color: "rgba(140, 200, 255, 0.5)",
               fontFamily: "'Share Tech Mono', monospace",
-              letterSpacing: "0.12em",
+              letterSpacing: "0.1em",
               textTransform: "uppercase",
-              marginTop: 2,
+              marginTop: 4,
+              textAlign: "center",
+              lineHeight: 1.2,
             }}
           >
             {stat.label}
@@ -632,121 +445,71 @@ function GovernanceStats() {
 }
 
 /* ═══════════════════════════════════════════════
-   CTA Buttons
-   ═══════════════════════════════════════════════ */
-
-function CTAButton({
-  label,
-  href,
-  variant = "primary",
-  delay,
-}: {
-  label: string;
-  href: string;
-  variant?: "primary" | "secondary";
-  delay: number;
-}) {
-  const isPrimary = variant === "primary";
-
-  return (
-    <motion.a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
-      className="relative inline-flex items-center justify-center cursor-pointer"
-      style={{
-        padding: "clamp(8px, 0.8vw, 12px) clamp(20px, 2.2vw, 36px)",
-        background: isPrimary
-          ? "linear-gradient(180deg, rgba(0, 229, 255, 0.12) 0%, rgba(0, 229, 255, 0.04) 100%)"
-          : "linear-gradient(180deg, rgba(42, 114, 229, 0.1) 0%, rgba(42, 114, 229, 0.03) 100%)",
-        border: isPrimary
-          ? "1px solid rgba(0, 229, 255, 0.4)"
-          : "1px solid rgba(42, 114, 229, 0.3)",
-        fontFamily: "'Share Tech Mono', monospace",
-        fontSize: "clamp(9px, 0.75vw, 12px)",
-        color: isPrimary ? "#00e5ff" : "#8cc8ff",
-        letterSpacing: "0.18em",
-        fontWeight: 700,
-        textTransform: "uppercase",
-        textDecoration: "none",
-        textShadow: isPrimary
-          ? "0 0 10px rgba(0, 229, 255, 0.5)"
-          : "0 0 8px rgba(42, 114, 229, 0.3)",
-        boxShadow: isPrimary
-          ? "0 0 20px rgba(0, 229, 255, 0.1), inset 0 0 20px rgba(0, 229, 255, 0.05)"
-          : "0 0 15px rgba(42, 114, 229, 0.08)",
-        transition: "all 0.3s ease",
-      }}
-      whileHover={{
-        boxShadow: isPrimary
-          ? "0 0 30px rgba(0, 229, 255, 0.25), inset 0 0 30px rgba(0, 229, 255, 0.1)"
-          : "0 0 25px rgba(42, 114, 229, 0.2), inset 0 0 20px rgba(42, 114, 229, 0.08)",
-        borderColor: isPrimary
-          ? "rgba(0, 229, 255, 0.7)"
-          : "rgba(42, 114, 229, 0.6)",
-      }}
-    >
-      {/* Corner brackets */}
-      {[
-        "top-0 left-0 border-t border-l",
-        "top-0 right-0 border-t border-r",
-        "bottom-0 left-0 border-b border-l",
-        "bottom-0 right-0 border-b border-r",
-      ].map((pos) => (
-        <span
-          key={pos}
-          className={`absolute w-2 h-2 pointer-events-none ${pos}`}
-          style={{
-            borderColor: isPrimary
-              ? "rgba(0, 229, 255, 0.7)"
-              : "rgba(42, 114, 229, 0.5)",
-            borderWidth: 1.5,
-          }}
-        />
-      ))}
-      {label}
-    </motion.a>
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   Energy Flow Lines — CSS animated connection
+   Energy Flow Lines — radiating outward from center
    ═══════════════════════════════════════════════ */
 
 function EnergyFlowLines() {
   return (
     <div className="absolute inset-0 pointer-events-none z-[4] overflow-hidden">
-      {[35, 50, 65].map((top, i) => (
-        <div
-          key={i}
-          className="absolute overflow-hidden"
-          style={{
-            top: `${top}%`,
-            left: "20%",
-            right: "20%",
-            height: 1,
-            background: "rgba(0, 229, 255, 0.05)",
-          }}
-        >
-          <motion.div
-            animate={{ x: ["100%", "-100%"] }}
-            transition={{
-              duration: 4 + i,
-              repeat: Infinity,
-              ease: "linear",
-              delay: i * 0.7,
-            }}
+      {/* Horizontal lines — radiating left and right from center */}
+      {[38, 50, 62].map((top, i) => (
+        <div key={`h-${i}`}>
+          {/* Left ray — center to left */}
+          <div
+            className="absolute overflow-hidden"
             style={{
-              width: "30%",
-              height: "100%",
-              background:
-                "linear-gradient(270deg, transparent, rgba(0, 229, 255, 0.4), transparent)",
-              boxShadow: "0 0 8px rgba(0, 229, 255, 0.2)",
+              top: `${top}%`,
+              left: "10%",
+              width: "35%",
+              height: 1,
+              background: "rgba(0, 229, 255, 0.05)",
             }}
-          />
+          >
+            <motion.div
+              animate={{ x: ["0%", "-120%"] }}
+              transition={{
+                duration: 3.5 + i,
+                repeat: Infinity,
+                ease: "linear",
+                delay: i * 0.6,
+              }}
+              style={{
+                width: "30%",
+                height: "100%",
+                background:
+                  "linear-gradient(270deg, rgba(0, 229, 255, 0.45), transparent)",
+                boxShadow: "0 0 8px rgba(0, 229, 255, 0.2)",
+              }}
+            />
+          </div>
+          {/* Right ray — center to right */}
+          <div
+            className="absolute overflow-hidden"
+            style={{
+              top: `${top}%`,
+              right: "10%",
+              width: "35%",
+              height: 1,
+              background: "rgba(0, 229, 255, 0.05)",
+            }}
+          >
+            <motion.div
+              animate={{ x: ["0%", "120%"] }}
+              transition={{
+                duration: 3.5 + i,
+                repeat: Infinity,
+                ease: "linear",
+                delay: i * 0.6 + 0.3,
+              }}
+              style={{
+                width: "30%",
+                height: "100%",
+                background:
+                  "linear-gradient(90deg, rgba(0, 229, 255, 0.45), transparent)",
+                boxShadow: "0 0 8px rgba(0, 229, 255, 0.2)",
+              }}
+            />
+          </div>
         </div>
       ))}
     </div>
@@ -754,34 +517,175 @@ function EnergyFlowLines() {
 }
 
 /* ═══════════════════════════════════════════════
-   Mobile Overlay — simplified, no 3D
+   Reactor CTA Buttons — primary with strong glow pulse
+   ═══════════════════════════════════════════════ */
+
+function ReactorCTAPrimary() {
+  return (
+    <motion.a
+      href="https://staking.tokamak.network"
+      target="_blank"
+      rel="noopener noreferrer"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, delay: 1.1 }}
+      className="relative inline-flex items-center justify-center cursor-pointer"
+      style={{
+        padding: "clamp(14px, 1.4vw, 20px) clamp(40px, 4vw, 60px)",
+        background: "linear-gradient(180deg, rgba(0, 40, 60, 0.95) 0%, rgba(5, 25, 50, 0.95) 100%)",
+        border: "2px solid rgba(0, 229, 255, 0.9)",
+        fontFamily: "'Orbitron', sans-serif",
+        fontSize: "clamp(12px, 1.1vw, 16px)",
+        color: "#fff",
+        letterSpacing: "0.18em",
+        fontWeight: 700,
+        textTransform: "uppercase",
+        textDecoration: "none",
+        textShadow: "0 0 20px rgba(0, 229, 255, 1), 0 0 40px rgba(0, 229, 255, 0.6)",
+        boxShadow:
+          "0 0 40px rgba(0, 229, 255, 0.35), 0 0 80px rgba(0, 229, 255, 0.15), 0 0 120px rgba(0, 229, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 0 30px rgba(0, 229, 255, 0.15)",
+        transition: "all 0.3s ease",
+      }}
+      whileHover={{
+        boxShadow:
+          "0 0 40px rgba(0, 229, 255, 0.4), 0 0 80px rgba(0, 229, 255, 0.2), 0 0 120px rgba(0, 229, 255, 0.1), inset 0 0 40px rgba(0, 229, 255, 0.15)",
+        borderColor: "#00e5ff",
+        background: "linear-gradient(180deg, rgba(0, 229, 255, 0.35) 0%, rgba(42, 114, 229, 0.2) 100%)",
+      }}
+    >
+      {/* Pulsing glow overlay */}
+      <span
+        className="absolute pointer-events-none"
+        style={{
+          inset: "-10px -20px",
+          background:
+            "radial-gradient(ellipse at center, rgba(0, 229, 255, 0.5) 0%, rgba(0, 229, 255, 0.15) 50%, transparent 75%)",
+          animation: "ctaGlowPulse 2s ease-in-out infinite",
+          borderRadius: 8,
+        }}
+      />
+      {/* Corner brackets */}
+      {[
+        { top: -1, left: -1, borderTop: "2px solid #00e5ff", borderLeft: "2px solid #00e5ff" },
+        { top: -1, right: -1, borderTop: "2px solid #00e5ff", borderRight: "2px solid #00e5ff" },
+        { bottom: -1, left: -1, borderBottom: "2px solid #00e5ff", borderLeft: "2px solid #00e5ff" },
+        { bottom: -1, right: -1, borderBottom: "2px solid #00e5ff", borderRight: "2px solid #00e5ff" },
+      ].map((s, i) => (
+        <span key={i} className="absolute w-3 h-3 pointer-events-none" style={s as React.CSSProperties} />
+      ))}
+      <span style={{ position: "relative", zIndex: 1 }}>Stake TON</span>
+    </motion.a>
+  );
+}
+
+function ReactorCTASecondary() {
+  return (
+    <motion.a
+      href="https://dao.tokamak.network"
+      target="_blank"
+      rel="noopener noreferrer"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, delay: 1.2 }}
+      className="relative inline-flex items-center justify-center cursor-pointer"
+      style={{
+        padding: "clamp(14px, 1.4vw, 20px) clamp(40px, 4vw, 60px)",
+        background: "linear-gradient(180deg, rgba(10, 20, 50, 0.9) 0%, rgba(5, 15, 40, 0.9) 100%)",
+        border: "2px solid rgba(42, 114, 229, 0.6)",
+        fontFamily: "'Orbitron', sans-serif",
+        fontSize: "clamp(12px, 1.1vw, 16px)",
+        color: "#8cc8ff",
+        letterSpacing: "0.18em",
+        fontWeight: 700,
+        textTransform: "uppercase",
+        textDecoration: "none",
+        textShadow: "0 0 14px rgba(42, 114, 229, 0.6)",
+        boxShadow:
+          "0 0 25px rgba(42, 114, 229, 0.2), inset 0 1px 0 rgba(140, 200, 255, 0.1)",
+        transition: "all 0.3s ease",
+      }}
+      whileHover={{
+        boxShadow:
+          "0 0 35px rgba(42, 114, 229, 0.35), inset 0 0 30px rgba(42, 114, 229, 0.1)",
+        borderColor: "rgba(42, 114, 229, 0.9)",
+      }}
+    >
+      {/* Corner brackets */}
+      {[
+        { top: -1, left: -1, borderTop: "2px solid rgba(42, 114, 229, 0.8)", borderLeft: "2px solid rgba(42, 114, 229, 0.8)" },
+        { top: -1, right: -1, borderTop: "2px solid rgba(42, 114, 229, 0.8)", borderRight: "2px solid rgba(42, 114, 229, 0.8)" },
+        { bottom: -1, left: -1, borderBottom: "2px solid rgba(42, 114, 229, 0.8)", borderLeft: "2px solid rgba(42, 114, 229, 0.8)" },
+        { bottom: -1, right: -1, borderBottom: "2px solid rgba(42, 114, 229, 0.8)", borderRight: "2px solid rgba(42, 114, 229, 0.8)" },
+      ].map((s, i) => (
+        <span key={i} className="absolute w-3 h-3 pointer-events-none" style={s as React.CSSProperties} />
+      ))}
+      <span style={{ position: "relative", zIndex: 1 }}>Vote Now</span>
+    </motion.a>
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   Bottom Control Panel — stats row + CTA buttons
+   ═══════════════════════════════════════════════ */
+
+function BottomControlPanel() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.6 }}
+      className="absolute z-10"
+      style={{
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "linear-gradient(180deg, transparent 0%, rgba(2, 8, 18, 0.7) 50%, rgba(2, 8, 18, 0.85) 100%)",
+        padding: "clamp(28px, 3.5vh, 50px) clamp(20px, 4vw, 60px) clamp(16px, 2vh, 28px)",
+      }}
+    >
+      <div className="flex flex-col items-center gap-4">
+        {/* Governance stats compact pillars */}
+        <GovernanceStatsRow />
+        {/* CTA buttons */}
+        <div className="flex items-center gap-4">
+          <ReactorCTAPrimary />
+          <ReactorCTASecondary />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   Mobile Overlay — simplified, flat, no 3D
    ═══════════════════════════════════════════════ */
 
 function GovernanceStakingMobileOverlay() {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center px-5 py-8 gap-5 overflow-y-auto">
+      <style dangerouslySetInnerHTML={{ __html: GLOBAL_KEYFRAMES }} />
+
       {/* Title */}
       <div className="flex flex-col items-center gap-1">
         <div
           style={{
-            fontSize: 10,
-            color: "rgba(140, 200, 255, 0.5)",
+            fontSize: 9,
+            color: "rgba(0, 229, 255, 0.5)",
             fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.18em",
+            letterSpacing: "0.25em",
             textTransform: "uppercase",
           }}
         >
-          Network Security
+          Reactor Core
         </div>
         <div
           style={{
             fontSize: 16,
-            color: "#00e5ff",
+            color: "#fff",
             fontFamily: "'Orbitron', sans-serif",
             fontWeight: 700,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            textShadow: "0 0 14px rgba(0, 229, 255, 0.5)",
+            letterSpacing: "0.08em",
+            textShadow: "0 0 14px rgba(0, 229, 255, 0.4)",
             textAlign: "center",
           }}
         >
@@ -789,21 +693,21 @@ function GovernanceStakingMobileOverlay() {
         </div>
         <div
           style={{
-            fontSize: 10,
+            fontSize: 9,
             color: "#22c55e",
             fontFamily: "'Share Tech Mono', monospace",
             letterSpacing: "0.12em",
           }}
         >
-          ● Active
+          ● REACTOR ONLINE
         </div>
       </div>
 
-      {/* Governance sub-section */}
+      {/* Reactor Log — proposals */}
       <div className="w-full max-w-xs flex flex-col gap-2">
         <div
           style={{
-            fontSize: 10,
+            fontSize: 9,
             color: "rgba(0, 229, 255, 0.7)",
             fontFamily: "'Orbitron', sans-serif",
             letterSpacing: "0.2em",
@@ -812,7 +716,7 @@ function GovernanceStakingMobileOverlay() {
             marginBottom: 2,
           }}
         >
-          Governance
+          Reactor Log
         </div>
         {PROPOSALS.map((proposal) => {
           const isActive = proposal.status === "active";
@@ -822,28 +726,31 @@ function GovernanceStakingMobileOverlay() {
               className="relative flex items-center justify-between px-3 py-2"
               style={{
                 background: isActive
-                  ? "linear-gradient(180deg, rgba(0, 229, 255, 0.1) 0%, rgba(4, 14, 28, 0.9) 100%)"
-                  : "linear-gradient(180deg, rgba(4, 14, 28, 0.85) 0%, rgba(2, 8, 18, 0.8) 100%)",
-                clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))",
-                border: "1px solid rgba(0, 229, 255, 0.12)",
+                  ? "rgba(0, 10, 20, 0.95)"
+                  : "rgba(5, 10, 20, 0.9)",
+                border: isActive
+                  ? "1px solid rgba(0, 229, 255, 0.3)"
+                  : "1px solid rgba(42, 114, 229, 0.2)",
                 minHeight: 44,
               }}
             >
               <div
                 className="absolute pointer-events-none"
                 style={{
-                  top: -1,
+                  top: 0,
                   left: 0,
-                  right: 6,
+                  right: 0,
                   height: 1,
-                  background: isActive ? "rgba(0, 229, 255, 0.5)" : "rgba(0, 229, 255, 0.2)",
+                  background: isActive
+                    ? "rgba(0, 229, 255, 0.5)"
+                    : "rgba(42, 114, 229, 0.3)",
                 }}
               />
               <div className="flex flex-col gap-0.5">
                 <span
                   style={{
                     fontSize: 9,
-                    color: isActive ? "#00e5ff" : "rgba(0, 229, 255, 0.5)",
+                    color: isActive ? "#00e5ff" : "rgba(0, 229, 255, 0.45)",
                     fontFamily: "'Share Tech Mono', monospace",
                     letterSpacing: "0.12em",
                   }}
@@ -863,17 +770,18 @@ function GovernanceStakingMobileOverlay() {
               <div className="flex flex-col items-end gap-0.5">
                 <span
                   style={{
-                    fontSize: 14,
+                    fontSize: 15,
                     color: "#fff",
                     fontFamily: "'Orbitron', sans-serif",
                     fontWeight: 700,
+                    textShadow: isActive ? "0 0 10px rgba(0, 229, 255, 0.6)" : "none",
                   }}
                 >
                   {proposal.votes}
                 </span>
                 <span
                   style={{
-                    fontSize: 9,
+                    fontSize: 8,
                     color: isActive ? "#22c55e" : "rgba(140, 200, 255, 0.4)",
                     fontFamily: "'Share Tech Mono', monospace",
                     textTransform: "uppercase",
@@ -888,11 +796,11 @@ function GovernanceStakingMobileOverlay() {
         })}
       </div>
 
-      {/* Staking sub-section */}
+      {/* Power Output — staking metrics */}
       <div className="w-full max-w-xs flex flex-col gap-2">
         <div
           style={{
-            fontSize: 10,
+            fontSize: 9,
             color: "rgba(0, 229, 255, 0.7)",
             fontFamily: "'Orbitron', sans-serif",
             letterSpacing: "0.2em",
@@ -901,67 +809,72 @@ function GovernanceStakingMobileOverlay() {
             marginBottom: 2,
           }}
         >
-          Staking
+          Power Output
         </div>
-        {STAKING_METRICS.map((metric) => (
-          <div
-            key={metric.label}
-            className="relative flex items-center justify-between px-3 py-2"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(4, 14, 28, 0.85) 0%, rgba(2, 8, 18, 0.8) 100%)",
-              clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)",
-              border: "1px solid rgba(0, 229, 255, 0.12)",
-              minHeight: 44,
-            }}
-          >
+        <div className="grid grid-cols-3 gap-2">
+          {STAKING_METRICS.map((metric) => (
             <div
-              className="absolute pointer-events-none"
+              key={metric.label}
+              className="relative flex flex-col items-center justify-center py-3"
               style={{
-                top: -1,
-                left: 0,
-                right: 8,
-                height: 1,
-                background: "rgba(0, 229, 255, 0.35)",
-              }}
-            />
-            <span
-              style={{
-                fontSize: 10,
-                color: "rgba(0, 229, 255, 0.7)",
-                fontFamily: "'Share Tech Mono', monospace",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
+                background: "rgba(5, 10, 20, 0.95)",
+                border: "1px solid rgba(42, 114, 229, 0.25)",
+                minHeight: 60,
               }}
             >
-              {metric.label}
-            </span>
-            <div className="flex items-baseline gap-1">
-              <span
+              <div
+                className="absolute pointer-events-none"
                 style={{
-                  fontSize: 18,
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 1,
+                  background: "rgba(0, 229, 255, 0.35)",
+                }}
+              />
+              <div
+                style={{
+                  fontSize: 16,
                   color: "#fff",
                   fontFamily: "'Orbitron', sans-serif",
                   fontWeight: 700,
-                  textShadow: "0 0 10px rgba(0, 229, 255, 0.3)",
+                  lineHeight: 1,
+                  textShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
                 }}
               >
                 {metric.value}
-              </span>
+              </div>
               {metric.suffix && (
-                <span
+                <div
                   style={{
-                    fontSize: 10,
-                    color: "rgba(0, 229, 255, 0.5)",
+                    fontSize: 8,
+                    color: "rgba(0, 229, 255, 0.6)",
                     fontFamily: "'Share Tech Mono', monospace",
+                    letterSpacing: "0.08em",
+                    marginTop: 2,
                   }}
                 >
                   {metric.suffix}
-                </span>
+                </div>
               )}
+              <div
+                style={{
+                  fontSize: 7,
+                  color: "rgba(122, 140, 168, 0.8)",
+                  fontFamily: "'Share Tech Mono', monospace",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  marginTop: 3,
+                  textAlign: "center",
+                  lineHeight: 1.2,
+                  padding: "0 4px",
+                }}
+              >
+                {metric.label}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* CTA buttons */}
@@ -970,21 +883,22 @@ function GovernanceStakingMobileOverlay() {
           href="https://staking.tokamak.network"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center"
+          className="relative inline-flex items-center justify-center"
           style={{
             padding: "12px 24px",
             minHeight: 44,
             background:
-              "linear-gradient(180deg, rgba(0, 229, 255, 0.12) 0%, rgba(0, 229, 255, 0.04) 100%)",
-            border: "1px solid rgba(0, 229, 255, 0.4)",
-            fontFamily: "'Share Tech Mono', monospace",
+              "linear-gradient(180deg, rgba(0, 40, 60, 0.9) 0%, rgba(5, 25, 50, 0.9) 100%)",
+            border: "1px solid rgba(0, 229, 255, 0.6)",
+            fontFamily: "'Orbitron', sans-serif",
             fontSize: 11,
-            color: "#00e5ff",
+            color: "#fff",
             letterSpacing: "0.18em",
             fontWeight: 700,
             textTransform: "uppercase",
             textDecoration: "none",
-            textShadow: "0 0 10px rgba(0, 229, 255, 0.5)",
+            textShadow: "0 0 10px rgba(0, 229, 255, 0.8)",
+            boxShadow: "0 0 20px rgba(0, 229, 255, 0.2)",
           }}
         >
           Stake TON
@@ -998,15 +912,16 @@ function GovernanceStakingMobileOverlay() {
             padding: "12px 24px",
             minHeight: 44,
             background:
-              "linear-gradient(180deg, rgba(42, 114, 229, 0.1) 0%, rgba(42, 114, 229, 0.03) 100%)",
-            border: "1px solid rgba(42, 114, 229, 0.3)",
-            fontFamily: "'Share Tech Mono', monospace",
+              "linear-gradient(180deg, rgba(10, 20, 50, 0.9) 0%, rgba(5, 15, 40, 0.9) 100%)",
+            border: "1px solid rgba(42, 114, 229, 0.5)",
+            fontFamily: "'Orbitron', sans-serif",
             fontSize: 11,
             color: "#8cc8ff",
             letterSpacing: "0.18em",
             fontWeight: 700,
             textTransform: "uppercase",
             textDecoration: "none",
+            textShadow: "0 0 8px rgba(42, 114, 229, 0.5)",
           }}
         >
           Vote Now
@@ -1033,81 +948,67 @@ export default function GovernanceStakingOverlay() {
         <div className="absolute inset-0">
           <HeaderBar />
 
-          {/* Section labels */}
-          <SectionLabel label="Governance" side="left" />
-          <SectionLabel label="Staking" side="right" />
+          {/* 3D Token Vortex — center focal element */}
+          <LazyWebGL style={{ position: "absolute", inset: 0 }}>
+            <TokenVortex />
+          </LazyWebGL>
 
-          {/* 3D Particle Bridge — center focal element */}
-          <TokenVortex />
-
-          {/* CSS Energy flow lines */}
+          {/* Energy flow lines — radiating from center */}
           <EnergyFlowLines />
 
-          {/* Governance seal — rotating mandala */}
-          <GovernanceSeal />
-
-          {/* Left — Floating proposal cards */}
+          {/* Occlusion layer — same bg image on top of particles, center masked out.
+              Pillars and structural elements cover particles for depth/parallax effect. */}
           <div
-            className="absolute z-10 flex flex-col items-center"
+            className="absolute inset-0 pointer-events-none"
             style={{
-              left: "clamp(30px, 8vw, 120px)",
-              top: "46%",
-              transform: "translateY(-50%)",
-              gap: "clamp(6px, 0.6vw, 10px)",
+              zIndex: 7,
+              maskImage:
+                "radial-gradient(ellipse 38% 40% at 50% 46%, transparent 50%, black 68%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse 38% 40% at 50% 46%, transparent 50%, black 68%)",
             }}
           >
-            <div
-              className="flex flex-col"
-              style={{ gap: "clamp(6px, 0.6vw, 10px)" }}
-            >
-              {PROPOSALS.map((proposal, i) => (
-                <ProposalCard key={proposal.id} proposal={proposal} index={i} />
-              ))}
-            </div>
-            <div style={{ marginTop: "clamp(8px, 1vw, 16px)" }}>
-              <GovernanceStats />
-            </div>
+            <Image
+              src="/tower/floor-governance-staking.png"
+              alt=""
+              fill
+              className="object-cover md:object-contain"
+              sizes="(max-width: 1400px) 100vw, 1400px"
+            />
           </div>
 
-          {/* Right — Crystal matrix + staking metrics */}
+          {/* Left — Reactor Log (proposal cascade cards) */}
           <div
-            className="absolute z-10 flex items-center"
+            className="absolute z-10 flex flex-col"
             style={{
-              right: "clamp(16px, 4vw, 60px)",
+              left: "clamp(16px, 5vw, 70px)",
               top: "46%",
               transform: "translateY(-50%)",
-              gap: "clamp(10px, 1.2vw, 20px)",
+              gap: "clamp(6px, 0.7vw, 10px)",
             }}
           >
-            {/* Staking metrics */}
-            <div className="flex flex-col" style={{ gap: "clamp(8px, 1vw, 14px)" }}>
-              {STAKING_METRICS.map((metric, i) => (
-                <StakingMetric key={metric.label} metric={metric} index={i} />
-              ))}
-            </div>
-
-            {/* Crystal hex grid */}
-            <CrystalMatrix />
+            {PROPOSALS.map((proposal, i) => (
+              <ReactorLogCard key={proposal.id} proposal={proposal} index={i} />
+            ))}
           </div>
 
-          {/* Bottom CTAs */}
+          {/* Right — Power Output (staking cascade cards) */}
           <div
-            className="absolute z-10 flex items-center justify-center gap-4"
-            style={{ left: 0, right: 0, bottom: "clamp(30px, 6vh, 60px)" }}
+            className="absolute z-10 flex flex-col"
+            style={{
+              right: "clamp(16px, 5vw, 70px)",
+              top: "46%",
+              transform: "translateY(-50%)",
+              gap: "clamp(6px, 0.7vw, 10px)",
+            }}
           >
-            <CTAButton
-              label="Stake TON"
-              href="https://staking.tokamak.network"
-              variant="primary"
-              delay={1.2}
-            />
-            <CTAButton
-              label="Vote Now"
-              href="https://dao.tokamak.network"
-              variant="secondary"
-              delay={1.3}
-            />
+            {STAKING_METRICS.map((metric, i) => (
+              <PowerOutputCard key={metric.label} metric={metric} index={i} />
+            ))}
           </div>
+
+          {/* Bottom — governance stats + CTA buttons */}
+          <BottomControlPanel />
         </div>
       </div>
     </div>

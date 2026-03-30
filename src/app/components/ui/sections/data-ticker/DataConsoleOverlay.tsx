@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import LazyWebGL from "../../LazyWebGL";
 import { Canvas, useFrame, RootState } from "@react-three/fiber";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { Mesh, CanvasTexture, RepeatWrapping, AdditiveBlending, DoubleSide, Group } from "three";
@@ -693,7 +694,9 @@ export default function DataConsoleOverlay({ items }: { items: TickerItem[] }) {
           <HeaderBar />
 
           {/* Central holographic sphere */}
-          <HoloSphere />
+          <LazyWebGL>
+            <HoloSphere />
+          </LazyWebGL>
 
           {/* Left metric panels */}
           <div

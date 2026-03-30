@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
+import LazyWebGL from "../../LazyWebGL";
 
 const TokamakGate = dynamic(() => import("./TokamakGate"), { ssr: false });
 
@@ -455,7 +456,9 @@ export default function ThanosL2Overlay() {
           <HeaderBar />
 
           {/* 3D holographic torus — pure mesh */}
-          <TokamakGate />
+          <LazyWebGL style={{ position: "absolute", inset: 0 }}>
+            <TokamakGate />
+          </LazyWebGL>
 
           {/* Left specs */}
           <div

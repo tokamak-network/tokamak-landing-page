@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 
-const ParticleBridge = dynamic(() => import("./ParticleBridge"), { ssr: false });
+const TokenVortex = dynamic(() => import("./TokenVortex"), { ssr: false });
 
 /* ═══════════════════════════════════════════════
    Header Bar
@@ -1038,7 +1038,7 @@ export default function GovernanceStakingOverlay() {
           <SectionLabel label="Staking" side="right" />
 
           {/* 3D Particle Bridge — center focal element */}
-          <ParticleBridge />
+          <TokenVortex />
 
           {/* CSS Energy flow lines */}
           <EnergyFlowLines />

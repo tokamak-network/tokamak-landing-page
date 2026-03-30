@@ -99,7 +99,7 @@ export default function TowerFoundation() {
           src="/tower/floor-foundation.png"
           alt="Tower foundation — Tokamak Network built on Ethereum"
           fill
-          className="object-cover object-top"
+          className="object-cover object-center"
           sizes="100vw"
         />
         {/* Top fade to black */}

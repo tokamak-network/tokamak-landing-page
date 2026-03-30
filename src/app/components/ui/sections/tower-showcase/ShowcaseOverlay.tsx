@@ -56,16 +56,16 @@ export default function ShowcaseOverlay({
   const selectedCat = selectedIdx !== null ? categories[selectedIdx] : null;
 
   const pedestals = [
-    { left: 9,    badgeTop: 36,   labelTop: 60 },
-    { left: 18,   badgeTop: 33,   labelTop: 56 },
-    { left: 27,   badgeTop: 30,   labelTop: 53 },
-    { left: 35.5, badgeTop: 28.5, labelTop: 51.5 },
-    { left: 44,   badgeTop: 27,   labelTop: 50.5 },
-    { left: 53,   badgeTop: 27,   labelTop: 50.5 },
-    { left: 61.5, badgeTop: 28.5, labelTop: 51.5 },
-    { left: 70,   badgeTop: 30,   labelTop: 53 },
-    { left: 79,   badgeTop: 33,   labelTop: 56 },
-    { left: 88,   badgeTop: 36,   labelTop: 60 },
+    { badgeLeft: 11.5, badgeTop: 31,   labelLeft: 12.5, labelTop: 57.5 },  // cab 1 ✅
+    { badgeLeft: 20.5, badgeTop: 29,   labelLeft: 21,   labelTop: 53 },    // cab 2
+    { badgeLeft: 28.5, badgeTop: 26,   labelLeft: 29,   labelTop: 49.5 },  // cab 3
+    { badgeLeft: 36.5, badgeTop: 24,   labelLeft: 36.5, labelTop: 47 },    // cab 4
+    { badgeLeft: 44.5, badgeTop: 23,   labelLeft: 44.5, labelTop: 46 },    // cab 5
+    { badgeLeft: 53.5, badgeTop: 23,   labelLeft: 53.5, labelTop: 46 },    // cab 6 ✅
+    { badgeLeft: 62,   badgeTop: 24,   labelLeft: 62,   labelTop: 47 },    // cab 7 ✅
+    { badgeLeft: 69.5, badgeTop: 26,   labelLeft: 69,   labelTop: 49.5 },  // cab 8
+    { badgeLeft: 77,   badgeTop: 29,   labelLeft: 76.5, labelTop: 53 },    // cab 9
+    { badgeLeft: 84.5, badgeTop: 31,   labelLeft: 83.5, labelTop: 57.5 },  // cab 10
   ];
 
   return (
@@ -82,7 +82,7 @@ export default function ShowcaseOverlay({
               onClick={() => handlePedestalClick(i)}
               className="absolute cursor-pointer"
               style={{
-                left: `${pos.left}%`,
+                left: `${pos.badgeLeft}%`,
                 top: `${pos.badgeTop}%`,
                 transform: "translateX(-50%)",
                 width: "clamp(56px, 7.5vw, 110px)",
@@ -99,7 +99,7 @@ export default function ShowcaseOverlay({
             <div
               className="absolute flex items-center justify-center pointer-events-none"
               style={{
-                left: `${pos.left}%`,
+                left: `${pos.badgeLeft}%`,
                 top: `${pos.badgeTop}%`,
                 transform: "translateX(-50%)",
                 width: "clamp(56px, 7.5vw, 110px)",
@@ -136,7 +136,7 @@ export default function ShowcaseOverlay({
             <div
               className="absolute text-center pointer-events-none"
               style={{
-                left: `${pos.left}%`,
+                left: `${pos.labelLeft}%`,
                 top: `${pos.labelTop}%`,
                 transform: "translateX(-50%)",
                 width: "clamp(55px, 7.5vw, 110px)",

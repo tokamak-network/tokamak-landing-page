@@ -61,7 +61,7 @@ export default function Home() {
       {/* Tower Floor 0 (Bottom): Governance & Staking */}
       <TowerFloor
         bgImage="/tower/floor-governance-staking.png"
-        bgAlt="Tower floor 0 — governance voting chamber and staking crystal matrix"
+        bgAlt="Tower floor 0 — radial grid platform for governance and staking vortex"
         isLast
       >
         <GovernanceStakingOverlay />

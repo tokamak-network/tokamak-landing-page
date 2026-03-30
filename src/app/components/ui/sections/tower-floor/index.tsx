@@ -4,10 +4,10 @@ import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 
 interface TowerFloorProps {
-  /** Background image path from /public */
-  bgImage: string;
+  /** Background image path from /public (omit for pure black bg) */
+  bgImage?: string;
   /** Alt text for the background image */
-  bgAlt: string;
+  bgAlt?: string;
   /** Content to overlay on the floor */
   children: React.ReactNode;
   /** Whether this is the first floor (no top fade) */
@@ -18,7 +18,7 @@ interface TowerFloorProps {
 
 export default function TowerFloor({
   bgImage,
-  bgAlt,
+  bgAlt = "",
   children,
   isFirst = false,
   isLast = false,
@@ -56,14 +56,16 @@ export default function TowerFloor({
           }}
         >
           <div className="relative w-full h-[70vh] md:h-auto md:aspect-video">
-            <Image
-              src={bgImage}
-              alt={bgAlt}
-              fill
-              className="object-cover md:object-contain"
-              sizes="(max-width: 1400px) 100vw, 1400px"
-              priority={isFirst}
-            />
+            {bgImage && (
+              <Image
+                src={bgImage}
+                alt={bgAlt}
+                fill
+                className="object-cover md:object-contain"
+                sizes="(max-width: 1400px) 100vw, 1400px"
+                priority={isFirst}
+              />
+            )}
 
             {/* Content overlay */}
             <div className="absolute inset-0 flex items-center justify-center">

@@ -8,6 +8,7 @@ import TowerShowcase from "./components/ui/sections/tower-showcase";
 import DataConsoleContent from "./components/ui/sections/data-ticker/DataConsoleContent";
 import ThanosL2Overlay from "./components/ui/sections/thanos-l2";
 import GovernanceStakingOverlay from "./components/ui/sections/governance-staking";
+import TowerFoundation from "./components/ui/sections/tower-foundation";
 export default function Home() {
   return (
     <main className="bg-black min-h-screen">
@@ -65,6 +66,12 @@ export default function Home() {
       >
         <GovernanceStakingOverlay />
       </TowerFloor>
+
+      {/* Floor transition indicator */}
+      <FloorIndicator floor={-1} label="Foundation · Built on Ethereum" />
+
+      {/* Foundation — Footer with Ethereum base */}
+      <TowerFoundation />
     </main>
   );
 }

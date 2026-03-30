@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import Image from "next/image";
+
 
 const TokamakGate = dynamic(() => import("./TokamakGate"), { ssr: false });
 
@@ -306,59 +306,7 @@ export default function ThanosL2Overlay() {
     <div className="absolute inset-0">
       <HeaderBar />
 
-      {/* Holographic torus asset — animated */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          left: "50%",
-          top: "38%",
-          transform: "translate(-50%, -50%)",
-          width: "clamp(280px, 42vw, 560px)",
-          height: "clamp(200px, 30vw, 400px)",
-          zIndex: 4,
-        }}
-      >
-        {/* Slow rotation for movement feel */}
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            animation: "torusSpin 6s ease-in-out infinite",
-          }}
-        >
-          <Image
-            src="/tower/torus-glow.png"
-            alt=""
-            fill
-            className="object-contain"
-            priority
-          />
-        </div>
-
-        {/* Shimmer scanline overlay */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(180deg, transparent 0%, rgba(0, 229, 255, 0.08) 48%, rgba(0, 229, 255, 0.15) 50%, rgba(0, 229, 255, 0.08) 52%, transparent 100%)",
-            backgroundSize: "100% 200%",
-            animation: "torusScanline 3s ease-in-out infinite",
-            mixBlendMode: "screen",
-          }}
-        />
-
-        {/* Pulsing glow aura */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse at center, rgba(0, 229, 255, 0.12) 0%, transparent 60%)",
-            animation: "torusPulse 4s ease-in-out infinite",
-          }}
-        />
-      </div>
-
-      {/* 3D particle effects overlay */}
+      {/* 3D holographic torus — full section like Data Console */}
       <TokamakGate />
 
       {/* Left metrics */}

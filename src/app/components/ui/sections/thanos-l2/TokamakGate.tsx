@@ -269,10 +269,6 @@ function CoreGlow() {
     <>
       <pointLight position={[0, 0, 0]} intensity={1.5} color="#00e5ff" distance={5} />
       <pointLight position={[0, 0, 0]} intensity={0.8} color="#2a72e5" distance={7} />
-      <mesh>
-        <sphereGeometry args={[0.08, 16, 16]} />
-        <meshBasicMaterial color="#00e5ff" transparent opacity={0.9} />
-      </mesh>
     </>
   );
 }

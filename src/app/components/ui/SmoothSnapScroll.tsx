@@ -3,7 +3,8 @@
 import { useEffect, useRef, useCallback } from "react";
 
 const SCROLL_DURATION = 1400;
-const DEBOUNCE_WINDOW = 200;
+const COOLDOWN = 1200;
+const TRACKPAD_THRESHOLD = 5;
 
 function easeInOutQuart(t: number): number {
   return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
@@ -11,11 +12,9 @@ function easeInOutQuart(t: number): number {
 
 export default function SmoothSnapScroll() {
   const isAnimating = useRef(false);
-  const currentIndex = useRef(0);
-  const wheelTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const accumulatedDelta = useRef(0);
+  const cooldownUntil = useRef(0);
   const animationFrame = useRef<number | null>(null);
-  const sectionsCache = useRef<HTMLElement[]>([]);
+  const lastDirection = useRef<1 | -1>(1);
 
   const getSections = useCallback((): HTMLElement[] => {
     const all: HTMLElement[] = [];
@@ -31,7 +30,6 @@ export default function SmoothSnapScroll() {
       }
     };
     walk(document.body);
-    sectionsCache.current = all;
     return all;
   }, []);
 
@@ -82,19 +80,16 @@ export default function SmoothSnapScroll() {
   }, []);
 
   const scrollToSection = useCallback((direction: 1 | -1) => {
-    if (isAnimating.current) return;
-
     const sections = getSections();
     if (sections.length === 0) return;
 
     const idx = findClosestIndex(sections);
-    currentIndex.current = idx;
-
     const nextIdx = Math.max(0, Math.min(sections.length - 1, idx + direction));
     if (nextIdx === idx) return;
 
-    currentIndex.current = nextIdx;
     isAnimating.current = true;
+    cooldownUntil.current = Date.now() + COOLDOWN + SCROLL_DURATION;
+    lastDirection.current = direction;
     smoothScrollTo(sections[nextIdx].offsetTop);
   }, [getSections, findClosestIndex, smoothScrollTo]);
 
@@ -102,23 +97,13 @@ export default function SmoothSnapScroll() {
     function handleWheel(e: WheelEvent) {
       e.preventDefault();
 
-      if (isAnimating.current) return;
+      const now = Date.now();
+      if (isAnimating.current || now < cooldownUntil.current) return;
 
-      accumulatedDelta.current += e.deltaY;
+      if (Math.abs(e.deltaY) < TRACKPAD_THRESHOLD) return;
 
-      if (wheelTimer.current) {
-        clearTimeout(wheelTimer.current);
-      }
-
-      wheelTimer.current = setTimeout(() => {
-        const delta = accumulatedDelta.current;
-        accumulatedDelta.current = 0;
-
-        if (Math.abs(delta) < 10) return;
-
-        const direction: 1 | -1 = delta > 0 ? 1 : -1;
-        scrollToSection(direction);
-      }, DEBOUNCE_WINDOW);
+      const direction: 1 | -1 = e.deltaY > 0 ? 1 : -1;
+      scrollToSection(direction);
     }
 
     function handleKeydown(e: KeyboardEvent) {
@@ -126,24 +111,23 @@ export default function SmoothSnapScroll() {
       if (!keys.includes(e.key)) return;
 
       e.preventDefault();
-      if (isAnimating.current) return;
+      const now = Date.now();
+      if (isAnimating.current || now < cooldownUntil.current) return;
 
       const direction: 1 | -1 = e.key === "ArrowDown" || e.key === "PageDown" || e.key === " " ? 1 : -1;
       scrollToSection(direction);
     }
 
-    // Touch handling for mobile
     let touchStartY = 0;
     function handleTouchStart(e: TouchEvent) {
       touchStartY = e.touches[0].clientY;
     }
 
     function handleTouchEnd(e: TouchEvent) {
-      if (isAnimating.current) return;
+      const now = Date.now();
+      if (isAnimating.current || now < cooldownUntil.current) return;
 
-      const touchEndY = e.changedTouches[0].clientY;
-      const diff = touchStartY - touchEndY;
-
+      const diff = touchStartY - e.changedTouches[0].clientY;
       if (Math.abs(diff) < 50) return;
 
       const direction: 1 | -1 = diff > 0 ? 1 : -1;
@@ -155,21 +139,14 @@ export default function SmoothSnapScroll() {
     window.addEventListener("touchstart", handleTouchStart, { passive: true });
     window.addEventListener("touchend", handleTouchEnd);
 
-    // Initialize: snap to nearest section on load
-    const sections = getSections();
-    if (sections.length > 0) {
-      currentIndex.current = findClosestIndex(sections);
-    }
-
     return () => {
       window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("keydown", handleKeydown);
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchend", handleTouchEnd);
-      if (wheelTimer.current) clearTimeout(wheelTimer.current);
       if (animationFrame.current) cancelAnimationFrame(animationFrame.current);
     };
-  }, [getSections, findClosestIndex, scrollToSection]);
+  }, [scrollToSection]);
 
   return null;
 }

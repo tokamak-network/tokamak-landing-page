@@ -6,87 +6,92 @@ import dynamic from "next/dynamic";
 const TokamakGate = dynamic(() => import("./TokamakGate"), { ssr: false });
 
 /* ═══════════════════════════════════════════════
-   Pipeline Node — Sequencer → Batcher → Proposer → L1
+   Feature Pillar — Stack / SDK / Modular
    ═══════════════════════════════════════════════ */
 
-const PIPELINE_STEPS = [
-  { id: "sequencer", label: "SEQUENCER", status: "ACTIVE" },
-  { id: "batcher", label: "BATCHER", status: "ACTIVE" },
-  { id: "proposer", label: "PROPOSER", status: "ACTIVE" },
-  { id: "l1", label: "L1", status: "SYNC" },
+const PILLARS = [
+  { id: "stack", label: "STACK", title: "Custom Config", desc: "Your own optimized chain setup" },
+  { id: "sdk", label: "SDK", title: "One-Click Deploy", desc: "Launch an L2 in minutes" },
+  { id: "modular", label: "MODULAR", title: "Plug & Extend", desc: "Open modular architecture" },
 ] as const;
 
-function PipelineNode({ label, status, index }: { label: string; status: string; index: number }) {
+function FeaturePillar({ pillar, index }: { pillar: typeof PILLARS[number]; index: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: 0.8 + index * 0.1 }}
-      className="flex items-center"
+      transition={{ duration: 0.4, delay: 0.8 + index * 0.15 }}
+      className="relative flex flex-col items-center justify-center"
+      style={{
+        width: "clamp(120px, 11vw, 170px)",
+        padding: "clamp(10px, 1vw, 16px) clamp(8px, 0.8vw, 14px)",
+        background: "rgba(2, 10, 22, 0.9)",
+        border: "1px solid rgba(0, 229, 255, 0.2)",
+        backdropFilter: "blur(12px)",
+      }}
     >
+      {/* Top accent */}
       <div
-        className="flex flex-col items-center justify-center"
+        className="absolute top-0 left-0 right-0"
         style={{
-          padding: "clamp(6px, 0.5vw, 10px) clamp(10px, 1vw, 18px)",
-          background: "rgba(0, 229, 255, 0.06)",
-          border: "1px solid rgba(0, 229, 255, 0.25)",
-          minWidth: "clamp(60px, 5vw, 80px)",
+          height: 2,
+          background: "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.6), transparent)",
+        }}
+      />
+      <span
+        style={{
+          fontSize: "clamp(9px, 0.7vw, 11px)",
+          color: "#00e5ff",
+          fontFamily: "'Share Tech Mono', monospace",
+          letterSpacing: "0.2em",
+          fontWeight: 700,
+          marginBottom: "clamp(4px, 0.4vw, 8px)",
         }}
       >
-        <span
-          style={{
-            fontSize: "clamp(7px, 0.6vw, 10px)",
-            color: "#00e5ff",
-            fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.1em",
-            fontWeight: 700,
-          }}
-        >
-          {label}
-        </span>
-        <span
-          style={{
-            fontSize: "clamp(5px, 0.45vw, 7px)",
-            color: status === "ACTIVE" ? "#22c55e" : "#00e5ff",
-            fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.08em",
-            marginTop: 2,
-            opacity: 0.7,
-          }}
-        >
-          {status}
-        </span>
-      </div>
-
-      {index < PIPELINE_STEPS.length - 1 && (
-        <div className="flex items-center" style={{ width: "clamp(16px, 1.5vw, 28px)" }}>
-          <div
-            style={{
-              flex: 1,
-              height: 1,
-              background: "rgba(0, 229, 255, 0.4)",
-            }}
-          />
-          <div
-            style={{
-              width: 0,
-              height: 0,
-              borderTop: "3px solid transparent",
-              borderBottom: "3px solid transparent",
-              borderLeft: "5px solid rgba(0, 229, 255, 0.5)",
-            }}
-          />
-        </div>
-      )}
+        {pillar.label}
+      </span>
+      <span
+        style={{
+          fontSize: "clamp(11px, 0.95vw, 15px)",
+          color: "#fff",
+          fontFamily: "'Orbitron', sans-serif",
+          fontWeight: 700,
+          letterSpacing: "0.04em",
+          textAlign: "center",
+          lineHeight: 1.25,
+          marginBottom: "clamp(3px, 0.3vw, 6px)",
+          textShadow: "0 0 14px rgba(0, 229, 255, 0.25)",
+        }}
+      >
+        {pillar.title}
+      </span>
+      <span
+        style={{
+          fontSize: "clamp(8px, 0.6vw, 10px)",
+          color: "rgba(160, 210, 255, 0.55)",
+          fontFamily: "'Share Tech Mono', monospace",
+          textAlign: "center",
+          lineHeight: 1.3,
+          letterSpacing: "0.02em",
+        }}
+      >
+        {pillar.desc}
+      </span>
     </motion.div>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Readout Panel — side metric with console feel
+   Cascade Card — Energy Cascade style side metric
    ═══════════════════════════════════════════════ */
 
-function ReadoutPanel({
+const cascadeKeyframes = `
+@keyframes cascadePulse {
+  0%, 100% { opacity: 0.15; transform: scaleX(0.4); }
+  50% { opacity: 0.8; transform: scaleX(1); }
+}`;
+
+function CascadeCard({
   label,
   value,
   index,
@@ -99,69 +104,68 @@ function ReadoutPanel({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: side === "left" ? -20 : 20 }}
+      initial={{ opacity: 0, x: side === "left" ? -16 : 16 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
-      className="relative"
+      transition={{ duration: 0.4, delay: 0.5 + index * 0.12 }}
+      className="relative flex flex-col items-center justify-center overflow-hidden"
       style={{
-        width: "clamp(110px, 10vw, 160px)",
-        background: "rgba(2, 10, 22, 0.92)",
-        border: "1px solid rgba(0, 229, 255, 0.2)",
-        backdropFilter: "blur(12px)",
+        width: "clamp(140px, 12vw, 195px)",
+        height: "clamp(120px, 11vw, 165px)",
+        background: "rgba(5, 10, 20, 0.95)",
+        border: "1px solid rgba(42, 114, 229, 0.3)",
+        borderRadius: 8,
       }}
     >
-      {/* Top accent line */}
+      <style dangerouslySetInnerHTML={{ __html: cascadeKeyframes }} />
+      {/* Cascade bars */}
+      {[0, 1, 2, 3, 4].map((i) => (
+        <div
+          key={i}
+          className="absolute left-0 right-0 pointer-events-none"
+          style={{
+            top: `${15 + i * 15}%`,
+            height: 3,
+            background: "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.7), transparent)",
+            boxShadow: "0 0 12px rgba(0, 229, 255, 0.5)",
+            animation: `cascadePulse 2s ease-in-out infinite`,
+            animationDelay: `${i * 0.2}s`,
+          }}
+        />
+      ))}
+      {/* Value */}
       <div
-        className="absolute pointer-events-none"
         style={{
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 1,
-          background: "linear-gradient(90deg, rgba(0, 229, 255, 0.6), rgba(0, 229, 255, 0.1))",
-        }}
-      />
-      {/* Label bar */}
-      <div
-        style={{
-          padding: "clamp(5px, 0.5vw, 8px) clamp(8px, 0.8vw, 12px)",
-          borderBottom: "1px solid rgba(0, 229, 255, 0.1)",
-          background: "rgba(0, 229, 255, 0.04)",
+          fontSize: "clamp(20px, 2.2vw, 34px)",
+          fontFamily: "'Orbitron', sans-serif",
+          fontWeight: 900,
+          color: "#fff",
+          textShadow:
+            "0 0 12px rgba(0, 229, 255, 1), 0 0 24px rgba(0, 229, 255, 0.7), 0 0 36px rgba(0, 229, 255, 0.5)",
+          zIndex: 1,
+          marginBottom: 6,
         }}
       >
-        <span
-          style={{
-            fontSize: "clamp(6px, 0.55vw, 9px)",
-            color: "rgba(0, 229, 255, 0.7)",
-            fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-          }}
-        >
-          {label}
-        </span>
+        {value}
       </div>
-      {/* Value */}
-      <div style={{ padding: "clamp(8px, 0.8vw, 14px) clamp(8px, 0.8vw, 12px)" }}>
-        <div
-          style={{
-            fontSize: "clamp(18px, 2vw, 30px)",
-            color: "#fff",
-            fontFamily: "'Orbitron', sans-serif",
-            fontWeight: 700,
-            lineHeight: 1,
-            textShadow: "0 0 20px rgba(0, 229, 255, 0.3)",
-          }}
-        >
-          {value}
-        </div>
+      {/* Label */}
+      <div
+        style={{
+          fontSize: "clamp(8px, 0.65vw, 11px)",
+          textTransform: "uppercase",
+          letterSpacing: "0.15em",
+          color: "rgba(122, 140, 168, 0.9)",
+          fontFamily: "'Share Tech Mono', monospace",
+          zIndex: 1,
+        }}
+      >
+        {label}
       </div>
     </motion.div>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Launch CTA — prominent launch button
+   Launch CTA — prominent deploy button
    ═══════════════════════════════════════════════ */
 
 function LaunchCTA() {
@@ -175,27 +179,44 @@ function LaunchCTA() {
       transition={{ duration: 0.5, delay: 1.0 }}
       className="relative inline-flex items-center justify-center cursor-pointer"
       style={{
-        padding: "clamp(12px, 1.2vw, 18px) clamp(36px, 3.5vw, 56px)",
-        background: "linear-gradient(180deg, rgba(0, 229, 255, 0.18) 0%, rgba(0, 229, 255, 0.06) 100%)",
-        border: "1px solid rgba(0, 229, 255, 0.5)",
+        padding: "clamp(16px, 1.6vw, 22px) clamp(48px, 5vw, 72px)",
+        background: "linear-gradient(180deg, rgba(0, 40, 60, 0.95) 0%, rgba(5, 25, 50, 0.95) 100%)",
+        border: "2px solid rgba(0, 229, 255, 0.9)",
         fontFamily: "'Orbitron', sans-serif",
-        fontSize: "clamp(11px, 1vw, 15px)",
-        color: "#00e5ff",
+        fontSize: "clamp(13px, 1.2vw, 17px)",
+        color: "#fff",
         letterSpacing: "0.18em",
         fontWeight: 700,
         textTransform: "uppercase",
         textDecoration: "none",
-        textShadow: "0 0 14px rgba(0, 229, 255, 0.6)",
+        textShadow: "0 0 20px rgba(0, 229, 255, 1), 0 0 40px rgba(0, 229, 255, 0.6)",
         boxShadow:
-          "0 0 30px rgba(0, 229, 255, 0.15), 0 0 60px rgba(0, 229, 255, 0.05), inset 0 1px 0 rgba(0, 229, 255, 0.2)",
+          "0 0 40px rgba(0, 229, 255, 0.35), 0 0 80px rgba(0, 229, 255, 0.15), 0 0 120px rgba(0, 229, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 0 30px rgba(0, 229, 255, 0.15)",
         transition: "all 0.3s ease",
       }}
       whileHover={{
         boxShadow:
-          "0 0 40px rgba(0, 229, 255, 0.3), 0 0 80px rgba(0, 229, 255, 0.1), inset 0 0 30px rgba(0, 229, 255, 0.08)",
-        borderColor: "rgba(0, 229, 255, 0.8)",
+          "0 0 40px rgba(0, 229, 255, 0.4), 0 0 80px rgba(0, 229, 255, 0.2), 0 0 120px rgba(0, 229, 255, 0.1), inset 0 0 40px rgba(0, 229, 255, 0.15)",
+        borderColor: "#00e5ff",
+        background: "linear-gradient(180deg, rgba(0, 229, 255, 0.35) 0%, rgba(42, 114, 229, 0.2) 100%)",
       }}
     >
+      {/* Pulsing glow overlay — strong pulse */}
+      <span
+        className="absolute pointer-events-none"
+        style={{
+          inset: "-12px -24px",
+          background: "radial-gradient(ellipse at center, rgba(0, 229, 255, 0.5) 0%, rgba(0, 229, 255, 0.15) 50%, transparent 75%)",
+          animation: "ctaGlow 2s ease-in-out infinite",
+          borderRadius: 8,
+        }}
+      />
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes ctaGlow {
+          0%, 100% { opacity: 0.4; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.08); }
+        }
+      `}} />
       {/* Corner brackets */}
       {[
         { top: -1, left: -1, borderTop: "2px solid #00e5ff", borderLeft: "2px solid #00e5ff" },
@@ -203,60 +224,68 @@ function LaunchCTA() {
         { bottom: -1, left: -1, borderBottom: "2px solid #00e5ff", borderLeft: "2px solid #00e5ff" },
         { bottom: -1, right: -1, borderBottom: "2px solid #00e5ff", borderRight: "2px solid #00e5ff" },
       ].map((s, i) => (
-        <span
-          key={i}
-          className="absolute w-3 h-3 pointer-events-none"
-          style={s as React.CSSProperties}
-        />
+        <span key={i} className="absolute w-3 h-3 pointer-events-none" style={s as React.CSSProperties} />
       ))}
-      Launch Your L2
+      <span style={{ position: "relative", zIndex: 1 }}>Deploy Your Appchain</span>
     </motion.a>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Header Bar — status strip
+   Header — title and tagline
    ═══════════════════════════════════════════════ */
 
 function HeaderBar() {
   return (
     <motion.div
-      initial={{ opacity: 0, y: -8 }}
+      initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.2 }}
-      className="absolute z-20 flex items-center justify-center"
-      style={{ top: "clamp(24px, 5vh, 50px)", left: 0, right: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="absolute z-20 flex flex-col items-center"
+      style={{ top: "clamp(28px, 5.5vh, 55px)", left: 0, right: 0 }}
     >
       <div
         style={{
-          padding: "clamp(6px, 0.6vw, 10px) clamp(20px, 2vw, 36px)",
-          background: "rgba(2, 10, 22, 0.8)",
-          border: "1px solid rgba(0, 229, 255, 0.15)",
-          backdropFilter: "blur(8px)",
+          fontSize: "clamp(8px, 0.65vw, 11px)",
+          color: "rgba(0, 229, 255, 0.5)",
+          fontFamily: "'Share Tech Mono', monospace",
+          letterSpacing: "0.25em",
+          textTransform: "uppercase",
+          marginBottom: "clamp(4px, 0.5vw, 8px)",
         }}
       >
-        <span
-          style={{
-            fontSize: "clamp(8px, 0.65vw, 11px)",
-            color: "rgba(140, 200, 255, 0.6)",
-            fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-          }}
-        >
-          Thanos L2
-          <span style={{ margin: "0 10px", opacity: 0.3 }}>|</span>
-          OP Stack Infrastructure
-          <span style={{ margin: "0 10px", opacity: 0.3 }}>|</span>
-          Status: <span style={{ color: "#22c55e" }}>Operational</span>
-        </span>
+        Thanos L2 · OP Stack
+      </div>
+      <div
+        style={{
+          fontSize: "clamp(14px, 1.4vw, 22px)",
+          color: "#fff",
+          fontFamily: "'Orbitron', sans-serif",
+          fontWeight: 700,
+          letterSpacing: "0.08em",
+          textShadow: "0 0 20px rgba(0, 229, 255, 0.3)",
+          textAlign: "center",
+        }}
+      >
+        On-Demand L2 for Ethereum
+      </div>
+      <div
+        style={{
+          fontSize: "clamp(7px, 0.55vw, 10px)",
+          color: "rgba(160, 210, 255, 0.5)",
+          fontFamily: "'Share Tech Mono', monospace",
+          letterSpacing: "0.12em",
+          marginTop: "clamp(3px, 0.3vw, 6px)",
+        }}
+      >
+        Fast · Secure · Fully Customizable
       </div>
     </motion.div>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Bottom Control Panel — integrated bar
+   Bottom Control Panel — pillars + CTA
    ═══════════════════════════════════════════════ */
 
 function BottomControlPanel() {
@@ -270,20 +299,19 @@ function BottomControlPanel() {
         left: 0,
         right: 0,
         bottom: 0,
-        background: "linear-gradient(180deg, transparent 0%, rgba(2, 8, 18, 0.85) 30%, rgba(2, 8, 18, 0.95) 100%)",
-        padding: "clamp(40px, 5vh, 70px) clamp(20px, 4vw, 60px) clamp(20px, 3vh, 40px)",
+        background: "linear-gradient(180deg, transparent 0%, rgba(2, 8, 18, 0.7) 50%, rgba(2, 8, 18, 0.85) 100%)",
+        padding: "clamp(30px, 4vh, 55px) clamp(20px, 4vw, 60px) clamp(16px, 2vh, 28px)",
       }}
     >
       <div className="flex flex-col items-center gap-4">
-        {/* Launch CTA */}
-        <LaunchCTA />
-
-        {/* Pipeline */}
-        <div className="flex items-center">
-          {PIPELINE_STEPS.map((step, i) => (
-            <PipelineNode key={step.id} label={step.label} status={step.status} index={i} />
+        {/* Feature pillars */}
+        <div className="flex items-stretch justify-center gap-3">
+          {PILLARS.map((p, i) => (
+            <FeaturePillar key={p.id} pillar={p} index={i} />
           ))}
         </div>
+        {/* CTA */}
+        <LaunchCTA />
       </div>
     </motion.div>
   );
@@ -294,10 +322,10 @@ function BottomControlPanel() {
    ═══════════════════════════════════════════════ */
 
 const MOBILE_METRICS = [
-  { label: "Bridge Time", value: "<3 MIN" },
-  { label: "Gas Reduction", value: "90%+" },
-  { label: "Block Time", value: "1.2s" },
-  { label: "On-Demand", value: "DEPLOY" },
+  { label: "Customizable", value: "STACK" },
+  { label: "Deploy Time", value: "<5 MIN" },
+  { label: "OP Stack", value: "BASE" },
+  { label: "Architecture", value: "MODULAR" },
 ] as const;
 
 function ThanosL2MobileOverlay() {
@@ -306,40 +334,37 @@ function ThanosL2MobileOverlay() {
       <div className="flex flex-col items-center gap-1">
         <div
           style={{
-            fontSize: 10,
-            color: "rgba(140, 200, 255, 0.5)",
+            fontSize: 9,
+            color: "rgba(0, 229, 255, 0.5)",
             fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.18em",
+            letterSpacing: "0.25em",
             textTransform: "uppercase",
           }}
         >
-          Floor 01
+          Thanos L2 · OP Stack
         </div>
         <div
           style={{
             fontSize: 16,
-            color: "#00e5ff",
+            color: "#fff",
             fontFamily: "'Orbitron', sans-serif",
             fontWeight: 700,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            textShadow: "0 0 14px rgba(0, 229, 255, 0.5)",
+            letterSpacing: "0.08em",
+            textShadow: "0 0 14px rgba(0, 229, 255, 0.4)",
             textAlign: "center",
           }}
         >
-          Thanos L2
+          On-Demand L2 for Ethereum
         </div>
         <div
           style={{
-            fontSize: 10,
-            color: "rgba(140, 200, 255, 0.5)",
+            fontSize: 9,
+            color: "rgba(160, 210, 255, 0.5)",
             fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
+            letterSpacing: "0.12em",
           }}
         >
-          OP Stack Infrastructure
-          <span style={{ marginLeft: 8, color: "#22c55e" }}>● Operational</span>
+          Fast · Secure · Fully Customizable
         </div>
       </div>
 
@@ -349,20 +374,19 @@ function ThanosL2MobileOverlay() {
             key={m.label}
             className="relative flex flex-col items-center justify-center py-3 px-2"
             style={{
-              background: "linear-gradient(180deg, rgba(4, 14, 28, 0.85) 0%, rgba(2, 8, 18, 0.8) 100%)",
-              clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)",
+              background: "rgba(2, 10, 22, 0.88)",
               border: "1px solid rgba(0, 229, 255, 0.15)",
-              minHeight: 64,
+              minHeight: 60,
             }}
           >
             <div
               className="absolute pointer-events-none"
-              style={{ top: -1, left: 0, right: 8, height: 1, background: "rgba(0, 229, 255, 0.4)" }}
+              style={{ top: 0, left: 0, right: 0, height: 1, background: "rgba(0, 229, 255, 0.3)" }}
             />
             <div
               style={{
-                fontSize: 9,
-                color: "rgba(0, 229, 255, 0.7)",
+                fontSize: 8,
+                color: "rgba(0, 229, 255, 0.6)",
                 fontFamily: "'Share Tech Mono', monospace",
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
@@ -373,40 +397,16 @@ function ThanosL2MobileOverlay() {
             </div>
             <div
               style={{
-                fontSize: 20,
+                fontSize: 18,
                 color: "#fff",
                 fontFamily: "'Orbitron', sans-serif",
                 fontWeight: 700,
                 lineHeight: 1,
-                textShadow: "0 0 12px rgba(0, 229, 255, 0.3)",
+                textShadow: "0 0 10px rgba(0, 229, 255, 0.25)",
               }}
             >
               {m.value}
             </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-1">
-        {PIPELINE_STEPS.map((step, i) => (
-          <div key={step.id} className="flex items-center gap-1">
-            <div
-              style={{
-                fontSize: 9,
-                color: "#00e5ff",
-                fontFamily: "'Share Tech Mono', monospace",
-                letterSpacing: "0.08em",
-                padding: "4px 8px",
-                border: "1px solid rgba(0, 229, 255, 0.3)",
-                background: "rgba(0, 229, 255, 0.06)",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {step.label}
-            </div>
-            {i < PIPELINE_STEPS.length - 1 && (
-              <div style={{ width: 12, height: 1, background: "rgba(0, 229, 255, 0.4)" }} />
-            )}
           </div>
         ))}
       </div>
@@ -419,19 +419,19 @@ function ThanosL2MobileOverlay() {
         style={{
           padding: "12px 32px",
           minHeight: 44,
-          background: "linear-gradient(180deg, rgba(0, 229, 255, 0.12) 0%, rgba(0, 229, 255, 0.04) 100%)",
-          border: "1px solid rgba(0, 229, 255, 0.4)",
-          fontFamily: "'Share Tech Mono', monospace",
+          background: "linear-gradient(180deg, rgba(0, 229, 255, 0.15) 0%, rgba(0, 229, 255, 0.05) 100%)",
+          border: "1px solid rgba(0, 229, 255, 0.5)",
+          fontFamily: "'Orbitron', sans-serif",
           fontSize: 12,
           color: "#00e5ff",
-          letterSpacing: "0.2em",
+          letterSpacing: "0.18em",
           fontWeight: 700,
           textTransform: "uppercase",
           textDecoration: "none",
           textShadow: "0 0 10px rgba(0, 229, 255, 0.5)",
         }}
       >
-        Launch Your L2
+        Deploy Your Appchain
       </a>
     </div>
   );
@@ -457,35 +457,35 @@ export default function ThanosL2Overlay() {
           {/* 3D holographic torus — pure mesh */}
           <TokamakGate />
 
-          {/* Left readouts */}
+          {/* Left specs */}
           <div
             className="absolute z-10 flex flex-col"
             style={{
               left: "clamp(16px, 5vw, 70px)",
-              top: "40%",
+              top: "46%",
               transform: "translateY(-50%)",
-              gap: "clamp(6px, 0.8vw, 12px)",
+              gap: "clamp(6px, 0.7vw, 10px)",
             }}
           >
-            <ReadoutPanel label="Bridge Time" value="<3 MIN" index={0} side="left" />
-            <ReadoutPanel label="Gas Reduction" value="90%+" index={1} side="left" />
+            <CascadeCard label="Infrastructure" value="OP" index={0} side="left" />
+            <CascadeCard label="Deploy Time" value="<5m" index={1} side="left" />
           </div>
 
-          {/* Right readouts */}
+          {/* Right specs */}
           <div
             className="absolute z-10 flex flex-col"
             style={{
               right: "clamp(16px, 5vw, 70px)",
-              top: "40%",
+              top: "46%",
               transform: "translateY(-50%)",
-              gap: "clamp(6px, 0.8vw, 12px)",
+              gap: "clamp(6px, 0.7vw, 10px)",
             }}
           >
-            <ReadoutPanel label="Block Time" value="1.2s" index={2} side="right" />
-            <ReadoutPanel label="On-Demand" value="DEPLOY" index={3} side="right" />
+            <CascadeCard label="Modular Design" value="MOD" index={2} side="right" />
+            <CascadeCard label="Entry Barrier" value="LOW" index={3} side="right" />
           </div>
 
-          {/* Bottom control panel — gradient fade + CTA + pipeline */}
+          {/* Bottom — feature pillars + CTA */}
           <BottomControlPanel />
         </div>
       </div>

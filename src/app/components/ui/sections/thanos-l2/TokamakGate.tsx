@@ -52,10 +52,10 @@ function createHexTexture(): CanvasTexture {
   const ctx = c.getContext("2d")!;
   ctx.clearRect(0, 0, size, size);
 
-  const hexR = 24;
+  const hexR = 20;
   const hexH = hexR * Math.sqrt(3);
-  ctx.strokeStyle = "rgba(0, 229, 255, 0.5)";
-  ctx.lineWidth = 1;
+  ctx.strokeStyle = "rgba(0, 229, 255, 0.6)";
+  ctx.lineWidth = 1.2;
 
   for (let row = -1; row < size / hexH + 1; row++) {
     for (let col = -1; col < size / (hexR * 1.5) + 1; col++) {
@@ -80,6 +80,12 @@ function createHexTexture(): CanvasTexture {
   return tex;
 }
 
+/* ═══════════════════════════════════════════
+   Torus constants
+   ═══════════════════════════════════════════ */
+const TORUS_R = 0.65;
+const TORUS_r = 0.2;
+
 /* ══════════════════════════════════════════════
    HexShell — hex grid texture on torus (outer shell)
    ══════════════════════════════════════════════ */
@@ -89,11 +95,11 @@ function HexShell() {
 
   return (
     <mesh ref={meshRef}>
-      <torusGeometry args={[1.0, 0.32, 32, 64]} />
+      <torusGeometry args={[TORUS_R, TORUS_r, 48, 96]} />
       <meshBasicMaterial
         map={tex}
         transparent
-        opacity={0.18}
+        opacity={0.22}
         side={DoubleSide}
         depthWrite={false}
       />
@@ -102,32 +108,48 @@ function HexShell() {
 }
 
 /* ══════════════════════════════════════════════
-   WireframeTorus — cyan wireframe
+   WireframeTorus — cyan wireframe (slightly smaller, inside hex)
    ══════════════════════════════════════════════ */
 function WireframeTorus() {
   return (
     <mesh>
-      <torusGeometry args={[1.0, 0.30, 24, 48]} />
+      <torusGeometry args={[TORUS_R, TORUS_r * 0.92, 32, 64]} />
       <meshBasicMaterial
         color="#00e5ff"
         wireframe
         transparent
-        opacity={0.15}
+        opacity={0.12}
       />
     </mesh>
   );
 }
 
 /* ══════════════════════════════════════════════
-   Surface Particles — on torus surface
+   Inner solid torus — dim fill for depth
+   ══════════════════════════════════════════════ */
+function InnerTorus() {
+  return (
+    <mesh>
+      <torusGeometry args={[TORUS_R, TORUS_r * 0.88, 32, 64]} />
+      <meshBasicMaterial
+        color="#041828"
+        transparent
+        opacity={0.5}
+      />
+    </mesh>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   Surface Particles — scattered on torus surface
    ══════════════════════════════════════════════ */
 function SurfaceParticles() {
   const ref = useRef<ThreePoints>(null);
 
   const geo = useMemo(() => {
-    const count = 300;
-    const R = 1.0;
-    const r = 0.32;
+    const count = 500;
+    const R = TORUS_R;
+    const r = TORUS_r;
     const positions = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       const u = Math.random() * Math.PI * 2;
@@ -145,9 +167,9 @@ function SurfaceParticles() {
     <points ref={ref} geometry={geo}>
       <pointsMaterial
         color="#00e5ff"
-        size={0.02}
+        size={0.018}
         transparent
-        opacity={0.5}
+        opacity={0.6}
         blending={AdditiveBlending}
         depthWrite={false}
       />
@@ -156,16 +178,16 @@ function SurfaceParticles() {
 }
 
 /* ══════════════════════════════════════════════
-   Equator ring — glow ring at torus center
+   Equator ring — bright glow ring at torus center plane
    ══════════════════════════════════════════════ */
 function EquatorRing() {
   return (
     <mesh rotation={[Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[1.03, 1.10, 128]} />
+      <ringGeometry args={[TORUS_R - 0.02, TORUS_R + 0.06, 128]} />
       <meshBasicMaterial
         color="#00e5ff"
         transparent
-        opacity={0.4}
+        opacity={0.35}
         side={DoubleSide}
         blending={AdditiveBlending}
         depthWrite={false}
@@ -211,7 +233,7 @@ function AmbientParticles() {
 }
 
 /* ══════════════════════════════════════════════
-   Orbital Rings — concentric energy rings
+   Orbital Rings — concentric energy rings around torus
    ══════════════════════════════════════════════ */
 function OrbitalRings() {
   const groupRef = useRef<Group>(null);
@@ -225,13 +247,12 @@ function OrbitalRings() {
   return (
     <group ref={groupRef}>
       {[
-        { r: 1.5, tilt: [Math.PI / 2, 0, 0] as [number, number, number], op: 0.3, color: "#00e5ff" },
-        { r: 1.7, tilt: [Math.PI / 2, 0, Math.PI / 6] as [number, number, number], op: 0.15, color: "#2a72e5" },
-        { r: 1.9, tilt: [Math.PI / 2, 0, Math.PI / 3] as [number, number, number], op: 0.08, color: "#00e5ff" },
-        { r: 2.1, tilt: [Math.PI / 2, 0, Math.PI / 2] as [number, number, number], op: 0.04, color: "#2a72e5" },
+        { r: 1.1, tilt: [Math.PI / 2, 0, 0] as [number, number, number], op: 0.25, color: "#00e5ff" },
+        { r: 1.25, tilt: [Math.PI / 2, 0, Math.PI / 8] as [number, number, number], op: 0.12, color: "#2a72e5" },
+        { r: 1.4, tilt: [Math.PI / 2, 0, Math.PI / 4] as [number, number, number], op: 0.06, color: "#00e5ff" },
       ].map((ring, i) => (
         <mesh key={i} rotation={ring.tilt}>
-          <torusGeometry args={[ring.r, 0.008, 8, 256]} />
+          <torusGeometry args={[ring.r, 0.006, 8, 256]} />
           <meshBasicMaterial color={ring.color} transparent opacity={ring.op} depthWrite={false} />
         </mesh>
       ))}
@@ -245,40 +266,44 @@ function OrbitalRings() {
 function CoreGlow() {
   return (
     <>
-      <pointLight position={[0, 0, 0]} intensity={1.5} color="#00e5ff" distance={6} />
-      <pointLight position={[0, 0, 0]} intensity={0.8} color="#2a72e5" distance={8} />
+      <pointLight position={[0, 0, 0]} intensity={1.5} color="#00e5ff" distance={5} />
+      <pointLight position={[0, 0, 0]} intensity={0.8} color="#2a72e5" distance={7} />
       <mesh>
-        <sphereGeometry args={[0.06, 16, 16]} />
-        <meshBasicMaterial color="#00e5ff" transparent opacity={0.8} />
+        <sphereGeometry args={[0.08, 16, 16]} />
+        <meshBasicMaterial color="#00e5ff" transparent opacity={0.9} />
       </mesh>
     </>
   );
 }
 
 /* ══════════════════════════════════════════════
-   Scene — rotating mesh torus group
+   Scene — rotating torus group
    ══════════════════════════════════════════════ */
 function TorusScene() {
   const groupRef = useRef<Group>(null);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y += 0.06 * delta;
+      const t = state.clock.elapsedTime;
+      groupRef.current.rotation.y += 0.08 * delta;
+      // Gentle horizontal wobble for dynamic 3D feel
+      groupRef.current.rotation.x = 0.5 + Math.sin(t * 0.4) * 0.15;
+      groupRef.current.rotation.z = Math.sin(t * 0.3) * 0.1;
     }
   });
 
   return (
     <>
       <ResizeHelper />
-      <ambientLight intensity={0.1} />
+      <ambientLight intensity={0.08} />
       <CoreGlow />
-      <group ref={groupRef} position={[0, 0.3, 0]}>
-        {/* Lay torus flat, slight tilt for perspective */}
-        <group rotation={[Math.PI / 2 - 0.2, 0, 0]}>
+      <group ref={groupRef} position={[0, 0.5, 0]}>
+        {/* Initial tilt applied via useFrame */}
+        <group>
+          <InnerTorus />
           <WireframeTorus />
           <HexShell />
           <SurfaceParticles />
-          <EquatorRing />
         </group>
       </group>
       <OrbitalRings />
@@ -322,7 +347,7 @@ export default function TokamakGate() {
       style={{ zIndex: 5 }}
     >
       <Canvas
-        camera={{ position: [0, 2, 6], fov: 50 }}
+        camera={{ position: [0, 1.0, 4], fov: 50 }}
         gl={{ alpha: true, antialias: true }}
         dpr={[1, 1.5]}
         style={{ background: "transparent" }}

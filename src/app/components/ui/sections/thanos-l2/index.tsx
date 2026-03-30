@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 
 const TokamakGate = dynamic(() => import("./TokamakGate"), { ssr: false });
 
@@ -11,100 +10,83 @@ const TokamakGate = dynamic(() => import("./TokamakGate"), { ssr: false });
    ═══════════════════════════════════════════════ */
 
 const PIPELINE_STEPS = [
-  { id: "sequencer", label: "SEQUENCER" },
-  { id: "batcher", label: "BATCHER" },
-  { id: "proposer", label: "PROPOSER" },
-  { id: "l1", label: "L1" },
+  { id: "sequencer", label: "SEQUENCER", status: "ACTIVE" },
+  { id: "batcher", label: "BATCHER", status: "ACTIVE" },
+  { id: "proposer", label: "PROPOSER", status: "ACTIVE" },
+  { id: "l1", label: "L1", status: "SYNC" },
 ] as const;
 
-function PipelineNode({ label, index }: { label: string; index: number }) {
+function PipelineNode({ label, status, index }: { label: string; status: string; index: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4, delay: 0.8 + index * 0.12 }}
-      className="flex items-center gap-0"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: 0.8 + index * 0.1 }}
+      className="flex items-center"
     >
-      <div className="relative flex items-center justify-center">
-        <div
-          className="flex items-center justify-center"
+      <div
+        className="flex flex-col items-center justify-center"
+        style={{
+          padding: "clamp(6px, 0.5vw, 10px) clamp(10px, 1vw, 18px)",
+          background: "rgba(0, 229, 255, 0.06)",
+          border: "1px solid rgba(0, 229, 255, 0.25)",
+          minWidth: "clamp(60px, 5vw, 80px)",
+        }}
+      >
+        <span
           style={{
-            width: "clamp(50px, 5.5vw, 74px)",
-            height: "clamp(42px, 4.5vw, 62px)",
-            background:
-              "linear-gradient(180deg, rgba(0, 229, 255, 0.15) 0%, rgba(0, 229, 255, 0.05) 100%)",
-            clipPath:
-              "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+            fontSize: "clamp(7px, 0.6vw, 10px)",
+            color: "#00e5ff",
+            fontFamily: "'Share Tech Mono', monospace",
+            letterSpacing: "0.1em",
+            fontWeight: 700,
           }}
         >
-          <span
-            style={{
-              fontSize: "clamp(6px, 0.6vw, 9px)",
-              color: "#00e5ff",
-              fontFamily: "'Share Tech Mono', monospace",
-              letterSpacing: "0.1em",
-              fontWeight: 700,
-              textShadow: "0 0 8px rgba(0, 229, 255, 0.5)",
-              position: "relative",
-              zIndex: 2,
-            }}
-          >
-            {label}
-          </span>
-        </div>
-        <svg
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          viewBox="0 0 100 86.6"
-          preserveAspectRatio="none"
+          {label}
+        </span>
+        <span
+          style={{
+            fontSize: "clamp(5px, 0.45vw, 7px)",
+            color: status === "ACTIVE" ? "#22c55e" : "#00e5ff",
+            fontFamily: "'Share Tech Mono', monospace",
+            letterSpacing: "0.08em",
+            marginTop: 2,
+            opacity: 0.7,
+          }}
         >
-          <polygon
-            points="25,0 75,0 100,43.3 75,86.6 25,86.6 0,43.3"
-            fill="none"
-            stroke="rgba(0, 229, 255, 0.5)"
-            strokeWidth="1.5"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
+          {status}
+        </span>
       </div>
 
       {index < PIPELINE_STEPS.length - 1 && (
-        <motion.div
-          initial={{ opacity: 0, scaleX: 0 }}
-          animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ duration: 0.3, delay: 1.0 + index * 0.12 }}
-          className="flex items-center"
-          style={{ width: "clamp(20px, 2.5vw, 40px)", originX: 0 }}
-        >
+        <div className="flex items-center" style={{ width: "clamp(16px, 1.5vw, 28px)" }}>
           <div
             style={{
               flex: 1,
               height: 1,
-              background:
-                "linear-gradient(90deg, rgba(0, 229, 255, 0.6), rgba(0, 229, 255, 0.3))",
-              boxShadow: "0 0 6px rgba(0, 229, 255, 0.3)",
+              background: "rgba(0, 229, 255, 0.4)",
             }}
           />
           <div
             style={{
               width: 0,
               height: 0,
-              borderTop: "4px solid transparent",
-              borderBottom: "4px solid transparent",
-              borderLeft: "6px solid rgba(0, 229, 255, 0.6)",
-              filter: "drop-shadow(0 0 4px rgba(0, 229, 255, 0.4))",
+              borderTop: "3px solid transparent",
+              borderBottom: "3px solid transparent",
+              borderLeft: "5px solid rgba(0, 229, 255, 0.5)",
             }}
           />
-        </motion.div>
+        </div>
       )}
     </motion.div>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Metric Panel — FUI chamfered card
+   Readout Panel — side metric with console feel
    ═══════════════════════════════════════════════ */
 
-function MetricPanel({
+function ReadoutPanel({
   label,
   value,
   index,
@@ -115,88 +97,71 @@ function MetricPanel({
   index: number;
   side: "left" | "right";
 }) {
-  const CHAMFER = 10;
-
   return (
     <motion.div
       initial={{ opacity: 0, x: side === "left" ? -20 : 20 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
+      transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
       className="relative"
       style={{
-        width: "clamp(120px, 11vw, 170px)",
-        padding: "clamp(10px, 1vw, 14px) clamp(12px, 1.1vw, 16px)",
-        background:
-          "linear-gradient(180deg, rgba(4, 14, 28, 0.85) 0%, rgba(2, 8, 18, 0.8) 100%)",
-        clipPath: `polygon(0 0, calc(100% - ${CHAMFER}px) 0, 100% ${CHAMFER}px, 100% 100%, 0 100%)`,
-        backdropFilter: "blur(10px)",
-        boxShadow:
-          "0 2px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 229, 255, 0.06), inset 0 1px 0 rgba(0, 229, 255, 0.15)",
+        width: "clamp(110px, 10vw, 160px)",
+        background: "rgba(2, 10, 22, 0.92)",
+        border: "1px solid rgba(0, 229, 255, 0.2)",
+        backdropFilter: "blur(12px)",
       }}
     >
+      {/* Top accent line */}
       <div
         className="absolute pointer-events-none"
         style={{
-          top: -1,
+          top: 0,
           left: 0,
-          right: CHAMFER,
-          height: 2,
-          background: "rgba(0, 229, 255, 0.4)",
-          boxShadow:
-            "0 0 8px rgba(0, 229, 255, 0.4), 0 0 16px rgba(0, 229, 255, 0.15)",
+          right: 0,
+          height: 1,
+          background: "linear-gradient(90deg, rgba(0, 229, 255, 0.6), rgba(0, 229, 255, 0.1))",
         }}
       />
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        preserveAspectRatio="none"
-      >
-        <polygon
-          points={`1,1 calc(100% - ${CHAMFER}px),1 100%,${CHAMFER + 1} 100%,100% 1,100%`}
-          fill="none"
-          stroke="rgba(0, 229, 255, 0.2)"
-          strokeWidth="1"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
+      {/* Label bar */}
       <div
-        className="uppercase font-bold tracking-wider"
         style={{
-          fontSize: "clamp(7px, 0.6vw, 10px)",
-          color: "rgba(0, 229, 255, 0.7)",
-          fontFamily: "'Share Tech Mono', monospace",
-          letterSpacing: "0.14em",
-          paddingBottom: "clamp(4px, 0.4vw, 6px)",
-          marginBottom: "clamp(4px, 0.4vw, 6px)",
+          padding: "clamp(5px, 0.5vw, 8px) clamp(8px, 0.8vw, 12px)",
           borderBottom: "1px solid rgba(0, 229, 255, 0.1)",
-          position: "relative",
-          zIndex: 2,
-          textShadow: "0 0 6px rgba(0, 229, 255, 0.3)",
+          background: "rgba(0, 229, 255, 0.04)",
         }}
       >
-        {label}
+        <span
+          style={{
+            fontSize: "clamp(6px, 0.55vw, 9px)",
+            color: "rgba(0, 229, 255, 0.7)",
+            fontFamily: "'Share Tech Mono', monospace",
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+          }}
+        >
+          {label}
+        </span>
       </div>
-      <div
-        className="font-bold"
-        style={{
-          fontSize: "clamp(16px, 1.8vw, 28px)",
-          color: "#fff",
-          fontFamily: "'Orbitron', sans-serif",
-          letterSpacing: "0.02em",
-          lineHeight: 1.1,
-          textShadow:
-            "0 0 16px rgba(0, 229, 255, 0.2), 0 0 32px rgba(0, 229, 255, 0.06)",
-          position: "relative",
-          zIndex: 2,
-        }}
-      >
-        {value}
+      {/* Value */}
+      <div style={{ padding: "clamp(8px, 0.8vw, 14px) clamp(8px, 0.8vw, 12px)" }}>
+        <div
+          style={{
+            fontSize: "clamp(18px, 2vw, 30px)",
+            color: "#fff",
+            fontFamily: "'Orbitron', sans-serif",
+            fontWeight: 700,
+            lineHeight: 1,
+            textShadow: "0 0 20px rgba(0, 229, 255, 0.3)",
+          }}
+        >
+          {value}
+        </div>
       </div>
     </motion.div>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Launch CTA Button
+   Launch CTA — prominent launch button
    ═══════════════════════════════════════════════ */
 
 function LaunchCTA() {
@@ -205,68 +170,52 @@ function LaunchCTA() {
       href="https://rolluphub.tokamak.network/"
       target="_blank"
       rel="noopener noreferrer"
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1.2 }}
-      className="relative inline-flex items-center justify-center group cursor-pointer"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, delay: 1.0 }}
+      className="relative inline-flex items-center justify-center cursor-pointer"
       style={{
-        padding: "clamp(10px, 1vw, 14px) clamp(28px, 3vw, 48px)",
-        background:
-          "linear-gradient(180deg, rgba(0, 229, 255, 0.12) 0%, rgba(0, 229, 255, 0.04) 100%)",
-        border: "1px solid rgba(0, 229, 255, 0.4)",
-        fontFamily: "'Share Tech Mono', monospace",
-        fontSize: "clamp(10px, 0.9vw, 14px)",
+        padding: "clamp(12px, 1.2vw, 18px) clamp(36px, 3.5vw, 56px)",
+        background: "linear-gradient(180deg, rgba(0, 229, 255, 0.18) 0%, rgba(0, 229, 255, 0.06) 100%)",
+        border: "1px solid rgba(0, 229, 255, 0.5)",
+        fontFamily: "'Orbitron', sans-serif",
+        fontSize: "clamp(11px, 1vw, 15px)",
         color: "#00e5ff",
-        letterSpacing: "0.2em",
+        letterSpacing: "0.18em",
         fontWeight: 700,
         textTransform: "uppercase",
         textDecoration: "none",
-        textShadow: "0 0 10px rgba(0, 229, 255, 0.5)",
+        textShadow: "0 0 14px rgba(0, 229, 255, 0.6)",
         boxShadow:
-          "0 0 20px rgba(0, 229, 255, 0.1), inset 0 0 20px rgba(0, 229, 255, 0.05)",
+          "0 0 30px rgba(0, 229, 255, 0.15), 0 0 60px rgba(0, 229, 255, 0.05), inset 0 1px 0 rgba(0, 229, 255, 0.2)",
         transition: "all 0.3s ease",
       }}
       whileHover={{
         boxShadow:
-          "0 0 30px rgba(0, 229, 255, 0.25), inset 0 0 30px rgba(0, 229, 255, 0.1)",
-        borderColor: "rgba(0, 229, 255, 0.7)",
+          "0 0 40px rgba(0, 229, 255, 0.3), 0 0 80px rgba(0, 229, 255, 0.1), inset 0 0 30px rgba(0, 229, 255, 0.08)",
+        borderColor: "rgba(0, 229, 255, 0.8)",
       }}
     >
-      <span
-        className="absolute top-0 left-0 w-2 h-2 pointer-events-none"
-        style={{
-          borderTop: "1.5px solid rgba(0, 229, 255, 0.7)",
-          borderLeft: "1.5px solid rgba(0, 229, 255, 0.7)",
-        }}
-      />
-      <span
-        className="absolute top-0 right-0 w-2 h-2 pointer-events-none"
-        style={{
-          borderTop: "1.5px solid rgba(0, 229, 255, 0.7)",
-          borderRight: "1.5px solid rgba(0, 229, 255, 0.7)",
-        }}
-      />
-      <span
-        className="absolute bottom-0 left-0 w-2 h-2 pointer-events-none"
-        style={{
-          borderBottom: "1.5px solid rgba(0, 229, 255, 0.7)",
-          borderLeft: "1.5px solid rgba(0, 229, 255, 0.7)",
-        }}
-      />
-      <span
-        className="absolute bottom-0 right-0 w-2 h-2 pointer-events-none"
-        style={{
-          borderBottom: "1.5px solid rgba(0, 229, 255, 0.7)",
-          borderRight: "1.5px solid rgba(0, 229, 255, 0.7)",
-        }}
-      />
+      {/* Corner brackets */}
+      {[
+        { top: -1, left: -1, borderTop: "2px solid #00e5ff", borderLeft: "2px solid #00e5ff" },
+        { top: -1, right: -1, borderTop: "2px solid #00e5ff", borderRight: "2px solid #00e5ff" },
+        { bottom: -1, left: -1, borderBottom: "2px solid #00e5ff", borderLeft: "2px solid #00e5ff" },
+        { bottom: -1, right: -1, borderBottom: "2px solid #00e5ff", borderRight: "2px solid #00e5ff" },
+      ].map((s, i) => (
+        <span
+          key={i}
+          className="absolute w-3 h-3 pointer-events-none"
+          style={s as React.CSSProperties}
+        />
+      ))}
       Launch Your L2
     </motion.a>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Header Bar
+   Header Bar — status strip
    ═══════════════════════════════════════════════ */
 
 function HeaderBar() {
@@ -275,31 +224,70 @@ function HeaderBar() {
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.2 }}
-      className="absolute z-20 flex items-center justify-center gap-4"
-      style={{ top: "clamp(30px, 6vh, 60px)", left: 0, right: 0 }}
+      className="absolute z-20 flex items-center justify-center"
+      style={{ top: "clamp(24px, 5vh, 50px)", left: 0, right: 0 }}
     >
-      <span
+      <div
         style={{
-          fontSize: "clamp(8px, 0.7vw, 11px)",
-          color: "rgba(140, 200, 255, 0.5)",
-          fontFamily: "'Share Tech Mono', monospace",
-          letterSpacing: "0.18em",
-          textTransform: "uppercase",
+          padding: "clamp(6px, 0.6vw, 10px) clamp(20px, 2vw, 36px)",
+          background: "rgba(2, 10, 22, 0.8)",
+          border: "1px solid rgba(0, 229, 255, 0.15)",
+          backdropFilter: "blur(8px)",
         }}
       >
-        Thanos L2
-        <span style={{ margin: "0 8px", opacity: 0.3 }}>|</span>
-        OP Stack Infrastructure
-        <span style={{ margin: "0 8px", opacity: 0.3 }}>|</span>
-        Status: <span style={{ color: "#22c55e" }}>Operational</span>
-      </span>
+        <span
+          style={{
+            fontSize: "clamp(8px, 0.65vw, 11px)",
+            color: "rgba(140, 200, 255, 0.6)",
+            fontFamily: "'Share Tech Mono', monospace",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+          }}
+        >
+          Thanos L2
+          <span style={{ margin: "0 10px", opacity: 0.3 }}>|</span>
+          OP Stack Infrastructure
+          <span style={{ margin: "0 10px", opacity: 0.3 }}>|</span>
+          Status: <span style={{ color: "#22c55e" }}>Operational</span>
+        </span>
+      </div>
     </motion.div>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Main Export — Thanos L2 Floor Overlay
+   Bottom Control Panel — integrated bar
    ═══════════════════════════════════════════════ */
+
+function BottomControlPanel() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.6 }}
+      className="absolute z-10"
+      style={{
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "linear-gradient(180deg, transparent 0%, rgba(2, 8, 18, 0.85) 30%, rgba(2, 8, 18, 0.95) 100%)",
+        padding: "clamp(40px, 5vh, 70px) clamp(20px, 4vw, 60px) clamp(20px, 3vh, 40px)",
+      }}
+    >
+      <div className="flex flex-col items-center gap-4">
+        {/* Launch CTA */}
+        <LaunchCTA />
+
+        {/* Pipeline */}
+        <div className="flex items-center">
+          {PIPELINE_STEPS.map((step, i) => (
+            <PipelineNode key={step.id} label={step.label} status={step.status} index={i} />
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 /* ═══════════════════════════════════════════════
    Mobile Overlay — simplified, no 3D
@@ -315,7 +303,6 @@ const MOBILE_METRICS = [
 function ThanosL2MobileOverlay() {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center px-5 py-8 gap-5">
-      {/* Title */}
       <div className="flex flex-col items-center gap-1">
         <div
           style={{
@@ -356,15 +343,13 @@ function ThanosL2MobileOverlay() {
         </div>
       </div>
 
-      {/* 2×2 metric grid */}
       <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
         {MOBILE_METRICS.map((m) => (
           <div
             key={m.label}
             className="relative flex flex-col items-center justify-center py-3 px-2"
             style={{
-              background:
-                "linear-gradient(180deg, rgba(4, 14, 28, 0.85) 0%, rgba(2, 8, 18, 0.8) 100%)",
+              background: "linear-gradient(180deg, rgba(4, 14, 28, 0.85) 0%, rgba(2, 8, 18, 0.8) 100%)",
               clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)",
               border: "1px solid rgba(0, 229, 255, 0.15)",
               minHeight: 64,
@@ -372,13 +357,7 @@ function ThanosL2MobileOverlay() {
           >
             <div
               className="absolute pointer-events-none"
-              style={{
-                top: -1,
-                left: 0,
-                right: 8,
-                height: 1,
-                background: "rgba(0, 229, 255, 0.4)",
-              }}
+              style={{ top: -1, left: 0, right: 8, height: 1, background: "rgba(0, 229, 255, 0.4)" }}
             />
             <div
               style={{
@@ -408,7 +387,6 @@ function ThanosL2MobileOverlay() {
         ))}
       </div>
 
-      {/* Pipeline steps — simple horizontal label row */}
       <div className="flex items-center gap-1">
         {PIPELINE_STEPS.map((step, i) => (
           <div key={step.id} className="flex items-center gap-1">
@@ -427,19 +405,12 @@ function ThanosL2MobileOverlay() {
               {step.label}
             </div>
             {i < PIPELINE_STEPS.length - 1 && (
-              <div
-                style={{
-                  width: 12,
-                  height: 1,
-                  background: "rgba(0, 229, 255, 0.4)",
-                }}
-              />
+              <div style={{ width: 12, height: 1, background: "rgba(0, 229, 255, 0.4)" }} />
             )}
           </div>
         ))}
       </div>
 
-      {/* CTA */}
       <a
         href="https://rolluphub.tokamak.network/"
         target="_blank"
@@ -448,8 +419,7 @@ function ThanosL2MobileOverlay() {
         style={{
           padding: "12px 32px",
           minHeight: 44,
-          background:
-            "linear-gradient(180deg, rgba(0, 229, 255, 0.12) 0%, rgba(0, 229, 255, 0.04) 100%)",
+          background: "linear-gradient(180deg, rgba(0, 229, 255, 0.12) 0%, rgba(0, 229, 255, 0.04) 100%)",
           border: "1px solid rgba(0, 229, 255, 0.4)",
           fontFamily: "'Share Tech Mono', monospace",
           fontSize: 12,
@@ -467,6 +437,10 @@ function ThanosL2MobileOverlay() {
   );
 }
 
+/* ═══════════════════════════════════════════════
+   Main Export — Thanos L2 Floor Overlay
+   ═══════════════════════════════════════════════ */
+
 export default function ThanosL2Overlay() {
   return (
     <div className="absolute inset-0">
@@ -480,80 +454,39 @@ export default function ThanosL2Overlay() {
         <div className="absolute inset-0">
           <HeaderBar />
 
-          {/* Torus glow asset — behind the 3D mesh */}
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              left: "50%",
-              top: "42%",
-              transform: "translate(-50%, -50%)",
-              width: "clamp(240px, 32vw, 440px)",
-              height: "clamp(180px, 24vw, 340px)",
-              zIndex: 3,
-            }}
-          >
-            <Image
-              src="/tower/torus-glow.png"
-              alt=""
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
-
-          {/* 3D holographic torus mesh — overlaid on asset */}
+          {/* 3D holographic torus — pure mesh */}
           <TokamakGate />
 
-          {/* Left metrics */}
+          {/* Left readouts */}
           <div
             className="absolute z-10 flex flex-col"
             style={{
-              left: "clamp(16px, 6vw, 90px)",
-              top: "46%",
+              left: "clamp(16px, 5vw, 70px)",
+              top: "40%",
               transform: "translateY(-50%)",
-              gap: "clamp(8px, 1vw, 14px)",
+              gap: "clamp(6px, 0.8vw, 12px)",
             }}
           >
-            <MetricPanel label="Bridge Time" value="<3 MIN" index={0} side="left" />
-            <MetricPanel label="Gas Reduction" value="90%+" index={1} side="left" />
+            <ReadoutPanel label="Bridge Time" value="<3 MIN" index={0} side="left" />
+            <ReadoutPanel label="Gas Reduction" value="90%+" index={1} side="left" />
           </div>
 
-          {/* Right metrics */}
+          {/* Right readouts */}
           <div
             className="absolute z-10 flex flex-col"
             style={{
-              right: "clamp(16px, 6vw, 90px)",
-              top: "46%",
+              right: "clamp(16px, 5vw, 70px)",
+              top: "40%",
               transform: "translateY(-50%)",
-              gap: "clamp(8px, 1vw, 14px)",
+              gap: "clamp(6px, 0.8vw, 12px)",
             }}
           >
-            <MetricPanel label="Block Time" value="1.2s" index={2} side="right" />
-            <MetricPanel label="On-Demand" value="DEPLOY" index={3} side="right" />
+            <ReadoutPanel label="Block Time" value="1.2s" index={2} side="right" />
+            <ReadoutPanel label="On-Demand" value="DEPLOY" index={3} side="right" />
           </div>
 
-          {/* Launch CTA — below the gate */}
-          <div
-            className="absolute z-10 flex justify-center"
-            style={{ left: 0, right: 0, bottom: "clamp(70px, 14vh, 130px)" }}
-          >
-            <LaunchCTA />
-          </div>
-
-          {/* Pipeline — bottom */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
-            className="absolute z-10 flex items-center justify-center"
-            style={{ left: 0, right: 0, bottom: "clamp(24px, 5vh, 55px)" }}
-          >
-            <div className="flex items-center">
-              {PIPELINE_STEPS.map((step, i) => (
-                <PipelineNode key={step.id} label={step.label} index={i} />
-              ))}
-            </div>
-          </motion.div>
+          {/* Bottom control panel — gradient fade + CTA + pipeline */}
+          <BottomControlPanel />
         </div>
       </div>
     </div>

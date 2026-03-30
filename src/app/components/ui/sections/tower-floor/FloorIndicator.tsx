@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef, useEffect, useState } from "react";
+
 interface FloorIndicatorProps {
   floor: number;
   label?: string;
@@ -7,13 +9,29 @@ interface FloorIndicatorProps {
 
 /**
  * Full-screen cyberpunk floor transition indicator.
- * Minimal HUD: horizontal cyan line + "FLOOR XX" text + down chevron.
+ * Reveals with scroll-triggered animation when entering viewport.
  */
 export default function FloorIndicator({ floor, label }: FloorIndicatorProps) {
   const floorNum = String(floor).padStart(2, "0");
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setVisible(true);
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div
+      ref={ref}
       className="relative w-full flex items-center justify-center overflow-hidden bg-black"
       style={{ height: "40vh" }}
     >
@@ -25,6 +43,8 @@ export default function FloorIndicator({ floor, label }: FloorIndicatorProps) {
           width: 1,
           background:
             "linear-gradient(180deg, transparent 5%, rgba(42, 114, 229, 0.12) 30%, rgba(42, 114, 229, 0.12) 70%, transparent 95%)",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.8s ease",
         }}
       />
       <div
@@ -34,11 +54,21 @@ export default function FloorIndicator({ floor, label }: FloorIndicatorProps) {
           width: 1,
           background:
             "linear-gradient(180deg, transparent 5%, rgba(42, 114, 229, 0.12) 30%, rgba(42, 114, 229, 0.12) 70%, transparent 95%)",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.8s ease",
         }}
       />
 
       {/* Center content */}
-      <div className="relative flex flex-col items-center gap-4">
+      <div
+        className="relative flex flex-col items-center gap-4"
+        style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? "translateY(0)" : "translateY(30px)",
+          transition:
+            "opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+      >
         {/* Floor label */}
         <span
           className="uppercase tracking-[0.35em] font-bold"
@@ -62,13 +92,15 @@ export default function FloorIndicator({ floor, label }: FloorIndicatorProps) {
               color: "rgba(140, 200, 255, 0.5)",
               fontFamily: "'Share Tech Mono', monospace",
               marginTop: -4,
+              opacity: visible ? 1 : 0,
+              transition: "opacity 0.6s ease 0.25s",
             }}
           >
             {label}
           </span>
         )}
 
-        {/* Horizontal cyan line */}
+        {/* Horizontal cyan line — expands from center */}
         <div
           style={{
             width: "clamp(200px, 40vw, 500px)",
@@ -77,6 +109,8 @@ export default function FloorIndicator({ floor, label }: FloorIndicatorProps) {
               "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.6) 20%, #00e5ff 50%, rgba(0, 229, 255, 0.6) 80%, transparent)",
             boxShadow:
               "0 0 8px rgba(0, 229, 255, 0.4), 0 0 20px rgba(0, 229, 255, 0.15)",
+            transform: visible ? "scaleX(1)" : "scaleX(0)",
+            transition: "transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s",
           }}
         />
 
@@ -89,7 +123,9 @@ export default function FloorIndicator({ floor, label }: FloorIndicatorProps) {
           style={{
             marginTop: 2,
             filter: "drop-shadow(0 0 6px rgba(0, 229, 255, 0.5))",
-            animation: "chevronBounce 2s ease-in-out infinite",
+            animation: visible ? "chevronBounce 2s ease-in-out infinite" : "none",
+            opacity: visible ? 1 : 0,
+            transition: "opacity 0.5s ease 0.4s",
           }}
         >
           <path
@@ -108,6 +144,8 @@ export default function FloorIndicator({ floor, label }: FloorIndicatorProps) {
         style={{
           background:
             "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(0, 229, 255, 0.04) 0%, transparent 70%)",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 1s ease 0.2s",
         }}
       />
     </div>

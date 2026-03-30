@@ -1,3 +1,6 @@
+"use client";
+
+import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 
 interface TowerFloorProps {
@@ -20,11 +23,38 @@ export default function TowerFloor({
   isFirst = false,
   isLast = false,
 }: TowerFloorProps) {
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    const el = stickyRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setRevealed(true);
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="relative" style={{ height: "200vh" }}>
       {/* Sticky viewport — fills screen, stays in place while scrolling */}
-      <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden bg-black">
-        <div className="relative w-full max-w-[1400px] mx-auto px-4">
+      <div
+        ref={stickyRef}
+        className="sticky top-0 h-screen flex items-center justify-center overflow-hidden bg-black"
+      >
+        <div
+          className="relative w-full max-w-[1400px] mx-auto px-4"
+          style={{
+            opacity: revealed ? 1 : 0,
+            transform: revealed ? "scale(1)" : "scale(0.97)",
+            transition:
+              "opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
           <div className="relative w-full h-[70vh] md:h-auto md:aspect-video">
             <Image
               src={bgImage}

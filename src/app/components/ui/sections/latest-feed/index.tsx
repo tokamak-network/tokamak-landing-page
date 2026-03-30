@@ -53,17 +53,162 @@ export default function LatestFeed() {
   const reportItems = loadReportFeedItems();
 
   return (
-    <section className="relative z-10 w-full flex justify-center px-6 py-[160px] [@media(max-width:640px)]:py-[80px]">
+    <section
+      className="relative z-10 w-full flex justify-center px-6 py-[160px] [@media(max-width:640px)]:py-[80px] overflow-hidden"
+      style={{ background: "#030810", height: "100vh", scrollSnapAlign: "start" }}
+    >
+      {/* ── Background layers ── */}
+
+      {/* Grid pattern */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px)
+          `,
+          backgroundSize: "60px 60px",
+        }}
+      />
+
+      {/* Finer sub-grid */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(0,229,255,0.015) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,229,255,0.015) 1px, transparent 1px)
+          `,
+          backgroundSize: "15px 15px",
+        }}
+      />
+
+      {/* Horizontal scan lines */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,229,255,0.012) 3px, rgba(0,229,255,0.012) 4px)",
+        }}
+      />
+
+      {/* Center radial glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(ellipse 70% 50% at 50% 50%, rgba(0,229,255,0.06) 0%, transparent 60%),
+            radial-gradient(ellipse 50% 30% at 50% 20%, rgba(42,114,229,0.04) 0%, transparent 50%)
+          `,
+        }}
+      />
+
+      {/* Vignette — edge fades like tower floors */}
+      <div
+        className="absolute top-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: "25%",
+          background: "linear-gradient(180deg, #030810 0%, rgba(3,8,16,0.8) 30%, transparent 100%)",
+        }}
+      />
+      <div
+        className="absolute bottom-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: "25%",
+          background: "linear-gradient(0deg, #030810 0%, rgba(3,8,16,0.8) 30%, transparent 100%)",
+        }}
+      />
+      <div
+        className="absolute top-0 bottom-0 left-0 pointer-events-none"
+        style={{
+          width: "15%",
+          background: "linear-gradient(90deg, #030810 0%, rgba(3,8,16,0.6) 40%, transparent 100%)",
+        }}
+      />
+      <div
+        className="absolute top-0 bottom-0 right-0 pointer-events-none"
+        style={{
+          width: "15%",
+          background: "linear-gradient(270deg, #030810 0%, rgba(3,8,16,0.6) 40%, transparent 100%)",
+        }}
+      />
+
+      {/* ── Border lines ── */}
+
+      {/* Top border line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[1px]"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(0,229,255,0.4) 30%, rgba(0,229,255,0.6) 50%, rgba(0,229,255,0.4) 70%, transparent 100%)",
+        }}
+      />
+      {/* Top glow bleed */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[60px] pointer-events-none"
+        style={{
+          background: "linear-gradient(180deg, rgba(0,229,255,0.06) 0%, transparent 100%)",
+        }}
+      />
+
+      {/* Corner brackets */}
+      <div className="absolute top-6 left-6 w-6 h-6 border-l border-t border-[rgba(0,229,255,0.35)]" />
+      <div className="absolute top-6 right-6 w-6 h-6 border-r border-t border-[rgba(0,229,255,0.35)]" />
+      <div className="absolute bottom-6 left-6 w-6 h-6 border-l border-b border-[rgba(0,229,255,0.35)]" />
+      <div className="absolute bottom-6 right-6 w-6 h-6 border-r border-b border-[rgba(0,229,255,0.35)]" />
+
       <div className="w-full max-w-[1280px] flex flex-col items-center">
-        <h2 className="text-[38px] md:text-[48px] font-[900] text-white tracking-[0.06em] uppercase mb-3 text-center">
+        {/* Section label */}
+        <span
+          className="text-[11px] uppercase tracking-[0.2em] mb-4 block"
+          style={{
+            fontFamily: "'Share Tech Mono', monospace",
+            color: "rgba(0,229,255,0.6)",
+          }}
+        >
+          INTEL FEED // LIVE
+        </span>
+
+        <h2
+          className="text-[38px] md:text-[48px] font-[900] uppercase tracking-[0.06em] mb-4 text-center"
+          style={{
+            fontFamily: "'Orbitron', sans-serif",
+            color: "#ffffff",
+            textShadow: "0 0 30px rgba(0,229,255,0.5), 0 0 60px rgba(0,229,255,0.2)",
+          }}
+        >
           Latest Updates
         </h2>
-        <div className="w-10 h-[3px] bg-primary mx-auto mb-5" />
-        <p className="text-[16px] text-[#929298] mb-[80px] text-center">
+
+        {/* Scan-line separator */}
+        <div className="relative w-40 h-[2px] mx-auto mb-5">
+          <div
+            className="absolute inset-0"
+            style={{
+              background: "linear-gradient(90deg, transparent, #00e5ff, transparent)",
+              boxShadow: "0 0 8px rgba(0,229,255,0.8)",
+            }}
+          />
+        </div>
+
+        <p
+          className="text-[14px] mb-[80px] text-center tracking-[0.06em]"
+          style={{
+            fontFamily: "'Share Tech Mono', monospace",
+            color: "rgba(140,200,255,0.55)",
+          }}
+        >
           News, research, and development updates from Tokamak Network
         </p>
+
         <LatestFeedClient reportItems={reportItems} />
       </div>
+
+      {/* Bottom border line */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-[1px]"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(0,229,255,0.4) 30%, rgba(0,229,255,0.6) 50%, rgba(0,229,255,0.4) 70%, transparent 100%)",
+        }}
+      />
     </section>
   );
 }

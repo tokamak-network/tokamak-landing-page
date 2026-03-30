@@ -46,6 +46,7 @@ export default function TorusHero() {
     <section
       ref={sectionRef}
       className="relative w-full h-screen overflow-hidden bg-black"
+      style={{ scrollSnapAlign: "start" }}
     >
       {/* 3D Torus — full screen canvas, fades in when intro starts fadeout */}
       <div

@@ -7,6 +7,10 @@
   --foreground: #c5c5ca;
 }
 
+html {
+  overflow-y: scroll;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);

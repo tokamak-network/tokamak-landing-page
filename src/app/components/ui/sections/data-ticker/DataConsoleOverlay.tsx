@@ -5,6 +5,7 @@ import { Canvas, useFrame, RootState } from "@react-three/fiber";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { Mesh, CanvasTexture, RepeatWrapping, AdditiveBlending, DoubleSide, Group } from "three";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 interface TickerItem {
   label: string;
@@ -380,6 +381,30 @@ function HeaderBar() {
       >
         {time}
       </span>
+      <Link
+        href="/about/reports"
+        style={{
+          fontSize: "clamp(8px, 0.7vw, 11px)",
+          color: "rgba(0, 229, 255, 0.5)",
+          fontFamily: "'Share Tech Mono', monospace",
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          textDecoration: "none",
+          borderLeft: "1px solid rgba(0, 229, 255, 0.15)",
+          paddingLeft: 12,
+          transition: "color 0.2s, text-shadow 0.2s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = "#00e5ff";
+          e.currentTarget.style.textShadow = "0 0 8px rgba(0, 229, 255, 0.4)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = "rgba(0, 229, 255, 0.5)";
+          e.currentTarget.style.textShadow = "none";
+        }}
+      >
+        Biweekly Reports &rarr;
+      </Link>
     </motion.div>
   );
 }
@@ -552,6 +577,20 @@ function DataConsoleMobileOverlay({ items }: { items: TickerItem[] }) {
         >
           Live Data Console
         </div>
+        <Link
+          href="/about/reports"
+          style={{
+            fontSize: 9,
+            color: "rgba(0, 229, 255, 0.5)",
+            fontFamily: "'Share Tech Mono', monospace",
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            textDecoration: "none",
+            marginTop: 4,
+          }}
+        >
+          Biweekly Reports &rarr;
+        </Link>
       </div>
 
       {/* Metrics 2-column grid */}

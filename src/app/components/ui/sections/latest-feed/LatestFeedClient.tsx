@@ -88,18 +88,58 @@ export default function LatestFeedClient({
         ))}
       </div>
 
-      <div className="flex gap-6 mt-[60px] text-[14px] font-[500]">
+      {/* Decorative separator */}
+      <div className="relative w-full mt-[60px] mb-6 flex items-center gap-4">
+        <div
+          className="flex-1 h-[1px]"
+          style={{
+            background: "linear-gradient(90deg, transparent, rgba(0,229,255,0.25))",
+          }}
+        />
+        <div
+          className="w-1.5 h-1.5 rotate-45"
+          style={{ background: "rgba(0,229,255,0.5)" }}
+        />
+        <div
+          className="flex-1 h-[1px]"
+          style={{
+            background: "linear-gradient(90deg, rgba(0,229,255,0.25), transparent)",
+          }}
+        />
+      </div>
+
+      <div className="flex gap-8">
         <Link
           href="/about/reports"
-          className="text-primary hover:underline"
+          className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.15em] transition-colors duration-300"
+          style={{
+            fontFamily: "'Share Tech Mono', monospace",
+            color: "rgba(0,229,255,0.7)",
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#00e5ff"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(0,229,255,0.7)"; }}
         >
-          View all reports &rarr;
+          <span
+            className="inline-block w-4 h-[1px] transition-all duration-300 group-hover:w-6"
+            style={{ background: "#00e5ff" }}
+          />
+          View all reports
         </Link>
         <Link
           href="/about/insight"
-          className="text-primary hover:underline"
+          className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.15em] transition-colors duration-300"
+          style={{
+            fontFamily: "'Share Tech Mono', monospace",
+            color: "rgba(0,229,255,0.7)",
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#00e5ff"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(0,229,255,0.7)"; }}
         >
-          View all posts &rarr;
+          <span
+            className="inline-block w-4 h-[1px] transition-all duration-300 group-hover:w-6"
+            style={{ background: "#00e5ff" }}
+          />
+          View all posts
         </Link>
       </div>
     </div>

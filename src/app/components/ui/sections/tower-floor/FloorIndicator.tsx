@@ -33,7 +33,7 @@ export default function FloorIndicator({ floor, label }: FloorIndicatorProps) {
     <div
       ref={ref}
       className="relative w-full flex items-center justify-center overflow-hidden bg-black"
-      style={{ height: "40vh" }}
+      style={{ height: "100vh", scrollSnapAlign: "start" }}
     >
       {/* Thin vertical guide lines on edges */}
       <div

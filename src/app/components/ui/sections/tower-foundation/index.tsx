@@ -92,7 +92,7 @@ export default function TowerFoundation() {
   const navColumns = NAV_COLUMNS.filter((c) => c.title !== "Social");
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ minHeight: "clamp(500px, 60vh, 700px)" }}>
+    <section className="relative w-full overflow-hidden" style={{ height: "100vh", scrollSnapAlign: "start" }}>
       {/* Background image */}
       <div className="absolute inset-0">
         <Image

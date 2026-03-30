@@ -15,7 +15,7 @@ const TYPE_CONFIG = {
   },
   report: {
     label: "Dev Report",
-    color: "#0077ff",
+    color: "#00e5ff",
     icon: <FileText size={12} />,
   },
 } as const;
@@ -66,11 +66,32 @@ export function FeedCard({ item }: { readonly item: FeedItem }) {
   return (
     <Wrapper
       {...linkProps}
-      className="relative w-full cursor-pointer group block overflow-hidden rounded-lg"
+      className="relative w-full cursor-pointer group block overflow-hidden"
       style={{
-        border: `1px solid ${cfg.color}20`,
+        borderRadius: "2px",
+        border: `1px solid rgba(0,229,255,0.15)`,
+        boxShadow: "0 0 0 0 transparent",
+        transition: "box-shadow 0.4s ease, border-color 0.4s ease",
+      }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = "rgba(0,229,255,0.4)";
+        el.style.boxShadow = "0 0 20px rgba(0,229,255,0.12), inset 0 0 20px rgba(0,229,255,0.03)";
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = "rgba(0,229,255,0.15)";
+        el.style.boxShadow = "0 0 0 0 transparent";
       }}
     >
+      {/* Scan-line overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none z-20"
+        style={{
+          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,229,255,0.015) 3px, rgba(0,229,255,0.015) 4px)",
+        }}
+      />
+
       {/* Full-card thumbnail */}
       <div className="relative w-full h-[300px] overflow-hidden">
         <Image
@@ -87,37 +108,57 @@ export function FeedCard({ item }: { readonly item: FeedItem }) {
         {/* Top row: badge + time */}
         <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-3 z-10">
           <span
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-[700] uppercase tracking-[0.06em] backdrop-blur-md"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-[700] uppercase tracking-[0.1em] backdrop-blur-md"
             style={{
-              backgroundColor: cfg.color + "25",
+              fontFamily: "'Share Tech Mono', monospace",
+              borderRadius: "2px",
+              backgroundColor: cfg.color + "20",
               color: cfg.color,
-              border: `1px solid ${cfg.color}40`,
+              border: `1px solid ${cfg.color}45`,
             }}
           >
             {cfg.icon}
             {cfg.label}
           </span>
-          <span className="px-2 py-0.5 text-[9px] font-[600] text-white/60 bg-black/40 backdrop-blur-md rounded">
+          <span
+            className="px-2 py-0.5 text-[9px] text-white/60 bg-black/50 backdrop-blur-md tracking-[0.08em] uppercase"
+            style={{
+              fontFamily: "'Share Tech Mono', monospace",
+              borderRadius: "2px",
+              border: "1px solid rgba(255,255,255,0.1)",
+            }}
+          >
             {relativeDays(item.date)}
           </span>
         </div>
 
-        {/* Glass overlay — default: bottom ~40%, hover: expands to ~65% */}
+        {/* Glass overlay */}
         <div
           className="absolute left-0 right-0 bottom-0 backdrop-blur-sm transition-all duration-500 ease-out flex flex-col justify-end"
           style={{
-            background: `linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0.35))`,
-            borderTop: `1px solid ${cfg.color}15`,
+            background: `linear-gradient(to top, rgba(0,0,0,0.82), rgba(0,0,0,0.38))`,
+            borderTop: `1px solid ${cfg.color}18`,
           }}
         >
           <div className="px-4 pt-3 pb-3">
             {/* Date */}
-            <span className="text-[11px] text-[#888] font-[400] block mb-1.5">
+            <span
+              className="text-[10px] block mb-1.5 tracking-[0.08em] uppercase"
+              style={{
+                fontFamily: "'Share Tech Mono', monospace",
+                color: "rgba(140,200,255,0.5)",
+              }}
+            >
               {formatDate(item.date)}
             </span>
 
             {/* Title */}
-            <h3 className="text-[16px] font-[700] text-white leading-snug line-clamp-2 group-hover:text-primary transition-colors duration-300 mb-0">
+            <h3
+              className="text-[16px] font-[700] text-white leading-snug line-clamp-2 mb-0 transition-colors duration-300"
+              style={{ fontFamily: "'Orbitron', sans-serif" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#00e5ff"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "#ffffff"; }}
+            >
               {item.title}
             </h3>
 
@@ -131,11 +172,13 @@ export function FeedCard({ item }: { readonly item: FeedItem }) {
                     return (
                       <span
                         key={stat}
-                        className="inline-flex items-center gap-1 text-[10px] font-[600] px-2 py-0.5 rounded"
+                        className="inline-flex items-center gap-1 text-[10px] font-[600] px-2 py-0.5 tracking-[0.06em]"
                         style={{
-                          backgroundColor: cfg.color + "15",
+                          fontFamily: "'Share Tech Mono', monospace",
+                          borderRadius: "2px",
+                          backgroundColor: cfg.color + "12",
                           color: cfg.color,
-                          border: `1px solid ${cfg.color}25`,
+                          border: `1px solid ${cfg.color}28`,
                         }}
                       >
                         {isRepo ? <GitPullRequest size={10} /> : <BarChart3 size={10} />}
@@ -148,7 +191,13 @@ export function FeedCard({ item }: { readonly item: FeedItem }) {
 
               {/* Excerpt for blogs */}
               {item.type === "blog" && item.excerpt && (
-                <p className="text-[12px] text-[#999] mt-3 leading-relaxed line-clamp-2">
+                <p
+                  className="text-[12px] mt-3 leading-relaxed line-clamp-2"
+                  style={{
+                    fontFamily: "'Share Tech Mono', monospace",
+                    color: "rgba(140,200,255,0.5)",
+                  }}
+                >
                   {item.excerpt}
                 </p>
               )}
@@ -156,22 +205,26 @@ export function FeedCard({ item }: { readonly item: FeedItem }) {
               {/* CTA */}
               <div className="flex items-center gap-1 mt-3">
                 <span
-                  className="text-[11px] font-[700] uppercase tracking-[0.06em]"
-                  style={{ color: cfg.color }}
+                  className="text-[11px] font-[700] uppercase tracking-[0.1em]"
+                  style={{
+                    fontFamily: "'Share Tech Mono', monospace",
+                    color: "#00e5ff",
+                  }}
                 >
                   {item.type === "report" ? "Open Report" : "Read More"}
                 </span>
-                <ArrowUpRight size={12} style={{ color: cfg.color }} />
+                <ArrowUpRight size={12} style={{ color: "#00e5ff" }} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Top edge glow on hover */}
+        {/* Top edge glow — always subtly visible, brighter on hover */}
         <div
-          className="absolute top-0 left-0 right-0 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          className="absolute top-0 left-0 right-0 h-[1px] opacity-40 group-hover:opacity-100 transition-opacity duration-500"
           style={{
             background: `linear-gradient(90deg, transparent, ${cfg.color}, transparent)`,
+            boxShadow: `0 0 6px ${cfg.color}80`,
           }}
         />
       </div>

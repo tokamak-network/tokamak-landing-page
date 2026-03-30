@@ -180,6 +180,7 @@ function SurfaceParticles() {
 /* ══════════════════════════════════════════════
    Equator ring — bright glow ring at torus center plane
    ══════════════════════════════════════════════ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function EquatorRing() {
   return (
     <mesh rotation={[Math.PI / 2, 0, 0]}>

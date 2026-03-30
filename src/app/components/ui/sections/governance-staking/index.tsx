@@ -754,88 +754,361 @@ function EnergyFlowLines() {
 }
 
 /* ═══════════════════════════════════════════════
+   Mobile Overlay — simplified, no 3D
+   ═══════════════════════════════════════════════ */
+
+function GovernanceStakingMobileOverlay() {
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center px-5 py-8 gap-5 overflow-y-auto">
+      {/* Title */}
+      <div className="flex flex-col items-center gap-1">
+        <div
+          style={{
+            fontSize: 10,
+            color: "rgba(140, 200, 255, 0.5)",
+            fontFamily: "'Share Tech Mono', monospace",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+          }}
+        >
+          Network Security
+        </div>
+        <div
+          style={{
+            fontSize: 16,
+            color: "#00e5ff",
+            fontFamily: "'Orbitron', sans-serif",
+            fontWeight: 700,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            textShadow: "0 0 14px rgba(0, 229, 255, 0.5)",
+            textAlign: "center",
+          }}
+        >
+          Governance &amp; Staking
+        </div>
+        <div
+          style={{
+            fontSize: 10,
+            color: "#22c55e",
+            fontFamily: "'Share Tech Mono', monospace",
+            letterSpacing: "0.12em",
+          }}
+        >
+          ● Active
+        </div>
+      </div>
+
+      {/* Governance sub-section */}
+      <div className="w-full max-w-xs flex flex-col gap-2">
+        <div
+          style={{
+            fontSize: 10,
+            color: "rgba(0, 229, 255, 0.7)",
+            fontFamily: "'Orbitron', sans-serif",
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            fontWeight: 700,
+            marginBottom: 2,
+          }}
+        >
+          Governance
+        </div>
+        {PROPOSALS.map((proposal) => {
+          const isActive = proposal.status === "active";
+          return (
+            <div
+              key={proposal.id}
+              className="relative flex items-center justify-between px-3 py-2"
+              style={{
+                background: isActive
+                  ? "linear-gradient(180deg, rgba(0, 229, 255, 0.1) 0%, rgba(4, 14, 28, 0.9) 100%)"
+                  : "linear-gradient(180deg, rgba(4, 14, 28, 0.85) 0%, rgba(2, 8, 18, 0.8) 100%)",
+                clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))",
+                border: "1px solid rgba(0, 229, 255, 0.12)",
+                minHeight: 44,
+              }}
+            >
+              <div
+                className="absolute pointer-events-none"
+                style={{
+                  top: -1,
+                  left: 0,
+                  right: 6,
+                  height: 1,
+                  background: isActive ? "rgba(0, 229, 255, 0.5)" : "rgba(0, 229, 255, 0.2)",
+                }}
+              />
+              <div className="flex flex-col gap-0.5">
+                <span
+                  style={{
+                    fontSize: 9,
+                    color: isActive ? "#00e5ff" : "rgba(0, 229, 255, 0.5)",
+                    fontFamily: "'Share Tech Mono', monospace",
+                    letterSpacing: "0.12em",
+                  }}
+                >
+                  {proposal.id}
+                </span>
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: "rgba(255, 255, 255, 0.85)",
+                    fontFamily: "'Share Tech Mono', monospace",
+                  }}
+                >
+                  {proposal.title}
+                </span>
+              </div>
+              <div className="flex flex-col items-end gap-0.5">
+                <span
+                  style={{
+                    fontSize: 14,
+                    color: "#fff",
+                    fontFamily: "'Orbitron', sans-serif",
+                    fontWeight: 700,
+                  }}
+                >
+                  {proposal.votes}
+                </span>
+                <span
+                  style={{
+                    fontSize: 9,
+                    color: isActive ? "#22c55e" : "rgba(140, 200, 255, 0.4)",
+                    fontFamily: "'Share Tech Mono', monospace",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                  }}
+                >
+                  {proposal.status}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Staking sub-section */}
+      <div className="w-full max-w-xs flex flex-col gap-2">
+        <div
+          style={{
+            fontSize: 10,
+            color: "rgba(0, 229, 255, 0.7)",
+            fontFamily: "'Orbitron', sans-serif",
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            fontWeight: 700,
+            marginBottom: 2,
+          }}
+        >
+          Staking
+        </div>
+        {STAKING_METRICS.map((metric) => (
+          <div
+            key={metric.label}
+            className="relative flex items-center justify-between px-3 py-2"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(4, 14, 28, 0.85) 0%, rgba(2, 8, 18, 0.8) 100%)",
+              clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)",
+              border: "1px solid rgba(0, 229, 255, 0.12)",
+              minHeight: 44,
+            }}
+          >
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                top: -1,
+                left: 0,
+                right: 8,
+                height: 1,
+                background: "rgba(0, 229, 255, 0.35)",
+              }}
+            />
+            <span
+              style={{
+                fontSize: 10,
+                color: "rgba(0, 229, 255, 0.7)",
+                fontFamily: "'Share Tech Mono', monospace",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+              }}
+            >
+              {metric.label}
+            </span>
+            <div className="flex items-baseline gap-1">
+              <span
+                style={{
+                  fontSize: 18,
+                  color: "#fff",
+                  fontFamily: "'Orbitron', sans-serif",
+                  fontWeight: 700,
+                  textShadow: "0 0 10px rgba(0, 229, 255, 0.3)",
+                }}
+              >
+                {metric.value}
+              </span>
+              {metric.suffix && (
+                <span
+                  style={{
+                    fontSize: 10,
+                    color: "rgba(0, 229, 255, 0.5)",
+                    fontFamily: "'Share Tech Mono', monospace",
+                  }}
+                >
+                  {metric.suffix}
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* CTA buttons */}
+      <div className="flex items-center gap-3">
+        <a
+          href="https://staking.tokamak.network"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center"
+          style={{
+            padding: "12px 24px",
+            minHeight: 44,
+            background:
+              "linear-gradient(180deg, rgba(0, 229, 255, 0.12) 0%, rgba(0, 229, 255, 0.04) 100%)",
+            border: "1px solid rgba(0, 229, 255, 0.4)",
+            fontFamily: "'Share Tech Mono', monospace",
+            fontSize: 11,
+            color: "#00e5ff",
+            letterSpacing: "0.18em",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            textDecoration: "none",
+            textShadow: "0 0 10px rgba(0, 229, 255, 0.5)",
+          }}
+        >
+          Stake TON
+        </a>
+        <a
+          href="https://dao.tokamak.network"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center"
+          style={{
+            padding: "12px 24px",
+            minHeight: 44,
+            background:
+              "linear-gradient(180deg, rgba(42, 114, 229, 0.1) 0%, rgba(42, 114, 229, 0.03) 100%)",
+            border: "1px solid rgba(42, 114, 229, 0.3)",
+            fontFamily: "'Share Tech Mono', monospace",
+            fontSize: 11,
+            color: "#8cc8ff",
+            letterSpacing: "0.18em",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            textDecoration: "none",
+          }}
+        >
+          Vote Now
+        </a>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════
    Main Export — Governance & Staking Overlay
    ═══════════════════════════════════════════════ */
 
 export default function GovernanceStakingOverlay() {
   return (
     <div className="absolute inset-0">
-      <HeaderBar />
-
-      {/* Section labels */}
-      <SectionLabel label="Governance" side="left" />
-      <SectionLabel label="Staking" side="right" />
-
-      {/* 3D Particle Bridge — center focal element */}
-      <ParticleBridge />
-
-      {/* CSS Energy flow lines */}
-      <EnergyFlowLines />
-
-      {/* Governance seal — rotating mandala */}
-      <GovernanceSeal />
-
-      {/* Left — Floating proposal cards */}
-      <div
-        className="absolute z-10 flex flex-col items-center"
-        style={{
-          left: "clamp(30px, 8vw, 120px)",
-          top: "46%",
-          transform: "translateY(-50%)",
-          gap: "clamp(6px, 0.6vw, 10px)",
-        }}
-      >
-        <div
-          className="flex flex-col"
-          style={{ gap: "clamp(6px, 0.6vw, 10px)" }}
-        >
-          {PROPOSALS.map((proposal, i) => (
-            <ProposalCard key={proposal.id} proposal={proposal} index={i} />
-          ))}
-        </div>
-        <div style={{ marginTop: "clamp(8px, 1vw, 16px)" }}>
-          <GovernanceStats />
-        </div>
+      {/* ── Mobile layout (below md) ── */}
+      <div className="block md:hidden w-full h-full">
+        <GovernanceStakingMobileOverlay />
       </div>
 
-      {/* Right — Crystal matrix + staking metrics */}
-      <div
-        className="absolute z-10 flex items-center"
-        style={{
-          right: "clamp(16px, 4vw, 60px)",
-          top: "46%",
-          transform: "translateY(-50%)",
-          gap: "clamp(10px, 1.2vw, 20px)",
-        }}
-      >
-        {/* Staking metrics */}
-        <div className="flex flex-col" style={{ gap: "clamp(8px, 1vw, 14px)" }}>
-          {STAKING_METRICS.map((metric, i) => (
-            <StakingMetric key={metric.label} metric={metric} index={i} />
-          ))}
+      {/* ── Desktop layout (md and above) ── */}
+      <div className="hidden md:block w-full h-full">
+        <div className="absolute inset-0">
+          <HeaderBar />
+
+          {/* Section labels */}
+          <SectionLabel label="Governance" side="left" />
+          <SectionLabel label="Staking" side="right" />
+
+          {/* 3D Particle Bridge — center focal element */}
+          <ParticleBridge />
+
+          {/* CSS Energy flow lines */}
+          <EnergyFlowLines />
+
+          {/* Governance seal — rotating mandala */}
+          <GovernanceSeal />
+
+          {/* Left — Floating proposal cards */}
+          <div
+            className="absolute z-10 flex flex-col items-center"
+            style={{
+              left: "clamp(30px, 8vw, 120px)",
+              top: "46%",
+              transform: "translateY(-50%)",
+              gap: "clamp(6px, 0.6vw, 10px)",
+            }}
+          >
+            <div
+              className="flex flex-col"
+              style={{ gap: "clamp(6px, 0.6vw, 10px)" }}
+            >
+              {PROPOSALS.map((proposal, i) => (
+                <ProposalCard key={proposal.id} proposal={proposal} index={i} />
+              ))}
+            </div>
+            <div style={{ marginTop: "clamp(8px, 1vw, 16px)" }}>
+              <GovernanceStats />
+            </div>
+          </div>
+
+          {/* Right — Crystal matrix + staking metrics */}
+          <div
+            className="absolute z-10 flex items-center"
+            style={{
+              right: "clamp(16px, 4vw, 60px)",
+              top: "46%",
+              transform: "translateY(-50%)",
+              gap: "clamp(10px, 1.2vw, 20px)",
+            }}
+          >
+            {/* Staking metrics */}
+            <div className="flex flex-col" style={{ gap: "clamp(8px, 1vw, 14px)" }}>
+              {STAKING_METRICS.map((metric, i) => (
+                <StakingMetric key={metric.label} metric={metric} index={i} />
+              ))}
+            </div>
+
+            {/* Crystal hex grid */}
+            <CrystalMatrix />
+          </div>
+
+          {/* Bottom CTAs */}
+          <div
+            className="absolute z-10 flex items-center justify-center gap-4"
+            style={{ left: 0, right: 0, bottom: "clamp(30px, 6vh, 60px)" }}
+          >
+            <CTAButton
+              label="Stake TON"
+              href="https://staking.tokamak.network"
+              variant="primary"
+              delay={1.2}
+            />
+            <CTAButton
+              label="Vote Now"
+              href="https://dao.tokamak.network"
+              variant="secondary"
+              delay={1.3}
+            />
+          </div>
         </div>
-
-        {/* Crystal hex grid */}
-        <CrystalMatrix />
-      </div>
-
-      {/* Bottom CTAs */}
-      <div
-        className="absolute z-10 flex items-center justify-center gap-4"
-        style={{ left: 0, right: 0, bottom: "clamp(30px, 6vh, 60px)" }}
-      >
-        <CTAButton
-          label="Stake TON"
-          href="https://staking.tokamak.network"
-          variant="primary"
-          delay={1.2}
-        />
-        <CTAButton
-          label="Vote Now"
-          href="https://dao.tokamak.network"
-          variant="secondary"
-          delay={1.3}
-        />
       </div>
     </div>
   );

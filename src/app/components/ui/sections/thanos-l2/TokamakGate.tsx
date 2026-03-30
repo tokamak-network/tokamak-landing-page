@@ -89,7 +89,7 @@ function HexShell() {
 
   return (
     <mesh ref={meshRef}>
-      <torusGeometry args={[2.5, 0.75, 32, 64]} />
+      <torusGeometry args={[1.0, 0.32, 32, 64]} />
       <meshBasicMaterial
         map={tex}
         transparent
@@ -107,7 +107,7 @@ function HexShell() {
 function WireframeTorus() {
   return (
     <mesh>
-      <torusGeometry args={[2.5, 0.73, 24, 48]} />
+      <torusGeometry args={[1.0, 0.30, 24, 48]} />
       <meshBasicMaterial
         color="#00e5ff"
         wireframe
@@ -126,8 +126,8 @@ function SurfaceParticles() {
 
   const geo = useMemo(() => {
     const count = 300;
-    const R = 2.5;
-    const r = 0.75;
+    const R = 1.0;
+    const r = 0.32;
     const positions = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       const u = Math.random() * Math.PI * 2;
@@ -161,7 +161,7 @@ function SurfaceParticles() {
 function EquatorRing() {
   return (
     <mesh rotation={[Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[2.55, 2.65, 128]} />
+      <ringGeometry args={[1.03, 1.10, 128]} />
       <meshBasicMaterial
         color="#00e5ff"
         transparent
@@ -225,10 +225,10 @@ function OrbitalRings() {
   return (
     <group ref={groupRef}>
       {[
-        { r: 3.8, tilt: [Math.PI / 2, 0, 0] as [number, number, number], op: 0.3, color: "#00e5ff" },
-        { r: 4.2, tilt: [Math.PI / 2, 0, Math.PI / 6] as [number, number, number], op: 0.15, color: "#2a72e5" },
-        { r: 4.6, tilt: [Math.PI / 2, 0, Math.PI / 3] as [number, number, number], op: 0.08, color: "#00e5ff" },
-        { r: 5.0, tilt: [Math.PI / 2, 0, Math.PI / 2] as [number, number, number], op: 0.04, color: "#2a72e5" },
+        { r: 1.5, tilt: [Math.PI / 2, 0, 0] as [number, number, number], op: 0.3, color: "#00e5ff" },
+        { r: 1.7, tilt: [Math.PI / 2, 0, Math.PI / 6] as [number, number, number], op: 0.15, color: "#2a72e5" },
+        { r: 1.9, tilt: [Math.PI / 2, 0, Math.PI / 3] as [number, number, number], op: 0.08, color: "#00e5ff" },
+        { r: 2.1, tilt: [Math.PI / 2, 0, Math.PI / 2] as [number, number, number], op: 0.04, color: "#2a72e5" },
       ].map((ring, i) => (
         <mesh key={i} rotation={ring.tilt}>
           <torusGeometry args={[ring.r, 0.008, 8, 256]} />
@@ -245,10 +245,10 @@ function OrbitalRings() {
 function CoreGlow() {
   return (
     <>
-      <pointLight position={[0, 0, 0]} intensity={2} color="#00e5ff" distance={12} />
-      <pointLight position={[0, 0, 0]} intensity={1} color="#2a72e5" distance={18} />
+      <pointLight position={[0, 0, 0]} intensity={1.5} color="#00e5ff" distance={6} />
+      <pointLight position={[0, 0, 0]} intensity={0.8} color="#2a72e5" distance={8} />
       <mesh>
-        <sphereGeometry args={[0.15, 16, 16]} />
+        <sphereGeometry args={[0.06, 16, 16]} />
         <meshBasicMaterial color="#00e5ff" transparent opacity={0.8} />
       </mesh>
     </>

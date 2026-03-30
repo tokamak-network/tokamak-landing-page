@@ -520,6 +520,119 @@ function BottomTicker({ items }: { items: TickerItem[] }) {
 }
 
 /* ═══════════════════════════════════════════════
+   Mobile Overlay — simplified, no 3D
+   ═══════════════════════════════════════════════ */
+
+function DataConsoleMobileOverlay({ items }: { items: TickerItem[] }) {
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-between py-8 px-5 gap-4">
+      {/* Title */}
+      <div className="flex flex-col items-center gap-1">
+        <div
+          style={{
+            fontSize: 10,
+            color: "rgba(140, 200, 255, 0.5)",
+            fontFamily: "'Share Tech Mono', monospace",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+          }}
+        >
+          System Status: <span style={{ color: "#22c55e" }}>Nominal</span>
+        </div>
+        <div
+          style={{
+            fontSize: 16,
+            color: "#00e5ff",
+            fontFamily: "'Orbitron', sans-serif",
+            fontWeight: 700,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            textShadow: "0 0 14px rgba(0, 229, 255, 0.5)",
+          }}
+        >
+          Live Data Console
+        </div>
+      </div>
+
+      {/* Metrics 2-column grid */}
+      <div className="grid grid-cols-2 gap-3 w-full max-w-xs flex-1 content-start">
+        {items.map((item) => (
+          <div
+            key={item.label}
+            className="relative flex flex-col items-center justify-center py-3 px-2"
+            style={{
+              background: "rgba(5, 10, 20, 0.85)",
+              border: "1px solid rgba(42, 114, 229, 0.25)",
+              borderRadius: 8,
+              minHeight: 72,
+            }}
+          >
+            {/* Top accent line */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 1,
+                background:
+                  "linear-gradient(90deg, rgba(42, 114, 229, 0.6), rgba(0, 229, 255, 0.4), rgba(42, 114, 229, 0.6))",
+                borderRadius: "8px 8px 0 0",
+              }}
+            />
+            <div
+              style={{
+                fontSize: 9,
+                color: "rgba(140, 200, 255, 0.6)",
+                fontFamily: "'Share Tech Mono', monospace",
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                marginBottom: 4,
+                textAlign: "center",
+              }}
+            >
+              {item.label}
+            </div>
+            <div
+              style={{
+                fontSize: 20,
+                color: "#fff",
+                fontFamily: "'Orbitron', sans-serif",
+                fontWeight: 900,
+                lineHeight: 1,
+                textShadow:
+                  "0 0 8px rgba(42, 114, 229, 0.8), 0 0 20px rgba(42, 114, 229, 0.4)",
+              }}
+            >
+              {item.prefix}
+              {item.value}
+            </div>
+            {item.change && (
+              <div
+                style={{
+                  marginTop: 3,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: item.change.startsWith("+") ? "#00ff88" : "#ef4444",
+                  fontFamily: "'Share Tech Mono', monospace",
+                }}
+              >
+                {item.change}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Bottom ticker — works on mobile as-is */}
+      <div className="w-full">
+        <BottomTicker items={items} />
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════
    Main Export
    ═══════════════════════════════════════════════ */
 export default function DataConsoleOverlay({ items }: { items: TickerItem[] }) {
@@ -529,49 +642,59 @@ export default function DataConsoleOverlay({ items }: { items: TickerItem[] }) {
 
   return (
     <div className="absolute inset-0">
-      {/* Header bar */}
-      <HeaderBar />
-
-      {/* Central holographic sphere */}
-      <HoloSphere />
-
-      {/* Left metric panels */}
-      <div
-        className="absolute z-10 flex flex-col"
-        style={{
-          left: "clamp(20px, 8vw, 120px)",
-          top: "46%",
-          transform: "translateY(-50%)",
-          gap: "clamp(8px, 1vw, 14px)",
-        }}
-      >
-        {leftItems.map((item, i) => (
-          <MetricPanel key={item.label} item={item} index={i} side="left" />
-        ))}
+      {/* ── Mobile layout (below md) ── */}
+      <div className="block md:hidden w-full h-full">
+        <DataConsoleMobileOverlay items={items} />
       </div>
 
-      {/* Right metric panels */}
-      <div
-        className="absolute z-10 flex flex-col"
-        style={{
-          right: "clamp(20px, 8vw, 120px)",
-          top: "46%",
-          transform: "translateY(-50%)",
-          gap: "clamp(8px, 1vw, 14px)",
-        }}
-      >
-        {rightItems.map((item, i) => (
-          <MetricPanel
-            key={item.label}
-            item={item}
-            index={i + mid}
-            side="right"
-          />
-        ))}
-      </div>
+      {/* ── Desktop layout (md and above) ── */}
+      <div className="hidden md:block w-full h-full">
+        <div className="absolute inset-0">
+          {/* Header bar */}
+          <HeaderBar />
 
-      {/* Bottom ticker carousel */}
-      <BottomTicker items={items} />
+          {/* Central holographic sphere */}
+          <HoloSphere />
+
+          {/* Left metric panels */}
+          <div
+            className="absolute z-10 flex flex-col"
+            style={{
+              left: "clamp(20px, 8vw, 120px)",
+              top: "46%",
+              transform: "translateY(-50%)",
+              gap: "clamp(8px, 1vw, 14px)",
+            }}
+          >
+            {leftItems.map((item, i) => (
+              <MetricPanel key={item.label} item={item} index={i} side="left" />
+            ))}
+          </div>
+
+          {/* Right metric panels */}
+          <div
+            className="absolute z-10 flex flex-col"
+            style={{
+              right: "clamp(20px, 8vw, 120px)",
+              top: "46%",
+              transform: "translateY(-50%)",
+              gap: "clamp(8px, 1vw, 14px)",
+            }}
+          >
+            {rightItems.map((item, i) => (
+              <MetricPanel
+                key={item.label}
+                item={item}
+                index={i + mid}
+                side="right"
+              />
+            ))}
+          </div>
+
+          {/* Bottom ticker carousel */}
+          <BottomTicker items={items} />
+        </div>
+      </div>
     </div>
   );
 }

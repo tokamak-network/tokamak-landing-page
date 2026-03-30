@@ -25,12 +25,12 @@ export default function TowerFloor({
       {/* Sticky viewport — fills screen, stays in place while scrolling */}
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden bg-black">
         <div className="relative w-full max-w-[1400px] mx-auto px-4">
-          <div className="relative w-full aspect-video">
+          <div className="relative w-full h-[70vh] md:h-auto md:aspect-video">
             <Image
               src={bgImage}
               alt={bgAlt}
               fill
-              className="object-contain"
+              className="object-cover md:object-contain"
               sizes="(max-width: 1400px) 100vw, 1400px"
               priority={isFirst}
             />

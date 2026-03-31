@@ -1175,367 +1175,349 @@ function GovernanceStakingMobileOverlay({
   proposals,
   stakingMetrics,
   govStats,
+  committee,
+  treasury,
+  totalSupply,
+  totalStaked,
+  seigPerBlock,
 }: {
   proposals: Proposal[];
   stakingMetrics: StakingMetric[];
   govStats: GovStat[];
+  committee: CommitteeMember[];
+  treasury: TreasuryData;
+  totalSupply: number;
+  totalStaked: number;
+  seigPerBlock: number;
 }) {
+  const aprMetric = stakingMetrics.find(m => m.label === "Staking APR");
+  const stakedMetric = stakingMetrics.find(m => m.label === "Total Staked");
+  const operatorMetric = stakingMetrics.find(m => m.label === "Operators");
+  const stakedRatio = totalSupply > 0 ? ((totalStaked / totalSupply) * 100).toFixed(1) : "0";
+  const seigAlloc = govStats.find(s => s.label === "Total Agendas");
+
   return (
-    <div className="absolute inset-0 flex flex-col px-5 py-8 gap-3 overflow-y-auto">
-      {/* ── Top label ── */}
-      <div
-        style={{
-          fontSize: 9,
-          color: "rgba(0, 229, 255, 0.6)",
-          fontFamily: "'Share Tech Mono', monospace",
-          letterSpacing: "0.25em",
-          textTransform: "uppercase",
-        }}
-      >
-        Reactor Core
-      </div>
+    <div className="absolute inset-0 flex flex-col px-4 py-6 gap-3 overflow-y-auto">
+      <style dangerouslySetInnerHTML={{ __html: TILE_GLOW_KEYFRAMES + STAKING_GLOW_KEYFRAMES }} />
 
       {/* ══════════════════════════════════════
-          STAKING PANEL (top card)
+          STAKING SECTION
           ══════════════════════════════════════ */}
+
+      {/* Staking Header */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div
+          style={{
+            fontSize: 13,
+            fontFamily: "'Orbitron', sans-serif",
+            fontWeight: 700,
+            color: "rgba(0,229,255,0.8)",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            textShadow: "0 0 10px rgba(0,229,255,0.3)",
+          }}
+        >
+          Staking
+        </div>
+        <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, rgba(0,229,255,0.3), transparent)" }} />
+      </div>
+
+      {/* APR Hero */}
       <div
-        className="relative overflow-hidden w-full"
+        className="relative overflow-hidden"
         style={{
-          background:
-            "linear-gradient(135deg, rgba(0,15,35,0.95), rgba(5,10,25,0.95))",
-          border: "1px solid rgba(0,229,255,0.2)",
-          padding: "18px 16px 16px",
+          padding: "20px 16px",
+          background: "rgba(0,10,25,0.9)",
+          border: "1px solid rgba(34,197,94,0.2)",
+          borderRadius: 8,
+          textAlign: "center",
+          animation: "greenGlow 3s ease-in-out infinite",
         }}
       >
-        {/* Top accent */}
         <div
           className="absolute pointer-events-none"
           style={{
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 2,
-            background:
-              "linear-gradient(90deg, transparent, #00e5ff, transparent)",
+            top: -10, left: "50%", transform: "translateX(-50%)",
+            width: 180, height: 80,
+            background: "radial-gradient(ellipse, rgba(34,197,94,0.08), transparent)",
           }}
         />
-        {/* Scan line texture */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,229,255,0.025) 3px, rgba(0,229,255,0.025) 4px)",
-          }}
-        />
+        <div style={{ fontSize: 9, color: "rgba(34,197,94,0.5)", letterSpacing: "0.3em", textTransform: "uppercase", marginBottom: 6, position: "relative", fontFamily: "'Share Tech Mono', monospace" }}>
+          Staking APR
+        </div>
+        <div style={{ fontSize: 42, fontFamily: "'Orbitron', sans-serif", fontWeight: 900, color: "#22c55e", textShadow: "0 0 20px rgba(34,197,94,0.6), 0 0 40px rgba(34,197,94,0.3)", lineHeight: 1, position: "relative" }}>
+          {aprMetric?.value ?? "—"}
+          <span style={{ fontSize: "0.38em", color: "rgba(34,197,94,0.5)" }}>%</span>
+        </div>
+        <div style={{ height: 1, background: "linear-gradient(90deg, transparent, rgba(34,197,94,0.3), transparent)", marginTop: 12 }} />
+      </div>
 
-        {/* Sub-label */}
+      {/* Total Staked */}
+      <div
+        style={{
+          padding: "14px 16px",
+          background: "rgba(0,10,25,0.9)",
+          border: "1px solid rgba(0,229,255,0.2)",
+          borderRadius: 8,
+        }}
+      >
+        <div style={{ fontSize: 9, color: "rgba(0,229,255,0.5)", letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: "'Share Tech Mono', monospace", marginBottom: 4 }}>
+          Total Staked
+        </div>
+        <div style={{ fontSize: 26, fontFamily: "'Orbitron', sans-serif", fontWeight: 900, color: "#fff", textShadow: "0 0 15px rgba(0,229,255,0.5)" }}>
+          {stakedMetric?.value ?? "—"}
+          <span style={{ fontSize: "0.4em", color: "rgba(0,229,255,0.5)", marginLeft: 4 }}>TON</span>
+        </div>
+      </div>
+
+      {/* Staked Ratio Gauge */}
+      <div
+        style={{
+          padding: "10px 14px",
+          background: "rgba(0,10,25,0.7)",
+          border: "1px solid rgba(0,229,255,0.1)",
+          borderRadius: 6,
+        }}
+      >
+        <div className="flex justify-between items-center" style={{ marginBottom: 5 }}>
+          <span style={{ fontSize: 9, color: "rgba(140,200,255,0.4)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.1em" }}>
+            STAKED / SUPPLY
+          </span>
+          <span style={{ fontSize: 12, color: "rgba(0,229,255,0.6)", fontFamily: "'Orbitron', sans-serif", fontWeight: 700 }}>
+            {stakedRatio}%
+          </span>
+        </div>
+        <div style={{ height: 5, background: "rgba(0,229,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${stakedRatio}%` }}
+            transition={{ duration: 1.5, delay: 0.3, ease: "easeOut" }}
+            style={{ height: "100%", background: "linear-gradient(90deg, #00e5ff, #2A72E5)", borderRadius: 3, boxShadow: "0 0 6px rgba(0,229,255,0.5)" }}
+          />
+        </div>
+      </div>
+
+      {/* Operators + Seig/Block row */}
+      <div className="flex" style={{ gap: 6 }}>
         <div
           style={{
-            fontSize: 10,
-            color: "rgba(0,229,255,0.7)",
-            fontFamily: "'Orbitron', sans-serif",
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            marginBottom: 16,
-            position: "relative",
-            zIndex: 1,
+            flex: 1, padding: "12px 8px",
+            background: "rgba(0,10,25,0.9)",
+            border: "1px solid rgba(0,229,255,0.15)",
+            borderRadius: 8, textAlign: "center",
           }}
         >
-          Power Output · Staking
+          <div style={{ fontSize: 18, fontFamily: "'Orbitron', sans-serif", fontWeight: 700, color: "#fff" }}>
+            {operatorMetric?.value ?? "—"}
+          </div>
+          <div style={{ fontSize: 8, color: "rgba(140,200,255,0.35)", fontFamily: "'Share Tech Mono', monospace", marginTop: 3, letterSpacing: "0.1em" }}>
+            OPERATORS
+          </div>
         </div>
-
-        {/* 3-column metrics row */}
         <div
-          className="flex"
-          style={{ position: "relative", zIndex: 1, marginBottom: 16 }}
-        >
-          {stakingMetrics.map((metric, i) => {
-            const isAPR = metric.label === "Staking APR";
-            return (
-              <div
-                key={metric.label}
-                className="flex flex-col items-center"
-                style={{
-                  flex: 1,
-                  borderLeft:
-                    i === 1 ? "1px solid rgba(0,229,255,0.1)" : undefined,
-                  borderRight:
-                    i === 1 ? "1px solid rgba(0,229,255,0.1)" : undefined,
-                  padding: "0 4px",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 20,
-                    color: isAPR ? "#22c55e" : "#fff",
-                    fontFamily: "'Orbitron', sans-serif",
-                    fontWeight: 900,
-                    lineHeight: 1,
-                  }}
-                >
-                  {metric.value}
-                  {metric.suffix && (
-                    <span
-                      style={{
-                        fontSize: "0.45em",
-                        color: isAPR
-                          ? "rgba(34,197,94,0.8)"
-                          : "rgba(0,229,255,0.6)",
-                        marginLeft: 2,
-                      }}
-                    >
-                      {metric.suffix}
-                    </span>
-                  )}
-                </div>
-                <div
-                  style={{
-                    fontSize: 8,
-                    color: "rgba(0,229,255,0.5)",
-                    fontFamily: "'Share Tech Mono', monospace",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.12em",
-                    marginTop: 5,
-                    textAlign: "center",
-                  }}
-                >
-                  {metric.label}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Stake TON CTA button */}
-        <a
-          href="https://github.com/tokamak-network/TokamakStaking"
-          target="_blank"
-          rel="noopener noreferrer"
           style={{
-            display: "block",
-            width: "100%",
-            padding: "12px",
-            background:
-              "linear-gradient(180deg, rgba(0,40,60,0.9), rgba(5,25,50,0.9))",
-            border: "1px solid rgba(0,229,255,0.5)",
+            flex: 1, padding: "12px 8px",
+            background: "rgba(0,10,25,0.9)",
+            border: "1px solid rgba(0,229,255,0.15)",
+            borderRadius: 8, textAlign: "center",
+          }}
+        >
+          <div style={{ fontSize: 18, fontFamily: "'Orbitron', sans-serif", fontWeight: 700, color: "#fff" }}>
+            {seigPerBlock > 0 ? seigPerBlock.toFixed(2) : "—"}
+            <span style={{ fontSize: "0.45em", color: "rgba(0,229,255,0.5)", marginLeft: 3 }}>TON</span>
+          </div>
+          <div style={{ fontSize: 8, color: "rgba(140,200,255,0.35)", fontFamily: "'Share Tech Mono', monospace", marginTop: 3, letterSpacing: "0.1em" }}>
+            SEIG / BLOCK
+          </div>
+        </div>
+      </div>
+
+      {/* Stake TON CTA */}
+      <a
+        href="https://github.com/tokamak-network/TokamakStaking"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: "block", width: "100%", padding: 12,
+          background: "linear-gradient(180deg, rgba(0,40,60,0.9), rgba(5,25,50,0.9))",
+          border: "1px solid rgba(0,229,255,0.5)",
+          fontFamily: "'Orbitron', sans-serif", fontSize: 12, fontWeight: 700,
+          color: "#fff", letterSpacing: "0.15em", textTransform: "uppercase",
+          textDecoration: "none", textAlign: "center", borderRadius: 4,
+        }}
+      >
+        Stake TON
+      </a>
+
+      {/* ══════════════════════════════════════
+          GOVERNANCE SECTION
+          ══════════════════════════════════════ */}
+
+      {/* Governance Header */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+        <div
+          style={{
+            fontSize: 13,
             fontFamily: "'Orbitron', sans-serif",
-            fontSize: 11,
             fontWeight: 700,
-            color: "#fff",
+            color: "rgba(0,229,255,0.8)",
             letterSpacing: "0.15em",
             textTransform: "uppercase",
-            textDecoration: "none",
-            textAlign: "center",
-            position: "relative",
-            zIndex: 1,
+            textShadow: "0 0 10px rgba(0,229,255,0.3)",
           }}
         >
-          Stake TON
+          Governance
+        </div>
+        <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, rgba(0,229,255,0.3), transparent)" }} />
+      </div>
+
+      {/* Treasury Tile */}
+      <div
+        style={{
+          padding: "14px 16px",
+          background: "rgba(0,10,25,0.9)",
+          border: "1px solid rgba(0,229,255,0.2)",
+          borderRadius: 8,
+        }}
+      >
+        <div className="flex justify-between items-center">
+          <div>
+            <div style={{ fontSize: 9, color: "rgba(0,229,255,0.5)", letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: "'Share Tech Mono', monospace" }}>
+              DAO Treasury
+            </div>
+            <div style={{ fontSize: 28, fontFamily: "'Orbitron', sans-serif", fontWeight: 900, color: "#fff", marginTop: 3, textShadow: "0 0 15px rgba(0,229,255,0.5)" }}>
+              {treasury.totalTonEquivalent > 0 ? formatTreasury(treasury.totalTonEquivalent) : "—"}
+              <span style={{ fontSize: "0.4em", color: "rgba(0,229,255,0.5)", marginLeft: 4 }}>TON</span>
+            </div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: 20, fontFamily: "'Orbitron', sans-serif", fontWeight: 700, color: "rgba(0,229,255,0.7)" }}>
+              50%
+            </div>
+            <div style={{ fontSize: 8, color: "rgba(140,200,255,0.35)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.1em" }}>
+              SEIG ALLOC
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Committee Section */}
+      <div style={{ fontSize: 9, color: "rgba(0,229,255,0.4)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        Committee · {committee.length}/{committee.length} Active
+      </div>
+
+      <div className="flex" style={{ gap: 6 }}>
+        {committee.map((member, i) => (
+          <div
+            key={member.seat}
+            style={{
+              flex: 1, padding: "12px 6px",
+              background: "rgba(0,10,25,0.9)",
+              border: "1px solid rgba(0,229,255,0.15)",
+              borderRadius: 8, textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                width: 28, height: 28, margin: "0 auto 6px",
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, rgba(0,229,255,0.15), rgba(42,114,229,0.15))",
+                border: "1px solid rgba(0,229,255,0.3)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}
+            >
+              <span style={{ fontSize: 10, color: "#00e5ff" }}>●</span>
+            </div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.85)", fontFamily: "'Share Tech Mono', monospace", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {member.name}
+            </div>
+            <div style={{ fontSize: 8, color: "rgba(140,200,255,0.35)", fontFamily: "'Share Tech Mono', monospace", marginTop: 3 }}>
+              Seat {member.seat} · {formatJoinLabel(member.joinedAt)}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Agenda Section */}
+      <div style={{ fontSize: 9, color: "rgba(0,229,255,0.4)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.18em", textTransform: "uppercase", marginTop: 2 }}>
+        Recent Agendas
+      </div>
+
+      <div className="flex flex-col" style={{ gap: 6 }}>
+        {proposals.map((proposal) => {
+          const sc = agendaStatusColor(proposal.status);
+          const isNotice = proposal.status === "notice" || proposal.status === "active";
+          return (
+            <div
+              key={proposal.id}
+              style={{
+                padding: "12px 14px",
+                background: "rgba(0,10,25,0.9)",
+                border: `1px solid ${sc.border}`,
+                borderRadius: 8,
+              }}
+            >
+              <div className="flex justify-between items-center" style={{ marginBottom: 4 }}>
+                <span style={{ fontSize: 14, fontFamily: "'Orbitron', sans-serif", fontWeight: 700, color: sc.text }}>
+                  {proposal.id}
+                </span>
+                <span style={{ fontSize: 9, color: sc.dot, fontFamily: "'Share Tech Mono', monospace" }}>
+                  {isNotice ? "● " : ""}{sc.label}
+                </span>
+              </div>
+              <div style={{ fontSize: 9, color: "rgba(140,200,255,0.3)", fontFamily: "'Share Tech Mono', monospace" }}>
+                {proposal.createdDate
+                  ? new Date(proposal.createdDate).toLocaleDateString("en", { month: "short", year: "numeric" })
+                  : "—"}
+                {proposal.votingStart && proposal.votingEnd
+                  ? ` · ${proposal.totalVotes ?? 0}/3 voted`
+                  : " · 0/3 voted"}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Summary bar */}
+      <div
+        className="flex items-center justify-between"
+        style={{
+          padding: "8px 12px",
+          background: "rgba(0,10,25,0.7)",
+          border: "1px solid rgba(0,229,255,0.08)",
+          borderRadius: 6,
+        }}
+      >
+        <span style={{ fontSize: 9, color: "rgba(140,200,255,0.35)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.1em" }}>
+          {seigAlloc ? `${seigAlloc.value} AGENDAS` : "—"} · QUORUM {govStats.find(s => s.label === "Quorum")?.value ?? "—"}
+        </span>
+        <a
+          href="https://github.com/tokamak-network/TokamakDAO"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontSize: 9, color: "rgba(0,229,255,0.5)", fontFamily: "'Share Tech Mono', monospace", textDecoration: "none", letterSpacing: "0.08em" }}
+        >
+          DAO →
         </a>
       </div>
 
-      {/* ══════════════════════════════════════
-          GOVERNANCE PANEL (bottom card)
-          ══════════════════════════════════════ */}
-      <div
-        className="relative overflow-hidden w-full"
+      {/* Vote Now CTA */}
+      <a
+        href="https://github.com/tokamak-network/TokamakDAO"
+        target="_blank"
+        rel="noopener noreferrer"
         style={{
-          background:
-            "linear-gradient(135deg, rgba(0,15,35,0.95), rgba(5,10,25,0.95))",
-          border: "1px solid rgba(0,229,255,0.2)",
-          padding: "18px 16px 16px",
+          display: "block", width: "100%", padding: 12,
+          background: "linear-gradient(180deg, rgba(10,20,50,0.9), rgba(5,15,40,0.9))",
+          border: "1px solid rgba(42,114,229,0.6)",
+          fontFamily: "'Orbitron', sans-serif", fontSize: 12, fontWeight: 700,
+          color: "#8cc8ff", letterSpacing: "0.15em", textTransform: "uppercase",
+          textDecoration: "none", textAlign: "center", borderRadius: 4,
+          marginBottom: 16,
         }}
       >
-        {/* Top accent — amber */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 2,
-            background:
-              "linear-gradient(90deg, transparent, #f59e0b, transparent)",
-          }}
-        />
-        {/* Scan line texture */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,229,255,0.025) 3px, rgba(0,229,255,0.025) 4px)",
-          }}
-        />
-
-        {/* Sub-label */}
-        <div
-          style={{
-            fontSize: 10,
-            color: "rgba(245,158,11,0.7)",
-            fontFamily: "'Orbitron', sans-serif",
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            marginBottom: 14,
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
-          Reactor Log · Governance
-        </div>
-
-        {/* Proposal list */}
-        <div
-          className="flex flex-col gap-2"
-          style={{ position: "relative", zIndex: 1, marginBottom: 14 }}
-        >
-          {proposals.map((proposal) => {
-            const isActive = proposal.status === "active";
-            return (
-              <div
-                key={proposal.id}
-                className="flex items-center justify-between"
-                style={{
-                  background: "rgba(0,10,20,0.9)",
-                  border: isActive
-                    ? "1px solid rgba(0,229,255,0.15)"
-                    : "1px solid rgba(0,229,255,0.1)",
-                  padding: "10px 12px",
-                }}
-              >
-                {/* Left: ID + title */}
-                <div className="flex flex-col" style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 9,
-                      color: isActive
-                        ? "#00e5ff"
-                        : "rgba(0,229,255,0.35)",
-                      fontFamily: "'Share Tech Mono', monospace",
-                      letterSpacing: "0.15em",
-                      marginBottom: 3,
-                    }}
-                  >
-                    {proposal.id}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: isActive
-                        ? "rgba(255,255,255,0.85)"
-                        : "rgba(255,255,255,0.45)",
-                      fontFamily: "'Share Tech Mono', monospace",
-                      lineHeight: 1.3,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {proposal.title}
-                  </div>
-                </div>
-
-                {/* Right: votes % + status */}
-                <div
-                  className="flex flex-col items-end"
-                  style={{ flexShrink: 0, marginLeft: 12 }}
-                >
-                  <div
-                    style={{
-                      fontSize: 16,
-                      color: "#fff",
-                      fontFamily: "'Orbitron', sans-serif",
-                      fontWeight: 700,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {proposal.votes}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 8,
-                      color: isActive
-                        ? "#22c55e"
-                        : "rgba(140,200,255,0.35)",
-                      fontFamily: "'Share Tech Mono', monospace",
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      marginTop: 3,
-                    }}
-                  >
-                    {proposal.status}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* GOV_STATS 3-column summary row */}
-        <div
-          className="grid grid-cols-3"
-          style={{ position: "relative", zIndex: 1, marginBottom: 14 }}
-        >
-          {govStats.map((stat, i) => (
-            <div
-              key={stat.label}
-              className="flex flex-col items-center"
-              style={{
-                borderLeft:
-                  i === 1 ? "1px solid rgba(0,229,255,0.1)" : undefined,
-                borderRight:
-                  i === 1 ? "1px solid rgba(0,229,255,0.1)" : undefined,
-                padding: "8px 4px",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 16,
-                  color: "#fff",
-                  fontFamily: "'Orbitron', sans-serif",
-                  fontWeight: 700,
-                  lineHeight: 1,
-                }}
-              >
-                {stat.value}
-              </span>
-              <span
-                style={{
-                  fontSize: 7,
-                  color: "rgba(140,200,255,0.5)",
-                  fontFamily: "'Share Tech Mono', monospace",
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  marginTop: 4,
-                  textAlign: "center",
-                  lineHeight: 1.2,
-                }}
-              >
-                {stat.label}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* Vote on DAO link */}
-        <div
-          style={{ position: "relative", zIndex: 1, textAlign: "center" }}
-        >
-          <a
-            href="https://github.com/tokamak-network/TokamakDAO"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              fontSize: 10,
-              color: "rgba(0,229,255,0.6)",
-              fontFamily: "'Share Tech Mono', monospace",
-              textDecoration: "none",
-              letterSpacing: "0.1em",
-            }}
-          >
-            Vote on DAO →
-          </a>
-        </div>
-      </div>
+        Vote Now
+      </a>
     </div>
   );
 }
@@ -1555,6 +1537,11 @@ export default function GovernanceStakingOverlay() {
           proposals={proposals}
           stakingMetrics={stakingMetrics}
           govStats={govStats}
+          committee={committee}
+          treasury={treasury}
+          totalSupply={totalSupply}
+          totalStaked={totalStaked}
+          seigPerBlock={seigPerBlock}
         />
       </div>
 

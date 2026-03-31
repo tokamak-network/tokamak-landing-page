@@ -182,7 +182,7 @@ export default function IntroSequence({ videoSrc }: IntroSequenceProps) {
           muted
           playsInline
           onEnded={handleVideoEnd}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-contain"
           style={{ zIndex: 1 }}
         />
       )}

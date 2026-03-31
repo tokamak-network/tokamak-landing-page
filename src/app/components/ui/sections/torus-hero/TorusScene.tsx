@@ -46,7 +46,7 @@ function createHelicalStripeTexture(): CanvasTexture {
   return texture;
 }
 
-/** Force renderer to match parent container size */
+/** Force renderer to match parent container size + responsive camera */
 function ResizeHelper() {
   const { gl, camera, size } = useThree();
 
@@ -55,32 +55,33 @@ function ResizeHelper() {
     const parent = canvas.parentElement;
     if (!parent) return;
 
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        if (width > 0 && height > 0) {
-          gl.setSize(width, height);
-          if ("aspect" in camera) {
-            (camera as { aspect: number }).aspect = width / height;
-          }
-          if ("updateProjectionMatrix" in camera) {
-            (camera as { updateProjectionMatrix: () => void }).updateProjectionMatrix();
-          }
-        }
-      }
-    });
-
-    observer.observe(parent);
-    // Initial size set
-    const rect = parent.getBoundingClientRect();
-    if (rect.width > 0 && rect.height > 0 && size.width <= 300) {
-      gl.setSize(rect.width, rect.height);
+    const updateCamera = (width: number, height: number) => {
+      if (width <= 0 || height <= 0) return;
+      gl.setSize(width, height);
       if ("aspect" in camera) {
-        (camera as { aspect: number }).aspect = rect.width / rect.height;
+        (camera as { aspect: number }).aspect = width / height;
+      }
+      // Widen FOV on narrow (portrait) screens so torus fits
+      if ("fov" in camera) {
+        const aspect = width / height;
+        (camera as { fov: number }).fov = aspect < 1 ? 75 : 55;
       }
       if ("updateProjectionMatrix" in camera) {
         (camera as { updateProjectionMatrix: () => void }).updateProjectionMatrix();
       }
+    };
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        updateCamera(width, height);
+      }
+    });
+
+    observer.observe(parent);
+    const rect = parent.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0 && size.width <= 300) {
+      updateCamera(rect.width, rect.height);
     }
 
     return () => observer.disconnect();

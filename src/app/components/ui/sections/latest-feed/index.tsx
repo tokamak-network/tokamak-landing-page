@@ -54,7 +54,7 @@ export default function LatestFeed() {
 
   return (
     <section
-      className="relative z-10 w-full flex justify-center px-6 py-[160px] [@media(max-width:640px)]:py-[80px] overflow-hidden bg-black"
+      className="relative z-10 w-full flex justify-center px-6 pt-[110px] pb-[160px] [@media(max-width:640px)]:py-[80px] overflow-hidden bg-black"
       style={{ height: "100vh", scrollSnapAlign: "start" }}
     >
       {/* ── Background layers ── */}

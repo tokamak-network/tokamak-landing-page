@@ -61,6 +61,19 @@ const daoAgendaManagerAbi = [
     ],
   },
   {
+    name: "getAgendaTimestamps",
+    type: "function",
+    stateMutability: "view",
+    inputs: [{ name: "_agendaID", type: "uint256" }],
+    outputs: [
+      { name: "createdTimestamp", type: "uint256" },
+      { name: "noticeEndTimestamp", type: "uint256" },
+      { name: "votingStartedTimestamp", type: "uint256" },
+      { name: "votingEndTimestamp", type: "uint256" },
+      { name: "executableLimitTimestamp", type: "uint256" },
+    ],
+  },
+  {
     name: "agendas",
     type: "function",
     stateMutability: "view",
@@ -86,7 +99,27 @@ const daoAgendaManagerAbi = [
 const daoCommitteeProxyAbi = [
   { name: "quorum", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
   { name: "maxMember", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
+  { name: "members", type: "function", stateMutability: "view", inputs: [{ type: "uint256" }], outputs: [{ type: "address" }] },
+  { name: "candidateInfos", type: "function", stateMutability: "view", inputs: [{ type: "address" }], outputs: [
+    { name: "candidateContract", type: "address" },
+    { name: "indexMembers", type: "uint256" },
+    { name: "rewardPeriod", type: "uint256" },
+    { name: "claimedTimestamp", type: "uint256" },
+    { name: "memberJoinedTimestamp", type: "uint256" },
+  ] },
+  { name: "daoVault", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "address" }] },
 ] as const;
+
+const candidateAbi = [
+  { name: "memo", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "string" }] },
+] as const;
+
+const erc20Abi = [
+  { name: "balanceOf", type: "function", stateMutability: "view", inputs: [{ name: "account", type: "address" }], outputs: [{ type: "uint256" }] },
+] as const;
+
+const TON_TOKEN = "0x2be5e8c109e2197D077D13A82dAead6a9b3433C5" as const;
+const WTON_TOKEN = "0xc4A11aaf6ea915Ed7Ac194161d2fC9384F15bff2" as const;
 
 /* ── Constants ── */
 const RAY = 27; // 10^27 decimals
@@ -151,6 +184,91 @@ async function fetchStakingData() {
     totalSupply: Math.round(totalSupply),
     apr: Math.round(apr * 100) / 100,
     operatorCount,
+    seigPerBlock: Math.round(seigPerBlockNum * 100) / 100,
+  };
+}
+
+/* ── Committee Members ── */
+async function fetchCommitteeData(maxMemberNum: number) {
+  // Fetch member addresses
+  const memberAddresses = await Promise.all(
+    Array.from({ length: maxMemberNum }, (_, i) =>
+      client.readContract({
+        address: DAO_COMMITTEE_PROXY,
+        abi: daoCommitteeProxyAbi,
+        functionName: "members",
+        args: [BigInt(i)],
+      })
+    )
+  );
+
+  // Fetch candidateInfos + memo for each member
+  const members = await Promise.all(
+    (memberAddresses as `0x${string}`[]).map(async (addr, i) => {
+      try {
+        const info = await client.readContract({
+          address: DAO_COMMITTEE_PROXY,
+          abi: daoCommitteeProxyAbi,
+          functionName: "candidateInfos",
+          args: [addr],
+        });
+        const [candidateContract, , , , memberJoinedTimestamp] = info as [string, bigint, bigint, bigint, bigint];
+        const joinedTs = Number(memberJoinedTimestamp);
+
+        let name = `Member ${i}`;
+        try {
+          name = await client.readContract({
+            address: candidateContract as `0x${string}`,
+            abi: candidateAbi,
+            functionName: "memo",
+          }) as string;
+        } catch { /* memo might not exist */ }
+
+        return {
+          name: name || `Member ${i}`,
+          address: addr,
+          seat: i,
+          joinedAt: joinedTs > 0 ? new Date(joinedTs * 1000).toISOString().split("T")[0] : null,
+        };
+      } catch {
+        return { name: `Member ${i}`, address: addr, seat: i, joinedAt: null };
+      }
+    })
+  );
+
+  return members;
+}
+
+/* ── DAO Treasury ── */
+async function fetchTreasuryData() {
+  const vaultAddress = await client.readContract({
+    address: DAO_COMMITTEE_PROXY,
+    abi: daoCommitteeProxyAbi,
+    functionName: "daoVault",
+  }) as `0x${string}`;
+
+  const [tonBalance, wtonBalance] = await Promise.all([
+    client.readContract({
+      address: TON_TOKEN,
+      abi: erc20Abi,
+      functionName: "balanceOf",
+      args: [vaultAddress],
+    }),
+    client.readContract({
+      address: WTON_TOKEN,
+      abi: erc20Abi,
+      functionName: "balanceOf",
+      args: [vaultAddress],
+    }),
+  ]);
+
+  const ton = Number(formatUnits(tonBalance as bigint, 18));
+  const wton = Number(formatUnits(wtonBalance as bigint, RAY));
+
+  return {
+    ton: Math.round(ton),
+    wton: Math.round(wton),
+    totalTonEquivalent: Math.round(ton + wton),
   };
 }
 
@@ -184,7 +302,7 @@ async function fetchGovernanceData() {
 
   const agendaData = await Promise.all(
     agendaIds.map(async (id) => {
-      const [status, result, votes] = await Promise.all([
+      const [status, result, votes, timestamps] = await Promise.all([
         client.readContract({
           address: DAO_AGENDA_MANAGER,
           abi: daoAgendaManagerAbi,
@@ -203,8 +321,15 @@ async function fetchGovernanceData() {
           functionName: "getVotingCount",
           args: [BigInt(id)],
         }),
+        client.readContract({
+          address: DAO_AGENDA_MANAGER,
+          abi: daoAgendaManagerAbi,
+          functionName: "getAgendaTimestamps",
+          args: [BigInt(id)],
+        }),
       ]);
 
+      const [createdTs, , votingStartTs, votingEndTs] = timestamps as [bigint, bigint, bigint, bigint, bigint];
       const statusNum = Number(status);
       const [resultNum, executed] = result as [bigint, boolean];
       const [yesVotes, noVotes, abstainVotes] = votes as [bigint, bigint, bigint];
@@ -233,6 +358,16 @@ async function fetchGovernanceData() {
       const votePercent =
         maxMemberNum > 0 ? Math.round((yes / maxMemberNum) * 100) : 0;
 
+      const createdDate = Number(createdTs) > 0
+        ? new Date(Number(createdTs) * 1000).toISOString().split("T")[0]
+        : null;
+      const votingStart = Number(votingStartTs) > 0
+        ? new Date(Number(votingStartTs) * 1000).toISOString().split("T")[0]
+        : null;
+      const votingEnd = Number(votingEndTs) > 0
+        ? new Date(Number(votingEndTs) * 1000).toISOString().split("T")[0]
+        : null;
+
       return {
         id: `#${id}`,
         title: `Agenda ${id}`,
@@ -245,6 +380,9 @@ async function fetchGovernanceData() {
         executed: Boolean(executed),
         rawStatus: AGENDA_STATUS[statusNum] || "unknown",
         rawResult: AGENDA_RESULT[resNum] || "unknown",
+        createdDate,
+        votingStart,
+        votingEnd,
       };
     })
   );
@@ -265,14 +403,20 @@ async function fetchGovernanceData() {
 
 /* ── Main Export ── */
 export async function fetchGovernanceStakingData() {
-  const [staking, governance] = await Promise.all([
+  const [staking, governance, treasury] = await Promise.all([
     fetchStakingData(),
     fetchGovernanceData(),
+    fetchTreasuryData(),
   ]);
+
+  // Fetch committee members (needs maxMember from governance)
+  const committee = await fetchCommitteeData(governance.maxMember);
 
   return {
     staking,
     governance,
+    committee,
+    treasury,
     fetchedAt: Date.now(),
   };
 }

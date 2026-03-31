@@ -31,6 +31,11 @@ interface Proposal {
   title: string;
   status: string;
   votes: string;
+  createdDate?: string | null;
+  votingStart?: string | null;
+  votingEnd?: string | null;
+  totalVotes?: number;
+  rawResult?: string;
 }
 
 interface StakingMetric {
@@ -42,6 +47,19 @@ interface StakingMetric {
 interface GovStat {
   label: string;
   value: string;
+}
+
+interface CommitteeMember {
+  name: string;
+  address: string;
+  seat: number;
+  joinedAt: string | null;
+}
+
+interface TreasuryData {
+  ton: number;
+  wton: number;
+  totalTonEquivalent: number;
 }
 
 /* ── Fallback data (shown while loading) ── */
@@ -64,6 +82,14 @@ const FALLBACK_GOV: GovStat[] = [
   { label: "Committee", value: "—" },
 ];
 
+const FALLBACK_COMMITTEE: CommitteeMember[] = [
+  { name: "—", address: "", seat: 0, joinedAt: null },
+  { name: "—", address: "", seat: 1, joinedAt: null },
+  { name: "—", address: "", seat: 2, joinedAt: null },
+];
+
+const FALLBACK_TREASURY: TreasuryData = { ton: 0, wton: 0, totalTonEquivalent: 0 };
+
 /* ═══════════════════════════════════════════════
    Format large numbers (e.g. 28935300 → "28.9M")
    ═══════════════════════════════════════════════ */
@@ -82,6 +108,11 @@ function useGovernanceStakingData() {
   const [proposals, setProposals] = useState<Proposal[]>(FALLBACK_PROPOSALS);
   const [stakingMetrics, setStakingMetrics] = useState<StakingMetric[]>(FALLBACK_STAKING);
   const [govStats, setGovStats] = useState<GovStat[]>(FALLBACK_GOV);
+  const [committee, setCommittee] = useState<CommitteeMember[]>(FALLBACK_COMMITTEE);
+  const [treasury, setTreasury] = useState<TreasuryData>(FALLBACK_TREASURY);
+  const [totalSupply, setTotalSupply] = useState(0);
+  const [totalStaked, setTotalStaked] = useState(0);
+  const [seigPerBlock, setSeigPerBlock] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -100,14 +131,22 @@ function useGovernanceStakingData() {
           { label: "Staking APR", value: data.staking.apr.toFixed(1), suffix: "%" },
           { label: "Operators", value: String(data.staking.operatorCount), suffix: "" },
         ]);
+        setTotalSupply(data.staking.totalSupply);
+        setTotalStaked(data.staking.totalStaked);
+        setSeigPerBlock(data.staking.seigPerBlock ?? 0);
 
-        // Proposals
+        // Proposals (with timestamps)
         setProposals(
           data.governance.proposals.map((p: Proposal) => ({
             id: p.id,
             title: p.title,
             status: p.status,
             votes: p.votes,
+            createdDate: p.createdDate,
+            votingStart: p.votingStart,
+            votingEnd: p.votingEnd,
+            totalVotes: p.totalVotes,
+            rawResult: p.rawResult,
           }))
         );
 
@@ -117,6 +156,12 @@ function useGovernanceStakingData() {
           { label: "Quorum", value: `${data.governance.quorum}/${data.governance.maxMember}` },
           { label: "Committee", value: String(data.governance.maxMember) },
         ]);
+
+        // Committee members
+        if (data.committee) setCommittee(data.committee);
+
+        // Treasury
+        if (data.treasury) setTreasury(data.treasury);
       } catch (err) {
         console.error("[GovernanceStaking] Failed to fetch live data:", err);
       }
@@ -126,7 +171,7 @@ function useGovernanceStakingData() {
     return () => { cancelled = true; };
   }, []);
 
-  return { proposals, stakingMetrics, govStats };
+  return { proposals, stakingMetrics, govStats, committee, treasury, totalSupply, totalStaked, seigPerBlock };
 }
 
 /* ═══════════════════════════════════════════════
@@ -184,259 +229,730 @@ function HeaderBar() {
 }
 
 /* ═══════════════════════════════════════════════
-   Reactor Log Card — proposal styled as cascade card
+   DAO Modular Tiles — Style 08
+   Treasury tile + Committee tiles + Agenda tiles
    ═══════════════════════════════════════════════ */
 
-function ReactorLogCard({
-  proposal,
-  index,
+const TILE_GLOW_KEYFRAMES = `
+@keyframes tileGlow {
+  0%, 100% { box-shadow: 0 0 6px rgba(0,229,255,0.12); }
+  50% { box-shadow: 0 0 16px rgba(0,229,255,0.35); }
+}
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+`;
+
+function formatTreasury(n: number): string {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
+  if (n >= 1_000) return (n / 1_000).toFixed(0) + "K";
+  return n.toString();
+}
+
+function formatJoinLabel(joinedAt: string | null): string {
+  if (!joinedAt) return "Founding";
+  const joined = new Date(joinedAt);
+  const now = new Date();
+  const diffMs = now.getTime() - joined.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays < 30) return `${diffDays}d`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo`;
+  return `${Math.floor(diffDays / 365)}yr`;
+}
+
+function agendaStatusColor(status: string): { border: string; text: string; dot: string; label: string } {
+  switch (status) {
+    case "active":
+    case "notice":
+      return { border: "rgba(245,158,11,0.2)", text: "rgba(245,158,11,0.8)", dot: "rgba(245,158,11,0.7)", label: status === "notice" ? "NOTICE" : "ACTIVE" };
+    case "passed":
+      return { border: "rgba(34,197,94,0.15)", text: "rgba(34,197,94,0.7)", dot: "rgba(34,197,94,0.5)", label: "ACCEPTED" };
+    case "rejected":
+      return { border: "rgba(239,68,68,0.15)", text: "rgba(239,68,68,0.6)", dot: "rgba(239,68,68,0.4)", label: "REJECTED" };
+    default:
+      return { border: "rgba(140,200,255,0.1)", text: "rgba(140,200,255,0.4)", dot: "rgba(140,200,255,0.3)", label: status.toUpperCase() };
+  }
+}
+
+function DaoModularTiles({
+  treasury,
+  committee,
+  proposals,
+  govStats,
 }: {
-  proposal: Proposal;
-  index: number;
+  treasury: TreasuryData;
+  committee: CommitteeMember[];
+  proposals: Proposal[];
+  govStats: GovStat[];
 }) {
-  const isActive = proposal.status === "active";
-  const voteNum = parseInt(proposal.votes);
+  const seigAlloc = govStats.find(s => s.label === "Total Agendas");
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -16 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay: 0.5 + index * 0.12 }}
-      className="relative flex flex-col justify-between overflow-hidden"
-      style={{
-        width: "clamp(150px, 13vw, 205px)",
-        padding: "clamp(10px, 1vw, 14px) clamp(12px, 1.1vw, 16px)",
-        background: isActive
-          ? "rgba(0, 10, 20, 0.80)"
-          : "rgba(5, 10, 20, 0.80)",
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
-        border: isActive
-          ? "1px solid rgba(0, 229, 255, 0.35)"
-          : "1px solid rgba(42, 114, 229, 0.25)",
-        borderRadius: 6,
-      }}
+    <div
+      className="flex flex-col"
+      style={{ gap: "clamp(6px, 0.7vw, 9px)", width: "clamp(260px, 23vw, 360px)" }}
     >
-      {/* Cascade pulse bars */}
-      {[0, 1, 2, 3].map((i) => (
+      <style dangerouslySetInnerHTML={{ __html: TILE_GLOW_KEYFRAMES }} />
+
+      {/* ── DAO Category Header ── */}
+      <motion.div
+        initial={{ opacity: 0, x: -12 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, delay: 0.3 }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "clamp(8px, 0.8vw, 12px)",
+          marginBottom: "clamp(3px, 0.4vw, 6px)",
+        }}
+      >
         <div
-          key={i}
-          className="absolute left-0 right-0 pointer-events-none"
           style={{
-            top: `${18 + i * 18}%`,
-            height: 2,
-            background: isActive
-              ? "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.65), transparent)"
-              : "linear-gradient(90deg, transparent, rgba(42, 114, 229, 0.5), transparent)",
-            boxShadow: isActive
-              ? "0 0 10px rgba(0, 229, 255, 0.4)"
-              : "0 0 8px rgba(42, 114, 229, 0.3)",
-            animation: "cascadePulse 2.2s ease-in-out infinite",
-            animationDelay: `${i * 0.22}s`,
+            fontSize: "clamp(12px, 1.05vw, 17px)",
+            fontFamily: "'Orbitron', sans-serif",
+            fontWeight: 700,
+            color: "rgba(0, 229, 255, 0.8)",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            textShadow: "0 0 10px rgba(0, 229, 255, 0.3)",
+          }}
+        >
+          Governance
+        </div>
+        <div
+          style={{
+            flex: 1,
+            height: 1,
+            background: "linear-gradient(90deg, rgba(0, 229, 255, 0.3), transparent)",
           }}
         />
-      ))}
+      </motion.div>
 
-      {/* Top accent */}
-      <div
-        className="absolute top-0 left-0 right-0 pointer-events-none"
+      {/* Treasury Tile */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="relative overflow-hidden"
         style={{
-          height: 2,
-          background: isActive
-            ? "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.8), transparent)"
-            : "linear-gradient(90deg, transparent, rgba(42, 114, 229, 0.5), transparent)",
-          boxShadow: isActive ? "0 0 12px rgba(0, 229, 255, 0.5)" : "none",
+          padding: "clamp(14px, 1.3vw, 22px) clamp(16px, 1.5vw, 24px)",
+          background: "rgba(0, 10, 25, 0.9)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          border: "1px solid rgba(0, 229, 255, 0.2)",
+          borderRadius: 8,
+          animation: "tileGlow 3s ease-in-out infinite",
         }}
-      />
+      >
+        <div className="flex justify-between items-center">
+          <div>
+            <div
+              style={{
+                fontSize: "clamp(8px, 0.65vw, 11px)",
+                color: "rgba(0, 229, 255, 0.5)",
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                fontFamily: "'Share Tech Mono', monospace",
+              }}
+            >
+              DAO Treasury
+            </div>
+            <div
+              style={{
+                fontSize: "clamp(24px, 2.4vw, 36px)",
+                fontFamily: "'Orbitron', sans-serif",
+                fontWeight: 900,
+                color: "#fff",
+                marginTop: 3,
+                textShadow: "0 0 15px rgba(0, 229, 255, 0.5)",
+              }}
+            >
+              {treasury.totalTonEquivalent > 0 ? formatTreasury(treasury.totalTonEquivalent) : "—"}
+              <span
+                style={{
+                  fontSize: "0.4em",
+                  color: "rgba(0, 229, 255, 0.5)",
+                  marginLeft: 4,
+                }}
+              >
+                TON
+              </span>
+            </div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div
+              style={{
+                fontSize: "clamp(18px, 1.8vw, 26px)",
+                fontFamily: "'Orbitron', sans-serif",
+                fontWeight: 700,
+                color: "rgba(0, 229, 255, 0.7)",
+              }}
+            >
+              50%
+            </div>
+            <div
+              style={{
+                fontSize: "clamp(7px, 0.55vw, 10px)",
+                color: "rgba(140, 200, 255, 0.35)",
+                fontFamily: "'Share Tech Mono', monospace",
+                letterSpacing: "0.1em",
+              }}
+            >
+              SEIG ALLOC
+            </div>
+          </div>
+        </div>
+      </motion.div>
 
-      {/* Proposal ID */}
+      {/* Committee Section Label */}
       <div
         style={{
-          fontSize: "clamp(7px, 0.55vw, 9px)",
-          color: isActive ? "#00e5ff" : "rgba(0, 229, 255, 0.45)",
+          fontSize: "clamp(8px, 0.6vw, 11px)",
+          color: "rgba(0, 229, 255, 0.4)",
           fontFamily: "'Share Tech Mono', monospace",
           letterSpacing: "0.18em",
-          fontWeight: 700,
-          zIndex: 1,
-          textShadow: isActive ? "0 0 8px rgba(0, 229, 255, 0.5)" : "none",
+          textTransform: "uppercase",
+          marginTop: "clamp(3px, 0.3vw, 6px)",
         }}
       >
-        {proposal.id}
-        <span
-          style={{
-            marginLeft: 8,
-            color: isActive ? "#22c55e" : "rgba(140, 200, 255, 0.35)",
-            textShadow: "none",
-          }}
-        >
-          ▸ {proposal.status.toUpperCase()}
-        </span>
+        Committee · {committee.length}/{committee.length} Active
       </div>
 
-      {/* Title */}
+      {/* Committee Member Tiles */}
+      <div className="flex" style={{ gap: "clamp(5px, 0.5vw, 8px)" }}>
+        {committee.map((member, i) => (
+          <motion.div
+            key={member.seat}
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.55 + i * 0.1 }}
+            className="relative overflow-hidden"
+            style={{
+              flex: 1,
+              padding: "clamp(10px, 1vw, 16px)",
+              background: "rgba(0, 10, 25, 0.9)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+              border: "1px solid rgba(0, 229, 255, 0.15)",
+              borderRadius: 8,
+              textAlign: "center",
+              animation: `tileGlow 3s ease-in-out infinite ${0.5 + i * 0.5}s`,
+            }}
+          >
+            {/* Avatar circle */}
+            <div
+              style={{
+                width: "clamp(26px, 2.3vw, 36px)",
+                height: "clamp(26px, 2.3vw, 36px)",
+                margin: "0 auto clamp(5px, 0.5vw, 8px)",
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(42, 114, 229, 0.15))",
+                border: "1px solid rgba(0, 229, 255, 0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "clamp(9px, 0.8vw, 13px)",
+                  color: "#00e5ff",
+                }}
+              >
+                ●
+              </span>
+            </div>
+            <div
+              style={{
+                fontSize: "clamp(10px, 0.85vw, 14px)",
+                color: "rgba(255, 255, 255, 0.85)",
+                fontFamily: "'Share Tech Mono', monospace",
+                lineHeight: 1.2,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {member.name}
+            </div>
+            <div
+              style={{
+                fontSize: "clamp(7px, 0.55vw, 10px)",
+                color: "rgba(140, 200, 255, 0.35)",
+                fontFamily: "'Share Tech Mono', monospace",
+                marginTop: 3,
+              }}
+            >
+              Seat {member.seat} · {formatJoinLabel(member.joinedAt)}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Agenda Section Label */}
       <div
         style={{
-          fontSize: "clamp(9px, 0.75vw, 12px)",
-          color: "rgba(255, 255, 255, 0.85)",
+          fontSize: "clamp(8px, 0.6vw, 11px)",
+          color: "rgba(0, 229, 255, 0.4)",
           fontFamily: "'Share Tech Mono', monospace",
-          marginTop: "clamp(4px, 0.4vw, 6px)",
-          lineHeight: 1.3,
-          zIndex: 1,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          marginTop: "clamp(3px, 0.3vw, 6px)",
         }}
       >
-        {proposal.title}
+        Recent Agendas
       </div>
 
-      {/* Vote bar + percentage */}
-      <div style={{ marginTop: "clamp(8px, 0.8vw, 12px)", zIndex: 1 }}>
-        <div className="flex items-center justify-between" style={{ marginBottom: 4 }}>
-          <span
-            style={{
-              fontSize: "clamp(6px, 0.5vw, 8px)",
-              color: "rgba(122, 140, 168, 0.8)",
-              fontFamily: "'Share Tech Mono', monospace",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-            }}
-          >
-            Votes
-          </span>
-          <span
-            style={{
-              fontSize: "clamp(12px, 1.1vw, 18px)",
-              color: "#fff",
-              fontFamily: "'Orbitron', sans-serif",
-              fontWeight: 900,
-              textShadow: isActive
-                ? "0 0 12px rgba(0, 229, 255, 1), 0 0 24px rgba(0, 229, 255, 0.6)"
-                : "0 0 8px rgba(0, 229, 255, 0.3)",
-            }}
-          >
-            {proposal.votes}
-          </span>
-        </div>
-        {/* Animated vote bar */}
-        <div
+      {/* Agenda Tiles */}
+      <div className="flex" style={{ gap: "clamp(5px, 0.5vw, 8px)" }}>
+        {proposals.map((proposal, i) => {
+          const sc = agendaStatusColor(proposal.status);
+          const isNotice = proposal.status === "notice" || proposal.status === "active";
+          return (
+            <motion.div
+              key={proposal.id}
+              initial={{ opacity: 0, x: -12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.7 + i * 0.1 }}
+              className="relative overflow-hidden"
+              style={{
+                flex: 1,
+                padding: "clamp(10px, 1vw, 16px)",
+                background: `rgba(0, 10, 25, 0.9)`,
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                border: `1px solid ${sc.border}`,
+                borderRadius: 8,
+              }}
+            >
+              <div className="flex justify-between items-center" style={{ marginBottom: "clamp(3px, 0.4vw, 6px)" }}>
+                <span
+                  style={{
+                    fontSize: "clamp(12px, 1.05vw, 16px)",
+                    fontFamily: "'Orbitron', sans-serif",
+                    fontWeight: 700,
+                    color: sc.text,
+                  }}
+                >
+                  {proposal.id}
+                </span>
+                <span
+                  style={{
+                    fontSize: "clamp(7px, 0.55vw, 10px)",
+                    color: sc.dot,
+                    fontFamily: "'Share Tech Mono', monospace",
+                    animation: isNotice ? "dotPulse 2s infinite" : "none",
+                  }}
+                >
+                  {isNotice ? "● " : ""}{sc.label}
+                </span>
+              </div>
+              <div
+                style={{
+                  fontSize: "clamp(8px, 0.6vw, 11px)",
+                  color: "rgba(140, 200, 255, 0.3)",
+                  fontFamily: "'Share Tech Mono', monospace",
+                }}
+              >
+                {proposal.createdDate
+                  ? new Date(proposal.createdDate).toLocaleDateString("en", { month: "short", year: "numeric" })
+                  : "—"}
+                {proposal.votingStart && proposal.votingEnd
+                  ? ` · ${proposal.totalVotes ?? 0}/3 voted`
+                  : " · 0/3 voted"}
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Agendas + Quorum summary mini-bar */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 1.0 }}
+        className="flex items-center justify-between"
+        style={{
+          padding: "clamp(6px, 0.55vw, 9px) clamp(12px, 1.1vw, 16px)",
+          background: "rgba(0, 10, 25, 0.7)",
+          border: "1px solid rgba(0, 229, 255, 0.08)",
+          borderRadius: 6,
+        }}
+      >
+        <span
           style={{
-            height: 3,
-            background: "rgba(0, 229, 255, 0.08)",
-            borderRadius: 2,
+            fontSize: "clamp(8px, 0.6vw, 11px)",
+            color: "rgba(140, 200, 255, 0.35)",
+            fontFamily: "'Share Tech Mono', monospace",
+            letterSpacing: "0.1em",
           }}
         >
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${voteNum}%` }}
-            transition={{ duration: 1.5, delay: 0.9 + index * 0.15, ease: "easeOut" }}
-            style={{
-              height: "100%",
-              background: isActive
-                ? "linear-gradient(90deg, #00e5ff, #2A72E5)"
-                : "rgba(0, 229, 255, 0.3)",
-              borderRadius: 2,
-              boxShadow: isActive ? "0 0 8px rgba(0, 229, 255, 0.5)" : "none",
-            }}
-          />
-        </div>
-      </div>
-    </motion.div>
+          {seigAlloc ? `${seigAlloc.value} AGENDAS` : "—"} · QUORUM {govStats.find(s => s.label === "Quorum")?.value ?? "—"}
+        </span>
+        <a
+          href="https://github.com/tokamak-network/TokamakDAO"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            fontSize: "clamp(8px, 0.6vw, 11px)",
+            color: "rgba(0, 229, 255, 0.5)",
+            fontFamily: "'Share Tech Mono', monospace",
+            textDecoration: "none",
+            letterSpacing: "0.08em",
+          }}
+        >
+          DAO →
+        </a>
+      </motion.div>
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Power Output Card — staking metric as cascade card
+   Staking Modular Tiles — Option A: Big Number Hero + Gauge
    ═══════════════════════════════════════════════ */
 
-function PowerOutputCard({
-  metric,
-  index,
+const STAKING_GLOW_KEYFRAMES = `
+@keyframes greenGlow {
+  0%, 100% { box-shadow: 0 0 6px rgba(34,197,94,0.1); }
+  50% { box-shadow: 0 0 16px rgba(34,197,94,0.3); }
+}
+@keyframes gaugeGrow {
+  from { width: 0; }
+}
+`;
+
+function StakingModularTiles({
+  stakingMetrics,
+  totalSupply,
+  totalStaked,
+  seigPerBlock,
 }: {
-  metric: StakingMetric;
-  index: number;
+  stakingMetrics: StakingMetric[];
+  totalSupply: number;
+  totalStaked: number;
+  seigPerBlock: number;
 }) {
+  const aprMetric = stakingMetrics.find(m => m.label === "Staking APR");
+  const stakedMetric = stakingMetrics.find(m => m.label === "Total Staked");
+  const operatorMetric = stakingMetrics.find(m => m.label === "Operators");
+  const stakedRatio = totalSupply > 0 ? ((totalStaked / totalSupply) * 100).toFixed(1) : "0";
+
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 16 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay: 0.5 + index * 0.12 }}
-      className="relative flex flex-col items-center justify-center overflow-hidden"
-      style={{
-        width: "clamp(140px, 12vw, 195px)",
-        height: "clamp(110px, 10vw, 150px)",
-        background: "rgba(5, 10, 20, 0.80)",
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
-        border: "1px solid rgba(42, 114, 229, 0.3)",
-        borderRadius: 8,
-      }}
+    <div
+      className="flex flex-col"
+      style={{ gap: "clamp(6px, 0.7vw, 9px)", width: "clamp(260px, 23vw, 360px)" }}
     >
-      {/* Cascade bars */}
-      {[0, 1, 2, 3, 4].map((i) => (
+      <style dangerouslySetInnerHTML={{ __html: STAKING_GLOW_KEYFRAMES }} />
+
+      {/* ── Staking Category Header ── */}
+      <motion.div
+        initial={{ opacity: 0, x: 12 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, delay: 0.3 }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "clamp(8px, 0.8vw, 12px)",
+          marginBottom: "clamp(3px, 0.4vw, 6px)",
+        }}
+      >
         <div
-          key={i}
-          className="absolute left-0 right-0 pointer-events-none"
           style={{
-            top: `${15 + i * 15}%`,
-            height: 3,
-            background: "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.7), transparent)",
-            boxShadow: "0 0 12px rgba(0, 229, 255, 0.5)",
-            animation: "cascadePulse 2s ease-in-out infinite",
-            animationDelay: `${i * 0.2}s`,
+            fontSize: "clamp(12px, 1.05vw, 17px)",
+            fontFamily: "'Orbitron', sans-serif",
+            fontWeight: 700,
+            color: "rgba(0, 229, 255, 0.8)",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            textShadow: "0 0 10px rgba(0, 229, 255, 0.3)",
+          }}
+        >
+          Staking
+        </div>
+        <div
+          style={{
+            flex: 1,
+            height: 1,
+            background: "linear-gradient(90deg, rgba(0, 229, 255, 0.3), transparent)",
           }}
         />
-      ))}
+      </motion.div>
 
-      {/* Top accent */}
-      <div
-        className="absolute top-0 left-0 right-0 pointer-events-none"
+      {/* APR Hero Tile */}
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="relative overflow-hidden"
         style={{
-          height: 2,
-          background: "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.6), transparent)",
-        }}
-      />
-
-      {/* Value */}
-      <div
-        style={{
-          fontSize: "clamp(20px, 2.2vw, 34px)",
-          fontFamily: "'Orbitron', sans-serif",
-          fontWeight: 900,
-          color: "#fff",
-          textShadow:
-            "0 0 12px rgba(0, 229, 255, 1), 0 0 24px rgba(0, 229, 255, 0.7), 0 0 36px rgba(0, 229, 255, 0.5)",
-          zIndex: 1,
-          marginBottom: 4,
-          letterSpacing: "0.02em",
+          padding: "clamp(18px, 1.8vw, 28px) clamp(16px, 1.5vw, 24px)",
+          background: "rgba(0, 10, 25, 0.9)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          border: "1px solid rgba(34, 197, 94, 0.2)",
+          borderRadius: 8,
+          textAlign: "center",
+          animation: "greenGlow 3s ease-in-out infinite",
         }}
       >
-        {metric.value}
-        {metric.suffix && (
+        {/* Radial glow */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            top: -10,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "clamp(150px, 15vw, 220px)",
+            height: "clamp(80px, 8vw, 120px)",
+            background: "radial-gradient(ellipse, rgba(34, 197, 94, 0.08), transparent)",
+          }}
+        />
+        <div
+          style={{
+            fontSize: "clamp(8px, 0.65vw, 11px)",
+            color: "rgba(34, 197, 94, 0.5)",
+            letterSpacing: "0.3em",
+            textTransform: "uppercase",
+            marginBottom: "clamp(6px, 0.5vw, 8px)",
+            position: "relative",
+            fontFamily: "'Share Tech Mono', monospace",
+          }}
+        >
+          Staking APR
+        </div>
+        <div
+          style={{
+            fontSize: "clamp(38px, 3.8vw, 56px)",
+            fontFamily: "'Orbitron', sans-serif",
+            fontWeight: 900,
+            color: "#22c55e",
+            textShadow: "0 0 20px rgba(34, 197, 94, 0.6), 0 0 40px rgba(34, 197, 94, 0.3)",
+            lineHeight: 1,
+            position: "relative",
+          }}
+        >
+          {aprMetric?.value ?? "—"}
           <span
             style={{
-              fontSize: "0.45em",
-              color: "rgba(0, 229, 255, 0.7)",
-              marginLeft: 4,
-              letterSpacing: "0.08em",
+              fontSize: "0.38em",
+              color: "rgba(34, 197, 94, 0.5)",
             }}
           >
-            {metric.suffix}
+            %
           </span>
-        )}
-      </div>
+        </div>
+        {/* Divider */}
+        <div
+          style={{
+            height: 1,
+            background: "linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.3), transparent)",
+            marginTop: "clamp(10px, 1vw, 16px)",
+          }}
+        />
+      </motion.div>
 
-      {/* Label */}
-      <div
+      {/* Total Staked Tile */}
+      <motion.div
+        initial={{ opacity: 0, x: 16 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, delay: 0.55 }}
+        className="relative overflow-hidden"
         style={{
-          fontSize: "clamp(8px, 0.65vw, 11px)",
-          textTransform: "uppercase",
-          letterSpacing: "0.15em",
-          color: "rgba(122, 140, 168, 0.9)",
-          fontFamily: "'Share Tech Mono', monospace",
-          zIndex: 1,
+          padding: "clamp(14px, 1.3vw, 20px) clamp(16px, 1.5vw, 24px)",
+          background: "rgba(0, 10, 25, 0.9)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          border: "1px solid rgba(0, 229, 255, 0.2)",
+          borderRadius: 8,
+          animation: "tileGlow 3s ease-in-out infinite 0.5s",
         }}
       >
-        {metric.label}
+        <div
+          style={{
+            fontSize: "clamp(8px, 0.65vw, 11px)",
+            color: "rgba(0, 229, 255, 0.5)",
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            fontFamily: "'Share Tech Mono', monospace",
+            marginBottom: "clamp(3px, 0.4vw, 6px)",
+          }}
+        >
+          Total Staked
+        </div>
+        <div
+          style={{
+            fontSize: "clamp(24px, 2.4vw, 34px)",
+            fontFamily: "'Orbitron', sans-serif",
+            fontWeight: 900,
+            color: "#fff",
+            textShadow: "0 0 15px rgba(0, 229, 255, 0.5)",
+          }}
+        >
+          {stakedMetric?.value ?? "—"}
+          <span
+            style={{
+              fontSize: "0.4em",
+              color: "rgba(0, 229, 255, 0.5)",
+              marginLeft: 4,
+            }}
+          >
+            TON
+          </span>
+        </div>
+      </motion.div>
+
+      {/* Staked Ratio Gauge */}
+      <motion.div
+        initial={{ opacity: 0, x: 12 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, delay: 0.65 }}
+        style={{
+          padding: "clamp(8px, 0.8vw, 13px) clamp(12px, 1.2vw, 18px)",
+          background: "rgba(0, 10, 25, 0.7)",
+          border: "1px solid rgba(0, 229, 255, 0.1)",
+          borderRadius: 6,
+        }}
+      >
+        <div
+          className="flex justify-between items-center"
+          style={{ marginBottom: "clamp(4px, 0.4vw, 7px)" }}
+        >
+          <span
+            style={{
+              fontSize: "clamp(8px, 0.6vw, 11px)",
+              color: "rgba(140, 200, 255, 0.4)",
+              fontFamily: "'Share Tech Mono', monospace",
+              letterSpacing: "0.1em",
+            }}
+          >
+            STAKED / SUPPLY
+          </span>
+          <span
+            style={{
+              fontSize: "clamp(10px, 0.9vw, 14px)",
+              color: "rgba(0, 229, 255, 0.6)",
+              fontFamily: "'Orbitron', sans-serif",
+              fontWeight: 700,
+            }}
+          >
+            {stakedRatio}%
+          </span>
+        </div>
+        <div
+          style={{
+            height: "clamp(4px, 0.4vw, 6px)",
+            background: "rgba(0, 229, 255, 0.06)",
+            borderRadius: 3,
+            overflow: "hidden",
+          }}
+        >
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${stakedRatio}%` }}
+            transition={{ duration: 1.5, delay: 0.8, ease: "easeOut" }}
+            style={{
+              height: "100%",
+              background: "linear-gradient(90deg, #00e5ff, #2A72E5)",
+              borderRadius: 3,
+              boxShadow: "0 0 6px rgba(0, 229, 255, 0.5)",
+            }}
+          />
+        </div>
+      </motion.div>
+
+      {/* Operators + Seig/Block row */}
+      <div className="flex" style={{ gap: "clamp(5px, 0.5vw, 8px)" }}>
+        <motion.div
+          initial={{ opacity: 0, x: 12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.75 }}
+          className="relative overflow-hidden"
+          style={{
+            flex: 1,
+            padding: "clamp(10px, 1vw, 14px)",
+            background: "rgba(0, 10, 25, 0.9)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            border: "1px solid rgba(0, 229, 255, 0.15)",
+            borderRadius: 8,
+            textAlign: "center",
+            animation: "tileGlow 3s ease-in-out infinite 1s",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "clamp(16px, 1.6vw, 24px)",
+              fontFamily: "'Orbitron', sans-serif",
+              fontWeight: 700,
+              color: "#fff",
+            }}
+          >
+            {operatorMetric?.value ?? "—"}
+          </div>
+          <div
+            style={{
+              fontSize: "clamp(7px, 0.55vw, 10px)",
+              color: "rgba(140, 200, 255, 0.35)",
+              fontFamily: "'Share Tech Mono', monospace",
+              marginTop: 3,
+              letterSpacing: "0.1em",
+            }}
+          >
+            OPERATORS
+          </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, x: 12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.85 }}
+          className="relative overflow-hidden"
+          style={{
+            flex: 1,
+            padding: "clamp(10px, 1vw, 14px)",
+            background: "rgba(0, 10, 25, 0.9)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            border: "1px solid rgba(0, 229, 255, 0.15)",
+            borderRadius: 8,
+            textAlign: "center",
+            animation: "tileGlow 3s ease-in-out infinite 1.5s",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "clamp(16px, 1.6vw, 24px)",
+              fontFamily: "'Orbitron', sans-serif",
+              fontWeight: 700,
+              color: "#fff",
+            }}
+          >
+            {seigPerBlock > 0 ? seigPerBlock.toFixed(2) : "—"}
+            <span
+              style={{
+                fontSize: "0.45em",
+                color: "rgba(0, 229, 255, 0.5)",
+                marginLeft: 3,
+              }}
+            >
+              TON
+            </span>
+          </div>
+          <div
+            style={{
+              fontSize: "clamp(7px, 0.55vw, 10px)",
+              color: "rgba(140, 200, 255, 0.35)",
+              fontFamily: "'Share Tech Mono', monospace",
+              marginTop: 3,
+              letterSpacing: "0.1em",
+            }}
+          >
+            SEIG / BLOCK
+          </div>
+        </motion.div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -518,7 +1034,7 @@ function GovernanceStatsRow({ stats }: { stats: GovStat[] }) {
 function ReactorCTAPrimary() {
   return (
     <motion.a
-      href="https://staking.tokamak.network"
+      href="https://github.com/tokamak-network/TokamakStaking"
       target="_blank"
       rel="noopener noreferrer"
       initial={{ opacity: 0, scale: 0.95 }}
@@ -576,7 +1092,7 @@ function ReactorCTAPrimary() {
 function ReactorCTASecondary() {
   return (
     <motion.a
-      href="https://dao.tokamak.network"
+      href="https://github.com/tokamak-network/TokamakDAO"
       target="_blank"
       rel="noopener noreferrer"
       initial={{ opacity: 0, scale: 0.95 }}
@@ -643,8 +1159,8 @@ function BottomControlPanel({ stats }: { stats: GovStat[] }) {
         <GovernanceStatsRow stats={stats} />
         {/* CTA buttons */}
         <div className="flex items-center gap-4">
-          <ReactorCTAPrimary />
           <ReactorCTASecondary />
+          <ReactorCTAPrimary />
         </div>
       </div>
     </motion.div>
@@ -792,7 +1308,7 @@ function GovernanceStakingMobileOverlay({
 
         {/* Stake TON CTA button */}
         <a
-          href="https://staking.tokamak.network"
+          href="https://github.com/tokamak-network/TokamakStaking"
           target="_blank"
           rel="noopener noreferrer"
           style={{
@@ -1005,7 +1521,7 @@ function GovernanceStakingMobileOverlay({
           style={{ position: "relative", zIndex: 1, textAlign: "center" }}
         >
           <a
-            href="https://dao.tokamak.network"
+            href="https://github.com/tokamak-network/TokamakDAO"
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -1029,7 +1545,7 @@ function GovernanceStakingMobileOverlay({
    ═══════════════════════════════════════════════ */
 
 export default function GovernanceStakingOverlay() {
-  const { proposals, stakingMetrics, govStats } = useGovernanceStakingData();
+  const { proposals, stakingMetrics, govStats, committee, treasury, totalSupply, totalStaked, seigPerBlock } = useGovernanceStakingData();
 
   return (
     <div className="absolute inset-0">
@@ -1049,34 +1565,38 @@ export default function GovernanceStakingOverlay() {
           {/* Plasma Vortex — 2D canvas particles orbiting reactor */}
           <TokenVortex />
 
-          {/* Left — Reactor Log (proposal cascade cards) */}
+          {/* Left — DAO Modular Tiles */}
           <div
-            className="absolute z-10 flex flex-col"
+            className="absolute z-10"
             style={{
               left: "clamp(16px, 5vw, 70px)",
               top: "46%",
               transform: "translateY(-50%)",
-              gap: "clamp(6px, 0.7vw, 10px)",
             }}
           >
-            {proposals.map((proposal, i) => (
-              <ReactorLogCard key={proposal.id} proposal={proposal} index={i} />
-            ))}
+            <DaoModularTiles
+              treasury={treasury}
+              committee={committee}
+              proposals={proposals}
+              govStats={govStats}
+            />
           </div>
 
-          {/* Right — Power Output (staking cascade cards) */}
+          {/* Right — Staking Modular Tiles */}
           <div
-            className="absolute z-10 flex flex-col"
+            className="absolute z-10"
             style={{
               right: "clamp(16px, 5vw, 70px)",
               top: "46%",
               transform: "translateY(-50%)",
-              gap: "clamp(6px, 0.7vw, 10px)",
             }}
           >
-            {stakingMetrics.map((metric, i) => (
-              <PowerOutputCard key={metric.label} metric={metric} index={i} />
-            ))}
+            <StakingModularTiles
+              stakingMetrics={stakingMetrics}
+              totalSupply={totalSupply}
+              totalStaked={totalStaked}
+              seigPerBlock={seigPerBlock}
+            />
           </div>
 
           {/* Bottom — governance stats + CTA buttons */}

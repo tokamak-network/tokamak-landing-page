@@ -73,10 +73,15 @@ export default function TokenVortex() {
   const animRef = useRef<number>(0);
   const timeRef = useRef(0);
   const sizeRef = useRef({ w: 0, h: 0 });
+  const visibleRef = useRef(false);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    if (!visibleRef.current) {
+      animRef.current = requestAnimationFrame(draw);
+      return;
+    }
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -209,11 +214,18 @@ export default function TokenVortex() {
     const observer = new ResizeObserver(resize);
     if (canvas.parentElement) observer.observe(canvas.parentElement);
 
+    const io = new IntersectionObserver(
+      ([entry]) => { visibleRef.current = entry.isIntersecting; },
+      { threshold: 0 },
+    );
+    io.observe(canvas);
+
     animRef.current = requestAnimationFrame(draw);
 
     return () => {
       cancelAnimationFrame(animRef.current);
       observer.disconnect();
+      io.disconnect();
     };
   }, [draw]);
 

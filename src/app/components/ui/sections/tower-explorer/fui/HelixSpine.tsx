@@ -15,6 +15,7 @@ export default function HelixSpine({ scrollProgress, color = "#00e5ff" }: Props)
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef(0);
   const timeRef = useRef(0);
+  const visibleRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -38,6 +39,10 @@ export default function HelixSpine({ scrollProgress, color = "#00e5ff" }: Props)
     const b = parseInt(hex.substring(4, 6), 16);
 
     const animate = () => {
+      if (!visibleRef.current) {
+        rafRef.current = requestAnimationFrame(animate);
+        return;
+      }
       const w = canvas.offsetWidth;
       const h = canvas.offsetHeight;
       ctx.clearRect(0, 0, w, h);
@@ -153,10 +158,17 @@ export default function HelixSpine({ scrollProgress, color = "#00e5ff" }: Props)
       rafRef.current = requestAnimationFrame(animate);
     };
 
+    const io = new IntersectionObserver(
+      ([entry]) => { visibleRef.current = entry.isIntersecting; },
+      { threshold: 0 },
+    );
+    io.observe(canvas);
+
     rafRef.current = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
+      io.disconnect();
       window.removeEventListener("resize", resize);
     };
   }, [color, scrollProgress]);

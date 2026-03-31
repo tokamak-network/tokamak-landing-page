@@ -21,6 +21,7 @@ export default function ParticleOverlay({ color, active }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const rafRef = useRef<number>(0);
+  const visibleRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -78,6 +79,10 @@ export default function ParticleOverlay({ color, active }: Props) {
 
     let frame = 0;
     const animate = () => {
+      if (!visibleRef.current) {
+        rafRef.current = requestAnimationFrame(animate);
+        return;
+      }
       const w = W();
       const h = H();
       ctx.clearRect(0, 0, w, h);
@@ -115,10 +120,17 @@ export default function ParticleOverlay({ color, active }: Props) {
       rafRef.current = requestAnimationFrame(animate);
     };
 
+    const io = new IntersectionObserver(
+      ([entry]) => { visibleRef.current = entry.isIntersecting; },
+      { threshold: 0 },
+    );
+    io.observe(canvas);
+
     rafRef.current = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
+      io.disconnect();
       window.removeEventListener("resize", resize);
     };
   }, [color, active]);

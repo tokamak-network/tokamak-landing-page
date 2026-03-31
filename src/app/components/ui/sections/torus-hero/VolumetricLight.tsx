@@ -91,7 +91,7 @@ export default function VolumetricLight() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const timeRef = useRef(0);
-  const sizeRef = useRef({ w: 0, h: 0, vh: 0, mobile: false });
+  const sizeRef = useRef({ w: 0, h: 0, vh: 0 });
   const rotationRef = useRef(0);
   const lastFrameRef = useRef(0);
   const visibleRef = useRef(true);
@@ -103,14 +103,13 @@ export default function VolumetricLight() {
     if (!ctx) return;
 
     const resize = () => {
-      const isMobile = window.innerWidth < 768;
-      canvas.style.setProperty("--aurora-h", isMobile ? "700vh" : "580vh");
+      canvas.style.setProperty("--aurora-h", "380vh");
       const dpr = Math.min(window.devicePixelRatio, 2);
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      sizeRef.current = { w: rect.width, h: rect.height, vh: window.innerHeight, mobile: isMobile };
+      sizeRef.current = { w: rect.width, h: rect.height, vh: window.innerHeight };
     };
 
     resize();
@@ -122,7 +121,7 @@ export default function VolumetricLight() {
         animRef.current = requestAnimationFrame(animate);
         return;
       }
-      const { w, h, vh, mobile } = sizeRef.current;
+      const { w, h, vh } = sizeRef.current;
       if (w === 0) { animRef.current = requestAnimationFrame(animate); return; }
 
       const delta = Math.min((now - lastFrameRef.current) / 1000, 0.1);
@@ -248,29 +247,12 @@ export default function VolumetricLight() {
           grd.addColorStop(fadeInEnd * 0.5, `hsla(${wave.hue}, 80%, ${wave.lightness}%, ${wave.opacity * 0.4 * opMul})`);
           grd.addColorStop(fadeInEnd, `hsla(${wave.hue}, 80%, ${wave.lightness}%, ${wave.opacity * 1.0 * opMul})`);
           grd.addColorStop(fadeInEnd + 0.08, `hsla(${wave.hue}, 75%, ${wave.lightness}%, ${wave.opacity * 0.9 * opMul})`);
-          if (mobile) {
-            // Mobile: sustain aurora across ALL floors (showcase → governance)
-            grd.addColorStop(0.12, `hsla(${wave.hue}, 75%, ${wave.lightness}%, ${wave.opacity * 0.85 * opMul})`);
-            grd.addColorStop(0.25, `hsla(${wave.hue}, 74%, ${wave.lightness}%, ${wave.opacity * 0.80 * opMul})`);
-            grd.addColorStop(0.38, `hsla(${wave.hue}, 72%, ${wave.lightness}%, ${wave.opacity * 0.75 * opMul})`);
-            grd.addColorStop(0.50, `hsla(${wave.hue}, 70%, ${wave.lightness}%, ${wave.opacity * 0.65 * opMul})`);
-            grd.addColorStop(0.62, `hsla(${wave.hue}, 68%, ${wave.lightness}%, ${wave.opacity * 0.55 * opMul})`);
-            grd.addColorStop(0.72, `hsla(${wave.hue}, 66%, ${wave.lightness}%, ${wave.opacity * 0.40 * opMul})`);
-            grd.addColorStop(0.82, `hsla(${wave.hue}, 64%, ${wave.lightness}%, ${wave.opacity * 0.25 * opMul})`);
-            grd.addColorStop(0.90, `hsla(${wave.hue}, 60%, ${wave.lightness}%, ${wave.opacity * 0.10 * opMul})`);
-            grd.addColorStop(1, "transparent");
-          } else {
-            // Desktop: sustain through showcase + floor indicator, gone before data console
-            // 580vh canvas: showcase ~34-52%, indicator ~52-69%, data console ~69%+
-            grd.addColorStop(0.15, `hsla(${wave.hue}, 75%, ${wave.lightness}%, ${wave.opacity * 0.85 * opMul})`);
-            grd.addColorStop(0.30, `hsla(${wave.hue}, 74%, ${wave.lightness}%, ${wave.opacity * 0.80 * opMul})`);
-            grd.addColorStop(0.45, `hsla(${wave.hue}, 72%, ${wave.lightness}%, ${wave.opacity * 0.65 * opMul})`);
-            grd.addColorStop(0.55, `hsla(${wave.hue}, 68%, ${wave.lightness}%, ${wave.opacity * 0.35 * opMul})`);
-            grd.addColorStop(0.62, `hsla(${wave.hue}, 62%, ${wave.lightness}%, ${wave.opacity * 0.12 * opMul})`);
-            grd.addColorStop(0.68, `hsla(${wave.hue}, 58%, ${wave.lightness}%, ${wave.opacity * 0.03 * opMul})`);
-            grd.addColorStop(0.72, "transparent");
-            grd.addColorStop(1, "transparent");
-          }
+          // Fade through ecosystem showcase floor, transparent before data console
+          grd.addColorStop(0.25, `hsla(${wave.hue}, 74%, ${wave.lightness}%, ${wave.opacity * 0.6 * opMul})`);
+          grd.addColorStop(0.45, `hsla(${wave.hue}, 70%, ${wave.lightness}%, ${wave.opacity * 0.25 * opMul})`);
+          grd.addColorStop(0.65, `hsla(${wave.hue}, 62%, ${wave.lightness}%, ${wave.opacity * 0.05 * opMul})`);
+          grd.addColorStop(0.80, "transparent");
+          grd.addColorStop(1, "transparent");
           ctx.fillStyle = grd;
           ctx.fill();
         }

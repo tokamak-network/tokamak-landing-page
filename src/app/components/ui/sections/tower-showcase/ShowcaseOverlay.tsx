@@ -797,17 +797,31 @@ export default function ShowcaseOverlay({
                 </span>
               )}
               <span
-                className="font-bold uppercase"
                 style={{
                   fontSize: "clamp(9px, 1.3vw, 18px)",
-                  color: "#00e5ff",
                   fontFamily: "'Orbitron', 'Share Tech Mono', monospace",
                   letterSpacing: "0.15em",
-                  textShadow:
-                    "0 0 12px rgba(0, 229, 255, 0.6), 0 0 30px rgba(42, 114, 229, 0.4)",
+                  textTransform: "uppercase" as const,
                 }}
               >
-                {item.value} {item.label}
+                <span
+                  style={{
+                    fontWeight: "bold",
+                    color: "#00e5ff",
+                    textShadow: "0 0 12px rgba(0, 229, 255, 0.6), 0 0 30px rgba(42, 114, 229, 0.4)",
+                  }}
+                >
+                  {item.value}
+                </span>{" "}
+                <span
+                  style={{
+                    fontWeight: 500,
+                    color: "rgba(0, 229, 255, 0.4)",
+                    textShadow: "0 0 8px rgba(0, 229, 255, 0.15)",
+                  }}
+                >
+                  {item.label}
+                </span>
               </span>
             </span>
           ))}

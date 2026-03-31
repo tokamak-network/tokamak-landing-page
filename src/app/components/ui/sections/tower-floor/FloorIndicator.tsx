@@ -126,6 +126,52 @@ export default function FloorIndicator({ floor, label }: FloorIndicatorProps) {
           transition: "opacity 1s ease 0.2s",
         }}
       />
+
+      {/* Aurora light curtain — volumetric glow from above */}
+      <div
+        className="absolute inset-0 pointer-events-none overflow-hidden"
+        style={{ opacity: visible ? 1 : 0, transition: "opacity 1.2s ease 0.3s" }}
+      >
+        {/* Primary curtain — wide soft wash */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: "10%",
+            right: "10%",
+            height: "70%",
+            background:
+              "linear-gradient(180deg, rgba(42, 114, 229, 0.08) 0%, rgba(42, 114, 229, 0.04) 30%, rgba(42, 114, 229, 0.015) 60%, transparent 100%)",
+            filter: "blur(30px)",
+          }}
+        />
+        {/* Secondary curtain — narrower, offset */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: "25%",
+            width: "30%",
+            height: "60%",
+            background:
+              "linear-gradient(180deg, rgba(0, 119, 255, 0.06) 0%, rgba(0, 119, 255, 0.02) 50%, transparent 100%)",
+            filter: "blur(20px)",
+          }}
+        />
+        {/* Tertiary — right side accent */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            right: "20%",
+            width: "25%",
+            height: "55%",
+            background:
+              "linear-gradient(180deg, rgba(42, 114, 229, 0.05) 0%, rgba(42, 114, 229, 0.015) 50%, transparent 100%)",
+            filter: "blur(25px)",
+          }}
+        />
+      </div>
     </div>
   );
 }

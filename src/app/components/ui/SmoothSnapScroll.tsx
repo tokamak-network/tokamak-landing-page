@@ -66,7 +66,7 @@ export default function SmoothSnapScroll() {
     let closest = 0;
     let minDist = Infinity;
     for (let i = 0; i < sections.length; i++) {
-      const dist = Math.abs(scrollY - sections[i].offsetTop);
+      const dist = Math.abs(scrollY - (sections[i].offsetTop - 50));
       if (dist < minDist) {
         minDist = dist;
         closest = i;
@@ -118,7 +118,9 @@ export default function SmoothSnapScroll() {
     isAnimating.current = true;
     cooldownUntil.current = Date.now() + COOLDOWN + SCROLL_DURATION;
     lastDirection.current = direction;
-    smoothScrollTo(sections[nextIdx].offsetTop);
+    // Offset by 50px so content doesn't sit right behind the header
+    const target = Math.max(0, sections[nextIdx].offsetTop - 50);
+    smoothScrollTo(target);
   }, [getSections, findClosestIndex, smoothScrollTo]);
 
   /* ── Desktop only: wheel, keyboard, NO touch ── */

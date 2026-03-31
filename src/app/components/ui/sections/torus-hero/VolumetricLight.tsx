@@ -255,15 +255,15 @@ export default function VolumetricLight() {
             grd.addColorStop(0.90, `hsla(${wave.hue}, 60%, ${wave.lightness}%, ${wave.opacity * 0.10 * opMul})`);
             grd.addColorStop(1, "transparent");
           } else {
-            // Desktop: sustain through ALL floors (showcase → governance)
+            // Desktop: sustain through showcase + floor indicator, gone before data console
+            // 580vh canvas: showcase ~34-52%, indicator ~52-69%, data console ~69%+
             grd.addColorStop(0.15, `hsla(${wave.hue}, 75%, ${wave.lightness}%, ${wave.opacity * 0.85 * opMul})`);
-            grd.addColorStop(0.28, `hsla(${wave.hue}, 74%, ${wave.lightness}%, ${wave.opacity * 0.80 * opMul})`);
-            grd.addColorStop(0.40, `hsla(${wave.hue}, 72%, ${wave.lightness}%, ${wave.opacity * 0.70 * opMul})`);
-            grd.addColorStop(0.52, `hsla(${wave.hue}, 70%, ${wave.lightness}%, ${wave.opacity * 0.55 * opMul})`);
-            grd.addColorStop(0.62, `hsla(${wave.hue}, 68%, ${wave.lightness}%, ${wave.opacity * 0.40 * opMul})`);
-            grd.addColorStop(0.72, `hsla(${wave.hue}, 65%, ${wave.lightness}%, ${wave.opacity * 0.25 * opMul})`);
-            grd.addColorStop(0.82, `hsla(${wave.hue}, 60%, ${wave.lightness}%, ${wave.opacity * 0.12 * opMul})`);
-            grd.addColorStop(0.92, `hsla(${wave.hue}, 55%, ${wave.lightness}%, ${wave.opacity * 0.04 * opMul})`);
+            grd.addColorStop(0.30, `hsla(${wave.hue}, 74%, ${wave.lightness}%, ${wave.opacity * 0.80 * opMul})`);
+            grd.addColorStop(0.45, `hsla(${wave.hue}, 72%, ${wave.lightness}%, ${wave.opacity * 0.65 * opMul})`);
+            grd.addColorStop(0.55, `hsla(${wave.hue}, 68%, ${wave.lightness}%, ${wave.opacity * 0.35 * opMul})`);
+            grd.addColorStop(0.62, `hsla(${wave.hue}, 62%, ${wave.lightness}%, ${wave.opacity * 0.12 * opMul})`);
+            grd.addColorStop(0.68, `hsla(${wave.hue}, 58%, ${wave.lightness}%, ${wave.opacity * 0.03 * opMul})`);
+            grd.addColorStop(0.72, "transparent");
             grd.addColorStop(1, "transparent");
           }
           ctx.fillStyle = grd;

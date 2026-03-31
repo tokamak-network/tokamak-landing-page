@@ -1407,7 +1407,7 @@ function GovernanceStakingMobileOverlay({
       </div>
 
       <div className="flex" style={{ gap: 6 }}>
-        {committee.map((member, i) => (
+        {committee.map((member) => (
           <div
             key={member.seat}
             style={{

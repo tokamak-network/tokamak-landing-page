@@ -4,14 +4,16 @@ import { useRef, useMemo, useCallback, useEffect } from "react";
 import { Canvas, useFrame, useThree, RootState } from "@react-three/fiber";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import {
+  IcosahedronGeometry,
+  ShaderMaterial,
   AdditiveBlending,
-  BufferGeometry,
-  Float32BufferAttribute,
-  Points,
+  DoubleSide,
+  BackSide,
+  Mesh,
 } from "three";
 
 /* ═══════════════════════════════════════════════
-   Resize helper
+   Resize helper (preserved exactly)
    ═══════════════════════════════════════════════ */
 
 function ResizeHelper() {
@@ -56,379 +58,261 @@ function ResizeHelper() {
 }
 
 /* ═══════════════════════════════════════════════
-   Inward Spiral — tokens converging to center
-   Two streams: left (indigo) and right (cyan)
+   HexShield — main mesh with per-cell pulsing shader
+   IcosahedronGeometry detail=3 gives ~320 triangular
+   faces that visually approximate hex tessellation.
    ═══════════════════════════════════════════════ */
 
-const SPIRAL_COUNT = 250;
+const hexShieldVert = /* glsl */ `
+  varying vec3 vNormal;
+  varying vec3 vWorldPos;
+  varying vec3 vLocalPos;
 
-function SpiralStream({ direction }: { direction: 1 | -1 }) {
-  const pointsRef = useRef<Points>(null!);
+  void main() {
+    vNormal    = normalize(normalMatrix * normal);
+    vLocalPos  = position;
+    vec4 wp    = modelMatrix * vec4(position, 1.0);
+    vWorldPos  = wp.xyz;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
 
-  const { angles, radii, speeds, yOffsets, phases } = useMemo(() => {
-    const angles = new Float32Array(SPIRAL_COUNT);
-    const radii = new Float32Array(SPIRAL_COUNT);
-    const speeds = new Float32Array(SPIRAL_COUNT);
-    const yOffsets = new Float32Array(SPIRAL_COUNT);
-    const phases = new Float32Array(SPIRAL_COUNT);
+const hexShieldFrag = /* glsl */ `
+  uniform float uTime;
+  uniform vec3  uColor;
+  uniform float uOpacity;
 
-    for (let i = 0; i < SPIRAL_COUNT; i++) {
-      angles[i] = Math.random() * Math.PI * 2;
-      radii[i] = 0.3 + Math.random() * 3.5;
-      speeds[i] = 0.3 + Math.random() * 0.8;
-      yOffsets[i] = (Math.random() - 0.5) * 2.5;
-      phases[i] = Math.random() * Math.PI * 2;
-    }
+  varying vec3 vNormal;
+  varying vec3 vWorldPos;
+  varying vec3 vLocalPos;
 
-    return { angles, radii, speeds, yOffsets, phases };
-  }, []);
+  // Cheap hash for per-cell variation
+  float hash(vec3 p) {
+    p = fract(p * vec3(127.1, 311.7, 74.7));
+    p += dot(p, p.yxz + 19.19);
+    return fract((p.x + p.y) * p.z);
+  }
 
-  const geometry = useMemo(() => {
-    const positions = new Float32Array(SPIRAL_COUNT * 3);
-    const geo = new BufferGeometry();
-    geo.setAttribute("position", new Float32BufferAttribute(positions, 3));
-    return geo;
-  }, []);
+  void main() {
+    // Fresnel — edges brighter
+    vec3 viewDir = normalize(cameraPosition - vWorldPos);
+    float fresnel = pow(1.0 - abs(dot(vNormal, viewDir)), 2.5);
 
-  useFrame(({ clock }) => {
-    if (!pointsRef.current) return;
-    const posAttr = pointsRef.current.geometry.getAttribute("position");
-    const t = clock.getElapsedTime();
+    // Cell id from quantised position (simulates hex cells)
+    vec3 cellPos = floor(vLocalPos * 3.5);
+    float cellId = hash(cellPos);
 
-    for (let i = 0; i < SPIRAL_COUNT; i++) {
-      // Spiral inward over time, then reset
-      const age = (t * speeds[i] + phases[i]) % 6.0;
-      const progress = age / 6.0; // 0 → 1 (outer → center)
-      const r = radii[i] * (1 - progress * 0.85); // shrink toward center
+    // Independent per-cell pulse (0.25 – 1.0 range)
+    float pulse = 0.25 + 0.75 * (0.5 + 0.5 * sin(uTime * (1.0 + cellId * 2.0) + cellId * 6.283));
 
-      // Rotate with direction
-      const angle = angles[i] + t * speeds[i] * direction * 1.5;
+    // Edge wireframe glow: detect near-edge triangles via barycentrics
+    // We approximate edge proximity using fwidth on local pos
+    float edgeFactor = length(fwidth(vLocalPos)) * 40.0;
+    edgeFactor = clamp(edgeFactor, 0.0, 1.0);
 
-      const x = Math.cos(angle) * r * 1.2; // wider horizontally
-      const z = Math.sin(angle) * r * 0.6;
-      const y = yOffsets[i] * (1 - progress * 0.7) +
-        Math.sin(t * 0.8 + phases[i]) * 0.1 * (1 - progress);
+    // Combine layers
+    float alpha = uOpacity * (fresnel * 0.7 + pulse * 0.3 + edgeFactor * 0.25);
+    alpha = clamp(alpha, 0.0, 0.85);
 
-      posAttr.setXYZ(i, x, y, z);
-    }
+    gl_FragColor = vec4(uColor * (0.6 + pulse * 0.4 + fresnel * 0.8), alpha);
+  }
+`;
 
-    posAttr.needsUpdate = true;
-  });
+function HexShield() {
+  const meshRef = useRef<Mesh>(null!);
 
-  return (
-    <points ref={pointsRef} geometry={geometry}>
-      <pointsMaterial
-        color={direction === 1 ? "#4466ff" : "#00e5ff"}
-        size={0.035}
-        transparent
-        opacity={0.65}
-        blending={AdditiveBlending}
-        depthWrite={false}
-        sizeAttenuation
-      />
-    </points>
+  const geometry = useMemo(() => new IcosahedronGeometry(2.0, 3), []);
+
+  const material = useMemo(
+    () =>
+      new ShaderMaterial({
+        vertexShader: hexShieldVert,
+        fragmentShader: hexShieldFrag,
+        uniforms: {
+          uTime:    { value: 0 },
+          uColor:   { value: [0.0, 0.898, 1.0] }, // #00e5ff
+          uOpacity: { value: 0.32 },
+        },
+        transparent: true,
+        blending: AdditiveBlending,
+        depthWrite: false,
+        side: DoubleSide,
+      }),
+    [],
   );
-}
-
-/* ═══════════════════════════════════════════════
-   Core pulse — bright center where tokens converge
-   ═══════════════════════════════════════════════ */
-
-const CORE_COUNT = 60;
-
-function CorePulse() {
-  const pointsRef = useRef<Points>(null!);
-
-  const { basePositions, phases } = useMemo(() => {
-    const basePositions = new Float32Array(CORE_COUNT * 3);
-    const phases = new Float32Array(CORE_COUNT);
-
-    for (let i = 0; i < CORE_COUNT; i++) {
-      // Tight cluster around center
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.random() * Math.PI;
-      const r = 0.05 + Math.random() * 0.25;
-
-      basePositions[i * 3] = Math.sin(phi) * Math.cos(theta) * r;
-      basePositions[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * r * 0.6;
-      basePositions[i * 3 + 2] = Math.cos(phi) * r * 0.4;
-      phases[i] = Math.random() * Math.PI * 2;
-    }
-
-    return { basePositions, phases };
-  }, []);
-
-  const geometry = useMemo(() => {
-    const positions = new Float32Array(CORE_COUNT * 3);
-    const geo = new BufferGeometry();
-    geo.setAttribute("position", new Float32BufferAttribute(positions, 3));
-    return geo;
-  }, []);
 
   useFrame(({ clock }) => {
-    if (!pointsRef.current) return;
-    const posAttr = pointsRef.current.geometry.getAttribute("position");
-    const t = clock.getElapsedTime();
-
-    // Pulsing scale
-    const pulse = 1 + Math.sin(t * 2.0) * 0.3;
-
-    for (let i = 0; i < CORE_COUNT; i++) {
-      const jitter = Math.sin(t * 3 + phases[i]) * 0.05;
-      posAttr.setXYZ(
-        i,
-        basePositions[i * 3] * pulse + jitter,
-        basePositions[i * 3 + 1] * pulse + Math.sin(t * 2.5 + phases[i]) * 0.03,
-        basePositions[i * 3 + 2] * pulse,
-      );
-    }
-
-    posAttr.needsUpdate = true;
-
-    // Pulse material opacity
-    const mat = pointsRef.current.material;
-    if ("opacity" in mat) {
-      (mat as { opacity: number }).opacity = 0.6 + Math.sin(t * 2.0) * 0.3;
+    material.uniforms.uTime.value = clock.getElapsedTime();
+    if (meshRef.current) {
+      meshRef.current.rotation.y += 0.0015;
+      meshRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.15) * 0.06;
     }
   });
 
   return (
-    <points ref={pointsRef} geometry={geometry}>
-      <pointsMaterial
-        color="#00e5ff"
-        size={0.06}
-        transparent
-        opacity={0.55}
-        blending={AdditiveBlending}
-        depthWrite={false}
-        sizeAttenuation
-      />
-    </points>
+    <mesh
+      ref={meshRef}
+      geometry={geometry}
+      material={material}
+      scale={[1.0, 0.75, 1.0]}
+    />
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Reward Ejection — particles burst outward from core
+   ShieldWireframe — wireframe overlay on same geo
    ═══════════════════════════════════════════════ */
 
-const EJECT_COUNT = 40;
+const wireVert = /* glsl */ `
+  varying vec3 vNormal;
+  varying vec3 vWorldPos;
 
-function RewardEjection() {
-  const pointsRef = useRef<Points>(null!);
+  void main() {
+    vNormal   = normalize(normalMatrix * normal);
+    vec4 wp   = modelMatrix * vec4(position, 1.0);
+    vWorldPos = wp.xyz;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
 
-  const { angles, speeds, phases, yOffsets } = useMemo(() => {
-    const angles = new Float32Array(EJECT_COUNT);
-    const speeds = new Float32Array(EJECT_COUNT);
-    const phases = new Float32Array(EJECT_COUNT);
-    const yOffsets = new Float32Array(EJECT_COUNT);
+const wireFrag = /* glsl */ `
+  uniform float uTime;
+  uniform vec3  uColor;
 
-    for (let i = 0; i < EJECT_COUNT; i++) {
-      angles[i] = Math.random() * Math.PI * 2;
-      speeds[i] = 0.5 + Math.random() * 1.0;
-      phases[i] = Math.random() * 4.0; // stagger ejection timing
-      yOffsets[i] = (Math.random() - 0.5) * 0.5;
-    }
+  varying vec3 vNormal;
+  varying vec3 vWorldPos;
 
-    return { angles, speeds, phases, yOffsets };
-  }, []);
+  void main() {
+    vec3 viewDir = normalize(cameraPosition - vWorldPos);
+    float fresnel = pow(1.0 - abs(dot(vNormal, viewDir)), 1.8);
+    float pulse = 0.5 + 0.5 * sin(uTime * 0.8);
+    float alpha = (0.10 + fresnel * 0.12) * (0.75 + pulse * 0.25);
+    gl_FragColor = vec4(uColor, clamp(alpha, 0.0, 0.35));
+  }
+`;
 
-  const geometry = useMemo(() => {
-    const positions = new Float32Array(EJECT_COUNT * 3);
-    const geo = new BufferGeometry();
-    geo.setAttribute("position", new Float32BufferAttribute(positions, 3));
-    return geo;
-  }, []);
+function ShieldWireframe() {
+  const meshRef = useRef<Mesh>(null!);
+
+  const geometry = useMemo(() => new IcosahedronGeometry(2.0, 3), []);
+
+  const material = useMemo(
+    () =>
+      new ShaderMaterial({
+        vertexShader: wireVert,
+        fragmentShader: wireFrag,
+        uniforms: {
+          uTime:  { value: 0 },
+          uColor: { value: [0.0, 0.898, 1.0] },
+        },
+        transparent: true,
+        blending: AdditiveBlending,
+        depthWrite: false,
+        wireframe: true,
+      }),
+    [],
+  );
 
   useFrame(({ clock }) => {
-    if (!pointsRef.current) return;
-    const posAttr = pointsRef.current.geometry.getAttribute("position");
-    const t = clock.getElapsedTime();
-
-    for (let i = 0; i < EJECT_COUNT; i++) {
-      const age = (t * speeds[i] + phases[i]) % 4.0;
-      const progress = age / 4.0;
-
-      // Only visible in ejection phase (first 40% of cycle)
-      if (progress > 0.4) {
-        posAttr.setXYZ(i, 0, -10, 0); // hide off-screen
-        continue;
-      }
-
-      const ejectProgress = progress / 0.4; // 0 → 1
-      const r = ejectProgress * 2.5;
-      const fade = 1 - ejectProgress; // dim as it travels
-
-      const x = Math.cos(angles[i]) * r * 1.3;
-      const y = yOffsets[i] + Math.sin(angles[i] * 2 + t) * 0.1 * fade;
-      const z = Math.sin(angles[i]) * r * 0.5;
-
-      posAttr.setXYZ(i, x, y, z);
+    material.uniforms.uTime.value = clock.getElapsedTime();
+    if (meshRef.current) {
+      meshRef.current.rotation.y += 0.0015;
+      meshRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.15) * 0.06;
     }
-
-    posAttr.needsUpdate = true;
   });
 
   return (
-    <points ref={pointsRef} geometry={geometry}>
-      <pointsMaterial
-        color="#00e5ff"
-        size={0.04}
-        transparent
-        opacity={0.4}
-        blending={AdditiveBlending}
-        depthWrite={false}
-        sizeAttenuation
-      />
-    </points>
+    <mesh
+      ref={meshRef}
+      geometry={geometry}
+      material={material}
+      scale={[1.01, 0.758, 1.01]}
+    />
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Orbital Ring — a ring of particles orbiting the core
+   ShieldGlow — outer atmosphere halo, BackSide
    ═══════════════════════════════════════════════ */
 
-const RING_COUNT = 80;
+const glowVert = /* glsl */ `
+  varying vec3 vNormal;
+  varying vec3 vWorldPos;
 
-function OrbitalRing() {
-  const pointsRef = useRef<Points>(null!);
+  void main() {
+    vNormal   = normalize(normalMatrix * normal);
+    vec4 wp   = modelMatrix * vec4(position, 1.0);
+    vWorldPos = wp.xyz;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
 
-  const { phases } = useMemo(() => {
-    const phases = new Float32Array(RING_COUNT);
-    for (let i = 0; i < RING_COUNT; i++) {
-      phases[i] = (i / RING_COUNT) * Math.PI * 2;
-    }
-    return { phases };
-  }, []);
+const glowFrag = /* glsl */ `
+  uniform float uTime;
+  uniform vec3  uColor;
 
-  const geometry = useMemo(() => {
-    const positions = new Float32Array(RING_COUNT * 3);
-    const geo = new BufferGeometry();
-    geo.setAttribute("position", new Float32BufferAttribute(positions, 3));
-    return geo;
-  }, []);
+  varying vec3 vNormal;
+  varying vec3 vWorldPos;
+
+  void main() {
+    vec3 viewDir = normalize(cameraPosition - vWorldPos);
+    // BackSide: normal points inward, so flip for fresnel
+    float rim = pow(1.0 - abs(dot(-vNormal, viewDir)), 2.2);
+    float pulse = 0.85 + 0.15 * sin(uTime * 0.6);
+    float alpha = rim * 0.13 * pulse;
+    gl_FragColor = vec4(uColor, clamp(alpha, 0.0, 0.18));
+  }
+`;
+
+function ShieldGlow() {
+  const meshRef = useRef<Mesh>(null!);
+
+  const geometry = useMemo(() => new IcosahedronGeometry(2.0, 2), []);
+
+  const material = useMemo(
+    () =>
+      new ShaderMaterial({
+        vertexShader: glowVert,
+        fragmentShader: glowFrag,
+        uniforms: {
+          uTime:  { value: 0 },
+          uColor: { value: [0.0, 0.898, 1.0] },
+        },
+        transparent: true,
+        blending: AdditiveBlending,
+        depthWrite: false,
+        side: BackSide,
+      }),
+    [],
+  );
 
   useFrame(({ clock }) => {
-    if (!pointsRef.current) return;
-    const posAttr = pointsRef.current.geometry.getAttribute("position");
-    const t = clock.getElapsedTime();
-
-    const ringRadius = 0.8 + Math.sin(t * 0.5) * 0.15;
-
-    for (let i = 0; i < RING_COUNT; i++) {
-      const angle = phases[i] + t * 0.6;
-      const wobble = Math.sin(t * 1.5 + phases[i] * 3) * 0.05;
-
-      const x = Math.cos(angle) * ringRadius * 1.4;
-      const y = wobble + Math.sin(angle * 2 + t) * 0.08;
-      const z = Math.sin(angle) * ringRadius * 0.5;
-
-      posAttr.setXYZ(i, x, y, z);
+    material.uniforms.uTime.value = clock.getElapsedTime();
+    if (meshRef.current) {
+      meshRef.current.rotation.y += 0.0015;
     }
-
-    posAttr.needsUpdate = true;
   });
 
   return (
-    <points ref={pointsRef} geometry={geometry}>
-      <pointsMaterial
-        color="#00e5ff"
-        size={0.025}
-        transparent
-        opacity={0.30}
-        blending={AdditiveBlending}
-        depthWrite={false}
-        sizeAttenuation
-      />
-    </points>
+    <mesh
+      ref={meshRef}
+      geometry={geometry}
+      material={material}
+      scale={[1.25, 0.94, 1.25]}
+    />
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Ambient dust — soft sparkles
+   Combined scene
    ═══════════════════════════════════════════════ */
 
-const DUST_COUNT = 100;
-
-function AmbientDust() {
-  const pointsRef = useRef<Points>(null!);
-
-  const { basePositions, phases, speeds } = useMemo(() => {
-    const basePositions = new Float32Array(DUST_COUNT * 3);
-    const phases = new Float32Array(DUST_COUNT);
-    const speeds = new Float32Array(DUST_COUNT);
-
-    for (let i = 0; i < DUST_COUNT; i++) {
-      basePositions[i * 3] = (Math.random() - 0.5) * 8;
-      basePositions[i * 3 + 1] = (Math.random() - 0.5) * 5;
-      basePositions[i * 3 + 2] = (Math.random() - 0.5) * 3;
-      phases[i] = Math.random() * Math.PI * 2;
-      speeds[i] = 0.15 + Math.random() * 0.3;
-    }
-
-    return { basePositions, phases, speeds };
-  }, []);
-
-  const geometry = useMemo(() => {
-    const positions = new Float32Array(DUST_COUNT * 3);
-    const geo = new BufferGeometry();
-    geo.setAttribute("position", new Float32BufferAttribute(positions, 3));
-    return geo;
-  }, []);
-
-  useFrame(({ clock }) => {
-    if (!pointsRef.current) return;
-    const posAttr = pointsRef.current.geometry.getAttribute("position");
-    const t = clock.getElapsedTime();
-
-    for (let i = 0; i < DUST_COUNT; i++) {
-      posAttr.setXYZ(
-        i,
-        basePositions[i * 3] + Math.sin(t * 0.2 + phases[i]) * 0.1,
-        basePositions[i * 3 + 1] + Math.sin(t * speeds[i] + phases[i]) * 0.15,
-        basePositions[i * 3 + 2],
-      );
-    }
-
-    posAttr.needsUpdate = true;
-  });
-
-  return (
-    <points ref={pointsRef} geometry={geometry}>
-      <pointsMaterial
-        color="#8ab4f8"
-        size={0.018}
-        transparent
-        opacity={0.25}
-        blending={AdditiveBlending}
-        depthWrite={false}
-        sizeAttenuation
-      />
-    </points>
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   Combined 3D scene
-   ═══════════════════════════════════════════════ */
-
-function VortexScene() {
+function ShieldScene() {
   return (
     <>
-      {/* Two spiral streams converging (left=indigo, right=cyan) */}
-      <SpiralStream direction={1} />
-      <SpiralStream direction={-1} />
-
-      {/* Bright pulsing core at center */}
-      <CorePulse />
-
-      {/* Orbital ring around core */}
-      <OrbitalRing />
-
-      {/* Reward particles ejected outward */}
-      <RewardEjection />
-
-      {/* Background dust */}
-      <AmbientDust />
+      <ShieldGlow />
+      <HexShield />
+      <ShieldWireframe />
     </>
   );
 }
@@ -473,12 +357,12 @@ export default function TokenVortex() {
         onCreated={handleCreated}
       >
         <ResizeHelper />
-        <VortexScene />
+        <ShieldScene />
         <EffectComposer>
           <Bloom
-            luminanceThreshold={0.35}
-            luminanceSmoothing={0.9}
-            intensity={0.9}
+            luminanceThreshold={0.4}
+            luminanceSmoothing={0.85}
+            intensity={0.6}
             mipmapBlur
           />
         </EffectComposer>

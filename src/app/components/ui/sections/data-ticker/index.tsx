@@ -33,8 +33,8 @@ export async function getTickerData(): Promise<TickerItem[]> {
     if (priceData) {
       items.push(
         { label: "TON", value: priceData.tonPrice.current.usd.toFixed(2), prefix: "$" },
-        { label: "MARKET CAP", value: `$${(priceData.marketCap / 1e6).toFixed(1)}M` },
-        { label: "24H VOLUME", value: `$${(priceData.tradingVolumeUSD / 1e6).toFixed(1)}M` },
+        { label: "MARKET CAP", value: priceData.marketCap >= 1e6 ? `$${(priceData.marketCap / 1e6).toFixed(1)}M` : `$${priceData.marketCap.toLocaleString()}` },
+        { label: "24H VOLUME", value: priceData.tradingVolumeUSD >= 1e6 ? `$${(priceData.tradingVolumeUSD / 1e6).toFixed(1)}M` : `$${priceData.tradingVolumeUSD.toLocaleString()}` },
       );
     }
 

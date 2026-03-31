@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { useRef, useState } from "react";
 import LazyWebGL from "../../LazyWebGL";
 
 const TokenVortex = dynamic(() => import("./TokenVortex"), { ssr: false });
@@ -639,35 +640,87 @@ function BottomControlPanel() {
 }
 
 /* ═══════════════════════════════════════════════
-   Mobile Overlay — simplified, flat, no 3D
+   Mobile Overlay — Layered Reveal with bottom sheet
    ═══════════════════════════════════════════════ */
 
-function GovernanceStakingMobileOverlay() {
-  return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center px-5 py-8 gap-5 overflow-y-auto">
-      <style dangerouslySetInnerHTML={{ __html: GLOBAL_KEYFRAMES }} />
+const MOBILE_EXTRA_KEYFRAMES = `
+@keyframes mobileRingPulse {
+  0% { transform: translate(-50%, -50%) scale(0.15); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+`;
 
-      {/* Title */}
-      <div className="flex flex-col items-center gap-1">
+function GovernanceStakingMobileOverlay() {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const dragStartY = useRef<number>(0);
+
+  function handleDragStart(_: unknown, info: { point: { y: number } }) {
+    dragStartY.current = info.point.y;
+  }
+
+  function handleDragEnd(_: unknown, info: { offset: { y: number }; velocity: { y: number } }) {
+    if (info.offset.y > 60 || info.velocity.y > 300) {
+      setSheetOpen(false);
+    } else if (info.offset.y < -60 || info.velocity.y < -300) {
+      setSheetOpen(true);
+    }
+  }
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <style dangerouslySetInnerHTML={{ __html: GLOBAL_KEYFRAMES + MOBILE_EXTRA_KEYFRAMES }} />
+
+      {/* ── Initial state: visual impact layer ── */}
+
+      {/* Concentric pulse rings from center */}
+      <div
+        className="absolute pointer-events-none"
+        style={{ inset: 0, zIndex: 3, overflow: "hidden" }}
+      >
+        {[0, 1, 2].map((i) => (
+          <div
+            key={`mobile-ring-${i}`}
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: "42%",
+              width: "80vw",
+              height: "80vw",
+              borderRadius: "50%",
+              border: "1px solid rgba(0, 229, 255, 0.45)",
+              boxShadow: "0 0 8px rgba(0, 229, 255, 0.15)",
+              animation: `mobileRingPulse 4s ease-out infinite`,
+              animationDelay: `${i * 1.3}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Title block — centered in upper portion */}
+      <div
+        className="absolute flex flex-col items-center"
+        style={{ top: "14%", left: 0, right: 0, zIndex: 6 }}
+      >
         <div
           style={{
             fontSize: 9,
-            color: "rgba(0, 229, 255, 0.5)",
+            color: "rgba(0, 229, 255, 0.55)",
             fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.25em",
+            letterSpacing: "0.28em",
             textTransform: "uppercase",
+            marginBottom: 6,
           }}
         >
           Reactor Core
         </div>
         <div
           style={{
-            fontSize: 16,
+            fontSize: 20,
             color: "#fff",
             fontFamily: "'Orbitron', sans-serif",
             fontWeight: 700,
             letterSpacing: "0.08em",
-            textShadow: "0 0 14px rgba(0, 229, 255, 0.4)",
+            textShadow: "0 0 20px rgba(0, 229, 255, 0.5), 0 0 40px rgba(0, 229, 255, 0.2)",
             textAlign: "center",
           }}
         >
@@ -678,237 +731,497 @@ function GovernanceStakingMobileOverlay() {
             fontSize: 9,
             color: "#22c55e",
             fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.12em",
+            letterSpacing: "0.15em",
+            marginTop: 6,
+            textShadow: "0 0 8px rgba(34, 197, 94, 0.5)",
           }}
         >
           ● REACTOR ONLINE
         </div>
       </div>
 
-      {/* Reactor Log — proposals */}
-      <div className="w-full max-w-xs flex flex-col gap-2">
-        <div
-          style={{
-            fontSize: 9,
-            color: "rgba(0, 229, 255, 0.7)",
-            fontFamily: "'Orbitron', sans-serif",
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            fontWeight: 700,
-            marginBottom: 2,
-          }}
-        >
-          Reactor Log
-        </div>
-        {PROPOSALS.map((proposal) => {
-          const isActive = proposal.status === "active";
-          return (
+      {/* Metric badges — floating over the visual */}
+      <div
+        className="absolute flex justify-around items-center"
+        style={{ bottom: "28%", left: "4%", right: "4%", zIndex: 6 }}
+      >
+        {STAKING_METRICS.map((metric, i) => (
+          <motion.div
+            key={metric.label}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 + i * 0.12 }}
+            className="relative flex flex-col items-center"
+            style={{
+              background: "rgba(2, 8, 18, 0.82)",
+              backdropFilter: "blur(6px)",
+              WebkitBackdropFilter: "blur(6px)",
+              border: "1px solid rgba(0, 229, 255, 0.25)",
+              borderRadius: 6,
+              padding: "8px 12px",
+              minWidth: 72,
+            }}
+          >
+            {/* top accent */}
             <div
-              key={proposal.id}
-              className="relative flex items-center justify-between px-3 py-2"
               style={{
-                background: isActive
-                  ? "rgba(0, 10, 20, 0.95)"
-                  : "rgba(5, 10, 20, 0.9)",
-                border: isActive
-                  ? "1px solid rgba(0, 229, 255, 0.3)"
-                  : "1px solid rgba(42, 114, 229, 0.2)",
-                minHeight: 44,
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 1,
+                background:
+                  "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.6), transparent)",
+              }}
+            />
+            <div
+              style={{
+                fontSize: 16,
+                color: "#fff",
+                fontFamily: "'Orbitron', sans-serif",
+                fontWeight: 700,
+                lineHeight: 1,
+                textShadow: "0 0 10px rgba(0, 229, 255, 0.5)",
               }}
             >
-              <div
-                className="absolute pointer-events-none"
-                style={{
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 1,
-                  background: isActive
-                    ? "rgba(0, 229, 255, 0.5)"
-                    : "rgba(42, 114, 229, 0.3)",
-                }}
-              />
-              <div className="flex flex-col gap-0.5">
+              {metric.value}
+              {metric.suffix && (
                 <span
                   style={{
                     fontSize: 9,
-                    color: isActive ? "#00e5ff" : "rgba(0, 229, 255, 0.45)",
-                    fontFamily: "'Share Tech Mono', monospace",
-                    letterSpacing: "0.12em",
-                  }}
-                >
-                  {proposal.id}
-                </span>
-                <span
-                  style={{
-                    fontSize: 11,
-                    color: "rgba(255, 255, 255, 0.85)",
-                    fontFamily: "'Share Tech Mono', monospace",
-                  }}
-                >
-                  {proposal.title}
-                </span>
-              </div>
-              <div className="flex flex-col items-end gap-0.5">
-                <span
-                  style={{
-                    fontSize: 15,
-                    color: "#fff",
-                    fontFamily: "'Orbitron', sans-serif",
-                    fontWeight: 700,
-                    textShadow: isActive ? "0 0 10px rgba(0, 229, 255, 0.6)" : "none",
-                  }}
-                >
-                  {proposal.votes}
-                </span>
-                <span
-                  style={{
-                    fontSize: 8,
-                    color: isActive ? "#22c55e" : "rgba(140, 200, 255, 0.4)",
-                    fontFamily: "'Share Tech Mono', monospace",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                  }}
-                >
-                  {proposal.status}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Power Output — staking metrics */}
-      <div className="w-full max-w-xs flex flex-col gap-2">
-        <div
-          style={{
-            fontSize: 9,
-            color: "rgba(0, 229, 255, 0.7)",
-            fontFamily: "'Orbitron', sans-serif",
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            fontWeight: 700,
-            marginBottom: 2,
-          }}
-        >
-          Power Output
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          {STAKING_METRICS.map((metric) => (
-            <div
-              key={metric.label}
-              className="relative flex flex-col items-center justify-center py-3"
-              style={{
-                background: "rgba(5, 10, 20, 0.95)",
-                border: "1px solid rgba(42, 114, 229, 0.25)",
-                minHeight: 60,
-              }}
-            >
-              <div
-                className="absolute pointer-events-none"
-                style={{
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 1,
-                  background: "rgba(0, 229, 255, 0.35)",
-                }}
-              />
-              <div
-                style={{
-                  fontSize: 16,
-                  color: "#fff",
-                  fontFamily: "'Orbitron', sans-serif",
-                  fontWeight: 700,
-                  lineHeight: 1,
-                  textShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
-                }}
-              >
-                {metric.value}
-              </div>
-              {metric.suffix && (
-                <div
-                  style={{
-                    fontSize: 8,
-                    color: "rgba(0, 229, 255, 0.6)",
-                    fontFamily: "'Share Tech Mono', monospace",
-                    letterSpacing: "0.08em",
-                    marginTop: 2,
+                    color: "rgba(0, 229, 255, 0.7)",
+                    marginLeft: 3,
+                    letterSpacing: "0.06em",
                   }}
                 >
                   {metric.suffix}
-                </div>
+                </span>
               )}
-              <div
-                style={{
-                  fontSize: 7,
-                  color: "rgba(122, 140, 168, 0.8)",
-                  fontFamily: "'Share Tech Mono', monospace",
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  marginTop: 3,
-                  textAlign: "center",
-                  lineHeight: 1.2,
-                  padding: "0 4px",
-                }}
-              >
-                {metric.label}
-              </div>
             </div>
-          ))}
-        </div>
+            <div
+              style={{
+                fontSize: 7,
+                color: "rgba(122, 140, 168, 0.8)",
+                fontFamily: "'Share Tech Mono', monospace",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                marginTop: 4,
+                textAlign: "center",
+                lineHeight: 1.2,
+              }}
+            >
+              {metric.label}
+            </div>
+          </motion.div>
+        ))}
       </div>
 
-      {/* CTA buttons */}
-      <div className="flex items-center gap-3">
-        <a
-          href="https://staking.tokamak.network"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="relative inline-flex items-center justify-center"
+      {/* Swipe-up hint — visible when sheet is closed */}
+      <motion.div
+        className="absolute flex flex-col items-center"
+        style={{ bottom: 0, left: 0, right: 0, zIndex: 10 }}
+        animate={{ opacity: sheetOpen ? 0 : 1 }}
+        transition={{ duration: 0.2 }}
+        onClick={() => setSheetOpen(true)}
+      >
+        {/* Card peek strip */}
+        <div
           style={{
-            padding: "12px 24px",
-            minHeight: 44,
-            background:
-              "linear-gradient(180deg, rgba(0, 40, 60, 0.9) 0%, rgba(5, 25, 50, 0.9) 100%)",
-            border: "1px solid rgba(0, 229, 255, 0.6)",
-            fontFamily: "'Orbitron', sans-serif",
-            fontSize: 11,
-            color: "#fff",
-            letterSpacing: "0.18em",
-            fontWeight: 700,
-            textTransform: "uppercase",
-            textDecoration: "none",
-            textShadow: "0 0 10px rgba(0, 229, 255, 0.8)",
-            boxShadow: "0 0 20px rgba(0, 229, 255, 0.2)",
+            width: "100%",
+            background: "rgba(5, 10, 20, 0.92)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            borderTop: "1px solid rgba(0, 229, 255, 0.2)",
+            paddingTop: 10,
+            paddingBottom: 20,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 6,
           }}
         >
-          Stake TON
-        </a>
-        <a
-          href="https://dao.tokamak.network"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center"
+          {/* Drag handle */}
+          <div
+            style={{
+              width: 40,
+              height: 3,
+              borderRadius: 2,
+              background: "rgba(0, 229, 255, 0.5)",
+              boxShadow: "0 0 8px rgba(0, 229, 255, 0.4)",
+              marginBottom: 2,
+            }}
+          />
+          {/* Chevron up */}
+          <motion.div
+            animate={{ y: [0, -4, 0] }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <svg
+              width="18"
+              height="10"
+              viewBox="0 0 18 10"
+              fill="none"
+              style={{ opacity: 0.7 }}
+            >
+              <path
+                d="M1 9L9 1L17 9"
+                stroke="#00e5ff"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <div
+              style={{
+                fontSize: 8,
+                color: "rgba(0, 229, 255, 0.6)",
+                fontFamily: "'Share Tech Mono', monospace",
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+              }}
+            >
+              Swipe Up
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* ── Backdrop dim when sheet open ── */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        style={{ zIndex: 8 }}
+        animate={{ opacity: sheetOpen ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div
           style={{
-            padding: "12px 24px",
-            minHeight: 44,
-            background:
-              "linear-gradient(180deg, rgba(10, 20, 50, 0.9) 0%, rgba(5, 15, 40, 0.9) 100%)",
-            border: "1px solid rgba(42, 114, 229, 0.5)",
-            fontFamily: "'Orbitron', sans-serif",
-            fontSize: 11,
-            color: "#8cc8ff",
-            letterSpacing: "0.18em",
-            fontWeight: 700,
-            textTransform: "uppercase",
-            textDecoration: "none",
-            textShadow: "0 0 8px rgba(42, 114, 229, 0.5)",
+            position: "absolute",
+            inset: 0,
+            background: "rgba(2, 5, 12, 0.6)",
+            backdropFilter: "blur(4px)",
+            WebkitBackdropFilter: "blur(4px)",
+          }}
+        />
+      </motion.div>
+
+      {/* Tap outside backdrop to close */}
+      {sheetOpen && (
+        <div
+          className="absolute inset-0"
+          style={{ zIndex: 9 }}
+          onClick={() => setSheetOpen(false)}
+        />
+      )}
+
+      {/* ── Bottom sheet ── */}
+      <motion.div
+        className="absolute left-0 right-0"
+        style={{
+          bottom: 0,
+          zIndex: 20,
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+          background: "rgba(5, 10, 20, 0.97)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderTop: "1px solid rgba(0, 229, 255, 0.25)",
+          maxHeight: "78vh",
+          overflow: "hidden",
+        }}
+        animate={{ y: sheetOpen ? 0 : "87%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0.05, bottom: 0.3 }}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        {/* Drag handle bar */}
+        <div
+          className="flex justify-center"
+          style={{ paddingTop: 12, paddingBottom: 8 }}
+          onClick={() => setSheetOpen((v) => !v)}
+        >
+          <div
+            style={{
+              width: 40,
+              height: 3,
+              borderRadius: 2,
+              background: "rgba(0, 229, 255, 0.55)",
+              boxShadow: "0 0 8px rgba(0, 229, 255, 0.4)",
+            }}
+          />
+        </div>
+
+        {/* Scrollable content */}
+        <div
+          style={{
+            overflowY: "auto",
+            maxHeight: "calc(78vh - 36px)",
+            padding: "0 16px 32px",
           }}
         >
-          Vote Now
-        </a>
-      </div>
+          {/* Sheet header */}
+          <div className="flex flex-col items-center" style={{ marginBottom: 18 }}>
+            <div
+              style={{
+                fontSize: 9,
+                color: "rgba(0, 229, 255, 0.55)",
+                fontFamily: "'Share Tech Mono', monospace",
+                letterSpacing: "0.25em",
+                textTransform: "uppercase",
+                marginBottom: 4,
+              }}
+            >
+              Reactor Core · Floor 00
+            </div>
+            <div
+              style={{
+                fontSize: 15,
+                color: "#fff",
+                fontFamily: "'Orbitron', sans-serif",
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textShadow: "0 0 14px rgba(0, 229, 255, 0.4)",
+                textAlign: "center",
+              }}
+            >
+              Governance &amp; Staking
+            </div>
+          </div>
+
+          {/* Reactor Log — proposals */}
+          <div className="flex flex-col" style={{ gap: 8, marginBottom: 20 }}>
+            <div
+              style={{
+                fontSize: 9,
+                color: "rgba(0, 229, 255, 0.7)",
+                fontFamily: "'Orbitron', sans-serif",
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                fontWeight: 700,
+                marginBottom: 4,
+              }}
+            >
+              Reactor Log
+            </div>
+            {PROPOSALS.map((proposal) => {
+              const isActive = proposal.status === "active";
+              return (
+                <div
+                  key={proposal.id}
+                  className="relative flex items-center justify-between px-3 py-2"
+                  style={{
+                    background: isActive
+                      ? "rgba(0, 10, 20, 0.95)"
+                      : "rgba(5, 10, 20, 0.9)",
+                    border: isActive
+                      ? "1px solid rgba(0, 229, 255, 0.3)"
+                      : "1px solid rgba(42, 114, 229, 0.2)",
+                    minHeight: 44,
+                  }}
+                >
+                  <div
+                    className="absolute pointer-events-none"
+                    style={{
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: 1,
+                      background: isActive
+                        ? "rgba(0, 229, 255, 0.5)"
+                        : "rgba(42, 114, 229, 0.3)",
+                    }}
+                  />
+                  <div className="flex flex-col gap-0.5">
+                    <span
+                      style={{
+                        fontSize: 9,
+                        color: isActive ? "#00e5ff" : "rgba(0, 229, 255, 0.45)",
+                        fontFamily: "'Share Tech Mono', monospace",
+                        letterSpacing: "0.12em",
+                      }}
+                    >
+                      {proposal.id}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: "rgba(255, 255, 255, 0.85)",
+                        fontFamily: "'Share Tech Mono', monospace",
+                      }}
+                    >
+                      {proposal.title}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end gap-0.5">
+                    <span
+                      style={{
+                        fontSize: 15,
+                        color: "#fff",
+                        fontFamily: "'Orbitron', sans-serif",
+                        fontWeight: 700,
+                        textShadow: isActive ? "0 0 10px rgba(0, 229, 255, 0.6)" : "none",
+                      }}
+                    >
+                      {proposal.votes}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 8,
+                        color: isActive ? "#22c55e" : "rgba(140, 200, 255, 0.4)",
+                        fontFamily: "'Share Tech Mono', monospace",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.08em",
+                      }}
+                    >
+                      {proposal.status}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Power Output — staking metrics */}
+          <div className="flex flex-col" style={{ gap: 8, marginBottom: 24 }}>
+            <div
+              style={{
+                fontSize: 9,
+                color: "rgba(0, 229, 255, 0.7)",
+                fontFamily: "'Orbitron', sans-serif",
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                fontWeight: 700,
+                marginBottom: 4,
+              }}
+            >
+              Power Output
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {STAKING_METRICS.map((metric) => (
+                <div
+                  key={metric.label}
+                  className="relative flex flex-col items-center justify-center py-3"
+                  style={{
+                    background: "rgba(5, 10, 20, 0.95)",
+                    border: "1px solid rgba(42, 114, 229, 0.25)",
+                    minHeight: 60,
+                  }}
+                >
+                  <div
+                    className="absolute pointer-events-none"
+                    style={{
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: 1,
+                      background: "rgba(0, 229, 255, 0.35)",
+                    }}
+                  />
+                  <div
+                    style={{
+                      fontSize: 16,
+                      color: "#fff",
+                      fontFamily: "'Orbitron', sans-serif",
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      textShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
+                    }}
+                  >
+                    {metric.value}
+                  </div>
+                  {metric.suffix && (
+                    <div
+                      style={{
+                        fontSize: 8,
+                        color: "rgba(0, 229, 255, 0.6)",
+                        fontFamily: "'Share Tech Mono', monospace",
+                        letterSpacing: "0.08em",
+                        marginTop: 2,
+                      }}
+                    >
+                      {metric.suffix}
+                    </div>
+                  )}
+                  <div
+                    style={{
+                      fontSize: 7,
+                      color: "rgba(122, 140, 168, 0.8)",
+                      fontFamily: "'Share Tech Mono', monospace",
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      marginTop: 3,
+                      textAlign: "center",
+                      lineHeight: 1.2,
+                      padding: "0 4px",
+                    }}
+                  >
+                    {metric.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CTA buttons */}
+          <div className="flex items-center gap-3 justify-center">
+            <a
+              href="https://staking.tokamak.network"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative inline-flex items-center justify-center"
+              style={{
+                padding: "12px 24px",
+                minHeight: 44,
+                background:
+                  "linear-gradient(180deg, rgba(0, 40, 60, 0.9) 0%, rgba(5, 25, 50, 0.9) 100%)",
+                border: "1px solid rgba(0, 229, 255, 0.6)",
+                fontFamily: "'Orbitron', sans-serif",
+                fontSize: 11,
+                color: "#fff",
+                letterSpacing: "0.18em",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                textDecoration: "none",
+                textShadow: "0 0 10px rgba(0, 229, 255, 0.8)",
+                boxShadow: "0 0 20px rgba(0, 229, 255, 0.2)",
+              }}
+            >
+              Stake TON
+            </a>
+            <a
+              href="https://dao.tokamak.network"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center"
+              style={{
+                padding: "12px 24px",
+                minHeight: 44,
+                background:
+                  "linear-gradient(180deg, rgba(10, 20, 50, 0.9) 0%, rgba(5, 15, 40, 0.9) 100%)",
+                border: "1px solid rgba(42, 114, 229, 0.5)",
+                fontFamily: "'Orbitron', sans-serif",
+                fontSize: 11,
+                color: "#8cc8ff",
+                letterSpacing: "0.18em",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                textDecoration: "none",
+                textShadow: "0 0 8px rgba(42, 114, 229, 0.5)",
+              }}
+            >
+              Vote Now
+            </a>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

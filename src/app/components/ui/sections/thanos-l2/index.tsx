@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useMotionValue } from "framer-motion";
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import LazyWebGL from "../../LazyWebGL";
 
@@ -329,111 +330,325 @@ const MOBILE_METRICS = [
   { label: "Architecture", value: "MODULAR" },
 ] as const;
 
-function ThanosL2MobileOverlay() {
-  return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center px-5 py-8 gap-5">
-      <div className="flex flex-col items-center gap-1">
-        <div
-          style={{
-            fontSize: 9,
-            color: "rgba(0, 229, 255, 0.5)",
-            fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.25em",
-            textTransform: "uppercase",
-          }}
-        >
-          Thanos L2 · OP Stack
-        </div>
-        <div
-          style={{
-            fontSize: 16,
-            color: "#fff",
-            fontFamily: "'Orbitron', sans-serif",
-            fontWeight: 700,
-            letterSpacing: "0.08em",
-            textShadow: "0 0 14px rgba(0, 229, 255, 0.4)",
-            textAlign: "center",
-          }}
-        >
-          On-Demand L2 for Ethereum
-        </div>
-        <div
-          style={{
-            fontSize: 9,
-            color: "rgba(160, 210, 255, 0.5)",
-            fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.12em",
-          }}
-        >
-          Fast · Secure · Fully Customizable
-        </div>
-      </div>
+const mobileKeyframes = `
+@keyframes scanSweep {
+  0%   { top: -2px; opacity: 0.6; }
+  80%  { opacity: 0.3; }
+  100% { top: 100%; opacity: 0; }
+}
+@keyframes gridFade {
+  0%, 100% { opacity: 0.03; }
+  50%       { opacity: 0.07; }
+}
+@keyframes swipeHint {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50%       { transform: translateY(-6px); opacity: 1; }
+}
+`;
 
-      <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
-        {MOBILE_METRICS.map((m) => (
+function ThanosL2MobileOverlay() {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const dragY = useMotionValue(0);
+
+  function handleDragEnd(_: unknown, info: { offset: { y: number }; velocity: { y: number } }) {
+    if (info.offset.y > 60 || info.velocity.y > 300) {
+      setSheetOpen(false);
+    } else if (info.offset.y < -40 || info.velocity.y < -300) {
+      setSheetOpen(true);
+    }
+  }
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <style dangerouslySetInnerHTML={{ __html: mobileKeyframes }} />
+
+      {/* ── Scan-line sweep ── */}
+      <div
+        className="absolute left-0 right-0 pointer-events-none"
+        style={{
+          height: 2,
+          background: "linear-gradient(90deg, transparent, #00e5ff, transparent)",
+          boxShadow: "0 0 8px rgba(0, 229, 255, 0.8)",
+          animation: "scanSweep 6s linear infinite",
+          zIndex: 5,
+        }}
+      />
+
+      {/* ── FUI grid overlay ── */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(0,229,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,1) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+          animation: "gridFade 4s ease-in-out infinite",
+          zIndex: 2,
+        }}
+      />
+
+      {/* ── Initial state: title + badges ── */}
+      <motion.div
+        className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none"
+        animate={{ opacity: sheetOpen ? 0 : 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        {/* Title block */}
+        <div className="flex flex-col items-center gap-1 px-5 text-center">
           <div
-            key={m.label}
-            className="relative flex flex-col items-center justify-center py-3 px-2"
             style={{
-              background: "rgba(2, 10, 22, 0.88)",
-              border: "1px solid rgba(0, 229, 255, 0.15)",
-              minHeight: 60,
+              fontSize: 9,
+              color: "rgba(0, 229, 255, 0.6)",
+              fontFamily: "'Share Tech Mono', monospace",
+              letterSpacing: "0.25em",
+              textTransform: "uppercase",
             }}
           >
+            Thanos L2 · OP Stack
+          </div>
+          <div
+            style={{
+              fontSize: 20,
+              color: "#fff",
+              fontFamily: "'Orbitron', sans-serif",
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              textShadow: "0 0 20px rgba(0, 229, 255, 0.5), 0 0 40px rgba(0, 229, 255, 0.2)",
+              lineHeight: 1.2,
+            }}
+          >
+            On-Demand L2<br />for Ethereum
+          </div>
+        </div>
+
+        {/* 2 key metric badges */}
+        <div className="flex gap-3 mt-6">
+          {[
+            { value: "< 1s", label: "Finality" },
+            { value: "99.9%", label: "Uptime" },
+          ].map((badge) => (
             <div
-              className="absolute pointer-events-none"
-              style={{ top: 0, left: 0, right: 0, height: 1, background: "rgba(0, 229, 255, 0.3)" }}
-            />
+              key={badge.label}
+              className="relative flex flex-col items-center justify-center px-4 py-2"
+              style={{
+                background: "rgba(5, 10, 20, 0.75)",
+                border: "1px solid rgba(0, 229, 255, 0.35)",
+                backdropFilter: "blur(8px)",
+                minWidth: 90,
+                minHeight: 52,
+              }}
+            >
+              <div
+                className="absolute top-0 left-0 right-0 pointer-events-none"
+                style={{ height: 1, background: "rgba(0, 229, 255, 0.5)" }}
+              />
+              <div
+                style={{
+                  fontSize: 18,
+                  color: "#fff",
+                  fontFamily: "'Orbitron', sans-serif",
+                  fontWeight: 700,
+                  textShadow: "0 0 12px rgba(0, 229, 255, 0.6)",
+                  lineHeight: 1,
+                }}
+              >
+                {badge.value}
+              </div>
+              <div
+                style={{
+                  fontSize: 8,
+                  color: "rgba(0, 229, 255, 0.7)",
+                  fontFamily: "'Share Tech Mono', monospace",
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
+                  marginTop: 3,
+                }}
+              >
+                {badge.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* ── Backdrop when sheet is open ── */}
+      <motion.div
+        className="absolute inset-0 z-20"
+        animate={{ opacity: sheetOpen ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+        style={{
+          background: "rgba(2, 6, 14, 0.6)",
+          backdropFilter: "blur(4px)",
+          pointerEvents: sheetOpen ? "auto" : "none",
+        }}
+        onClick={() => setSheetOpen(false)}
+      />
+
+      {/* ── Bottom sheet ── */}
+      <motion.div
+        className="absolute left-0 right-0 bottom-0 z-30 flex flex-col"
+        animate={{ y: sheetOpen ? 0 : "85%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0.05, bottom: 0.3 }}
+        style={{
+          y: dragY,
+          background: "rgba(5, 10, 20, 0.95)",
+          backdropFilter: "blur(20px)",
+          borderTop: "1px solid rgba(0, 229, 255, 0.3)",
+          borderLeft: "1px solid rgba(0, 229, 255, 0.1)",
+          borderRight: "1px solid rgba(0, 229, 255, 0.1)",
+          borderRadius: "12px 12px 0 0",
+          paddingBottom: "env(safe-area-inset-bottom, 16px)",
+        }}
+        onDragEnd={handleDragEnd}
+        onTap={() => { if (!sheetOpen) setSheetOpen(true); }}
+      >
+        {/* Top accent line */}
+        <div
+          className="absolute top-0 left-0 right-0 pointer-events-none"
+          style={{
+            height: 1,
+            background: "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.7), transparent)",
+          }}
+        />
+
+        {/* Drag handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div
+            style={{
+              width: 36,
+              height: 4,
+              borderRadius: 2,
+              background: "rgba(0, 229, 255, 0.35)",
+            }}
+          />
+        </div>
+
+        {/* Swipe-up hint (visible when closed) */}
+        <motion.div
+          className="flex flex-col items-center pb-2"
+          animate={{ opacity: sheetOpen ? 0 : 1 }}
+          transition={{ duration: 0.2 }}
+          style={{ pointerEvents: "none" }}
+        >
+          <div
+            style={{
+              animation: "swipeHint 1.8s ease-in-out infinite",
+              display: "inline-flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            {/* Chevron up */}
+            <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+              <path d="M1 9L8 2L15 9" stroke="#00e5ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
             <div
               style={{
                 fontSize: 8,
                 color: "rgba(0, 229, 255, 0.6)",
                 fontFamily: "'Share Tech Mono', monospace",
-                letterSpacing: "0.12em",
+                letterSpacing: "0.2em",
                 textTransform: "uppercase",
-                marginBottom: 4,
               }}
             >
-              {m.label}
-            </div>
-            <div
-              style={{
-                fontSize: 18,
-                color: "#fff",
-                fontFamily: "'Orbitron', sans-serif",
-                fontWeight: 700,
-                lineHeight: 1,
-                textShadow: "0 0 10px rgba(0, 229, 255, 0.25)",
-              }}
-            >
-              {m.value}
+              Swipe up
             </div>
           </div>
-        ))}
-      </div>
+        </motion.div>
 
-      <a
-        href="https://rolluphub.tokamak.network/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="relative inline-flex items-center justify-center"
-        style={{
-          padding: "12px 32px",
-          minHeight: 44,
-          background: "linear-gradient(180deg, rgba(0, 229, 255, 0.15) 0%, rgba(0, 229, 255, 0.05) 100%)",
-          border: "1px solid rgba(0, 229, 255, 0.5)",
-          fontFamily: "'Orbitron', sans-serif",
-          fontSize: 12,
-          color: "#00e5ff",
-          letterSpacing: "0.18em",
-          fontWeight: 700,
-          textTransform: "uppercase",
-          textDecoration: "none",
-          textShadow: "0 0 10px rgba(0, 229, 255, 0.5)",
-        }}
-      >
-        Deploy Your Appchain
-      </a>
+        {/* Sheet content (metrics + CTA) */}
+        <motion.div
+          className="flex flex-col items-center px-5 gap-4"
+          animate={{ opacity: sheetOpen ? 1 : 0 }}
+          transition={{ duration: 0.25, delay: sheetOpen ? 0.1 : 0 }}
+          style={{ paddingBottom: 24 }}
+        >
+          {/* 2×2 metrics grid */}
+          <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
+            {MOBILE_METRICS.map((m) => (
+              <div
+                key={m.label}
+                className="relative flex flex-col items-center justify-center py-3 px-2"
+                style={{
+                  background: "rgba(2, 10, 22, 0.9)",
+                  border: "1px solid rgba(0, 229, 255, 0.18)",
+                  minHeight: 64,
+                }}
+              >
+                <div
+                  className="absolute pointer-events-none"
+                  style={{ top: 0, left: 0, right: 0, height: 1, background: "rgba(0, 229, 255, 0.4)" }}
+                />
+                <div
+                  style={{
+                    fontSize: 8,
+                    color: "rgba(0, 229, 255, 0.65)",
+                    fontFamily: "'Share Tech Mono', monospace",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    marginBottom: 4,
+                  }}
+                >
+                  {m.label}
+                </div>
+                <div
+                  style={{
+                    fontSize: 18,
+                    color: "#fff",
+                    fontFamily: "'Orbitron', sans-serif",
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    textShadow: "0 0 10px rgba(0, 229, 255, 0.3)",
+                  }}
+                >
+                  {m.value}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA button */}
+          <a
+            href="https://rolluphub.tokamak.network/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative inline-flex items-center justify-center w-full max-w-xs"
+            style={{
+              padding: "14px 32px",
+              minHeight: 48,
+              background: "linear-gradient(180deg, rgba(0, 40, 60, 0.95) 0%, rgba(5, 25, 50, 0.95) 100%)",
+              border: "1.5px solid rgba(0, 229, 255, 0.8)",
+              fontFamily: "'Orbitron', sans-serif",
+              fontSize: 12,
+              color: "#fff",
+              letterSpacing: "0.18em",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              textDecoration: "none",
+              textShadow: "0 0 14px rgba(0, 229, 255, 0.8)",
+              boxShadow: "0 0 24px rgba(0, 229, 255, 0.25), inset 0 0 20px rgba(0, 229, 255, 0.08)",
+            }}
+          >
+            Deploy Your Appchain
+          </a>
+
+          {/* Sub-tagline */}
+          <div
+            style={{
+              fontSize: 9,
+              color: "rgba(160, 210, 255, 0.45)",
+              fontFamily: "'Share Tech Mono', monospace",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+            }}
+          >
+            Fast · Secure · Fully Customizable
+          </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

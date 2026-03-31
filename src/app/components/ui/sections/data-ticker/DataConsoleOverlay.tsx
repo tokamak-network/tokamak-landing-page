@@ -431,7 +431,7 @@ function TickerItemSpan({ item }: { item: TickerItem }) {
           textShadow: "0 0 8px rgba(0, 229, 255, 0.4)",
         }}
       >
-        ${item.label}
+        {item.label}
       </span>
       <span
         style={{
@@ -546,128 +546,530 @@ function BottomTicker({ items }: { items: TickerItem[] }) {
 }
 
 /* ═══════════════════════════════════════════════
-   Mobile Overlay — simplified, no 3D
+   Mobile Overlay — Layered Reveal (bottom sheet)
    ═══════════════════════════════════════════════ */
 
+const mobileKeyframes = `
+@keyframes holoPulse {
+  0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+}
+@keyframes holoPulse2 {
+  0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0.5; }
+  100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+}
+@keyframes holoCoreSpin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes swipeHint {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(-5px); opacity: 1; }
+}`;
+
 function DataConsoleMobileOverlay({ items }: { items: TickerItem[] }) {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const peekItems = items.slice(0, 2);
+
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-between py-8 px-5 gap-4">
-      {/* Title */}
-      <div className="flex flex-col items-center gap-1">
+    <div className="absolute inset-0 overflow-hidden">
+      <style dangerouslySetInnerHTML={{ __html: mobileKeyframes }} />
+
+      {/* ── Initial state layer ── */}
+      <div className="absolute inset-0 flex flex-col items-center">
+        {/* Title block */}
+        <div
+          className="flex flex-col items-center gap-1"
+          style={{ paddingTop: 32, zIndex: 10, position: "relative" }}
+        >
+          <div
+            style={{
+              fontSize: 10,
+              color: "rgba(140, 200, 255, 0.5)",
+              fontFamily: "'Share Tech Mono', monospace",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+            }}
+          >
+            System Status:{" "}
+            <span style={{ color: "#22c55e" }}>Nominal</span>
+          </div>
+          <div
+            style={{
+              fontSize: 16,
+              color: "#00e5ff",
+              fontFamily: "'Orbitron', sans-serif",
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              textShadow: "0 0 14px rgba(0, 229, 255, 0.5)",
+            }}
+          >
+            Live Data Console
+          </div>
+        </div>
+
+        {/* CSS holographic pulse sphere */}
         <div
           style={{
-            fontSize: 10,
-            color: "rgba(140, 200, 255, 0.5)",
+            position: "absolute",
+            top: "42%",
+            left: "50%",
+            width: 180,
+            height: 180,
+            zIndex: 2,
+            pointerEvents: "none",
+          }}
+        >
+          {/* Outer pulse ring 1 */}
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              width: 140,
+              height: 140,
+              borderRadius: "50%",
+              border: "1.5px solid rgba(0, 229, 255, 0.6)",
+              animation: "holoPulse 2.4s ease-out infinite",
+            }}
+          />
+          {/* Outer pulse ring 2 (offset) */}
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              width: 140,
+              height: 140,
+              borderRadius: "50%",
+              border: "1px solid rgba(42, 114, 229, 0.5)",
+              animation: "holoPulse2 2.4s ease-out infinite 1.2s",
+            }}
+          />
+          {/* Core spinning ring */}
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              width: 64,
+              height: 64,
+              borderRadius: "50%",
+              border: "2px solid transparent",
+              borderTopColor: "#00e5ff",
+              borderRightColor: "rgba(0, 229, 255, 0.3)",
+              animation: "holoCoreSpin 1.8s linear infinite",
+              boxShadow: "0 0 12px rgba(0, 229, 255, 0.4)",
+            }}
+          />
+          {/* Inner filled core */}
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              background:
+                "radial-gradient(circle, rgba(0, 229, 255, 0.35) 0%, rgba(42, 114, 229, 0.15) 60%, transparent 100%)",
+              boxShadow:
+                "0 0 20px rgba(0, 229, 255, 0.3), 0 0 40px rgba(42, 114, 229, 0.15)",
+            }}
+          />
+        </div>
+
+        {/* Floating metric badges (first 2 items) */}
+        <div
+          style={{
+            position: "absolute",
+            top: "30%",
+            left: 0,
+            right: 0,
+            display: "flex",
+            justifyContent: "space-between",
+            padding: "0 20px",
+            zIndex: 6,
+            pointerEvents: "none",
+          }}
+        >
+          {peekItems.map((item, i) => (
+            <div
+              key={item.label}
+              style={{
+                background: "rgba(5, 10, 20, 0.82)",
+                border: "1px solid rgba(42, 114, 229, 0.35)",
+                borderRadius: 8,
+                padding: "8px 12px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                minWidth: 88,
+                backdropFilter: "blur(8px)",
+                boxShadow:
+                  i === 0
+                    ? "-4px 0 16px rgba(0, 229, 255, 0.08)"
+                    : "4px 0 16px rgba(0, 229, 255, 0.08)",
+              }}
+            >
+              {/* Top accent */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 1,
+                  background:
+                    "linear-gradient(90deg, rgba(42, 114, 229, 0.6), rgba(0, 229, 255, 0.4), rgba(42, 114, 229, 0.6))",
+                  borderRadius: "8px 8px 0 0",
+                }}
+              />
+              <div
+                style={{
+                  fontSize: 8,
+                  color: "rgba(140, 200, 255, 0.6)",
+                  fontFamily: "'Share Tech Mono', monospace",
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  marginBottom: 3,
+                  textAlign: "center",
+                }}
+              >
+                {item.label}
+              </div>
+              <div
+                style={{
+                  fontSize: 17,
+                  color: "#fff",
+                  fontFamily: "'Orbitron', sans-serif",
+                  fontWeight: 900,
+                  lineHeight: 1,
+                  textShadow:
+                    "0 0 8px rgba(42, 114, 229, 0.8), 0 0 20px rgba(42, 114, 229, 0.4)",
+                }}
+              >
+                {item.prefix}
+                {item.value}
+              </div>
+              {item.change && (
+                <div
+                  style={{
+                    marginTop: 2,
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: item.change.startsWith("+") ? "#00ff88" : "#ef4444",
+                    fontFamily: "'Share Tech Mono', monospace",
+                  }}
+                >
+                  {item.change}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Backdrop (tap to close) ── */}
+      {sheetOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="absolute inset-0"
+          style={{
+            background: "rgba(3, 8, 16, 0.55)",
+            backdropFilter: "blur(4px)",
+            zIndex: 20,
+          }}
+          onClick={() => setSheetOpen(false)}
+        />
+      )}
+
+      {/* ── Bottom ticker (always visible) ── */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: sheetOpen ? "auto" : 20,
+          left: 0,
+          right: 0,
+          zIndex: sheetOpen ? 0 : 15,
+          opacity: sheetOpen ? 0 : 1,
+          transition: "opacity 0.2s",
+          pointerEvents: sheetOpen ? "none" : "auto",
+        }}
+      >
+        <BottomTicker items={items} />
+      </div>
+
+      {/* ── Swipe-up / peek indicator ── */}
+      <motion.div
+        animate={{ opacity: sheetOpen ? 0 : 1 }}
+        transition={{ duration: 0.2 }}
+        style={{
+          position: "absolute",
+          bottom: 68,
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 16,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 4,
+          pointerEvents: sheetOpen ? "none" : "auto",
+          cursor: "pointer",
+          minHeight: 44,
+          justifyContent: "center",
+        }}
+        onClick={() => setSheetOpen(true)}
+      >
+        <div
+          style={{
+            fontSize: 8,
+            color: "rgba(0, 229, 255, 0.5)",
             fontFamily: "'Share Tech Mono', monospace",
             letterSpacing: "0.18em",
             textTransform: "uppercase",
+            animation: "swipeHint 1.8s ease-in-out infinite",
           }}
         >
-          System Status: <span style={{ color: "#22c55e" }}>Nominal</span>
+          View All Metrics
         </div>
         <div
           style={{
-            fontSize: 16,
-            color: "#00e5ff",
-            fontFamily: "'Orbitron', sans-serif",
-            fontWeight: 700,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            textShadow: "0 0 14px rgba(0, 229, 255, 0.5)",
+            width: 28,
+            height: 28,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            animation: "swipeHint 1.8s ease-in-out infinite 0.2s",
           }}
         >
-          Live Data Console
+          <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+            <path
+              d="M1 8.5L8 1.5L15 8.5"
+              stroke="#00e5ff"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              opacity="0.6"
+            />
+          </svg>
         </div>
-        <Link
-          href="/about/reports"
+      </motion.div>
+
+      {/* ── Bottom sheet ── */}
+      <motion.div
+        animate={{ y: sheetOpen ? 0 : "85%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0.05, bottom: 0.3 }}
+        onDragEnd={(_, info) => {
+          if (info.offset.y > 60 || info.velocity.y > 300) {
+            setSheetOpen(false);
+          } else if (info.offset.y < -40 || info.velocity.y < -300) {
+            setSheetOpen(true);
+          }
+        }}
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 25,
+          borderRadius: "16px 16px 0 0",
+          background: "rgba(5, 10, 20, 0.95)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(42, 114, 229, 0.2)",
+          borderBottom: "none",
+          boxShadow:
+            "0 -8px 40px rgba(0, 0, 0, 0.6), 0 -2px 0 rgba(0, 229, 255, 0.08)",
+          paddingBottom: 24,
+          cursor: sheetOpen ? "default" : "pointer",
+          touchAction: "none",
+        }}
+        onClick={() => {
+          if (!sheetOpen) setSheetOpen(true);
+        }}
+      >
+        {/* Drag handle */}
+        <div
           style={{
-            fontSize: 9,
-            color: "rgba(0, 229, 255, 0.5)",
-            fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            textDecoration: "none",
-            marginTop: 4,
+            display: "flex",
+            justifyContent: "center",
+            paddingTop: 12,
+            paddingBottom: 8,
           }}
         >
-          Biweekly Reports &rarr;
-        </Link>
-      </div>
-
-      {/* Metrics 2-column grid */}
-      <div className="grid grid-cols-2 gap-3 w-full max-w-xs flex-1 content-start">
-        {items.map((item) => (
           <div
-            key={item.label}
-            className="relative flex flex-col items-center justify-center py-3 px-2"
             style={{
-              background: "rgba(5, 10, 20, 0.85)",
-              border: "1px solid rgba(42, 114, 229, 0.25)",
-              borderRadius: 8,
-              minHeight: 72,
+              width: 36,
+              height: 4,
+              borderRadius: 2,
+              background: "rgba(0, 229, 255, 0.25)",
+            }}
+          />
+        </div>
+
+        {/* Sheet header */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 4,
+            paddingBottom: 16,
+            borderBottom: "1px solid rgba(42, 114, 229, 0.12)",
+            marginBottom: 16,
+            paddingLeft: 20,
+            paddingRight: 20,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 13,
+              color: "#00e5ff",
+              fontFamily: "'Orbitron', sans-serif",
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              textShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
             }}
           >
-            {/* Top accent line */}
+            Live Data Console
+          </div>
+          <div
+            style={{
+              fontSize: 9,
+              color: "rgba(140, 200, 255, 0.5)",
+              fontFamily: "'Share Tech Mono', monospace",
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+            }}
+          >
+            System Status:{" "}
+            <span style={{ color: "#22c55e" }}>Nominal</span>
+          </div>
+        </div>
+
+        {/* Metrics 2x2 grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 10,
+            padding: "0 16px",
+            marginBottom: 16,
+          }}
+        >
+          {items.map((item) => (
             <div
-              className="absolute pointer-events-none"
+              key={item.label}
+              className="relative flex flex-col items-center justify-center py-3 px-2"
               style={{
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 1,
-                background:
-                  "linear-gradient(90deg, rgba(42, 114, 229, 0.6), rgba(0, 229, 255, 0.4), rgba(42, 114, 229, 0.6))",
-                borderRadius: "8px 8px 0 0",
-              }}
-            />
-            <div
-              style={{
-                fontSize: 9,
-                color: "rgba(140, 200, 255, 0.6)",
-                fontFamily: "'Share Tech Mono', monospace",
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                marginBottom: 4,
-                textAlign: "center",
+                background: "rgba(5, 10, 20, 0.85)",
+                border: "1px solid rgba(42, 114, 229, 0.25)",
+                borderRadius: 8,
+                minHeight: 72,
               }}
             >
-              {item.label}
-            </div>
-            <div
-              style={{
-                fontSize: 20,
-                color: "#fff",
-                fontFamily: "'Orbitron', sans-serif",
-                fontWeight: 900,
-                lineHeight: 1,
-                textShadow:
-                  "0 0 8px rgba(42, 114, 229, 0.8), 0 0 20px rgba(42, 114, 229, 0.4)",
-              }}
-            >
-              {item.prefix}
-              {item.value}
-            </div>
-            {item.change && (
+              {/* Top accent line */}
+              <div
+                className="absolute pointer-events-none"
+                style={{
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 1,
+                  background:
+                    "linear-gradient(90deg, rgba(42, 114, 229, 0.6), rgba(0, 229, 255, 0.4), rgba(42, 114, 229, 0.6))",
+                  borderRadius: "8px 8px 0 0",
+                }}
+              />
               <div
                 style={{
-                  marginTop: 3,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  color: item.change.startsWith("+") ? "#00ff88" : "#ef4444",
+                  fontSize: 9,
+                  color: "rgba(140, 200, 255, 0.6)",
                   fontFamily: "'Share Tech Mono', monospace",
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  marginBottom: 4,
+                  textAlign: "center",
                 }}
               >
-                {item.change}
+                {item.label}
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+              <div
+                style={{
+                  fontSize: 20,
+                  color: "#fff",
+                  fontFamily: "'Orbitron', sans-serif",
+                  fontWeight: 900,
+                  lineHeight: 1,
+                  textShadow:
+                    "0 0 8px rgba(42, 114, 229, 0.8), 0 0 20px rgba(42, 114, 229, 0.4)",
+                }}
+              >
+                {item.prefix}
+                {item.value}
+              </div>
+              {item.change && (
+                <div
+                  style={{
+                    marginTop: 3,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: item.change.startsWith("+") ? "#00ff88" : "#ef4444",
+                    fontFamily: "'Share Tech Mono', monospace",
+                  }}
+                >
+                  {item.change}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
 
-      {/* Bottom ticker — works on mobile as-is */}
-      <div className="w-full">
-        <BottomTicker items={items} />
-      </div>
+        {/* Biweekly Reports link */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: 16,
+            padding: "0 16px",
+          }}
+        >
+          <Link
+            href="/about/reports"
+            style={{
+              fontSize: 10,
+              color: "rgba(0, 229, 255, 0.6)",
+              fontFamily: "'Share Tech Mono', monospace",
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              textDecoration: "none",
+              border: "1px solid rgba(0, 229, 255, 0.18)",
+              borderRadius: 6,
+              padding: "8px 16px",
+              minHeight: 44,
+              display: "flex",
+              alignItems: "center",
+              background: "rgba(0, 229, 255, 0.04)",
+            }}
+          >
+            Biweekly Reports &rarr;
+          </Link>
+        </div>
+
+        {/* Sheet bottom ticker */}
+        <div style={{ padding: "0 4px" }}>
+          <BottomTicker items={items} />
+        </div>
+      </motion.div>
     </div>
   );
 }

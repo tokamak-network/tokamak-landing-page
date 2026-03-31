@@ -199,8 +199,14 @@ function HoloSphere() {
 }
 
 /* ═══════════════════════════════════════════════
-   2. Metric Panel — Plasma Core style
+   2. Metric Panel — Cascade Card style (matches FUI console bg)
    ═══════════════════════════════════════════════ */
+
+const metricKeyframes = `
+@keyframes cascadePulseMetric {
+  0%, 100% { opacity: 0.12; transform: scaleX(0.35); }
+  50% { opacity: 0.7; transform: scaleX(1); }
+}`;
 
 function MetricPanel({
   item,
@@ -213,85 +219,77 @@ function MetricPanel({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: side === "left" ? -24 : 24 }}
+      initial={{ opacity: 0, x: side === "left" ? -16 : 16 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5, delay: 0.3 + index * 0.1, ease: "easeOut" }}
+      transition={{ duration: 0.4, delay: 0.3 + index * 0.12, ease: "easeOut" }}
       className="relative flex flex-col items-center justify-center overflow-hidden"
       style={{
-        width: "clamp(200px, 18vw, 260px)",
-        height: "clamp(140px, 14vw, 180px)",
-        background:
-          "radial-gradient(ellipse at center, rgba(42, 114, 229, 0.25) 0%, rgba(42, 114, 229, 0.04) 40%, transparent 70%)",
-        borderRadius: 16,
-        animation: "plasmaBreathe 3s ease-in-out infinite",
+        width: "clamp(160px, 14vw, 210px)",
+        height: "clamp(120px, 12vw, 165px)",
+        background: "rgba(5, 10, 20, 0.85)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+        border: "1px solid rgba(42, 114, 229, 0.3)",
+        borderRadius: 8,
       }}
     >
-      {/* Rotating conic glow ring */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          inset: -2,
-          background:
-            "conic-gradient(from 0deg, #2A72E5, #00e5ff, #2A72E5)",
-          borderRadius: 16,
-          zIndex: 0,
-          opacity: 0.35,
-          filter: "blur(8px)",
-          animation: "plasmaRotate 4s linear infinite",
-        }}
-      />
+      <style dangerouslySetInnerHTML={{ __html: metricKeyframes }} />
 
-      {/* Dark inner fill */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          inset: 2,
-          background: "#050a14",
-          borderRadius: 14,
-          zIndex: 0,
-        }}
-      />
+      {/* Cascade pulse bars */}
+      {[0, 1, 2, 3, 4].map((i) => (
+        <div
+          key={i}
+          className="absolute left-0 right-0 pointer-events-none"
+          style={{
+            top: `${15 + i * 15}%`,
+            height: 3,
+            background:
+              "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.6), transparent)",
+            boxShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
+            animation: "cascadePulseMetric 2.2s ease-in-out infinite",
+            animationDelay: `${i * 0.2}s`,
+          }}
+        />
+      ))}
 
-      {/* Radial inner glow */}
+      {/* Top accent line */}
       <div
-        className="absolute pointer-events-none"
+        className="absolute top-0 left-0 right-0 pointer-events-none"
         style={{
-          inset: 2,
-          borderRadius: 14,
+          height: 2,
           background:
-            "radial-gradient(ellipse at center, rgba(42, 114, 229, 0.12) 0%, transparent 60%)",
-          zIndex: 1,
+            "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.6), transparent)",
         }}
       />
 
       {/* Label */}
       <div
         style={{
-          fontSize: "clamp(8px, 0.7vw, 11px)",
-          color: "rgba(140, 200, 255, 0.6)",
+          fontSize: "clamp(8px, 0.65vw, 11px)",
+          color: "rgba(122, 140, 168, 0.9)",
           fontFamily: "'Share Tech Mono', monospace",
-          letterSpacing: "0.2em",
+          letterSpacing: "0.15em",
           textTransform: "uppercase",
           marginBottom: "clamp(4px, 0.4vw, 8px)",
           position: "relative",
-          zIndex: 2,
+          zIndex: 1,
         }}
       >
         {item.label}
       </div>
 
-      {/* Value — hero element */}
+      {/* Value */}
       <div
         style={{
           fontFamily: "'Orbitron', sans-serif",
-          fontSize: "clamp(26px, 2.8vw, 36px)",
+          fontSize: "clamp(22px, 2.4vw, 34px)",
           fontWeight: 900,
           color: "#fff",
           lineHeight: 1.1,
           textShadow:
-            "0 0 10px rgba(42, 114, 229, 1), 0 0 20px rgba(42, 114, 229, 0.8), 0 0 40px rgba(42, 114, 229, 0.5), 0 0 60px rgba(42, 114, 229, 0.3)",
+            "0 0 12px rgba(0, 229, 255, 1), 0 0 24px rgba(0, 229, 255, 0.7), 0 0 36px rgba(0, 229, 255, 0.5)",
           position: "relative",
-          zIndex: 2,
+          zIndex: 1,
         }}
       >
         {item.prefix}
@@ -308,7 +306,7 @@ function MetricPanel({
             color: item.change.startsWith("+") ? "#00ff88" : "#ef4444",
             fontFamily: "'Share Tech Mono', monospace",
             position: "relative",
-            zIndex: 2,
+            zIndex: 1,
             textShadow: item.change.startsWith("+")
               ? "0 0 8px rgba(0, 255, 136, 0.4)"
               : "0 0 8px rgba(239, 68, 68, 0.4)",

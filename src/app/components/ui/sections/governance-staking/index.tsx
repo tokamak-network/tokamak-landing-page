@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import LazyWebGL from "../../LazyWebGL";
 
 const TokenVortex = dynamic(() => import("./TokenVortex"), { ssr: false });
 
@@ -1122,71 +1121,11 @@ export default function GovernanceStakingOverlay() {
       <div className="hidden md:block absolute inset-0">
           <HeaderBar />
 
-          {/* 3D Token Vortex — center focal element */}
-          <LazyWebGL style={{ position: "absolute", inset: 0 }}>
-            <TokenVortex />
-          </LazyWebGL>
+          {/* Plasma Vortex — 2D canvas particles orbiting reactor */}
+          <TokenVortex />
 
           {/* Energy flow lines — radiating from center */}
           <EnergyFlowLines />
-
-          {/* Concentric pulse rings — energy radiating outward from reactor core */}
-          <div
-            className="absolute inset-0 pointer-events-none overflow-hidden"
-            style={{ zIndex: 5 }}
-          >
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={`pulse-${i}`}
-                className="absolute"
-                style={{
-                  left: "50%",
-                  top: "46%",
-                  transform: "translate(-50%, -50%)",
-                  borderRadius: "50%",
-                  border: "1px solid rgba(0, 229, 255, 0.4)",
-                  boxShadow:
-                    "0 0 8px rgba(0, 229, 255, 0.15), inset 0 0 8px rgba(0, 229, 255, 0.05)",
-                }}
-                animate={{
-                  width: ["8%", "70%"],
-                  height: ["5%", "55%"],
-                  opacity: [0.6, 0],
-                  borderColor: [
-                    "rgba(0, 229, 255, 0.4)",
-                    "rgba(0, 229, 255, 0)",
-                  ],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeOut",
-                  delay: i * 1.3,
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Occlusion layer — same bg image on top of particles, center masked out.
-              Pillars and structural elements cover particles for depth/parallax effect. */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              zIndex: 7,
-              maskImage:
-                "radial-gradient(ellipse 55% 55% at 50% 46%, transparent 45%, black 75%)",
-              WebkitMaskImage:
-                "radial-gradient(ellipse 55% 55% at 50% 46%, transparent 45%, black 75%)",
-            }}
-          >
-            <Image
-              src="/tower/floor-governance-staking.png"
-              alt=""
-              fill
-              className="object-cover md:object-contain"
-              sizes="(max-width: 1400px) 100vw, 1400px"
-            />
-          </div>
 
           {/* Left — Reactor Log (proposal cascade cards) */}
           <div

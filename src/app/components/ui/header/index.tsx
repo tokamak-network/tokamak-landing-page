@@ -31,7 +31,7 @@ export default function NavigationBar() {
 
   return (
     <div className="fixed top-[24px] w-full flex justify-center px-5 md:px-12 z-50">
-      <div className="max-w-[1360px] w-full h-[72px] flex flex-col justify-center px-4 md:pr-11 md:pl-8 text-base font-medium text-center text-white whitespace-nowrap rounded-2xl border border-solid bg-black/40 backdrop-blur-xl border-white/10">
+      <div className="max-w-[1360px] w-full h-[72px] flex flex-col justify-center px-4 md:pr-11 md:pl-8 text-base font-medium text-center text-white whitespace-nowrap rounded-2xl border border-solid bg-black/20 backdrop-blur-md border-white/10">
         <div className="flex justify-between items-center w-full">
           {/* 로고 */}
           <Link href="/">

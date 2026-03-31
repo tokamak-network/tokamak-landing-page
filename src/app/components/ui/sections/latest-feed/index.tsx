@@ -54,106 +54,71 @@ export default function LatestFeed() {
 
   return (
     <section
-      className="relative z-10 w-full flex justify-center px-6 py-[160px] [@media(max-width:640px)]:py-[80px] overflow-hidden"
-      style={{ background: "#030810", height: "100vh", scrollSnapAlign: "start" }}
+      className="relative z-10 w-full flex justify-center px-6 py-[160px] [@media(max-width:640px)]:py-[80px] overflow-hidden bg-black"
+      style={{ height: "100vh", scrollSnapAlign: "start" }}
     >
       {/* ── Background layers ── */}
 
-      {/* Grid pattern */}
+      {/* Subtle grid — same density as tower floors */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px)
+            linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px)
           `,
           backgroundSize: "60px 60px",
         }}
       />
 
-      {/* Finer sub-grid */}
+      {/* Scan lines */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: `
-            linear-gradient(rgba(0,229,255,0.015) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,229,255,0.015) 1px, transparent 1px)
-          `,
-          backgroundSize: "15px 15px",
+          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,229,255,0.008) 3px, rgba(0,229,255,0.008) 4px)",
         }}
       />
 
-      {/* Horizontal scan lines */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,229,255,0.012) 3px, rgba(0,229,255,0.012) 4px)",
-        }}
-      />
-
-      {/* Center radial glow */}
+      {/* Center radial glow — soft, does not compete with cards */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background: `
-            radial-gradient(ellipse 70% 50% at 50% 50%, rgba(0,229,255,0.06) 0%, transparent 60%),
-            radial-gradient(ellipse 50% 30% at 50% 20%, rgba(42,114,229,0.04) 0%, transparent 50%)
+            radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0,229,255,0.035) 0%, transparent 55%),
+            radial-gradient(ellipse 40% 30% at 50% 45%, rgba(0,229,255,0.02) 0%, transparent 40%)
           `,
         }}
       />
 
-      {/* Vignette — edge fades like tower floors */}
+      {/* ── Edge fades — matched to TowerFloor ── */}
       <div
         className="absolute top-0 left-0 right-0 pointer-events-none"
         style={{
-          height: "25%",
-          background: "linear-gradient(180deg, #030810 0%, rgba(3,8,16,0.8) 30%, transparent 100%)",
+          height: "18%",
+          background: "linear-gradient(180deg, black 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.4) 65%, transparent 100%)",
         }}
       />
       <div
         className="absolute bottom-0 left-0 right-0 pointer-events-none"
         style={{
-          height: "25%",
-          background: "linear-gradient(0deg, #030810 0%, rgba(3,8,16,0.8) 30%, transparent 100%)",
+          height: "18%",
+          background: "linear-gradient(0deg, black 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.4) 65%, transparent 100%)",
         }}
       />
       <div
         className="absolute top-0 bottom-0 left-0 pointer-events-none"
         style={{
-          width: "15%",
-          background: "linear-gradient(90deg, #030810 0%, rgba(3,8,16,0.6) 40%, transparent 100%)",
+          width: "18%",
+          background: "linear-gradient(90deg, black 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.4) 65%, transparent 100%)",
         }}
       />
       <div
         className="absolute top-0 bottom-0 right-0 pointer-events-none"
         style={{
-          width: "15%",
-          background: "linear-gradient(270deg, #030810 0%, rgba(3,8,16,0.6) 40%, transparent 100%)",
+          width: "18%",
+          background: "linear-gradient(270deg, black 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.4) 65%, transparent 100%)",
         }}
       />
-
-      {/* ── Border lines ── */}
-
-      {/* Top border line */}
-      <div
-        className="absolute top-0 left-0 right-0 h-[1px]"
-        style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(0,229,255,0.4) 30%, rgba(0,229,255,0.6) 50%, rgba(0,229,255,0.4) 70%, transparent 100%)",
-        }}
-      />
-      {/* Top glow bleed */}
-      <div
-        className="absolute top-0 left-0 right-0 h-[60px] pointer-events-none"
-        style={{
-          background: "linear-gradient(180deg, rgba(0,229,255,0.06) 0%, transparent 100%)",
-        }}
-      />
-
-      {/* Corner brackets */}
-      <div className="absolute top-6 left-6 w-6 h-6 border-l border-t border-[rgba(0,229,255,0.35)]" />
-      <div className="absolute top-6 right-6 w-6 h-6 border-r border-t border-[rgba(0,229,255,0.35)]" />
-      <div className="absolute bottom-6 left-6 w-6 h-6 border-l border-b border-[rgba(0,229,255,0.35)]" />
-      <div className="absolute bottom-6 right-6 w-6 h-6 border-r border-b border-[rgba(0,229,255,0.35)]" />
 
       <div className="w-full max-w-[1280px] flex flex-col items-center">
         {/* Section label */}

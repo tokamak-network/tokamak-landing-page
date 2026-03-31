@@ -1,20 +1,48 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 
 const SCROLL_DURATION = 1400;
 const COOLDOWN = 100;
 const TRACKPAD_THRESHOLD = 5;
+const MOBILE_BREAKPOINT = 768;
 
 function easeInOutQuart(t: number): number {
   return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
 }
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  return isMobile;
+}
+
 export default function SmoothSnapScroll() {
+  const isMobile = useIsMobile();
   const isAnimating = useRef(false);
   const cooldownUntil = useRef(0);
   const animationFrame = useRef<number | null>(null);
   const lastDirection = useRef<1 | -1>(1);
+
+  /* ── Mobile: enable CSS scroll-snap on <html> ── */
+  useEffect(() => {
+    const html = document.documentElement;
+    if (isMobile) {
+      html.style.scrollSnapType = "y mandatory";
+    } else {
+      html.style.scrollSnapType = "";
+    }
+    return () => {
+      html.style.scrollSnapType = "";
+    };
+  }, [isMobile]);
 
   const getSections = useCallback((): HTMLElement[] => {
     const all: HTMLElement[] = [];
@@ -93,7 +121,10 @@ export default function SmoothSnapScroll() {
     smoothScrollTo(sections[nextIdx].offsetTop);
   }, [getSections, findClosestIndex, smoothScrollTo]);
 
+  /* ── Desktop only: wheel, keyboard, NO touch ── */
   useEffect(() => {
+    if (isMobile) return; // CSS scroll-snap handles mobile
+
     function handleWheel(e: WheelEvent) {
       e.preventDefault();
 
@@ -118,35 +149,15 @@ export default function SmoothSnapScroll() {
       scrollToSection(direction);
     }
 
-    let touchStartY = 0;
-    function handleTouchStart(e: TouchEvent) {
-      touchStartY = e.touches[0].clientY;
-    }
-
-    function handleTouchEnd(e: TouchEvent) {
-      const now = Date.now();
-      if (isAnimating.current || now < cooldownUntil.current) return;
-
-      const diff = touchStartY - e.changedTouches[0].clientY;
-      if (Math.abs(diff) < 50) return;
-
-      const direction: 1 | -1 = diff > 0 ? 1 : -1;
-      scrollToSection(direction);
-    }
-
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("keydown", handleKeydown);
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchend", handleTouchEnd);
 
     return () => {
       window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("keydown", handleKeydown);
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchend", handleTouchEnd);
       if (animationFrame.current) cancelAnimationFrame(animationFrame.current);
     };
-  }, [scrollToSection]);
+  }, [isMobile, scrollToSection]);
 
   return null;
 }

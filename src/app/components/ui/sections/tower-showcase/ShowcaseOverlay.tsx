@@ -32,6 +32,253 @@ const formatLines = (n: number) => {
   return n.toString();
 };
 
+const MOBILE_KEYFRAMES = `
+@keyframes showcaseTickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+`;
+
+function ShowcaseMobileOverlay({ categories, activeProjects, codeChanges, netGrowth }: ShowcaseOverlayProps) {
+  const [expandedCat, setExpandedCat] = useState<string | null>(null);
+  const totalRepos = categories.reduce((sum, c) => sum + c.repoCount, 0);
+  const maxRepoCount = Math.max(...categories.map(c => c.repoCount), 1);
+
+  const fmt = (n: number) => {
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+    return n.toString();
+  };
+
+  const tickerItems = [
+    { label: "Active Projects", value: String(activeProjects) },
+    { label: "Code Changes", value: `+${fmt(codeChanges)}`, isGreen: true },
+    { label: "Net Growth", value: `+${fmt(netGrowth)}`, isGreen: true },
+    { label: "Total Repos", value: String(totalRepos) },
+    { label: "Categories", value: String(categories.length) },
+  ];
+
+  return (
+    <div className="flex flex-col px-5 py-8 gap-4">
+      <style dangerouslySetInnerHTML={{ __html: MOBILE_KEYFRAMES + '.showcase-ticker::-webkit-scrollbar{display:none}' }} />
+
+      {/* Ticker Tape */}
+      <div style={{
+        overflow: 'hidden',
+        border: '1px solid rgba(0, 229, 255, 0.15)',
+        padding: '10px 0',
+        position: 'relative',
+        background: 'rgba(0, 5, 15, 0.8)',
+      }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, #00e5ff, transparent)' }} />
+        <div style={{
+          display: 'flex',
+          gap: 32,
+          animation: 'showcaseTickerScroll 18s linear infinite',
+          width: 'max-content',
+          padding: '0 16px',
+        }}>
+          {[...tickerItems, ...tickerItems].map((item, idx) => (
+            <div key={idx} style={{ display: 'flex', alignItems: 'baseline', gap: 6, whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: 9, color: 'rgba(140, 200, 255, 0.5)', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'Share Tech Mono', monospace" }}>{item.label}</span>
+              <span style={{ fontFamily: "'Orbitron', sans-serif", fontSize: 14, fontWeight: 900, color: '#00e5ff', textShadow: '0 0 8px rgba(0, 229, 255, 0.4)' }}>{item.value}</span>
+              {item.isGreen && <span style={{ fontSize: 10, color: '#22c55e', fontWeight: 700 }}>▲</span>}
+              <span style={{ color: 'rgba(0, 229, 255, 0.2)', fontSize: 12, margin: '0 4px' }}>│</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Section label */}
+      <div style={{
+        fontFamily: "'Orbitron', sans-serif",
+        fontSize: 9,
+        color: 'rgba(0, 229, 255, 0.6)',
+        letterSpacing: '0.2em',
+        textTransform: 'uppercase',
+      }}>
+        Ecosystem Categories
+      </div>
+
+      {/* Category cards */}
+      <div className="flex flex-col gap-2">
+        {categories.slice(0, 10).map((cat) => {
+          const totalLines = cat.repos.reduce((s, r) => s + r.linesAdded + r.linesDeleted, 0);
+          const netLines = cat.repos.reduce((s, r) => s + (r.linesAdded - r.linesDeleted), 0);
+          const barWidth = Math.max(5, (cat.repoCount / maxRepoCount) * 100);
+          const isExpanded = expandedCat === cat.name;
+
+          return (
+            <div key={cat.name}>
+              {/* Card header — clickable */}
+              <button
+                onClick={() => setExpandedCat(isExpanded ? null : cat.name)}
+                style={{
+                  width: '100%',
+                  background: isExpanded
+                    ? 'linear-gradient(135deg, rgba(0, 18, 40, 0.98) 0%, rgba(5, 12, 30, 0.98) 100%)'
+                    : 'linear-gradient(135deg, rgba(0, 12, 28, 0.95) 0%, rgba(5, 8, 22, 0.95) 100%)',
+                  border: `1px solid rgba(0, 229, 255, ${isExpanded ? '0.3' : '0.12'})`,
+                  borderBottom: isExpanded ? 'none' : `1px solid rgba(0, 229, 255, 0.12)`,
+                  padding: '14px 16px',
+                  display: 'flex',
+                  gap: 14,
+                  alignItems: 'center',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, rgba(0, 229, 255, ${isExpanded ? '0.5' : '0.3'}), transparent 60%)` }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(0, 229, 255, 0.015) 4px, rgba(0, 229, 255, 0.015) 5px)', pointerEvents: 'none' }} />
+
+                {/* Circle icon */}
+                <div style={{
+                  width: 44, height: 44,
+                  border: `2px solid rgba(0, 229, 255, ${isExpanded ? '0.5' : '0.3'})`,
+                  borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: "'Orbitron', sans-serif",
+                  fontSize: 14, fontWeight: 900,
+                  color: '#00e5ff',
+                  flexShrink: 0,
+                  position: 'relative',
+                  textShadow: '0 0 8px rgba(0, 229, 255, 0.5)',
+                  transition: 'border-color 0.2s ease',
+                }}>
+                  {cat.repoCount}
+                  <div style={{ position: 'absolute', inset: -5, border: '1px solid rgba(0, 229, 255, 0.08)', borderRadius: '50%' }} />
+                </div>
+
+                {/* Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: 11, fontWeight: 700, color: '#fff', marginBottom: 2 }}>
+                      {cat.name}
+                    </div>
+                    <span style={{
+                      fontSize: 10,
+                      color: 'rgba(0, 229, 255, 0.5)',
+                      transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s ease',
+                      display: 'inline-block',
+                    }}>▼</span>
+                  </div>
+                  <div style={{ fontSize: 9, color: 'rgba(140, 200, 255, 0.45)', fontFamily: "'Share Tech Mono', monospace", marginBottom: 8 }}>
+                    {cat.repoCount} repositories
+                  </div>
+                  <div style={{ height: 3, background: 'rgba(0, 229, 255, 0.08)', position: 'relative' }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${barWidth}%`,
+                      background: 'linear-gradient(90deg, #00e5ff, rgba(0, 229, 255, 0.2))',
+                      boxShadow: '0 0 6px rgba(0, 229, 255, 0.3)',
+                    }} />
+                  </div>
+                  {totalLines > 0 && (
+                    <div style={{ fontSize: 9, color: '#22c55e', fontFamily: "'Share Tech Mono', monospace", marginTop: 4 }}>
+                      ▲ {netLines >= 0 ? '+' : ''}{fmt(netLines)} net · {fmt(totalLines)} total
+                    </div>
+                  )}
+                </div>
+              </button>
+
+              {/* Expanded repo list */}
+              {isExpanded && cat.repos.length > 0 && (
+                <div style={{
+                  background: 'rgba(0, 6, 16, 0.98)',
+                  border: '1px solid rgba(0, 229, 255, 0.3)',
+                  borderTop: 'none',
+                  padding: '4px 0',
+                }}>
+                  {[...cat.repos]
+                    .sort((a, b) => (b.linesAdded + b.linesDeleted) - (a.linesAdded + a.linesDeleted))
+                    .map((repo) => {
+                      const net = repo.linesAdded - repo.linesDeleted;
+                      return (
+                        <a
+                          key={repo.name}
+                          href={repo.githubUrl || `https://github.com/tokamak-network/${repo.name}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '10px 16px',
+                            borderBottom: '1px solid rgba(0, 229, 255, 0.06)',
+                            textDecoration: 'none',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
+                            <div style={{
+                              width: 5, height: 5, borderRadius: '50%', flexShrink: 0,
+                              background: repo.activity === 'high' ? '#00ff88' : repo.activity === 'medium' ? '#ffaa00' : '#555',
+                              boxShadow: repo.activity === 'high' ? '0 0 6px rgba(0, 255, 136, 0.5)' : undefined,
+                            }} />
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{
+                                fontFamily: "'Share Tech Mono', monospace",
+                                fontSize: 11, color: 'rgba(200, 225, 255, 0.9)',
+                                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                              }}>
+                                {repo.name}
+                              </div>
+                              {repo.description && (
+                                <div style={{
+                                  fontFamily: "'Share Tech Mono', monospace",
+                                  fontSize: 9, color: 'rgba(140, 170, 210, 0.5)', marginTop: 1,
+                                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                                }}>
+                                  {repo.description}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 8 }}>
+                            <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: 'rgba(140, 200, 255, 0.6)' }}>
+                              {fmt(repo.linesAdded + repo.linesDeleted)}
+                            </span>
+                            <span style={{
+                              fontFamily: "'Share Tech Mono', monospace", fontSize: 10, fontWeight: 600,
+                              color: net >= 0 ? '#00ff88' : '#ff5555', minWidth: 45, textAlign: 'right',
+                            }}>
+                              {net >= 0 ? '+' : ''}{fmt(net)}
+                            </span>
+                          </div>
+                        </a>
+                      );
+                    })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Bottom summary stats */}
+      <div style={{ display: 'flex', gap: 2 }}>
+        <div style={{ flex: 1, background: 'rgba(0, 8, 20, 0.95)', border: '1px solid rgba(0, 229, 255, 0.1)', padding: '12px 8px', textAlign: 'center', position: 'relative' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'rgba(0, 229, 255, 0.3)' }} />
+          <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: 16, fontWeight: 900, color: '#00e5ff', textShadow: '0 0 10px rgba(0, 229, 255, 0.4)' }}>{activeProjects}</div>
+          <div style={{ fontSize: 7, color: 'rgba(140, 200, 255, 0.5)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 4, fontFamily: "'Share Tech Mono', monospace" }}>Active Repos</div>
+        </div>
+        <div style={{ flex: 1, background: 'rgba(0, 8, 20, 0.95)', border: '1px solid rgba(0, 229, 255, 0.1)', padding: '12px 8px', textAlign: 'center', position: 'relative' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'rgba(0, 229, 255, 0.3)' }} />
+          <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: 16, fontWeight: 900, color: '#f59e0b', textShadow: '0 0 10px rgba(245, 158, 11, 0.4)' }}>{fmt(codeChanges)}</div>
+          <div style={{ fontSize: 7, color: 'rgba(140, 200, 255, 0.5)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 4, fontFamily: "'Share Tech Mono', monospace" }}>Code Changes</div>
+        </div>
+        <div style={{ flex: 1, background: 'rgba(0, 8, 20, 0.95)', border: '1px solid rgba(0, 229, 255, 0.1)', padding: '12px 8px', textAlign: 'center', position: 'relative' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'rgba(0, 229, 255, 0.3)' }} />
+          <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: 16, fontWeight: 900, color: '#22c55e', textShadow: '0 0 10px rgba(34, 197, 94, 0.4)' }}>+{fmt(netGrowth)}</div>
+          <div style={{ fontSize: 7, color: 'rgba(140, 200, 255, 0.5)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 4, fontFamily: "'Share Tech Mono', monospace" }}>Net Growth</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ShowcaseOverlay({
   categories,
   activeProjects,
@@ -69,7 +316,14 @@ export default function ShowcaseOverlay({
   ];
 
   return (
-    <div className="absolute inset-0">
+    <>
+      {/* ── Mobile layout (below md) ── */}
+      <div className="block md:hidden w-full">
+        <ShowcaseMobileOverlay categories={categories} activeProjects={activeProjects} codeChanges={codeChanges} netGrowth={netGrowth} />
+      </div>
+
+      {/* ── Desktop layout (md and above) ── */}
+      <div className="hidden md:block absolute inset-0">
       {categories.slice(0, 10).map((cat, i) => {
         const pos = pedestals[i];
         if (!pos) return null;
@@ -473,6 +727,7 @@ export default function ShowcaseOverlay({
           onClick={() => setSelectedIdx(null)}
         />
       )}
-    </div>
+      </div>
+    </>
   );
 }

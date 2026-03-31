@@ -546,530 +546,122 @@ function BottomTicker({ items }: { items: TickerItem[] }) {
 }
 
 /* ═══════════════════════════════════════════════
-   Mobile Overlay — Layered Reveal (bottom sheet)
+   Mobile Overlay — Background First (simple single-view)
    ═══════════════════════════════════════════════ */
 
-const mobileKeyframes = `
-@keyframes holoPulse {
-  0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0.7; }
-  100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
-}
-@keyframes holoPulse2 {
-  0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0.5; }
-  100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
-}
-@keyframes holoCoreSpin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-@keyframes swipeHint {
-  0%, 100% { transform: translateY(0); opacity: 0.6; }
-  50% { transform: translateY(-5px); opacity: 1; }
-}`;
-
 function DataConsoleMobileOverlay({ items }: { items: TickerItem[] }) {
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const peekItems = items.slice(0, 2);
-
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      <style dangerouslySetInnerHTML={{ __html: mobileKeyframes }} />
+    <div className="absolute inset-0 flex flex-col items-center justify-between py-8 px-5 gap-4">
 
-      {/* ── Initial state layer ── */}
-      <div className="absolute inset-0 flex flex-col items-center">
-        {/* Title block */}
-        <div
-          className="flex flex-col items-center gap-1"
-          style={{ paddingTop: 32, zIndex: 10, position: "relative" }}
-        >
-          <div
-            style={{
-              fontSize: 10,
-              color: "rgba(140, 200, 255, 0.5)",
-              fontFamily: "'Share Tech Mono', monospace",
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-            }}
-          >
-            System Status:{" "}
-            <span style={{ color: "#22c55e" }}>Nominal</span>
-          </div>
-          <div
-            style={{
-              fontSize: 16,
-              color: "#00e5ff",
-              fontFamily: "'Orbitron', sans-serif",
-              fontWeight: 700,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              textShadow: "0 0 14px rgba(0, 229, 255, 0.5)",
-            }}
-          >
-            Live Data Console
-          </div>
-        </div>
-
-        {/* CSS holographic pulse sphere */}
+      {/* Title block */}
+      <div className="flex flex-col items-center gap-1" style={{ zIndex: 10, width: "100%" }}>
         <div
           style={{
-            position: "absolute",
-            top: "42%",
-            left: "50%",
-            width: 180,
-            height: 180,
-            zIndex: 2,
-            pointerEvents: "none",
-          }}
-        >
-          {/* Outer pulse ring 1 */}
-          <div
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              width: 140,
-              height: 140,
-              borderRadius: "50%",
-              border: "1.5px solid rgba(0, 229, 255, 0.6)",
-              animation: "holoPulse 2.4s ease-out infinite",
-            }}
-          />
-          {/* Outer pulse ring 2 (offset) */}
-          <div
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              width: 140,
-              height: 140,
-              borderRadius: "50%",
-              border: "1px solid rgba(42, 114, 229, 0.5)",
-              animation: "holoPulse2 2.4s ease-out infinite 1.2s",
-            }}
-          />
-          {/* Core spinning ring */}
-          <div
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              width: 64,
-              height: 64,
-              borderRadius: "50%",
-              border: "2px solid transparent",
-              borderTopColor: "#00e5ff",
-              borderRightColor: "rgba(0, 229, 255, 0.3)",
-              animation: "holoCoreSpin 1.8s linear infinite",
-              boxShadow: "0 0 12px rgba(0, 229, 255, 0.4)",
-            }}
-          />
-          {/* Inner filled core */}
-          <div
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: 36,
-              height: 36,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(0, 229, 255, 0.35) 0%, rgba(42, 114, 229, 0.15) 60%, transparent 100%)",
-              boxShadow:
-                "0 0 20px rgba(0, 229, 255, 0.3), 0 0 40px rgba(42, 114, 229, 0.15)",
-            }}
-          />
-        </div>
-
-        {/* Floating metric badges (first 2 items) */}
-        <div
-          style={{
-            position: "absolute",
-            top: "30%",
-            left: 0,
-            right: 0,
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "0 20px",
-            zIndex: 6,
-            pointerEvents: "none",
-          }}
-        >
-          {peekItems.map((item, i) => (
-            <div
-              key={item.label}
-              style={{
-                background: "rgba(5, 10, 20, 0.82)",
-                border: "1px solid rgba(42, 114, 229, 0.35)",
-                borderRadius: 8,
-                padding: "8px 12px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                minWidth: 88,
-                backdropFilter: "blur(8px)",
-                boxShadow:
-                  i === 0
-                    ? "-4px 0 16px rgba(0, 229, 255, 0.08)"
-                    : "4px 0 16px rgba(0, 229, 255, 0.08)",
-              }}
-            >
-              {/* Top accent */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 1,
-                  background:
-                    "linear-gradient(90deg, rgba(42, 114, 229, 0.6), rgba(0, 229, 255, 0.4), rgba(42, 114, 229, 0.6))",
-                  borderRadius: "8px 8px 0 0",
-                }}
-              />
-              <div
-                style={{
-                  fontSize: 8,
-                  color: "rgba(140, 200, 255, 0.6)",
-                  fontFamily: "'Share Tech Mono', monospace",
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  marginBottom: 3,
-                  textAlign: "center",
-                }}
-              >
-                {item.label}
-              </div>
-              <div
-                style={{
-                  fontSize: 17,
-                  color: "#fff",
-                  fontFamily: "'Orbitron', sans-serif",
-                  fontWeight: 900,
-                  lineHeight: 1,
-                  textShadow:
-                    "0 0 8px rgba(42, 114, 229, 0.8), 0 0 20px rgba(42, 114, 229, 0.4)",
-                }}
-              >
-                {item.prefix}
-                {item.value}
-              </div>
-              {item.change && (
-                <div
-                  style={{
-                    marginTop: 2,
-                    fontSize: 9,
-                    fontWeight: 700,
-                    color: item.change.startsWith("+") ? "#00ff88" : "#ef4444",
-                    fontFamily: "'Share Tech Mono', monospace",
-                  }}
-                >
-                  {item.change}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Backdrop (tap to close) ── */}
-      {sheetOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="absolute inset-0"
-          style={{
-            background: "rgba(3, 8, 16, 0.55)",
-            backdropFilter: "blur(4px)",
-            zIndex: 20,
-          }}
-          onClick={() => setSheetOpen(false)}
-        />
-      )}
-
-      {/* ── Bottom ticker (always visible) ── */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: sheetOpen ? "auto" : 20,
-          left: 0,
-          right: 0,
-          zIndex: sheetOpen ? 0 : 15,
-          opacity: sheetOpen ? 0 : 1,
-          transition: "opacity 0.2s",
-          pointerEvents: sheetOpen ? "none" : "auto",
-        }}
-      >
-        <BottomTicker items={items} />
-      </div>
-
-      {/* ── Swipe-up / peek indicator ── */}
-      <motion.div
-        animate={{ opacity: sheetOpen ? 0 : 1 }}
-        transition={{ duration: 0.2 }}
-        style={{
-          position: "absolute",
-          bottom: 68,
-          left: "50%",
-          transform: "translateX(-50%)",
-          zIndex: 16,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 4,
-          pointerEvents: sheetOpen ? "none" : "auto",
-          cursor: "pointer",
-          minHeight: 44,
-          justifyContent: "center",
-        }}
-        onClick={() => setSheetOpen(true)}
-      >
-        <div
-          style={{
-            fontSize: 8,
-            color: "rgba(0, 229, 255, 0.5)",
+            fontSize: 10,
+            color: "rgba(140, 200, 255, 0.5)",
             fontFamily: "'Share Tech Mono', monospace",
             letterSpacing: "0.18em",
             textTransform: "uppercase",
-            animation: "swipeHint 1.8s ease-in-out infinite",
           }}
         >
-          View All Metrics
+          System Status: <span style={{ color: "#22c55e" }}>Nominal</span>
         </div>
         <div
           style={{
-            width: 28,
-            height: 28,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            animation: "swipeHint 1.8s ease-in-out infinite 0.2s",
+            fontSize: 16,
+            color: "#00e5ff",
+            fontFamily: "'Orbitron', sans-serif",
+            fontWeight: 700,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            textShadow: "0 0 14px rgba(0, 229, 255, 0.5)",
           }}
         >
-          <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
-            <path
-              d="M1 8.5L8 1.5L15 8.5"
-              stroke="#00e5ff"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              opacity="0.6"
-            />
-          </svg>
+          Live Data Console
         </div>
-      </motion.div>
+        <Link
+          href="/about/reports"
+          style={{
+            marginTop: 4,
+            fontSize: 9,
+            color: "rgba(0, 229, 255, 0.6)",
+            fontFamily: "'Share Tech Mono', monospace",
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            textDecoration: "none",
+          }}
+        >
+          Biweekly Reports &rarr;
+        </Link>
+      </div>
 
-      {/* ── Bottom sheet ── */}
-      <motion.div
-        animate={{ y: sheetOpen ? 0 : "85%" }}
-        transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        drag="y"
-        dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={{ top: 0.05, bottom: 0.3 }}
-        onDragEnd={(_, info) => {
-          if (info.offset.y > 60 || info.velocity.y > 300) {
-            setSheetOpen(false);
-          } else if (info.offset.y < -40 || info.velocity.y < -300) {
-            setSheetOpen(true);
-          }
-        }}
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 25,
-          borderRadius: "16px 16px 0 0",
-          background: "rgba(5, 10, 20, 0.95)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid rgba(42, 114, 229, 0.2)",
-          borderBottom: "none",
-          boxShadow:
-            "0 -8px 40px rgba(0, 0, 0, 0.6), 0 -2px 0 rgba(0, 229, 255, 0.08)",
-          paddingBottom: 24,
-          cursor: sheetOpen ? "default" : "pointer",
-          touchAction: "none",
-        }}
-        onClick={() => {
-          if (!sheetOpen) setSheetOpen(true);
-        }}
-      >
-        {/* Drag handle */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            paddingTop: 12,
-            paddingBottom: 8,
-          }}
-        >
+      {/* Metrics carousel */}
+      <div style={{ width: "100%", zIndex: 10, flex: 1, minHeight: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <>
+          <style dangerouslySetInnerHTML={{ __html: '.dataconsole-carousel::-webkit-scrollbar { display: none; }' }} />
           <div
+            className="dataconsole-carousel"
             style={{
-              width: 36,
-              height: 4,
-              borderRadius: 2,
-              background: "rgba(0, 229, 255, 0.25)",
-            }}
-          />
-        </div>
-
-        {/* Sheet header */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 4,
-            paddingBottom: 16,
-            borderBottom: "1px solid rgba(42, 114, 229, 0.12)",
-            marginBottom: 16,
-            paddingLeft: 20,
-            paddingRight: 20,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 13,
-              color: "#00e5ff",
-              fontFamily: "'Orbitron', sans-serif",
-              fontWeight: 700,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              textShadow: "0 0 10px rgba(0, 229, 255, 0.4)",
-            }}
-          >
-            Live Data Console
-          </div>
-          <div
-            style={{
-              fontSize: 9,
-              color: "rgba(140, 200, 255, 0.5)",
-              fontFamily: "'Share Tech Mono', monospace",
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-            }}
-          >
-            System Status:{" "}
-            <span style={{ color: "#22c55e" }}>Nominal</span>
-          </div>
-        </div>
-
-        {/* Metrics 2x2 grid */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 10,
-            padding: "0 16px",
-            marginBottom: 16,
-          }}
-        >
-          {items.map((item) => (
-            <div
-              key={item.label}
-              className="relative flex flex-col items-center justify-center py-3 px-2"
-              style={{
-                background: "rgba(5, 10, 20, 0.85)",
-                border: "1px solid rgba(42, 114, 229, 0.25)",
-                borderRadius: 8,
-                minHeight: 72,
-              }}
-            >
-              {/* Top accent line */}
-              <div
-                className="absolute pointer-events-none"
-                style={{
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 1,
-                  background:
-                    "linear-gradient(90deg, rgba(42, 114, 229, 0.6), rgba(0, 229, 255, 0.4), rgba(42, 114, 229, 0.6))",
-                  borderRadius: "8px 8px 0 0",
-                }}
-              />
-              <div
-                style={{
-                  fontSize: 9,
-                  color: "rgba(140, 200, 255, 0.6)",
-                  fontFamily: "'Share Tech Mono', monospace",
-                  letterSpacing: "0.16em",
-                  textTransform: "uppercase",
-                  marginBottom: 4,
-                  textAlign: "center",
-                }}
-              >
-                {item.label}
-              </div>
-              <div
-                style={{
-                  fontSize: 20,
-                  color: "#fff",
-                  fontFamily: "'Orbitron', sans-serif",
-                  fontWeight: 900,
-                  lineHeight: 1,
-                  textShadow:
-                    "0 0 8px rgba(42, 114, 229, 0.8), 0 0 20px rgba(42, 114, 229, 0.4)",
-                }}
-              >
-                {item.prefix}
-                {item.value}
-              </div>
-              {item.change && (
-                <div
-                  style={{
-                    marginTop: 3,
-                    fontSize: 10,
-                    fontWeight: 700,
-                    color: item.change.startsWith("+") ? "#00ff88" : "#ef4444",
-                    fontFamily: "'Share Tech Mono', monospace",
-                  }}
-                >
-                  {item.change}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Biweekly Reports link */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: 16,
-            padding: "0 16px",
-          }}
-        >
-          <Link
-            href="/about/reports"
-            style={{
-              fontSize: 10,
-              color: "rgba(0, 229, 255, 0.6)",
-              fontFamily: "'Share Tech Mono', monospace",
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              textDecoration: "none",
-              border: "1px solid rgba(0, 229, 255, 0.18)",
-              borderRadius: 6,
-              padding: "8px 16px",
-              minHeight: 44,
               display: "flex",
-              alignItems: "center",
-              background: "rgba(0, 229, 255, 0.04)",
+              gap: 12,
+              overflowX: "auto",
+              scrollSnapType: "x mandatory",
+              WebkitOverflowScrolling: "touch",
+              paddingBottom: 8,
+              scrollbarWidth: "none",
             }}
           >
-            Biweekly Reports &rarr;
-          </Link>
-        </div>
+            {items.map((item, idx) => (
+              <div
+                key={item.label}
+                style={{
+                  minWidth: "45%",
+                  scrollSnapAlign: "start",
+                  flexShrink: 0,
+                  background: "linear-gradient(135deg, rgba(0, 15, 35, 0.95) 0%, rgba(5, 10, 25, 0.95) 100%)",
+                  border: "1px solid rgba(42, 114, 229, 0.25)",
+                  padding: "16px",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+              >
+                {/* Top accent line */}
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, rgba(42, 114, 229, 0.6), rgba(0, 229, 255, 0.4), rgba(42, 114, 229, 0.6))" }} />
 
-        {/* Sheet bottom ticker */}
-        <div style={{ padding: "0 4px" }}>
-          <BottomTicker items={items} />
-        </div>
-      </motion.div>
+                {/* Scan line texture */}
+                <div style={{ position: "absolute", inset: 0, background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 229, 255, 0.02) 3px, rgba(0, 229, 255, 0.02) 4px)", pointerEvents: "none" }} />
+
+                {/* Index number (faded) */}
+                <div style={{ fontSize: 8, color: "rgba(0, 229, 255, 0.3)", fontFamily: "'Share Tech Mono', monospace", marginBottom: 4 }}>
+                  [{String(idx).padStart(2, "0")}]
+                </div>
+
+                {/* Label */}
+                <div style={{ fontSize: 9, color: "rgba(140, 200, 255, 0.6)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: 8 }}>
+                  {item.label}
+                </div>
+
+                {/* Value */}
+                <div style={{ fontSize: 22, color: "#fff", fontFamily: "'Orbitron', sans-serif", fontWeight: 900, lineHeight: 1, textShadow: "0 0 8px rgba(42, 114, 229, 0.6)" }}>
+                  {item.prefix}{item.value}
+                </div>
+
+                {/* Change */}
+                {item.change && (
+                  <div style={{ marginTop: 6, fontSize: 11, fontWeight: 700, color: item.change.startsWith("+") ? "#00ff88" : "#ef4444", fontFamily: "'Share Tech Mono', monospace" }}>
+                    {item.change}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      </div>
+
+      {/* Bottom ticker */}
+      <div style={{ width: "100%", zIndex: 10 }}>
+        <BottomTicker items={items} />
+      </div>
     </div>
   );
 }
@@ -1083,15 +675,14 @@ export default function DataConsoleOverlay({ items }: { items: TickerItem[] }) {
   const rightItems = items.slice(mid);
 
   return (
-    <div className="absolute inset-0">
+    <>
       {/* ── Mobile layout (below md) ── */}
-      <div className="block md:hidden w-full h-full">
+      <div className="block md:hidden w-full">
         <DataConsoleMobileOverlay items={items} />
       </div>
 
       {/* ── Desktop layout (md and above) ── */}
-      <div className="hidden md:block w-full h-full">
-        <div className="absolute inset-0">
+      <div className="hidden md:block absolute inset-0">
           {/* Header bar */}
           <HeaderBar />
 
@@ -1147,8 +738,7 @@ export default function DataConsoleOverlay({ items }: { items: TickerItem[] }) {
 
           {/* Bottom ticker carousel */}
           <BottomTicker items={items} />
-        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -4,16 +4,18 @@ import { useRef, useMemo, useCallback, useEffect } from "react";
 import { Canvas, useFrame, useThree, RootState } from "@react-three/fiber";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import {
-  IcosahedronGeometry,
+  BufferGeometry,
+  Float32BufferAttribute,
   ShaderMaterial,
   AdditiveBlending,
-  DoubleSide,
-  BackSide,
+  Points,
+  SphereGeometry,
   Mesh,
+  Color,
 } from "three";
 
 /* ═══════════════════════════════════════════════
-   Resize helper (preserved exactly)
+   Resize helper
    ═══════════════════════════════════════════════ */
 
 function ResizeHelper() {
@@ -58,112 +60,258 @@ function ResizeHelper() {
 }
 
 /* ═══════════════════════════════════════════════
-   HexShield — main mesh with per-cell pulsing shader
-   IcosahedronGeometry detail=3 gives ~320 triangular
-   faces that visually approximate hex tessellation.
+   Plasma Vortex — particles orbiting reactor
+   vessel in toroidal flow with trailing streaks
    ═══════════════════════════════════════════════ */
 
-const hexShieldVert = /* glsl */ `
-  varying vec3 vNormal;
-  varying vec3 vWorldPos;
-  varying vec3 vLocalPos;
+const DOT_COUNT = 400;
+const TRAIL_COUNT = 200;
+const TRAIL_LEN = 6; // positions per trail
 
-  void main() {
-    vNormal    = normalize(normalMatrix * normal);
-    vLocalPos  = position;
-    vec4 wp    = modelMatrix * vec4(position, 1.0);
-    vWorldPos  = wp.xyz;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
+/* ── Main dot particles ── */
 
-const hexShieldFrag = /* glsl */ `
+const dotVert = /* glsl */ `
+  attribute float aPhase;
+  attribute float aSpeed;
+  attribute float aOrbitRadius;
+  attribute float aBrightness;
+  attribute float aYOffset;
+  attribute float aYAmp;
+
   uniform float uTime;
-  uniform vec3  uColor;
-  uniform float uOpacity;
 
-  varying vec3 vNormal;
-  varying vec3 vWorldPos;
-  varying vec3 vLocalPos;
-
-  // Cheap hash for per-cell variation
-  float hash(vec3 p) {
-    p = fract(p * vec3(127.1, 311.7, 74.7));
-    p += dot(p, p.yxz + 19.19);
-    return fract((p.x + p.y) * p.z);
-  }
+  varying float vAlpha;
+  varying float vBrightness;
 
   void main() {
-    // Fresnel — edges brighter
-    vec3 viewDir = normalize(cameraPosition - vWorldPos);
-    float fresnel = pow(1.0 - abs(dot(vNormal, viewDir)), 2.5);
+    float t = uTime * aSpeed + aPhase;
+    float angle = t;
 
-    // Cell id from quantised position (simulates hex cells)
-    vec3 cellPos = floor(vLocalPos * 3.5);
-    float cellId = hash(cellPos);
+    float x = cos(angle) * aOrbitRadius;
+    float z = sin(angle) * aOrbitRadius;
+    float y = aYOffset + sin(t * 0.7 + aPhase * 3.0) * aYAmp;
 
-    // Independent per-cell pulse (0.25 – 1.0 range)
-    float pulse = 0.25 + 0.75 * (0.5 + 0.5 * sin(uTime * (1.0 + cellId * 2.0) + cellId * 6.283));
+    vec3 pos = vec3(x, y, z);
 
-    // Edge wireframe glow: detect near-edge triangles via barycentrics
-    // We approximate edge proximity using fwidth on local pos
-    float edgeFactor = length(fwidth(vLocalPos)) * 40.0;
-    edgeFactor = clamp(edgeFactor, 0.0, 1.0);
+    // Depth fade: behind reactor is dimmer, front is brighter
+    float depthFade = 0.15 + 0.85 * smoothstep(-2.0, 1.5, pos.z);
 
-    // Combine layers
-    float alpha = uOpacity * (fresnel * 0.7 + pulse * 0.3 + edgeFactor * 0.25);
-    alpha = clamp(alpha, 0.0, 0.85);
+    vAlpha = aBrightness * depthFade;
+    vBrightness = aBrightness;
 
-    gl_FragColor = vec4(uColor * (0.6 + pulse * 0.4 + fresnel * 0.8), alpha);
+    // Size scales with depth
+    float size = (3.0 + aBrightness * 4.0) * (0.7 + depthFade * 0.5);
+
+    vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
+    gl_Position = projectionMatrix * mvPos;
+    gl_PointSize = size * (320.0 / -mvPos.z);
   }
 `;
 
-function HexShield() {
-  const meshRef = useRef<Mesh>(null!);
+const dotFrag = /* glsl */ `
+  uniform vec3 uColor;
 
-  const geometry = useMemo(() => new IcosahedronGeometry(2.0, 3), []);
+  varying float vAlpha;
+  varying float vBrightness;
 
-  const material = useMemo(
-    () =>
-      new ShaderMaterial({
-        vertexShader: hexShieldVert,
-        fragmentShader: hexShieldFrag,
-        uniforms: {
-          uTime:    { value: 0 },
-          uColor:   { value: [0.0, 0.898, 1.0] }, // #00e5ff
-          uOpacity: { value: 0.32 },
-        },
-        transparent: true,
-        blending: AdditiveBlending,
-        depthWrite: false,
-        side: DoubleSide,
-      }),
-    [],
-  );
+  void main() {
+    float d = length(gl_PointCoord - 0.5) * 2.0;
+    if (d > 1.0) discard;
+
+    // Radial glow: bright core, soft falloff
+    float glow = exp(-d * d * 2.5);
+    float core = smoothstep(0.5, 0.0, d);
+
+    // Bright cyan core + softer glow
+    vec3 coreColor = mix(uColor, vec3(0.7, 0.94, 1.0), core * 0.6);
+    float alpha = vAlpha * (glow * 0.7 + core * 0.3);
+
+    gl_FragColor = vec4(coreColor, alpha);
+  }
+`;
+
+function DotParticles() {
+  const pointsRef = useRef<Points>(null!);
+
+  const { geometry, material } = useMemo(() => {
+    const geo = new BufferGeometry();
+    const positions = new Float32Array(DOT_COUNT * 3);
+    const phases = new Float32Array(DOT_COUNT);
+    const speeds = new Float32Array(DOT_COUNT);
+    const orbitRadii = new Float32Array(DOT_COUNT);
+    const brightnesses = new Float32Array(DOT_COUNT);
+    const yOffsets = new Float32Array(DOT_COUNT);
+    const yAmps = new Float32Array(DOT_COUNT);
+
+    for (let i = 0; i < DOT_COUNT; i++) {
+      phases[i] = Math.random() * Math.PI * 2;
+      speeds[i] = 0.15 + Math.random() * 0.45;
+      orbitRadii[i] = 1.0 + Math.random() * 1.4; // match demo: 120-280px → 1.0-2.4 units
+      brightnesses[i] = 0.3 + Math.random() * 0.7;
+      yOffsets[i] = (Math.random() - 0.5) * 1.8;
+      yAmps[i] = 0.15 + Math.random() * 0.35;
+      positions[i * 3] = 0;
+      positions[i * 3 + 1] = 0;
+      positions[i * 3 + 2] = 0;
+    }
+
+    geo.setAttribute("position", new Float32BufferAttribute(positions, 3));
+    geo.setAttribute("aPhase", new Float32BufferAttribute(phases, 1));
+    geo.setAttribute("aSpeed", new Float32BufferAttribute(speeds, 1));
+    geo.setAttribute("aOrbitRadius", new Float32BufferAttribute(orbitRadii, 1));
+    geo.setAttribute("aBrightness", new Float32BufferAttribute(brightnesses, 1));
+    geo.setAttribute("aYOffset", new Float32BufferAttribute(yOffsets, 1));
+    geo.setAttribute("aYAmp", new Float32BufferAttribute(yAmps, 1));
+
+    const mat = new ShaderMaterial({
+      vertexShader: dotVert,
+      fragmentShader: dotFrag,
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new Color(0x00e5ff) },
+      },
+      transparent: true,
+      blending: AdditiveBlending,
+      depthWrite: false,
+    });
+
+    return { geometry: geo, material: mat };
+  }, []);
 
   useFrame(({ clock }) => {
     material.uniforms.uTime.value = clock.getElapsedTime();
-    if (meshRef.current) {
-      meshRef.current.rotation.y += 0.0015;
-      meshRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.15) * 0.06;
-    }
   });
 
-  return (
-    <mesh
-      ref={meshRef}
-      geometry={geometry}
-      material={material}
-      scale={[1.0, 0.75, 1.0]}
-    />
-  );
+  return <points ref={pointsRef} geometry={geometry} material={material} frustumCulled={false} />;
 }
 
-/* ═══════════════════════════════════════════════
-   ShieldWireframe — wireframe overlay on same geo
-   ═══════════════════════════════════════════════ */
+/* ── Trail particles — each trail = TRAIL_LEN fading dots ── */
 
-const wireVert = /* glsl */ `
+const trailVert = /* glsl */ `
+  attribute float aPhase;
+  attribute float aSpeed;
+  attribute float aOrbitRadius;
+  attribute float aBrightness;
+  attribute float aYOffset;
+  attribute float aYAmp;
+  attribute float aTailIndex; // 0 = head, 1..N = older positions
+
+  uniform float uTime;
+  uniform float uTailLen;
+
+  varying float vAlpha;
+
+  void main() {
+    float tailFade = 1.0 - aTailIndex / uTailLen;
+
+    float t = uTime * aSpeed + aPhase - aTailIndex * 0.04;
+    float angle = t;
+
+    float x = cos(angle) * aOrbitRadius;
+    float z = sin(angle) * aOrbitRadius;
+    float y = aYOffset + sin(t * 0.7 + aPhase * 3.0) * aYAmp;
+
+    vec3 pos = vec3(x, y, z);
+
+    float depthFade = 0.15 + 0.85 * smoothstep(-2.0, 1.5, pos.z);
+
+    vAlpha = aBrightness * depthFade * tailFade;
+
+    float size = (1.5 + aBrightness * 2.0) * tailFade * (0.7 + depthFade * 0.3);
+
+    vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
+    gl_Position = projectionMatrix * mvPos;
+    gl_PointSize = max(size * (280.0 / -mvPos.z), 0.5);
+  }
+`;
+
+const trailFrag = /* glsl */ `
+  uniform vec3 uColor;
+
+  varying float vAlpha;
+
+  void main() {
+    float d = length(gl_PointCoord - 0.5) * 2.0;
+    if (d > 1.0) discard;
+
+    float softness = 1.0 - d * d;
+    gl_FragColor = vec4(uColor, vAlpha * softness);
+  }
+`;
+
+function TrailParticles() {
+  const pointsRef = useRef<Points>(null!);
+
+  const { geometry, material } = useMemo(() => {
+    const totalPoints = TRAIL_COUNT * TRAIL_LEN;
+    const geo = new BufferGeometry();
+    const positions = new Float32Array(totalPoints * 3);
+    const phases = new Float32Array(totalPoints);
+    const speeds = new Float32Array(totalPoints);
+    const orbitRadii = new Float32Array(totalPoints);
+    const brightnesses = new Float32Array(totalPoints);
+    const yOffsets = new Float32Array(totalPoints);
+    const yAmps = new Float32Array(totalPoints);
+    const tailIndices = new Float32Array(totalPoints);
+
+    for (let i = 0; i < TRAIL_COUNT; i++) {
+      const phase = Math.random() * Math.PI * 2;
+      const speed = 0.3 + Math.random() * 0.6;
+      const radius = 0.85 + Math.random() * 1.55;
+      const brightness = 0.15 + Math.random() * 0.4;
+      const yOff = (Math.random() - 0.5) * 1.6;
+      const yAmp = 0.12 + Math.random() * 0.25;
+
+      for (let k = 0; k < TRAIL_LEN; k++) {
+        const idx = i * TRAIL_LEN + k;
+        phases[idx] = phase;
+        speeds[idx] = speed;
+        orbitRadii[idx] = radius;
+        brightnesses[idx] = brightness;
+        yOffsets[idx] = yOff;
+        yAmps[idx] = yAmp;
+        tailIndices[idx] = k;
+        positions[idx * 3] = 0;
+        positions[idx * 3 + 1] = 0;
+        positions[idx * 3 + 2] = 0;
+      }
+    }
+
+    geo.setAttribute("position", new Float32BufferAttribute(positions, 3));
+    geo.setAttribute("aPhase", new Float32BufferAttribute(phases, 1));
+    geo.setAttribute("aSpeed", new Float32BufferAttribute(speeds, 1));
+    geo.setAttribute("aOrbitRadius", new Float32BufferAttribute(orbitRadii, 1));
+    geo.setAttribute("aBrightness", new Float32BufferAttribute(brightnesses, 1));
+    geo.setAttribute("aYOffset", new Float32BufferAttribute(yOffsets, 1));
+    geo.setAttribute("aYAmp", new Float32BufferAttribute(yAmps, 1));
+    geo.setAttribute("aTailIndex", new Float32BufferAttribute(tailIndices, 1));
+
+    const mat = new ShaderMaterial({
+      vertexShader: trailVert,
+      fragmentShader: trailFrag,
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new Color(0x00e5ff) },
+        uTailLen: { value: TRAIL_LEN },
+      },
+      transparent: true,
+      blending: AdditiveBlending,
+      depthWrite: false,
+    });
+
+    return { geometry: geo, material: mat };
+  }, []);
+
+  useFrame(({ clock }) => {
+    material.uniforms.uTime.value = clock.getElapsedTime();
+  });
+
+  return <points ref={pointsRef} geometry={geometry} material={material} frustumCulled={false} />;
+}
+
+/* ── Subtle core glow at reactor center ── */
+
+const coreVert = /* glsl */ `
   varying vec3 vNormal;
   varying vec3 vWorldPos;
 
@@ -175,7 +323,7 @@ const wireVert = /* glsl */ `
   }
 `;
 
-const wireFrag = /* glsl */ `
+const coreFrag = /* glsl */ `
   uniform float uTime;
   uniform vec3  uColor;
 
@@ -184,135 +332,52 @@ const wireFrag = /* glsl */ `
 
   void main() {
     vec3 viewDir = normalize(cameraPosition - vWorldPos);
-    float fresnel = pow(1.0 - abs(dot(vNormal, viewDir)), 1.8);
-    float pulse = 0.5 + 0.5 * sin(uTime * 0.8);
-    float alpha = (0.10 + fresnel * 0.12) * (0.75 + pulse * 0.25);
-    gl_FragColor = vec4(uColor, clamp(alpha, 0.0, 0.35));
+    float facing = abs(dot(vNormal, viewDir));
+
+    float pulse = 0.7 + 0.3 * sin(uTime * 0.8);
+    float alpha = facing * facing * 0.06 * pulse;
+
+    gl_FragColor = vec4(uColor, alpha);
   }
 `;
 
-function ShieldWireframe() {
+function CoreGlow() {
   const meshRef = useRef<Mesh>(null!);
-
-  const geometry = useMemo(() => new IcosahedronGeometry(2.0, 3), []);
+  const geometry = useMemo(() => new SphereGeometry(0.6, 20, 20), []);
 
   const material = useMemo(
     () =>
       new ShaderMaterial({
-        vertexShader: wireVert,
-        fragmentShader: wireFrag,
+        vertexShader: coreVert,
+        fragmentShader: coreFrag,
         uniforms: {
-          uTime:  { value: 0 },
-          uColor: { value: [0.0, 0.898, 1.0] },
+          uTime: { value: 0 },
+          uColor: { value: new Color(0x00e5ff) },
         },
         transparent: true,
         blending: AdditiveBlending,
         depthWrite: false,
-        wireframe: true,
       }),
     [],
   );
 
   useFrame(({ clock }) => {
     material.uniforms.uTime.value = clock.getElapsedTime();
-    if (meshRef.current) {
-      meshRef.current.rotation.y += 0.0015;
-      meshRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.15) * 0.06;
-    }
   });
 
-  return (
-    <mesh
-      ref={meshRef}
-      geometry={geometry}
-      material={material}
-      scale={[1.01, 0.758, 1.01]}
-    />
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   ShieldGlow — outer atmosphere halo, BackSide
-   ═══════════════════════════════════════════════ */
-
-const glowVert = /* glsl */ `
-  varying vec3 vNormal;
-  varying vec3 vWorldPos;
-
-  void main() {
-    vNormal   = normalize(normalMatrix * normal);
-    vec4 wp   = modelMatrix * vec4(position, 1.0);
-    vWorldPos = wp.xyz;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
-
-const glowFrag = /* glsl */ `
-  uniform float uTime;
-  uniform vec3  uColor;
-
-  varying vec3 vNormal;
-  varying vec3 vWorldPos;
-
-  void main() {
-    vec3 viewDir = normalize(cameraPosition - vWorldPos);
-    // BackSide: normal points inward, so flip for fresnel
-    float rim = pow(1.0 - abs(dot(-vNormal, viewDir)), 2.2);
-    float pulse = 0.85 + 0.15 * sin(uTime * 0.6);
-    float alpha = rim * 0.13 * pulse;
-    gl_FragColor = vec4(uColor, clamp(alpha, 0.0, 0.18));
-  }
-`;
-
-function ShieldGlow() {
-  const meshRef = useRef<Mesh>(null!);
-
-  const geometry = useMemo(() => new IcosahedronGeometry(2.0, 2), []);
-
-  const material = useMemo(
-    () =>
-      new ShaderMaterial({
-        vertexShader: glowVert,
-        fragmentShader: glowFrag,
-        uniforms: {
-          uTime:  { value: 0 },
-          uColor: { value: [0.0, 0.898, 1.0] },
-        },
-        transparent: true,
-        blending: AdditiveBlending,
-        depthWrite: false,
-        side: BackSide,
-      }),
-    [],
-  );
-
-  useFrame(({ clock }) => {
-    material.uniforms.uTime.value = clock.getElapsedTime();
-    if (meshRef.current) {
-      meshRef.current.rotation.y += 0.0015;
-    }
-  });
-
-  return (
-    <mesh
-      ref={meshRef}
-      geometry={geometry}
-      material={material}
-      scale={[1.25, 0.94, 1.25]}
-    />
-  );
+  return <mesh ref={meshRef} geometry={geometry} material={material} />;
 }
 
 /* ═══════════════════════════════════════════════
    Combined scene
    ═══════════════════════════════════════════════ */
 
-function ShieldScene() {
+function VortexScene() {
   return (
     <>
-      <ShieldGlow />
-      <HexShield />
-      <ShieldWireframe />
+      <DotParticles />
+      <TrailParticles />
+      <CoreGlow />
     </>
   );
 }
@@ -357,12 +422,12 @@ export default function TokenVortex() {
         onCreated={handleCreated}
       >
         <ResizeHelper />
-        <ShieldScene />
+        <VortexScene />
         <EffectComposer>
           <Bloom
-            luminanceThreshold={0.4}
-            luminanceSmoothing={0.85}
-            intensity={0.6}
+            luminanceThreshold={0.5}
+            luminanceSmoothing={0.9}
+            intensity={0.4}
             mipmapBlur
           />
         </EffectComposer>

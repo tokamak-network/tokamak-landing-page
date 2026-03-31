@@ -20,12 +20,6 @@ const GLOBAL_KEYFRAMES = `
   0%, 100% { opacity: 0.35; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.08); }
 }
-@keyframes headerScan {
-  0% { transform: translateX(-100%); opacity: 0; }
-  20% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { transform: translateX(300%); opacity: 0; }
-}
 `;
 
 /* ═══════════════════════════════════════════════
@@ -77,29 +71,17 @@ function HeaderBar() {
         Reactor Core · Governance &amp; Staking
       </div>
       <div
-        className="relative overflow-hidden"
         style={{
           fontSize: "clamp(14px, 1.4vw, 22px)",
           color: "#fff",
           fontFamily: "'Orbitron', sans-serif",
           fontWeight: 700,
           letterSpacing: "0.08em",
-          textShadow: "0 0 20px rgba(0, 229, 255, 0.6), 0 0 40px rgba(0, 229, 255, 0.2)",
+          textShadow: "0 0 20px rgba(0, 229, 255, 0.3)",
           textAlign: "center",
-          padding: "clamp(6px, 0.5vw, 10px) clamp(40px, 5vw, 80px)",
-          background: "linear-gradient(90deg, transparent, rgba(0, 8, 16, 0.7) 20%, rgba(0, 8, 16, 0.7) 80%, transparent)",
         }}
       >
         Network Power &amp; Consensus Layer
-        {/* Scan sweep */}
-        <span
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: "linear-gradient(90deg, transparent 0%, rgba(0, 229, 255, 0.30) 50%, transparent 100%)",
-            animation: "headerScan 4s ease-in-out infinite",
-            animationDelay: "1s",
-          }}
-        />
       </div>
       <div
         style={{

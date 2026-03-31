@@ -2,54 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import TokamakLogo from "@/assets/images/Tokamak_Symbol.svg";
-import TokamakLogoText from "@/assets/images/Tokamak_LogoText.svg";
 import { NAV_COLUMNS } from "@/app/components/ui/footer/navData";
 import InlineNewsletter from "@/app/components/ui/footer/InlineNewsletter";
-
-/* ═══════════════════════════════════════════════
-   Ethereum Badge — "Built on Ethereum" indicator
-   ═══════════════════════════════════════════════ */
-
-function EthereumBadge() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
-      className="flex items-center gap-2"
-    >
-      {/* Ethereum diamond icon */}
-      <svg
-        width="16"
-        height="26"
-        viewBox="0 0 16 26"
-        fill="none"
-        style={{ filter: "drop-shadow(0 0 6px rgba(98, 126, 234, 0.5))" }}
-      >
-        <path d="M7.998 0L7.852 0.497V17.546L7.998 17.691L15.996 13.228L7.998 0Z" fill="#627EEA" fillOpacity="0.8" />
-        <path d="M7.998 0L0 13.228L7.998 17.691V9.47V0Z" fill="#627EEA" fillOpacity="0.6" />
-        <path d="M7.998 19.172L7.916 19.271V25.413L7.998 25.652L16 14.712L7.998 19.172Z" fill="#627EEA" fillOpacity="0.8" />
-        <path d="M7.998 25.652V19.172L0 14.712L7.998 25.652Z" fill="#627EEA" fillOpacity="0.6" />
-        <path d="M7.998 17.691L15.996 13.228L7.998 9.47V17.691Z" fill="#627EEA" fillOpacity="0.5" />
-        <path d="M0 13.228L7.998 17.691V9.47L0 13.228Z" fill="#627EEA" fillOpacity="0.35" />
-      </svg>
-      <span
-        style={{
-          fontSize: "clamp(9px, 0.7vw, 11px)",
-          color: "rgba(98, 126, 234, 0.7)",
-          fontFamily: "'Share Tech Mono', monospace",
-          letterSpacing: "0.15em",
-          textTransform: "uppercase",
-          textShadow: "0 0 8px rgba(98, 126, 234, 0.3)",
-        }}
-      >
-        Built on Ethereum
-      </span>
-    </motion.div>
-  );
-}
 
 /* ═══════════════════════════════════════════════
    Social Icon Links
@@ -92,195 +46,192 @@ export default function TowerFoundation() {
   const navColumns = NAV_COLUMNS.filter((c) => c.title !== "Social");
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: "100vh", scrollSnapAlign: "start" }}>
-      {/* Background image */}
-      <div className="absolute inset-0">
-        <Image
-          src="/tower/floor-foundation.png"
-          alt="Tower foundation — Tokamak Network built on Ethereum"
-          fill
-          className="object-cover object-center"
-          sizes="100vw"
-        />
-        {/* Top fade to black */}
-        <div
-          className="absolute top-0 left-0 right-0 pointer-events-none"
-          style={{
-            height: "30%",
-            background:
-              "linear-gradient(180deg, black 0%, rgba(0,0,0,0.7) 40%, transparent 100%)",
-          }}
-        />
-        {/* Dark overlay for text readability */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.85) 100%)",
-          }}
-        />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 max-w-[1280px] mx-auto px-6 pt-[clamp(60px,10vh,100px)] pb-[clamp(30px,5vh,50px)] flex flex-col h-full">
-        {/* Top Section: Logo + Ethereum Badge + Newsletter */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex flex-col md:flex-row justify-between items-start gap-8 mb-[clamp(30px,5vh,50px)]"
-        >
-          {/* Logo + Tagline + Ethereum */}
-          <div className="flex flex-col gap-4">
-            <figure className="flex items-center gap-2">
-              <Image
-                loading="lazy"
-                src={TokamakLogo}
-                alt="Tokamak Network Logo"
-              />
-              <Image
-                loading="lazy"
-                src={TokamakLogoText}
-                alt="Tokamak Network"
-              />
-            </figure>
-            <p
-              style={{
-                fontSize: "clamp(12px, 1vw, 14px)",
-                color: "rgba(255, 255, 255, 0.5)",
-                fontFamily: "'Share Tech Mono', monospace",
-                letterSpacing: "0.05em",
-              }}
-            >
-              Every app deserves its own L2.
-            </p>
-            <EthereumBadge />
-          </div>
-
-          {/* Newsletter */}
-          <div className="w-full md:w-auto md:max-w-[320px]">
-            <InlineNewsletter variant="dark" />
-          </div>
-        </motion.div>
-
-        {/* Navigation Columns */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="grid grid-cols-2 md:grid-cols-3 gap-x-[clamp(30px,4vw,60px)] gap-y-6 mb-[clamp(30px,5vh,50px)] [@media(max-width:640px)]:hidden"
-        >
-          {navColumns.map((col) => (
-            <div key={col.title} className="flex flex-col gap-2">
-              <h3
-                style={{
-                  fontSize: "clamp(9px, 0.7vw, 11px)",
-                  color: "rgba(0, 229, 255, 0.6)",
-                  fontFamily: "'Orbitron', sans-serif",
-                  letterSpacing: "0.2em",
-                  textTransform: "uppercase",
-                  fontWeight: 700,
-                  marginBottom: 4,
-                  textShadow: "0 0 8px rgba(0, 229, 255, 0.2)",
-                }}
-              >
-                {col.title}
-              </h3>
-              {col.links.map((link) =>
-                link.isInternal ? (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    className="text-white/50 hover:text-[#00e5ff] transition-colors duration-300"
-                    style={{
-                      fontSize: "clamp(11px, 0.85vw, 13px)",
-                      fontFamily: "'Share Tech Mono', monospace",
-                      letterSpacing: "0.03em",
-                    }}
-                  >
-                    {link.label}
-                  </Link>
-                ) : (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    className="text-white/50 hover:text-[#00e5ff] transition-colors duration-300"
-                    style={{
-                      fontSize: "clamp(11px, 0.85vw, 13px)",
-                      fontFamily: "'Share Tech Mono', monospace",
-                      letterSpacing: "0.03em",
-                    }}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {link.label}
-                  </a>
-                ),
-              )}
-            </div>
-          ))}
-        </motion.div>
-
-        {/* Spacer to push bottom section down */}
-        <div className="flex-1" />
-
-        {/* Bottom: Divider + Copyright + Social Icons */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          {/* Divider line with glow */}
+    <div style={{ height: "100vh", scrollSnapAlign: "start" }} className="flex flex-col w-full">
+      {/* Indicator area — black bg, fills space above footer */}
+      <div className="flex-1 flex items-center justify-center bg-black">
+        <div className="flex flex-col items-center gap-3">
+          <span
+            className="uppercase tracking-[0.35em] font-bold"
+            style={{
+              fontSize: "clamp(12px, 1.5vw, 20px)",
+              color: "#00e5ff",
+              fontFamily: "'Orbitron', 'Share Tech Mono', monospace",
+              textShadow:
+                "0 0 15px rgba(0, 229, 255, 0.6), 0 0 40px rgba(0, 229, 255, 0.2)",
+            }}
+          >
+            Foundation
+          </span>
+          <span
+            className="uppercase tracking-[0.2em]"
+            style={{
+              fontSize: "clamp(9px, 0.9vw, 12px)",
+              color: "rgba(140, 200, 255, 0.5)",
+              fontFamily: "'Share Tech Mono', monospace",
+            }}
+          >
+            Built on Ethereum
+          </span>
           <div
             style={{
+              width: "clamp(160px, 30vw, 400px)",
               height: 1,
               background:
-                "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.2) 20%, rgba(98, 126, 234, 0.3) 50%, rgba(0, 229, 255, 0.2) 80%, transparent)",
-              marginBottom: "clamp(16px, 2vh, 24px)",
+                "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.6) 20%, #00e5ff 50%, rgba(0, 229, 255, 0.6) 80%, transparent)",
+              boxShadow:
+                "0 0 8px rgba(0, 229, 255, 0.4), 0 0 20px rgba(0, 229, 255, 0.15)",
             }}
           />
+        </div>
+      </div>
 
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            {/* Copyright */}
-            <p
-              style={{
-                fontSize: "clamp(10px, 0.7vw, 12px)",
-                color: "rgba(255, 255, 255, 0.3)",
-                fontFamily: "'Share Tech Mono', monospace",
-                letterSpacing: "0.05em",
-              }}
-            >
-              &copy; {new Date().getFullYear()} Tokamak Network | All Rights
-              Reserved.
-            </p>
+      {/* Footer — fixed 400px with background image */}
+      <footer className="relative w-full overflow-hidden shrink-0" style={{ height: 400 }}>
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/tower/floor-foundation.png"
+            alt="Tower foundation — Tokamak Network built on Ethereum"
+            fill
+            className="object-cover object-[center_40%]"
+            sizes="100vw"
+          />
+          {/* Top fade to black */}
+          <div
+            className="absolute top-0 left-0 right-0 pointer-events-none"
+            style={{
+              height: "40%",
+              background:
+                "linear-gradient(180deg, black 0%, rgba(0,0,0,0.7) 50%, transparent 100%)",
+            }}
+          />
+          {/* Dark overlay for text readability */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.7) 100%)",
+            }}
+          />
+        </div>
 
-            {/* Social Icons */}
-            <div className="flex items-center gap-3">
-              {socialColumn?.links.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white/30 hover:text-[#00e5ff] transition-all duration-300 hover:drop-shadow-[0_0_6px_rgba(0,229,255,0.4)]"
-                  title={link.label}
+        {/* Footer content */}
+        <div className="relative z-10 max-w-[1280px] w-full mx-auto px-6 pt-10 pb-6 flex flex-col h-full">
+        {/* Nav (left) + Newsletter (right) */}
+        <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-8">
+          {/* Navigation Columns */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-10 gap-y-5 [@media(max-width:640px)]:hidden">
+            {navColumns.map((col) => (
+              <div key={col.title} className="flex flex-col gap-1.5">
+                <h3
+                  style={{
+                    fontSize: 10,
+                    color: "rgba(0, 229, 255, 0.6)",
+                    fontFamily: "'Orbitron', sans-serif",
+                    letterSpacing: "0.2em",
+                    textTransform: "uppercase",
+                    fontWeight: 700,
+                    marginBottom: 2,
+                    textShadow: "0 0 8px rgba(0, 229, 255, 0.2)",
+                  }}
                 >
-                  {SOCIAL_ICONS[link.label] || (
-                    <span
+                  {col.title}
+                </h3>
+                {col.links.map((link) =>
+                  link.isInternal ? (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      className="text-white/50 hover:text-[#00e5ff] transition-colors duration-300"
                       style={{
-                        fontSize: 11,
+                        fontSize: 12,
                         fontFamily: "'Share Tech Mono', monospace",
+                        letterSpacing: "0.03em",
                       }}
                     >
                       {link.label}
-                    </span>
-                  )}
-                </a>
-              ))}
-            </div>
+                    </Link>
+                  ) : (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      className="text-white/50 hover:text-[#00e5ff] transition-colors duration-300"
+                      style={{
+                        fontSize: 12,
+                        fontFamily: "'Share Tech Mono', monospace",
+                        letterSpacing: "0.03em",
+                      }}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {link.label}
+                    </a>
+                  ),
+                )}
+              </div>
+            ))}
           </div>
-        </motion.div>
-      </div>
-    </section>
+
+          {/* Newsletter */}
+          <div className="w-full md:w-auto md:max-w-[320px] shrink-0">
+            <InlineNewsletter variant="dark" />
+          </div>
+        </div>
+
+        {/* Spacer to push copyright to bottom */}
+        <div className="flex-1" />
+
+        {/* Divider line with glow */}
+        <div
+          style={{
+            height: 1,
+            background:
+              "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.2) 20%, rgba(98, 126, 234, 0.3) 50%, rgba(0, 229, 255, 0.2) 80%, transparent)",
+            marginBottom: 16,
+          }}
+        />
+
+        {/* Bottom: Copyright + Social Icons */}
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+          <p
+            style={{
+              fontSize: 11,
+              color: "rgba(255, 255, 255, 0.3)",
+              fontFamily: "'Share Tech Mono', monospace",
+              letterSpacing: "0.05em",
+            }}
+          >
+            &copy; {new Date().getFullYear()} Tokamak Network | All Rights
+            Reserved.
+          </p>
+
+          {/* Social Icons */}
+          <div className="flex items-center gap-3">
+            {socialColumn?.links.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/30 hover:text-[#00e5ff] transition-all duration-300 hover:drop-shadow-[0_0_6px_rgba(0,229,255,0.4)]"
+                title={link.label}
+              >
+                {SOCIAL_ICONS[link.label] || (
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontFamily: "'Share Tech Mono', monospace",
+                    }}
+                  >
+                    {link.label}
+                  </span>
+                )}
+              </a>
+            ))}
+          </div>
+        </div>
+        </div>
+      </footer>
+    </div>
   );
 }

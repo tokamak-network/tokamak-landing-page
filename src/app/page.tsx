@@ -73,9 +73,6 @@ export default function Home() {
       {/* Latest Updates — Biweekly Reports & Medium Articles */}
       <LatestFeed />
 
-      {/* Floor transition indicator */}
-      <FloorIndicator floor={-1} label="Foundation · Built on Ethereum" />
-
       {/* Foundation — Footer with Ethereum base */}
       <TowerFoundation />
     </main>

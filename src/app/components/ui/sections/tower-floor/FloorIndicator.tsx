@@ -35,29 +35,7 @@ export default function FloorIndicator({ floor, label }: FloorIndicatorProps) {
       className="relative w-full flex items-center justify-center overflow-hidden bg-black"
       style={{ height: "100vh", scrollSnapAlign: "start" }}
     >
-      {/* Thin vertical guide lines on edges */}
-      <div
-        className="absolute top-0 bottom-0"
-        style={{
-          left: "12%",
-          width: 1,
-          background:
-            "linear-gradient(180deg, transparent 5%, rgba(42, 114, 229, 0.12) 30%, rgba(42, 114, 229, 0.12) 70%, transparent 95%)",
-          opacity: visible ? 1 : 0,
-          transition: "opacity 0.8s ease",
-        }}
-      />
-      <div
-        className="absolute top-0 bottom-0"
-        style={{
-          right: "12%",
-          width: 1,
-          background:
-            "linear-gradient(180deg, transparent 5%, rgba(42, 114, 229, 0.12) 30%, rgba(42, 114, 229, 0.12) 70%, transparent 95%)",
-          opacity: visible ? 1 : 0,
-          transition: "opacity 0.8s ease",
-        }}
-      />
+      {/* Vertical guide lines removed — caused visible border artifacts */}
 
       {/* Center content */}
       <div

@@ -658,27 +658,16 @@ function DataConsoleMobileOverlay({ items }: { items: TickerItem[] }) {
               }}
             />
 
-            {/* Index */}
-            <div
-              style={{
-                fontSize: 8,
-                color: "rgba(0,229,255,0.3)",
-                fontFamily: "'Share Tech Mono', monospace",
-                marginBottom: 4,
-              }}
-            >
-              [{String(idx).padStart(2, "0")}]
-            </div>
-
             {/* Label */}
             <div
               style={{
-                fontSize: 9,
-                color: "rgba(140,200,255,0.5)",
+                fontSize: 11,
+                color: "#00e5ff",
                 fontFamily: "'Share Tech Mono', monospace",
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
                 marginBottom: 8,
+                textShadow: "0 0 6px rgba(0,229,255,0.3)",
               }}
             >
               {item.label}

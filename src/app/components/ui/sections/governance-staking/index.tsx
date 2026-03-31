@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import Image from "next/image";
+
 
 const TokenVortex = dynamic(() => import("./TokenVortex"), { ssr: false });
 
@@ -508,78 +508,6 @@ function GovernanceStatsRow({ stats }: { stats: GovStat[] }) {
         </div>
       ))}
     </motion.div>
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   Energy Flow Lines — radiating outward from center
-   ═══════════════════════════════════════════════ */
-
-function EnergyFlowLines() {
-  return (
-    <div className="absolute inset-0 pointer-events-none z-[4] overflow-hidden">
-      {/* Horizontal lines — radiating left and right from center */}
-      {[38, 50, 62].map((top, i) => (
-        <div key={`h-${i}`}>
-          {/* Left ray — center to left */}
-          <div
-            className="absolute overflow-hidden"
-            style={{
-              top: `${top}%`,
-              left: "10%",
-              width: "35%",
-              height: 1,
-              background: "rgba(0, 229, 255, 0.05)",
-            }}
-          >
-            <motion.div
-              animate={{ x: ["0%", "-120%"] }}
-              transition={{
-                duration: 3.5 + i,
-                repeat: Infinity,
-                ease: "linear",
-                delay: i * 0.6,
-              }}
-              style={{
-                width: "30%",
-                height: "100%",
-                background:
-                  "linear-gradient(270deg, rgba(0, 229, 255, 0.45), transparent)",
-                boxShadow: "0 0 8px rgba(0, 229, 255, 0.2)",
-              }}
-            />
-          </div>
-          {/* Right ray — center to right */}
-          <div
-            className="absolute overflow-hidden"
-            style={{
-              top: `${top}%`,
-              right: "10%",
-              width: "35%",
-              height: 1,
-              background: "rgba(0, 229, 255, 0.05)",
-            }}
-          >
-            <motion.div
-              animate={{ x: ["0%", "120%"] }}
-              transition={{
-                duration: 3.5 + i,
-                repeat: Infinity,
-                ease: "linear",
-                delay: i * 0.6 + 0.3,
-              }}
-              style={{
-                width: "30%",
-                height: "100%",
-                background:
-                  "linear-gradient(90deg, rgba(0, 229, 255, 0.45), transparent)",
-                boxShadow: "0 0 8px rgba(0, 229, 255, 0.2)",
-              }}
-            />
-          </div>
-        </div>
-      ))}
-    </div>
   );
 }
 
@@ -1120,9 +1048,6 @@ export default function GovernanceStakingOverlay() {
 
           {/* Plasma Vortex — 2D canvas particles orbiting reactor */}
           <TokenVortex />
-
-          {/* Energy flow lines — radiating from center */}
-          <EnergyFlowLines />
 
           {/* Left — Reactor Log (proposal cascade cards) */}
           <div

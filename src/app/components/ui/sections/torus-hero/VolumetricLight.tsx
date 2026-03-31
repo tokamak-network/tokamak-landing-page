@@ -91,7 +91,7 @@ export default function VolumetricLight() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const timeRef = useRef(0);
-  const sizeRef = useRef({ w: 0, h: 0, vh: 0 }); // w, h = canvas; vh = viewport height
+  const sizeRef = useRef({ w: 0, h: 0, vh: 0, mobile: false }); // w, h = canvas; vh = viewport height
   const rotationRef = useRef(0);
   const lastFrameRef = useRef(0);
 
@@ -102,12 +102,14 @@ export default function VolumetricLight() {
     if (!ctx) return;
 
     const resize = () => {
+      const isMobile = window.innerWidth < 768;
+      canvas.style.setProperty("--aurora-h", isMobile ? "700vh" : "580vh");
       const dpr = Math.min(window.devicePixelRatio, 2);
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      sizeRef.current = { w: rect.width, h: rect.height, vh: window.innerHeight };
+      sizeRef.current = { w: rect.width, h: rect.height, vh: window.innerHeight, mobile: isMobile };
     };
 
     resize();
@@ -115,7 +117,7 @@ export default function VolumetricLight() {
     lastFrameRef.current = performance.now();
 
     const animate = (now: number) => {
-      const { w, h, vh } = sizeRef.current;
+      const { w, h, vh, mobile } = sizeRef.current;
       if (w === 0) { animRef.current = requestAnimationFrame(animate); return; }
 
       const delta = Math.min((now - lastFrameRef.current) / 1000, 0.1);
@@ -241,15 +243,29 @@ export default function VolumetricLight() {
           grd.addColorStop(fadeInEnd * 0.5, `hsla(${wave.hue}, 80%, ${wave.lightness}%, ${wave.opacity * 0.4 * opMul})`);
           grd.addColorStop(fadeInEnd, `hsla(${wave.hue}, 80%, ${wave.lightness}%, ${wave.opacity * 1.0 * opMul})`);
           grd.addColorStop(fadeInEnd + 0.08, `hsla(${wave.hue}, 75%, ${wave.lightness}%, ${wave.opacity * 0.9 * opMul})`);
-          // Sustain through showcase floor (~40-55% of canvas)
-          grd.addColorStop(0.25, `hsla(${wave.hue}, 75%, ${wave.lightness}%, ${wave.opacity * 0.85 * opMul})`);
-          grd.addColorStop(0.45, `hsla(${wave.hue}, 72%, ${wave.lightness}%, ${wave.opacity * 0.75 * opMul})`);
-          // Fade after showcase — data console region (~55-80%)
-          grd.addColorStop(0.55, `hsla(${wave.hue}, 70%, ${wave.lightness}%, ${wave.opacity * 0.5 * opMul})`);
-          grd.addColorStop(0.65, `hsla(${wave.hue}, 65%, ${wave.lightness}%, ${wave.opacity * 0.25 * opMul})`);
-          grd.addColorStop(0.75, `hsla(${wave.hue}, 60%, ${wave.lightness}%, ${wave.opacity * 0.1 * opMul})`);
-          grd.addColorStop(0.85, `hsla(${wave.hue}, 55%, ${wave.lightness}%, ${wave.opacity * 0.03 * opMul})`);
-          grd.addColorStop(1, "transparent");
+          if (mobile) {
+            // Mobile: sustain aurora across ALL floors (showcase → governance)
+            grd.addColorStop(0.12, `hsla(${wave.hue}, 75%, ${wave.lightness}%, ${wave.opacity * 0.85 * opMul})`);
+            grd.addColorStop(0.25, `hsla(${wave.hue}, 74%, ${wave.lightness}%, ${wave.opacity * 0.80 * opMul})`);
+            grd.addColorStop(0.38, `hsla(${wave.hue}, 72%, ${wave.lightness}%, ${wave.opacity * 0.75 * opMul})`);
+            grd.addColorStop(0.50, `hsla(${wave.hue}, 70%, ${wave.lightness}%, ${wave.opacity * 0.65 * opMul})`);
+            grd.addColorStop(0.62, `hsla(${wave.hue}, 68%, ${wave.lightness}%, ${wave.opacity * 0.55 * opMul})`);
+            grd.addColorStop(0.72, `hsla(${wave.hue}, 66%, ${wave.lightness}%, ${wave.opacity * 0.40 * opMul})`);
+            grd.addColorStop(0.82, `hsla(${wave.hue}, 64%, ${wave.lightness}%, ${wave.opacity * 0.25 * opMul})`);
+            grd.addColorStop(0.90, `hsla(${wave.hue}, 60%, ${wave.lightness}%, ${wave.opacity * 0.10 * opMul})`);
+            grd.addColorStop(1, "transparent");
+          } else {
+            // Desktop: sustain through ALL floors (showcase → governance)
+            grd.addColorStop(0.15, `hsla(${wave.hue}, 75%, ${wave.lightness}%, ${wave.opacity * 0.85 * opMul})`);
+            grd.addColorStop(0.28, `hsla(${wave.hue}, 74%, ${wave.lightness}%, ${wave.opacity * 0.80 * opMul})`);
+            grd.addColorStop(0.40, `hsla(${wave.hue}, 72%, ${wave.lightness}%, ${wave.opacity * 0.70 * opMul})`);
+            grd.addColorStop(0.52, `hsla(${wave.hue}, 70%, ${wave.lightness}%, ${wave.opacity * 0.55 * opMul})`);
+            grd.addColorStop(0.62, `hsla(${wave.hue}, 68%, ${wave.lightness}%, ${wave.opacity * 0.40 * opMul})`);
+            grd.addColorStop(0.72, `hsla(${wave.hue}, 65%, ${wave.lightness}%, ${wave.opacity * 0.25 * opMul})`);
+            grd.addColorStop(0.82, `hsla(${wave.hue}, 60%, ${wave.lightness}%, ${wave.opacity * 0.12 * opMul})`);
+            grd.addColorStop(0.92, `hsla(${wave.hue}, 55%, ${wave.lightness}%, ${wave.opacity * 0.04 * opMul})`);
+            grd.addColorStop(1, "transparent");
+          }
           ctx.fillStyle = grd;
           ctx.fill();
         }
@@ -307,7 +323,7 @@ export default function VolumetricLight() {
     <canvas
       ref={canvasRef}
       className="absolute inset-x-0 top-0 pointer-events-none"
-      style={{ width: "100%", height: "380vh", zIndex: 10 }}
+      style={{ width: "100%", height: "var(--aurora-h, 380vh)", zIndex: 10 }}
     />
   );
 }

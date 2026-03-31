@@ -549,119 +549,202 @@ function BottomTicker({ items }: { items: TickerItem[] }) {
    Mobile Overlay — Background First (simple single-view)
    ═══════════════════════════════════════════════ */
 
-function DataConsoleMobileOverlay({ items }: { items: TickerItem[] }) {
-  return (
-    <div className="absolute inset-0 flex flex-col items-center justify-between py-8 px-5 gap-4">
+const DC_MOBILE_KEYFRAMES = `
+@keyframes dcTickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+`;
 
-      {/* Title block */}
-      <div className="flex flex-col items-center gap-1" style={{ zIndex: 10, width: "100%" }}>
-        <div
-          style={{
-            fontSize: 10,
-            color: "rgba(140, 200, 255, 0.5)",
-            fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-          }}
-        >
-          System Status: <span style={{ color: "#22c55e" }}>Nominal</span>
+function DataConsoleMobileOverlay({ items }: { items: TickerItem[] }) {
+  const tickerItems = items.map((item) => ({
+    label: item.label,
+    value: `${item.prefix ?? ""}${item.value}${item.suffix ?? ""}`,
+    change: item.change,
+  }));
+
+  return (
+    <div className="absolute inset-0 flex flex-col overflow-y-auto overflow-x-hidden">
+      <style dangerouslySetInnerHTML={{ __html: DC_MOBILE_KEYFRAMES }} />
+
+      {/* Ticker Tape — full-width, outside padded area */}
+      <div style={{
+        overflow: "hidden",
+        borderTop: "1px solid rgba(0, 229, 255, 0.15)",
+        borderBottom: "1px solid rgba(0, 229, 255, 0.15)",
+        padding: "10px 0",
+        position: "relative",
+        background: "rgba(0, 5, 15, 0.8)",
+        marginTop: 32,
+        flexShrink: 0,
+      }}>
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, #00e5ff, transparent)" }} />
+        <div style={{
+          display: "flex",
+          gap: 32,
+          animation: "dcTickerScroll 20s linear infinite",
+          width: "max-content",
+          padding: "0 16px",
+        }}>
+          {[...tickerItems, ...tickerItems].map((item, idx) => (
+            <div key={idx} style={{ display: "flex", alignItems: "baseline", gap: 6, whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: 9, color: "rgba(140, 200, 255, 0.5)", letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: "'Share Tech Mono', monospace" }}>{item.label}</span>
+              <span style={{ fontFamily: "'Orbitron', sans-serif", fontSize: 14, fontWeight: 900, color: "#00e5ff", textShadow: "0 0 8px rgba(0, 229, 255, 0.4)" }}>{item.value}</span>
+              {item.change && (
+                <span style={{ fontSize: 10, color: item.change.startsWith("+") ? "#22c55e" : "#ef4444", fontWeight: 700 }}>
+                  {item.change.startsWith("+") ? "▲" : "▼"}
+                </span>
+              )}
+              <span style={{ color: "rgba(0, 229, 255, 0.2)", fontSize: 12, margin: "0 4px" }}>│</span>
+            </div>
+          ))}
         </div>
-        <div
-          style={{
-            fontSize: 16,
-            color: "#00e5ff",
-            fontFamily: "'Orbitron', sans-serif",
-            fontWeight: 700,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            textShadow: "0 0 14px rgba(0, 229, 255, 0.5)",
-          }}
-        >
-          Live Data Console
-        </div>
-        <Link
-          href="/about/reports"
-          style={{
-            marginTop: 4,
-            fontSize: 9,
-            color: "rgba(0, 229, 255, 0.6)",
-            fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-            textDecoration: "none",
-          }}
-        >
-          Biweekly Reports &rarr;
-        </Link>
       </div>
 
-      {/* Metrics carousel */}
-      <div style={{ width: "100%", zIndex: 10, flex: 1, minHeight: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-        <>
-          <style dangerouslySetInnerHTML={{ __html: '.dataconsole-carousel::-webkit-scrollbar { display: none; }' }} />
+      {/* Padded content area */}
+      <div className="flex flex-col px-5 py-4 gap-4">
+
+      {/* Section label */}
+      <div
+        style={{
+          fontSize: 10,
+          color: "rgba(140, 200, 255, 0.5)",
+          fontFamily: "'Share Tech Mono', monospace",
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+        }}
+      >
+        System Status: <span style={{ color: "#22c55e" }}>Nominal</span>
+      </div>
+
+      {/* 2-column metric grid */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 8,
+        }}
+      >
+        {items.map((item, idx) => (
           <div
-            className="dataconsole-carousel"
+            key={item.label}
             style={{
-              display: "flex",
-              gap: 12,
-              overflowX: "auto",
-              scrollSnapType: "x mandatory",
-              WebkitOverflowScrolling: "touch",
-              paddingBottom: 8,
-              scrollbarWidth: "none",
+              background: "linear-gradient(135deg, rgba(0,12,28,0.95), rgba(5,8,22,0.95))",
+              border: "1px solid rgba(0,229,255,0.12)",
+              padding: "14px 12px",
+              position: "relative",
+              overflow: "hidden",
             }}
           >
-            {items.map((item, idx) => (
+            {/* Top accent line */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 2,
+                background: "linear-gradient(90deg, rgba(0,229,255,0.4), transparent 60%)",
+              }}
+            />
+
+            {/* Scan line texture */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,229,255,0.02) 3px, rgba(0,229,255,0.02) 4px)",
+                pointerEvents: "none",
+              }}
+            />
+
+            {/* Index */}
+            <div
+              style={{
+                fontSize: 8,
+                color: "rgba(0,229,255,0.3)",
+                fontFamily: "'Share Tech Mono', monospace",
+                marginBottom: 4,
+              }}
+            >
+              [{String(idx).padStart(2, "0")}]
+            </div>
+
+            {/* Label */}
+            <div
+              style={{
+                fontSize: 9,
+                color: "rgba(140,200,255,0.5)",
+                fontFamily: "'Share Tech Mono', monospace",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                marginBottom: 8,
+              }}
+            >
+              {item.label}
+            </div>
+
+            {/* Value */}
+            <div
+              style={{
+                fontSize: "clamp(14px, 4.5vw, 22px)",
+                color: "#fff",
+                fontFamily: "'Orbitron', sans-serif",
+                fontWeight: 900,
+                lineHeight: 1,
+                textShadow: "0 0 8px rgba(0,229,255,0.5)",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {item.prefix}{item.value}{item.suffix}
+            </div>
+
+            {/* Change indicator */}
+            {item.change && (
               <div
-                key={item.label}
                 style={{
-                  minWidth: "45%",
-                  scrollSnapAlign: "start",
-                  flexShrink: 0,
-                  background: "linear-gradient(135deg, rgba(0, 15, 35, 0.95) 0%, rgba(5, 10, 25, 0.95) 100%)",
-                  border: "1px solid rgba(42, 114, 229, 0.25)",
-                  padding: "16px",
-                  position: "relative",
-                  overflow: "hidden",
+                  marginTop: 6,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: item.change.startsWith("+") ? "#22c55e" : "#ef4444",
+                  fontFamily: "'Share Tech Mono', monospace",
                 }}
               >
-                {/* Top accent line */}
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, rgba(42, 114, 229, 0.6), rgba(0, 229, 255, 0.4), rgba(42, 114, 229, 0.6))" }} />
-
-                {/* Scan line texture */}
-                <div style={{ position: "absolute", inset: 0, background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 229, 255, 0.02) 3px, rgba(0, 229, 255, 0.02) 4px)", pointerEvents: "none" }} />
-
-                {/* Index number (faded) */}
-                <div style={{ fontSize: 8, color: "rgba(0, 229, 255, 0.3)", fontFamily: "'Share Tech Mono', monospace", marginBottom: 4 }}>
-                  [{String(idx).padStart(2, "0")}]
-                </div>
-
-                {/* Label */}
-                <div style={{ fontSize: 9, color: "rgba(140, 200, 255, 0.6)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: 8 }}>
-                  {item.label}
-                </div>
-
-                {/* Value */}
-                <div style={{ fontSize: 22, color: "#fff", fontFamily: "'Orbitron', sans-serif", fontWeight: 900, lineHeight: 1, textShadow: "0 0 8px rgba(42, 114, 229, 0.6)" }}>
-                  {item.prefix}{item.value}
-                </div>
-
-                {/* Change */}
-                {item.change && (
-                  <div style={{ marginTop: 6, fontSize: 11, fontWeight: 700, color: item.change.startsWith("+") ? "#00ff88" : "#ef4444", fontFamily: "'Share Tech Mono', monospace" }}>
-                    {item.change}
-                  </div>
-                )}
+                {item.change}
               </div>
-            ))}
+            )}
           </div>
-        </>
+        ))}
       </div>
 
-      {/* Bottom ticker */}
-      <div style={{ width: "100%", zIndex: 10 }}>
-        <BottomTicker items={items} />
-      </div>
+      {/* Biweekly Reports button */}
+      <Link
+        href="/about/reports"
+        style={{
+          display: "block",
+          width: "100%",
+          padding: "14px 24px",
+          minHeight: 48,
+          background: "linear-gradient(180deg, rgba(0,40,60,0.9), rgba(5,25,50,0.9))",
+          border: "1px solid rgba(0,229,255,0.6)",
+          boxShadow: "0 0 20px rgba(0,229,255,0.15)",
+          fontFamily: "'Orbitron', sans-serif",
+          fontSize: 11,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: "0.18em",
+          color: "#fff",
+          textShadow: "0 0 10px rgba(0,229,255,0.8)",
+          textDecoration: "none",
+          textAlign: "center",
+          boxSizing: "border-box",
+        }}
+      >
+        Biweekly Reports
+      </Link>
+    </div>{/* end padded content */}
     </div>
   );
 }
@@ -675,14 +758,14 @@ export default function DataConsoleOverlay({ items }: { items: TickerItem[] }) {
   const rightItems = items.slice(mid);
 
   return (
-    <>
+    <div className="absolute inset-0">
       {/* ── Mobile layout (below md) ── */}
-      <div className="block md:hidden w-full">
+      <div className="block md:hidden w-full h-full">
         <DataConsoleMobileOverlay items={items} />
       </div>
 
       {/* ── Desktop layout (md and above) ── */}
-      <div className="hidden md:block absolute inset-0">
+      <div className="hidden md:block w-full h-full">
           {/* Header bar */}
           <HeaderBar />
 
@@ -739,6 +822,6 @@ export default function DataConsoleOverlay({ items }: { items: TickerItem[] }) {
           {/* Bottom ticker carousel */}
           <BottomTicker items={items} />
       </div>
-    </>
+    </div>
   );
 }

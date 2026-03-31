@@ -59,16 +59,19 @@ function ShowcaseMobileOverlay({ categories, activeProjects, codeChanges, netGro
   ];
 
   return (
-    <div className="flex flex-col px-5 py-8 gap-4">
+    <div className="absolute inset-0 flex flex-col overflow-y-auto overflow-x-hidden">
       <style dangerouslySetInnerHTML={{ __html: MOBILE_KEYFRAMES + '.showcase-ticker::-webkit-scrollbar{display:none}' }} />
 
-      {/* Ticker Tape */}
+      {/* Ticker Tape — full-width, outside padded area */}
       <div style={{
         overflow: 'hidden',
-        border: '1px solid rgba(0, 229, 255, 0.15)',
+        borderTop: '1px solid rgba(0, 229, 255, 0.15)',
+        borderBottom: '1px solid rgba(0, 229, 255, 0.15)',
         padding: '10px 0',
         position: 'relative',
         background: 'rgba(0, 5, 15, 0.8)',
+        marginTop: 32,
+        flexShrink: 0,
       }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, #00e5ff, transparent)' }} />
         <div style={{
@@ -88,6 +91,9 @@ function ShowcaseMobileOverlay({ categories, activeProjects, codeChanges, netGro
           ))}
         </div>
       </div>
+
+      {/* Padded content area */}
+      <div className="flex flex-col px-5 py-4 gap-4">
 
       {/* Section label */}
       <div style={{
@@ -275,6 +281,7 @@ function ShowcaseMobileOverlay({ categories, activeProjects, codeChanges, netGro
           <div style={{ fontSize: 7, color: 'rgba(140, 200, 255, 0.5)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 4, fontFamily: "'Share Tech Mono', monospace" }}>Net Growth</div>
         </div>
       </div>
+    </div>{/* end padded content */}
     </div>
   );
 }
@@ -316,14 +323,14 @@ export default function ShowcaseOverlay({
   ];
 
   return (
-    <>
+    <div className="absolute inset-0">
       {/* ── Mobile layout (below md) ── */}
-      <div className="block md:hidden w-full">
+      <div className="block md:hidden w-full h-full">
         <ShowcaseMobileOverlay categories={categories} activeProjects={activeProjects} codeChanges={codeChanges} netGrowth={netGrowth} />
       </div>
 
       {/* ── Desktop layout (md and above) ── */}
-      <div className="hidden md:block absolute inset-0">
+      <div className="hidden md:block w-full h-full">
       {categories.slice(0, 10).map((cat, i) => {
         const pos = pedestals[i];
         if (!pos) return null;
@@ -728,6 +735,6 @@ export default function ShowcaseOverlay({
         />
       )}
       </div>
-    </>
+    </div>
   );
 }

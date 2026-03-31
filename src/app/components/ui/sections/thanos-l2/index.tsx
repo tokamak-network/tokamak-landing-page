@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import LazyWebGL from "../../LazyWebGL";
@@ -322,34 +323,67 @@ function BottomControlPanel() {
    Mobile Overlay — simplified, no 3D
    ═══════════════════════════════════════════════ */
 
-const MOBILE_METRICS = [
-  { label: "Customizable", value: "STACK" },
-  { label: "Deploy Time", value: "<5 MIN" },
-  { label: "OP Stack", value: "BASE" },
-  { label: "Architecture", value: "MODULAR" },
-] as const;
-
-const mobileKeyframes = `
-@keyframes scanLine {
-  0%   { top: 0; }
-  100% { top: 100%; }
+const THANOS_TERMINAL_KEYFRAMES = `
+@keyframes thanosBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+@keyframes thanosStatusPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@keyframes thanosFadeInLine {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 `;
 
-function ThanosL2MobileOverlay() {
-  return (
-    <div
-      className="absolute inset-0 flex flex-col px-5 py-8 gap-5 overflow-y-auto"
-      style={{
-        background: "linear-gradient(180deg, rgba(0, 5, 15, 0.55) 0%, rgba(0, 10, 25, 0.4) 100%)",
-      }}
-    >
-      <style dangerouslySetInnerHTML={{ __html: `
-        ${mobileKeyframes}
-        .thanos-carousel::-webkit-scrollbar { display: none; }
-      ` }} />
+const TERMINAL_LINES: { type: string; text?: string; dim?: string; highlight?: string }[] = [
+  { type: "cmd", text: "$ thanos deploy --chain my-l2" },
+  { type: "blank" },
+  { type: "step", text: "[1/4] Initializing OP Stack config..." },
+  { type: "ok", text: "\u2713 Config loaded", dim: "(0.8s)" },
+  { type: "step", text: "[2/4] Setting up sequencer node..." },
+  { type: "ok", text: "\u2713 Sequencer online", dim: "(1.2s)" },
+  { type: "step", text: "[3/4] Deploying bridge contracts..." },
+  { type: "ok", text: "\u2713 Bridge deployed at", highlight: "0x7a2f...e4b1" },
+  { type: "step", text: "[4/4] Running health checks..." },
+  { type: "ok", text: "\u2713 All systems operational" },
+];
 
-      {/* ── Label ── */}
+const DEPLOY_RESULT: { label: string; value: string; isHighlight?: boolean }[] = [
+  { label: "Chain ID:", value: "111551119999", isHighlight: true },
+  { label: "RPC:", value: "https://rpc.my-l2.tokamak.network" },
+  { label: "Explorer:", value: "https://explorer.my-l2.tokamak.network" },
+  { label: "Time:", value: "4m 23s", isHighlight: true },
+];
+
+const SPEC_ITEMS: { value: string; label: string; smallFont?: boolean }[] = [
+  { value: "100%", label: "Open Source" },
+  { value: "CUSTOM", label: "Config", smallFont: true },
+  { value: "MODULAR", label: "Architecture", smallFont: true },
+];
+
+function ThanosL2MobileOverlay() {
+  const termRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = termRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={termRef} className="absolute inset-0 flex flex-col px-3 py-8 gap-3 overflow-y-auto">
+      <style dangerouslySetInnerHTML={{ __html: THANOS_TERMINAL_KEYFRAMES }} />
+
+      {/* ── Top label ── */}
       <div
         style={{
           fontSize: 9,
@@ -357,178 +391,229 @@ function ThanosL2MobileOverlay() {
           fontFamily: "'Share Tech Mono', monospace",
           letterSpacing: "0.25em",
           textTransform: "uppercase",
+          paddingLeft: 4,
         }}
       >
-        THANOS L2 · OP STACK
+        THANOS L2 &middot; DEPLOY
       </div>
 
-      {/* ── Title ── */}
-      <div style={{ marginTop: -12 }}>
-        <div
-          style={{
-            fontSize: 24,
-            color: "#fff",
-            fontFamily: "'Orbitron', sans-serif",
-            fontWeight: 700,
-            letterSpacing: "0.06em",
-            textShadow: "0 0 20px rgba(0, 229, 255, 0.4)",
-            lineHeight: 1.15,
-          }}
-        >
-          On-Demand L2<br />for Ethereum
-        </div>
-      </div>
-
-      {/* ── Hero Card ── */}
+      {/* ── Terminal window ── */}
       <div
         style={{
-          background: "linear-gradient(135deg, rgba(0, 20, 40, 0.95) 0%, rgba(5, 10, 25, 0.95) 100%)",
-          border: "1px solid rgba(0, 229, 255, 0.25)",
-          padding: "20px 16px",
-          position: "relative",
+          background: "rgba(0, 8, 16, 0.98)",
+          border: "1px solid rgba(0, 229, 255, 0.3)",
           overflow: "hidden",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        {/* Top accent line */}
+        {/* Title bar */}
         <div
           style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 2,
-            background: "linear-gradient(90deg, transparent, #00e5ff, transparent)",
-          }}
-        />
-        {/* Scan line texture */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 229, 255, 0.03) 3px, rgba(0, 229, 255, 0.03) 4px)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            fontSize: 10,
-            color: "#00e5ff",
-            fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-            marginBottom: 10,
-            position: "relative",
-            zIndex: 1,
+            display: "flex",
+            alignItems: "center",
+            padding: "10px 14px",
+            gap: 8,
+            background: "rgba(0, 229, 255, 0.06)",
+            borderBottom: "1px solid rgba(0, 229, 255, 0.15)",
           }}
         >
-          ▸ Platform Overview
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#ff5f57" }} />
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#ffbd2e" }} />
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#28c840" }} />
+          <span
+            style={{
+              fontSize: 10,
+              color: "rgba(140, 200, 255, 0.4)",
+              fontFamily: "'Share Tech Mono', monospace",
+              marginLeft: 8,
+            }}
+          >
+            thanos-cli v2.1.0
+          </span>
         </div>
+
+        {/* Terminal body */}
         <div
           style={{
-            fontSize: 13,
-            color: "rgba(160, 210, 255, 0.75)",
+            padding: 16,
+            flex: 1,
+            fontSize: 12,
+            lineHeight: 1.9,
+            color: "rgba(200, 225, 255, 0.85)",
             fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.08em",
-            lineHeight: 1.5,
-            position: "relative",
-            zIndex: 1,
           }}
         >
-          Fast · Secure · Fully Customizable
+          {TERMINAL_LINES.map((line, i) => (
+            <div
+              key={i}
+              style={{
+                opacity: visible ? undefined : 0,
+                animation: visible ? `thanosFadeInLine 0.3s ease ${i * 0.4}s both` : "none",
+              }}
+            >
+              {line.type === "blank" && <br />}
+              {line.type === "cmd" && (
+                <>
+                  <span style={{ color: "#00e5ff" }}>$</span>{" "}
+                  <span style={{ color: "#fff", fontWeight: 700 }}>
+                    {line.text?.replace("$ ", "")}
+                  </span>
+                </>
+              )}
+              {line.type === "step" && (
+                <span style={{ color: "rgba(140, 200, 255, 0.4)" }}>{line.text}</span>
+              )}
+              {line.type === "ok" && (
+                <>
+                  <span style={{ color: "#22c55e" }}>{line.text}</span>
+                  {line.dim && (
+                    <span style={{ color: "rgba(140, 200, 255, 0.4)" }}> {line.dim}</span>
+                  )}
+                  {line.highlight && (
+                    <span style={{ color: "#f59e0b", fontWeight: 700 }}> {line.highlight}</span>
+                  )}
+                </>
+              )}
+            </div>
+          ))}
+
+          {/* Deploy result */}
+          <div style={{
+            opacity: visible ? undefined : 0,
+            animation: visible ? `thanosFadeInLine 0.3s ease ${TERMINAL_LINES.length * 0.4}s both` : "none",
+          }}>
+            <br />
+            <span style={{ color: "#22c55e", fontWeight: 700 }}>&#9670; Chain deployed successfully!</span>
+            <br />
+            {DEPLOY_RESULT.map((r) => (
+              <div key={r.label}>
+                <span style={{ color: "rgba(140, 200, 255, 0.4)" }}>{"  "}{r.label}</span>{" "}
+                <span style={{ color: r.isHighlight ? "#f59e0b" : "rgba(200, 225, 255, 0.85)", fontWeight: r.isHighlight ? 700 : 400 }}>
+                  {r.value}
+                </span>
+              </div>
+            ))}
+            <br />
+            <span style={{ color: "#00e5ff" }}>$</span>{" "}
+            <span
+              style={{
+                display: "inline-block",
+                width: 8,
+                height: 14,
+                background: "#00e5ff",
+                animation: "thanosBlink 1s step-end infinite",
+                verticalAlign: "text-bottom",
+              }}
+            />
+          </div>
         </div>
       </div>
 
-      {/* ── Specs section ── */}
-      <div>
+      {/* ── Live status ── */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          background: "rgba(0, 229, 255, 0.05)",
+          border: "1px solid rgba(0, 229, 255, 0.15)",
+          padding: "12px 14px",
+        }}
+      >
         <div
           style={{
-            fontSize: 8,
-            color: "rgba(0, 229, 255, 0.5)",
-            fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.25em",
-            textTransform: "uppercase",
-            marginBottom: 10,
+            width: 10,
+            height: 10,
+            borderRadius: "50%",
+            background: "#22c55e",
+            boxShadow: "0 0 8px rgba(34, 197, 94, 0.5)",
+            animation: "thanosStatusPulse 2s ease infinite",
           }}
-        >
-          SPECIFICATIONS
+        />
+        <div>
+          <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: 11, fontWeight: 700, color: "#22c55e" }}>
+            CHAIN LIVE
+          </div>
+          <div style={{ fontSize: 9, color: "rgba(140, 200, 255, 0.4)", marginTop: 2, fontFamily: "'Share Tech Mono', monospace" }}>
+            Block #1,247 &middot; 2.0s block time
+          </div>
         </div>
-
-        {/* Horizontal carousel */}
         <div
-          className="thanos-carousel"
           style={{
-            display: "flex",
-            gap: 12,
-            overflowX: "auto",
-            scrollSnapType: "x mandatory",
-            WebkitOverflowScrolling: "touch",
-            paddingBottom: 8,
-            scrollbarWidth: "none",
+            marginLeft: "auto",
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: 14,
+            fontWeight: 900,
+            color: "#00e5ff",
+            textShadow: "0 0 8px rgba(0, 229, 255, 0.4)",
           }}
         >
-          {MOBILE_METRICS.map((m) => (
+          &lt;5m
+        </div>
+      </div>
+
+      {/* ── Spec stats row ── */}
+      <div style={{ display: "flex", gap: 4 }}>
+        {SPEC_ITEMS.map((s) => (
+          <div
+            key={s.label}
+            style={{
+              flex: 1,
+              background: "rgba(0, 8, 20, 0.95)",
+              border: "1px solid rgba(0, 229, 255, 0.12)",
+              padding: "12px 8px",
+              textAlign: "center",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
             <div
-              key={m.label}
               style={{
-                minWidth: "45%",
-                scrollSnapAlign: "start",
-                flexShrink: 0,
-                background: "rgba(0, 10, 25, 0.95)",
-                border: "1px solid rgba(0, 229, 255, 0.2)",
-                padding: "16px",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 1,
+                background: "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.4), transparent)",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 229, 255, 0.02) 3px, rgba(0, 229, 255, 0.02) 4px)",
+                pointerEvents: "none",
+              }}
+            />
+            <div
+              style={{
+                fontFamily: "'Orbitron', sans-serif",
+                fontSize: s.smallFont ? 13 : 16,
+                fontWeight: 900,
+                color: "#00e5ff",
+                textShadow: "0 0 10px rgba(0, 229, 255, 0.5)",
                 position: "relative",
               }}
             >
-              {/* Top accent */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 1,
-                  background: "rgba(0, 229, 255, 0.3)",
-                }}
-              />
-              <div
-                style={{
-                  fontSize: 8,
-                  color: "rgba(0, 229, 255, 0.6)",
-                  fontFamily: "'Share Tech Mono', monospace",
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  marginBottom: 8,
-                }}
-              >
-                {m.label}
-              </div>
-              <div
-                style={{
-                  fontSize: 22,
-                  color: "#fff",
-                  fontFamily: "'Orbitron', sans-serif",
-                  fontWeight: 700,
-                  textShadow: "0 0 10px rgba(0, 229, 255, 0.3)",
-                }}
-              >
-                {m.value}
-              </div>
+              {s.value}
             </div>
-          ))}
-        </div>
-
-        <div
-          style={{
-            fontSize: 8,
-            color: "rgba(0, 229, 255, 0.35)",
-            fontFamily: "'Share Tech Mono', monospace",
-            letterSpacing: "0.1em",
-            marginTop: 4,
-          }}
-        >
-          swipe for more →
-        </div>
+            <div
+              style={{
+                fontSize: 7,
+                color: "rgba(140, 200, 255, 0.5)",
+                fontFamily: "'Share Tech Mono', monospace",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                marginTop: 4,
+                position: "relative",
+              }}
+            >
+              {s.label}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* ── CTA button ── */}
@@ -536,21 +621,24 @@ function ThanosL2MobileOverlay() {
         href="https://rolluphub.tokamak.network/"
         target="_blank"
         rel="noopener noreferrer"
-        className="relative inline-flex items-center justify-center w-full"
         style={{
-          padding: "14px 32px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "100%",
+          padding: "14px 24px",
           minHeight: 48,
-          background: "linear-gradient(180deg, rgba(0, 40, 60, 0.95) 0%, rgba(5, 25, 50, 0.95) 100%)",
-          border: "1.5px solid rgba(0, 229, 255, 0.8)",
+          background: "linear-gradient(180deg, rgba(0, 40, 60, 0.9), rgba(5, 25, 50, 0.9))",
+          border: "1px solid rgba(0, 229, 255, 0.6)",
           fontFamily: "'Orbitron', sans-serif",
-          fontSize: 12,
+          fontSize: 11,
           color: "#fff",
           letterSpacing: "0.18em",
           fontWeight: 700,
           textTransform: "uppercase",
           textDecoration: "none",
-          textShadow: "0 0 14px rgba(0, 229, 255, 0.8)",
-          boxShadow: "0 0 24px rgba(0, 229, 255, 0.25), inset 0 0 20px rgba(0, 229, 255, 0.08)",
+          textShadow: "0 0 10px rgba(0, 229, 255, 0.8)",
+          boxShadow: "0 0 20px rgba(0, 229, 255, 0.15)",
         }}
       >
         Deploy Your Appchain
@@ -565,14 +653,14 @@ function ThanosL2MobileOverlay() {
 
 export default function ThanosL2Overlay() {
   return (
-    <>
+    <div className="absolute inset-0">
       {/* ── Mobile layout (below md) ── */}
-      <div className="block md:hidden w-full">
+      <div className="block md:hidden w-full h-full">
         <ThanosL2MobileOverlay />
       </div>
 
       {/* ── Desktop layout (md and above) ── */}
-      <div className="hidden md:block absolute inset-0">
+      <div className="hidden md:block w-full h-full">
           <HeaderBar />
 
           {/* 3D holographic torus — pure mesh */}
@@ -611,6 +699,6 @@ export default function ThanosL2Overlay() {
           {/* Bottom — feature pillars + CTA */}
           <BottomControlPanel />
       </div>
-    </>
+    </div>
   );
 }

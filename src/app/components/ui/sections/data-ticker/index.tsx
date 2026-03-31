@@ -40,7 +40,7 @@ export async function getTickerData(): Promise<TickerItem[]> {
 
     if (reportStats) {
       items.push(
-        { label: "CODE CHANGES", value: reportStats.stats.linesChanged, suffix: "lines" },
+        { label: "CODE CHANGES", value: reportStats.stats.linesChanged, prefix: "+" },
         { label: "ACTIVE PROJECTS", value: reportStats.stats.activeRepos },
       );
       if (reportStats.stats.netGrowth && reportStats.stats.netGrowth !== "0") {
@@ -54,7 +54,7 @@ export async function getTickerData(): Promise<TickerItem[]> {
         { label: "TON", value: "1.20", prefix: "$" },
         { label: "MARKET CAP", value: "$70M" },
         { label: "24H VOLUME", value: "$1.2M" },
-        { label: "CODE CHANGES", value: FALLBACK_REPORT.codeChanges, suffix: "lines" },
+        { label: "CODE CHANGES", value: FALLBACK_REPORT.codeChanges, prefix: "+" },
         { label: "ACTIVE PROJECTS", value: FALLBACK_REPORT.activeProjects },
       ];
     }
@@ -65,7 +65,7 @@ export async function getTickerData(): Promise<TickerItem[]> {
       { label: "TON", value: "1.20", prefix: "$" },
       { label: "MARKET CAP", value: "$70M" },
       { label: "24H VOLUME", value: "$1.2M" },
-      { label: "CODE CHANGES", value: FALLBACK_REPORT.codeChanges, suffix: "lines" },
+      { label: "CODE CHANGES", value: FALLBACK_REPORT.codeChanges, prefix: "+" },
       { label: "ACTIVE PROJECTS", value: FALLBACK_REPORT.activeProjects },
     ];
   }

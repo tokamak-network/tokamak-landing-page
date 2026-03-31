@@ -73,7 +73,7 @@ export default function TokenVortex() {
   const animRef = useRef<number>(0);
   const timeRef = useRef(0);
   const sizeRef = useRef({ w: 0, h: 0 });
-  const visibleRef = useRef(false);
+  const visibleRef = useRef(true);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;

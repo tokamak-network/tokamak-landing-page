@@ -8,18 +8,30 @@ function parseNum(s: string | undefined): number {
   return parseInt(s.replace(/,/g, ""), 10) || 0;
 }
 
+const SHORT_NAMES: Record<string, string> = {
+  "Platform & Services": "Platform",
+  "Core Infrastructure": "Infra",
+  "AI & Machine Learning": "AI / ML",
+  "Privacy & ZK": "ZK",
+  "Research & Education": "Lab",
+  "Automation & Tooling": "Tool",
+  "DeFi & Staking": "DeFi",
+  "Gaming & Social": "Social",
+  "Data & Analytics": "Analytics",
+};
+
 // Default categories when no report data available
 const FALLBACK_CATEGORIES = [
-  { name: "Platform & Services", repoCount: 10, repos: [] },
-  { name: "Core Infrastructure", repoCount: 4, repos: [] },
-  { name: "AI & Machine Learning", repoCount: 4, repos: [] },
-  { name: "Privacy & ZK", repoCount: 4, repos: [] },
-  { name: "Research & Education", repoCount: 5, repos: [] },
-  { name: "Automation & Tooling", repoCount: 8, repos: [] },
-  { name: "DeFi & Staking", repoCount: 5, repos: [] },
-  { name: "Gaming & Social", repoCount: 3, repos: [] },
+  { name: "Platform", repoCount: 10, repos: [] },
+  { name: "Infra", repoCount: 4, repos: [] },
+  { name: "AI / ML", repoCount: 4, repos: [] },
+  { name: "ZK", repoCount: 4, repos: [] },
+  { name: "Lab", repoCount: 5, repos: [] },
+  { name: "Tool", repoCount: 8, repos: [] },
+  { name: "DeFi", repoCount: 5, repos: [] },
+  { name: "Social", repoCount: 3, repos: [] },
   { name: "Governance", repoCount: 2, repos: [] },
-  { name: "Data & Analytics", repoCount: 3, repos: [] },
+  { name: "Analytics", repoCount: 3, repos: [] },
 ];
 
 async function getShowcaseData() {
@@ -35,7 +47,7 @@ async function getShowcaseData() {
 
     const categories =
       detail.ecosystemLandscape?.categories?.map((c) => ({
-        name: c.name,
+        name: SHORT_NAMES[c.name] ?? c.name,
         repoCount: c.repoCount,
         repos: c.repos.map((r) => ({
           name: r.name,

@@ -15,7 +15,7 @@ export default function HelixSpine({ scrollProgress, color = "#00e5ff" }: Props)
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef(0);
   const timeRef = useRef(0);
-  const visibleRef = useRef(false);
+  const visibleRef = useRef(true);
 
   useEffect(() => {
     const canvas = canvasRef.current;

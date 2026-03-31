@@ -21,7 +21,7 @@ export default function ParticleOverlay({ color, active }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const rafRef = useRef<number>(0);
-  const visibleRef = useRef(false);
+  const visibleRef = useRef(true);
 
   useEffect(() => {
     const canvas = canvasRef.current;

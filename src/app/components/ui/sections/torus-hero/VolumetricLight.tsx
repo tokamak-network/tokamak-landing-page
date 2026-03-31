@@ -94,7 +94,7 @@ export default function VolumetricLight() {
   const sizeRef = useRef({ w: 0, h: 0, vh: 0, mobile: false });
   const rotationRef = useRef(0);
   const lastFrameRef = useRef(0);
-  const visibleRef = useRef(false);
+  const visibleRef = useRef(true);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -117,21 +117,11 @@ export default function VolumetricLight() {
     window.addEventListener("resize", resize);
     lastFrameRef.current = performance.now();
 
-    // Pause when off-screen
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        visibleRef.current = entry.isIntersecting;
-        if (entry.isIntersecting) {
-          lastFrameRef.current = performance.now();
-          animRef.current = requestAnimationFrame(animate);
-        }
-      },
-      { threshold: 0 }
-    );
-    io.observe(canvas);
-
     const animate = (now: number) => {
-      if (!visibleRef.current) return;
+      if (!visibleRef.current) {
+        animRef.current = requestAnimationFrame(animate);
+        return;
+      }
       const { w, h, vh, mobile } = sizeRef.current;
       if (w === 0) { animRef.current = requestAnimationFrame(animate); return; }
 
@@ -325,6 +315,12 @@ export default function VolumetricLight() {
 
       animRef.current = requestAnimationFrame(animate);
     };
+
+    const io = new IntersectionObserver(
+      ([entry]) => { visibleRef.current = entry.isIntersecting; },
+      { threshold: 0 },
+    );
+    io.observe(canvas);
 
     animRef.current = requestAnimationFrame(animate);
 

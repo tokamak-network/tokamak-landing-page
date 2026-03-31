@@ -625,7 +625,7 @@ function DataConsoleMobileOverlay({ items }: { items: TickerItem[] }) {
           gap: 8,
         }}
       >
-        {items.map((item, idx) => (
+        {items.map((item) => (
           <div
             key={item.label}
             style={{

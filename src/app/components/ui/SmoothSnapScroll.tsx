@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback } from "react";
 
 const SCROLL_DURATION = 1400;
-const COOLDOWN = 1200;
+const COOLDOWN = 100;
 const TRACKPAD_THRESHOLD = 5;
 
 function easeInOutQuart(t: number): number {

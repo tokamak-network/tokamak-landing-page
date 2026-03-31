@@ -34,14 +34,14 @@ export async function getTickerData(): Promise<TickerItem[]> {
       items.push(
         { label: "TON", value: priceData.tonPrice.current.usd.toFixed(2), prefix: "$" },
         { label: "MARKET CAP", value: `$${(priceData.marketCap / 1e6).toFixed(1)}M` },
-        { label: "TVL", value: `${(priceData.stakedVolume / 1e6).toFixed(1)}M`, suffix: "TON" },
+        { label: "24H VOLUME", value: `$${(priceData.tradingVolumeUSD / 1e6).toFixed(1)}M` },
       );
     }
 
     if (reportStats) {
       items.push(
-        { label: "CODE", value: reportStats.stats.linesChanged, suffix: "lines" },
-        { label: "PROJECTS", value: reportStats.stats.activeRepos },
+        { label: "CODE CHANGES", value: reportStats.stats.linesChanged, suffix: "lines" },
+        { label: "ACTIVE PROJECTS", value: reportStats.stats.activeRepos },
       );
       if (reportStats.stats.netGrowth && reportStats.stats.netGrowth !== "0") {
         items.push({ label: "NET GROWTH", value: reportStats.stats.netGrowth });
@@ -53,9 +53,9 @@ export async function getTickerData(): Promise<TickerItem[]> {
       return [
         { label: "TON", value: "1.20", prefix: "$" },
         { label: "MARKET CAP", value: "$70M" },
-        { label: "TVL", value: "28.5M", suffix: "TON" },
-        { label: "CODE", value: FALLBACK_REPORT.codeChanges, suffix: "lines" },
-        { label: "PROJECTS", value: FALLBACK_REPORT.activeProjects },
+        { label: "24H VOLUME", value: "$1.2M" },
+        { label: "CODE CHANGES", value: FALLBACK_REPORT.codeChanges, suffix: "lines" },
+        { label: "ACTIVE PROJECTS", value: FALLBACK_REPORT.activeProjects },
       ];
     }
 
@@ -64,9 +64,9 @@ export async function getTickerData(): Promise<TickerItem[]> {
     return [
       { label: "TON", value: "1.20", prefix: "$" },
       { label: "MARKET CAP", value: "$70M" },
-      { label: "TVL", value: "28.5M", suffix: "TON" },
-      { label: "CODE", value: FALLBACK_REPORT.codeChanges, suffix: "lines" },
-      { label: "PROJECTS", value: FALLBACK_REPORT.activeProjects },
+      { label: "24H VOLUME", value: "$1.2M" },
+      { label: "CODE CHANGES", value: FALLBACK_REPORT.codeChanges, suffix: "lines" },
+      { label: "ACTIVE PROJECTS", value: FALLBACK_REPORT.activeProjects },
     ];
   }
 }

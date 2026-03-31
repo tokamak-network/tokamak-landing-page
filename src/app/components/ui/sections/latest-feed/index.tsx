@@ -90,21 +90,7 @@ export default function LatestFeed() {
         }}
       />
 
-      {/* ── Edge fades — matched to TowerFloor ── */}
-      <div
-        className="absolute top-0 left-0 right-0 pointer-events-none"
-        style={{
-          height: "18%",
-          background: "linear-gradient(180deg, black 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.4) 65%, transparent 100%)",
-        }}
-      />
-      <div
-        className="absolute bottom-0 left-0 right-0 pointer-events-none"
-        style={{
-          height: "18%",
-          background: "linear-gradient(0deg, black 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.4) 65%, transparent 100%)",
-        }}
-      />
+      {/* ── Edge fades — left/right only, no top/bottom to keep buttons visible ── */}
       <div
         className="absolute top-0 bottom-0 left-0 pointer-events-none"
         style={{

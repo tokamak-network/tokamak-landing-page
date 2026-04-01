@@ -1,0 +1,223 @@
+# Tokamak Network — Full Reference
+
+> Tokamak Network is an Ethereum-native Layer 2 platform that enables on-demand rollup deployment. Built on the OP Stack, it allows any application to launch its own optimized L2 chain in minutes. The native token TON powers seigniorage staking, DAO governance, and cross-chain bridging across the ecosystem.
+
+---
+
+## Overview
+
+Tokamak Network provides a complete Layer 2 ecosystem on Ethereum. The project's tagline is "Every app deserves its own L2." The core thesis is that applications should be able to deploy dedicated, optimized rollup chains without the overhead of building infrastructure from scratch.
+
+The network is built around these pillars:
+
+1. **Thanos L2** — On-demand rollup deployment using the OP Stack
+2. **Seigniorage Staking** — Economic security through TON staking with seigniorage rewards
+3. **DAO Governance** — Decentralized protocol governance with on-chain voting
+4. **Cross-Chain Bridge** — Trustless asset transfers between L1 and L2
+
+---
+
+## Thanos L2: On-Demand Rollup Infrastructure
+
+Thanos is Tokamak Network's flagship product for launching application-specific L2 chains.
+
+### Architecture
+
+- **Stack**: Built on the OP Stack (Optimism's modular rollup framework)
+- **Block Time**: 1.2 seconds
+- **Deployment**: One-click deployment through the Rollup Hub
+- **Configuration**: Custom chain parameters — gas limits, sequencer settings, bridge configuration
+
+### Three Pillars
+
+1. **STACK — Custom Config**: Each L2 can be configured with its own optimized chain parameters
+2. **SDK — One-Click Deploy**: Launch a production-ready L2 in minutes via the Rollup Hub
+3. **MODULAR — Plug & Extend**: Open modular architecture allowing custom extensions
+
+### Rollup Hub
+
+The Rollup Hub (https://rolluphub.tokamak.network/) is the deployment and management interface for Thanos L2 chains. It provides:
+
+- Chain deployment wizard
+- Configuration management
+- Monitoring and analytics
+- Bridge interface
+
+---
+
+## TON Token
+
+TON is the native utility token of Tokamak Network on Ethereum mainnet.
+
+### Token Details
+
+| Property | Value |
+|----------|-------|
+| Name | Tokamak Network Token |
+| Symbol | TON |
+| Network | Ethereum Mainnet |
+| Contract | `0x2be5e8c109e2197D077D13A82dAead6a9b3433C5` |
+| Standard | ERC-20 |
+
+### Related Contracts
+
+| Contract | Address |
+|----------|---------|
+| WTON (Wrapped TON) | `0xc4A11aaf6ea915Ed7Ac194161d2fC9384F15bff2` |
+| SEIG Manager Proxy | `0x0b55a0f463b6defb81c6063973763951712d0e5f` |
+| Layer2 Registry Proxy | `0x0b3E174A2170083e770D5d4Cf56774D221b7063e` |
+| DAO Agenda Manager | `0xcD4421d082752f363E1687544a09d5112cD4f484` |
+| DAO Committee Proxy | `0xDD9f0cCc044B0781289Ee318e5971b0139602C26` |
+
+### How to Get TON
+
+Guide: https://docs.tokamak.network/home/information/get-ton
+
+### On-Chain Verification
+
+- Total Supply: https://etherscan.io/address/0x0b55a0f463b6defb81c6063973763951712d0e5f#readProxyContract#F64
+- Burned Supply: https://etherscan.io/token/0x2be5e8c109e2197D077D13A82dAead6a9b3433C5?a=0x0000000000000000000000000000000000000001
+- Tokenomics Dashboard: https://dune.com/tokamak-network/tokamak-network-tokenomics-dashboard
+
+---
+
+## Seigniorage Staking
+
+Tokamak Network uses a seigniorage-based staking model where TON holders stake tokens to earn rewards and secure the network.
+
+### How It Works
+
+1. TON holders stake their tokens through the staking contracts
+2. Seigniorage is generated per block as new TON
+3. Stakers receive proportional rewards based on their stake
+4. Staking secures Layer 2 operators on the network
+
+### Key Metrics
+
+- 42M+ TON staked across the network
+- Seigniorage distributed per block via the SEIG Manager contract
+- Both individual staking and DAO-level staking supported
+
+### Contracts
+
+- Staking source code: https://github.com/tokamak-network/TokamakStaking
+- SEIG Manager: `0x0b55a0f463b6defb81c6063973763951712d0e5f`
+
+---
+
+## DAO Governance
+
+Tokamak Network is governed by a DAO with on-chain proposal and voting mechanisms.
+
+### Structure
+
+- **DAO Committee**: Elected members who manage protocol decisions
+- **Agenda System**: Proposals (agendas) are submitted, discussed, and voted on-chain
+- **Voting**: TON stakers participate in governance votes
+
+### Contracts
+
+- DAO source code: https://github.com/tokamak-network/TokamakDAO
+- DAO Agenda Manager: `0xcD4421d082752f363E1687544a09d5112cD4f484`
+- DAO Committee Proxy: `0xDD9f0cCc044B0781289Ee318e5971b0139602C26`
+
+---
+
+## Cross-Chain Bridge
+
+Trustless asset transfers between Ethereum L1 and Tokamak L2 chains.
+
+### Features
+
+- Bridge time under 3 minutes
+- Cross-trade protocol for fast, trustless bridging
+- Supports native ETH and ERC-20 tokens
+- Integrated into the Rollup Hub interface
+
+---
+
+## Ecosystem Categories
+
+The Tokamak Network ecosystem spans 10 categories with 48+ active repositories:
+
+1. **Platform** (10 repos) — Core platform services and infrastructure
+2. **Infra** (4 repos) — Network infrastructure and node tooling
+3. **AI / ML** (4 repos) — AI and machine learning integrations
+4. **ZK** (4 repos) — Zero-knowledge proof implementations
+5. **Lab** (5 repos) — Research and educational resources
+6. **Tool** (8 repos) — Developer automation and tooling
+7. **DeFi** (5 repos) — Decentralized finance protocols and staking
+8. **Social** (3 repos) — Gaming and social applications
+9. **Governance** (2 repos) — DAO and governance contracts
+10. **Analytics** (3 repos) — Data analytics and dashboards
+
+---
+
+## Developer Resources
+
+### Documentation
+
+- Official Docs: https://docs.tokamak.network
+- GitHub: https://github.com/tokamak-network
+
+### Programs
+
+- Grant Program: https://tokamak.notion.site/Tokamak-Network-Grant-Program-f2384b458ea341a0987c7e73a909aa21
+- Onboarding: https://tokamak.notion.site/Tokamak-Network-Onboarding-523bc627bd374326b5dfbec3d3b0a8e1
+
+### Engineering Reports
+
+Tokamak Network publishes biweekly engineering reports covering development progress across all repositories. Reports include:
+
+- Active repository count
+- Lines of code changed
+- Net growth metrics
+- Per-category breakdown of development activity
+- Executive summaries of key changes
+
+Reports are available at: https://tokamak.network/about/reports
+
+---
+
+## Community & Social
+
+| Platform | Link |
+|----------|------|
+| Medium | https://medium.com/tokamak-network |
+| X (Twitter) | https://twitter.com/tokamak_network |
+| Discord | https://discord.com/invite/J4chV2zuAK |
+| Telegram | https://t.me/tokamak_network |
+| LinkedIn | https://www.linkedin.com/company/tokamaknetwork/ |
+
+---
+
+## Website Structure
+
+The Tokamak Network website (https://tokamak.network) has the following pages:
+
+| Path | Description |
+|------|-------------|
+| `/` | Main landing page with ecosystem overview, live metrics, and tower showcase |
+| `/about/price` | Live price dashboard — TON price, market cap, supply, staking data |
+| `/about/partners` | Ecosystem partners |
+| `/about/insight` | Medium blog feed with technical articles |
+| `/about/reports` | Biweekly engineering progress reports |
+| `/about/reports/[slug]` | Individual report detail pages |
+
+---
+
+## API Endpoints
+
+The website exposes the following public data endpoints:
+
+| Endpoint | Description |
+|----------|-------------|
+| `/api/price` | TON price, market cap, trading volume, supply data |
+| `/api/medium` | Latest Medium blog posts (RSS feed) |
+| `/api/governance-staking` | On-chain governance and staking metrics |
+| `/api/github-activity` | GitHub repository activity data |
+
+---
+
+*Last updated: April 2026*
+*Source: https://tokamak.network*

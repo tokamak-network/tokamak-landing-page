@@ -438,7 +438,7 @@ function buildCardList(categories: CategoryData[]): CardItem[] {
   return result;
 }
 
-function EcoCard({ item, idx, onHover }: { item: CardItem; idx: number; onHover?: (hovering: boolean) => void }) {
+function EcoCard({ item, onHover }: { item: CardItem; idx: number; onHover?: (hovering: boolean) => void }) {
   const vars = colorVars(item.color);
   const bgUrl = `/cards/bg-${item.bgSlug}-a.png`;
   const startPos = useRef({ x: 0, y: 0 });
@@ -559,7 +559,7 @@ export default function CarouselClient({ categories }: Props) {
 
   // Card width + gap for navigation
   const CARD_STEP = 244; // 220px card + 24px gap
-  const offsetRef = useRef(0); // accumulated manual offset in px
+  // offsetRef removed — unused
 
   // Step left/right by N cards with smooth transition
   const stepCards = useCallback((dir: -1 | 1) => {

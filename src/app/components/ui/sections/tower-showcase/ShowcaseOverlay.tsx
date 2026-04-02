@@ -668,17 +668,31 @@ export default function ShowcaseOverlay({
 
       {/* ── Desktop layout (md and above) ── */}
       <div className="hidden md:block w-full h-full">
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+.pedestal-group:has(.pedestal-btn:hover) .pedestal-badge {
+  filter: brightness(1.5) !important;
+  transform: translateX(-50%) scale(1.08);
+}
+.pedestal-group:has(.pedestal-btn:hover) .pedestal-label span {
+  color: rgba(0, 229, 255, 1) !important;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.8), 0 0 20px rgba(42, 114, 229, 0.4) !important;
+}
+`,
+          }}
+        />
         {categories.slice(0, 10).map((cat, i) => {
           const pos = pedestals[i];
           if (!pos) return null;
           const isSelected = selectedIdx === i;
 
           return (
-            <div key={cat.name}>
+            <div key={cat.name} className="pedestal-group">
               {/* ── Clickable pedestal area ── */}
               <button
                 onClick={() => handlePedestalClick(i)}
-                className="absolute cursor-pointer"
+                className="absolute cursor-pointer pedestal-btn"
                 style={{
                   left: `${pos.badgeLeft}%`,
                   top: `${pos.badgeTop}%`,
@@ -695,7 +709,7 @@ export default function ShowcaseOverlay({
 
               {/* ── Speech-bubble badge with 3D asset ── */}
               <div
-                className="absolute flex items-center justify-center pointer-events-none"
+                className="absolute flex items-center justify-center pointer-events-none pedestal-badge"
                 style={{
                   left: `${pos.badgeLeft}%`,
                   top: `${pos.badgeTop}%`,
@@ -704,7 +718,7 @@ export default function ShowcaseOverlay({
                   aspectRatio: "1.79",
                   zIndex: 2,
                   filter: isSelected ? "brightness(1.4)" : undefined,
-                  transition: "filter 0.2s ease",
+                  transition: "filter 0.2s ease, transform 0.2s ease",
                 }}
               >
                 <Image
@@ -732,7 +746,7 @@ export default function ShowcaseOverlay({
 
               {/* ── Category name label ── */}
               <div
-                className="absolute text-center pointer-events-none"
+                className="absolute text-center pointer-events-none pedestal-label"
                 style={{
                   left: `${pos.labelLeft}%`,
                   top: `${pos.labelTop}%`,
@@ -763,6 +777,27 @@ export default function ShowcaseOverlay({
             </div>
           );
         })}
+
+        {/* ── Click hint ── */}
+        <div
+          className="absolute left-0 right-0 text-center pointer-events-none"
+          style={{
+            top: "67%",
+            zIndex: 2,
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "'Share Tech Mono', monospace",
+              fontSize: "clamp(9px, 0.85vw, 13px)",
+              color: "rgba(0, 229, 255, 0.35)",
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+            }}
+          >
+            Click a category to explore projects
+          </span>
+        </div>
 
         {/* ── Bottom ticker strip ── */}
         <div

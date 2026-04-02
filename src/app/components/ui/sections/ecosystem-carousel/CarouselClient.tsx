@@ -256,7 +256,7 @@ const CSS = `
   }
   .eco-card-name {
     font-family: 'Orbitron', monospace;
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 700;
     color: #e8f4ff;
     letter-spacing: 0.05em;
@@ -267,7 +267,7 @@ const CSS = `
   }
   .eco-card-desc {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
+    font-size: 12px;
     color: rgba(180,200,230,0.7);
     line-height: 1.5;
     margin-bottom: 8px;
@@ -449,6 +449,7 @@ function buildCardList(categories: CategoryData[]): CardItem[] {
 function EcoCard({ item, idx, onHover }: { item: CardItem; idx: number; onHover?: (hovering: boolean) => void }) {
   const vars = colorVars(item.color);
   const bgUrl = `/cards/bg-${item.bgSlug}-a.png`;
+  const startPos = useRef({ x: 0, y: 0 });
 
   return (
     <div
@@ -456,6 +457,13 @@ function EcoCard({ item, idx, onHover }: { item: CardItem; idx: number; onHover?
       style={vars}
       onMouseEnter={() => onHover?.(true)}
       onMouseLeave={() => onHover?.(false)}
+      onMouseDown={(e) => { startPos.current = { x: e.clientX, y: e.clientY }; }}
+      onClick={(e) => {
+        const dx = Math.abs(e.clientX - startPos.current.x);
+        const dy = Math.abs(e.clientY - startPos.current.y);
+        if (dx > 5 || dy > 5) return; // was a drag, not a click
+        if (item.repo.githubUrl) window.open(item.repo.githubUrl, "_blank");
+      }}
     >
       {/* Background image */}
       <div

@@ -28,7 +28,7 @@ const CATEGORY_COLOR: Record<string, string> = {
   ZK: "#8b5cf6",
   Lab: "#06b6d4",
   Tool: "#ec4899",
-  DeFi: "#10b981",
+  DeFi: "#d4a24e",
   Social: "#f97316",
   Governance: "#6366f1",
   Analytics: "#14b8a6",
@@ -751,7 +751,7 @@ export default function CarouselClient({ categories }: Props) {
                 "0 0 15px rgba(0,229,255,0.6), 0 0 40px rgba(0,229,255,0.2)",
             }}
           >
-            Ecosystem Index
+            Ecosystem Nexus
           </span>
           <span
             style={{

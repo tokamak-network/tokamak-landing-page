@@ -58,7 +58,7 @@ function getFlowData(): {
   // Always exactly 10 categories — pad with "Other" if fewer
   const SLOT_COUNT = 10;
   const fillerColors = [
-    "#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981",
+    "#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#d4a24e",
     "#06b6d4", "#3b82f6", "#ef4444", "#84cc16", "#f97316",
   ];
   const categories: FlowCategory[] = rawCategories.slice(0, SLOT_COUNT);

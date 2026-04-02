@@ -402,7 +402,7 @@ function buildCardList(categories: CategoryData[]): CardItem[] {
 
   while (remaining > 0) {
     // Build candidates: buckets with items left, excluding recent 6 categories
-    let candidates: { idx: number; rem: number }[] = [];
+    const candidates: { idx: number; rem: number }[] = [];
     for (let i = 0; i < buckets.length; i++) {
       const rem = buckets[i].length - indices[i];
       if (rem > 0 && !recentCats.includes(buckets[i][0].category)) {

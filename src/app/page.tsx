@@ -5,6 +5,7 @@ import VolumetricLight from "./components/ui/sections/torus-hero/VolumetricLight
 import TowerFloor from "./components/ui/sections/tower-floor";
 import FloorIndicator from "./components/ui/sections/tower-floor/FloorIndicator";
 import TowerShowcase from "./components/ui/sections/tower-showcase";
+import EcosystemCarousel from "./components/ui/sections/ecosystem-carousel";
 import DataConsoleContent from "./components/ui/sections/data-ticker/DataConsoleContent";
 import ThanosL2Overlay from "./components/ui/sections/thanos-l2";
 import GovernanceStakingOverlay from "./components/ui/sections/governance-staking";
@@ -25,6 +26,9 @@ export default function Home() {
 
         {/* Floor transition indicator */}
         <FloorIndicator floor={3} label="Ecosystem Showcase" />
+
+        {/* NEW: Ecosystem Project Cards Carousel */}
+        <EcosystemCarousel />
 
         {/* Tower Floor 3 (Top): Ecosystem Showcase — illuminated by torus */}
         <TowerFloor

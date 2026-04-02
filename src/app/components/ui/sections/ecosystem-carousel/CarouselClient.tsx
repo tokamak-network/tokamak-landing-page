@@ -394,15 +394,15 @@ function buildCardList(categories: CategoryData[]): CardItem[] {
   }
 
   // Max-spread interleave: always pick from the category with most remaining items
-  // that differs from the last 2 placed categories (ensures max diversity per screen)
+  // that differs from the last 6 placed categories (ensures 7 consecutive cards are unique)
   const result: CardItem[] = [];
   const indices = buckets.map(() => 0);
   let remaining = buckets.reduce((s, b) => s + b.length, 0);
-  const recentCats: string[] = []; // track last 2
+  const recentCats: string[] = []; // track last 6
 
   while (remaining > 0) {
-    // Build candidates: buckets with items left, excluding recent categories
-    const candidates: { idx: number; rem: number }[] = [];
+    // Build candidates: buckets with items left, excluding recent 6 categories
+    let candidates: { idx: number; rem: number }[] = [];
     for (let i = 0; i < buckets.length; i++) {
       const rem = buckets[i].length - indices[i];
       if (rem > 0 && !recentCats.includes(buckets[i][0].category)) {
@@ -410,22 +410,14 @@ function buildCardList(categories: CategoryData[]): CardItem[] {
       }
     }
 
-    // Fallback: if all remaining are in recent categories, relax to exclude only last 1
-    if (candidates.length === 0) {
-      const lastOne = recentCats[recentCats.length - 1] ?? "";
+    // Progressive fallback: relax window from 5 → 4 → 3 → 2 → 1 → 0
+    for (let window = 5; candidates.length === 0 && window >= 0; window--) {
+      const excluded = recentCats.slice(-window);
       for (let i = 0; i < buckets.length; i++) {
         const rem = buckets[i].length - indices[i];
-        if (rem > 0 && buckets[i][0].category !== lastOne) {
+        if (rem > 0 && !excluded.includes(buckets[i][0].category)) {
           candidates.push({ idx: i, rem });
         }
-      }
-    }
-
-    // Last resort: take anything remaining
-    if (candidates.length === 0) {
-      for (let i = 0; i < buckets.length; i++) {
-        const rem = buckets[i].length - indices[i];
-        if (rem > 0) candidates.push({ idx: i, rem });
       }
     }
 
@@ -440,7 +432,7 @@ function buildCardList(categories: CategoryData[]): CardItem[] {
     remaining--;
 
     recentCats.push(item.category);
-    if (recentCats.length > 2) recentCats.shift();
+    if (recentCats.length > 6) recentCats.shift();
   }
 
   return result;
@@ -736,45 +728,41 @@ export default function CarouselClient({ categories }: Props) {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "6px",
+            gap: "8px",
           }}
         >
+          {/* Main title — white, larger, distinct from cyan floor indicators */}
           <span
             style={{
-              fontFamily: "'Orbitron', 'Share Tech Mono', monospace",
-              fontSize: "clamp(14px, 1.8vw, 24px)",
-              fontWeight: 700,
-              color: "#00e5ff",
-              letterSpacing: "0.35em",
-              textTransform: "uppercase",
+              fontFamily: "'Orbitron', sans-serif",
+              fontSize: "clamp(18px, 2.4vw, 32px)",
+              fontWeight: 900,
+              color: "#fff",
+              letterSpacing: "0.06em",
               textShadow:
-                "0 0 15px rgba(0,229,255,0.6), 0 0 40px rgba(0,229,255,0.2)",
+                "0 0 20px rgba(255,255,255,0.15), 0 0 60px rgba(0,229,255,0.12)",
             }}
           >
             Ecosystem Nexus
           </span>
-          <span
+          {/* Stats line */}
+          <div
             style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "clamp(8px, 1.2vw, 16px)",
               fontFamily: "'Share Tech Mono', monospace",
-              fontSize: "clamp(9px, 0.9vw, 13px)",
-              color: "rgba(140,200,255,0.5)",
-              letterSpacing: "0.2em",
+              fontSize: "clamp(9px, 0.85vw, 12px)",
+              letterSpacing: "0.12em",
               textTransform: "uppercase",
             }}
           >
-            {totalRepos} projects · {totalCategories} categories
-          </span>
-          <div
-            style={{
-              width: "clamp(200px, 40vw, 500px)",
-              height: 1,
-              marginTop: "4px",
-              background:
-                "linear-gradient(90deg, transparent, rgba(0,229,255,0.6) 20%, #00e5ff 50%, rgba(0,229,255,0.6) 80%, transparent)",
-              boxShadow:
-                "0 0 8px rgba(0,229,255,0.4), 0 0 20px rgba(0,229,255,0.15)",
-            }}
-          />
+            <span style={{ color: "rgba(0,229,255,0.7)" }}>{totalRepos}</span>
+            <span style={{ color: "rgba(140,200,255,0.35)" }}>projects</span>
+            <span style={{ color: "rgba(0,229,255,0.2)" }}>·</span>
+            <span style={{ color: "rgba(0,229,255,0.7)" }}>{totalCategories}</span>
+            <span style={{ color: "rgba(140,200,255,0.35)" }}>categories</span>
+          </div>
         </div>
       </div>
 

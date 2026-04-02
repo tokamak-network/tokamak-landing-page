@@ -682,6 +682,44 @@ export default function ShowcaseOverlay({
 `,
           }}
         />
+        {/* ── Section header ── */}
+        <div
+          className="absolute left-0 right-0 text-center pointer-events-none"
+          style={{
+            top: "12%",
+            zIndex: 2,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "6px",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "'Orbitron', sans-serif",
+              fontSize: "clamp(14px, 1.6vw, 22px)",
+              fontWeight: 900,
+              color: "#fff",
+              letterSpacing: "0.06em",
+              textShadow:
+                "0 0 20px rgba(255,255,255,0.15), 0 0 60px rgba(0,229,255,0.12)",
+            }}
+          >
+            Select a Category
+          </span>
+          <span
+            style={{
+              fontFamily: "'Share Tech Mono', monospace",
+              fontSize: "clamp(9px, 0.8vw, 12px)",
+              color: "rgba(140, 200, 255, 0.35)",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+            }}
+          >
+            Click to explore repositories
+          </span>
+        </div>
+
         {categories.slice(0, 10).map((cat, i) => {
           const pos = pedestals[i];
           if (!pos) return null;
@@ -777,27 +815,6 @@ export default function ShowcaseOverlay({
             </div>
           );
         })}
-
-        {/* ── Click hint ── */}
-        <div
-          className="absolute left-0 right-0 text-center pointer-events-none"
-          style={{
-            top: "67%",
-            zIndex: 2,
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "'Share Tech Mono', monospace",
-              fontSize: "clamp(9px, 0.85vw, 13px)",
-              color: "rgba(0, 229, 255, 0.35)",
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-            }}
-          >
-            Click a category to explore projects
-          </span>
-        </div>
 
         {/* ── Bottom ticker strip ── */}
         <div

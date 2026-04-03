@@ -32,6 +32,7 @@ function reportToFeedItem(report: ReportSummary): FeedItem {
     date: dateStr,
     type: "report",
     href: `/about/reports/${report.slug}`,
+    thumbnail: "/images/biweekly-report-thumbnail.png",
     statsSummary: statsPreview || undefined,
   };
 }

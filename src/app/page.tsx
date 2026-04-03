@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Header from "./components/ui/header";
 import IntroSequence from "./components/ui/sections/intro-sequence";
 import TorusHero from "./components/ui/sections/torus-hero";

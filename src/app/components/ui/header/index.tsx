@@ -52,6 +52,7 @@ export default function NavigationBar() {
                 loading="lazy"
                 src={TokamakLogoText}
                 alt="Tokamak Network"
+                className={isAbout ? "invert" : ""}
               />
             </figure>
           </Link>
@@ -60,7 +61,7 @@ export default function NavigationBar() {
           <div className="hidden sm:flex gap-x-[60px] items-center">
             {navItems.map((item, index) => (
               <div key={index} className={item.className}>
-                <NavItem label={item.label} icon={item.icon} />
+                <NavItem label={item.label} icon={item.icon} isAbout={isAbout} />
               </div>
             ))}
           </div>

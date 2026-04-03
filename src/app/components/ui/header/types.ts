@@ -4,6 +4,7 @@ export interface NavItemProps {
   label: string;
   icon?: boolean;
   href?: string;
+  isAbout?: boolean;
   setIsMobileMenuOpen?: Dispatch<SetStateAction<boolean>>;
 }
 

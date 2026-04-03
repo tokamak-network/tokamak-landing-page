@@ -48,6 +48,7 @@ export default function NavigationBar({ isAbout = false }: { isAbout?: boolean }
                   loading="lazy"
                   src={TokamakLogoText}
                   alt="Tokamak Network"
+                  className={isAbout ? "invert" : ""}
                 />
               </figure>
             </Link>
@@ -111,6 +112,7 @@ export default function NavigationBar({ isAbout = false }: { isAbout?: boolean }
                   <NavItem
                     label={item.label}
                     icon={item.icon}
+                    isAbout={isAbout}
                     setIsMobileMenuOpen={setIsMobileMenuOpen}
                   />
                 </li>

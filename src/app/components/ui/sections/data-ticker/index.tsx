@@ -1,6 +1,4 @@
-import { listReports, getReportPath } from "@/app/lib/reports/listReports";
-import { parseReportSummary } from "@/app/lib/reports/parseReport";
-import { FALLBACK_REPORT } from "@/app/lib/reports/constants";
+import { getEcosystemData } from "@/app/lib/ecosystem-data";
 import { fetchPriceDatas } from "@/app/api/price";
 import TickerClient from "./TickerClient";
 
@@ -14,18 +12,17 @@ interface TickerItem {
 
 export { type TickerItem };
 
+function formatNum(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return n.toLocaleString("en-US");
+}
+
 export async function getTickerData(): Promise<TickerItem[]> {
   try {
-    const [priceData, reportStats] = await Promise.all([
+    const [priceData, ecoData] = await Promise.all([
       fetchPriceDatas().catch(() => null),
-      Promise.resolve((() => {
-        const metas = listReports();
-        if (metas.length === 0) return null;
-        const latest = metas[0];
-        const filePath = getReportPath(latest.slug);
-        if (!filePath) return null;
-        return parseReportSummary(filePath, latest);
-      })()),
+      getEcosystemData(),
     ]);
 
     const items: TickerItem[] = [];
@@ -38,25 +35,12 @@ export async function getTickerData(): Promise<TickerItem[]> {
       );
     }
 
-    if (reportStats) {
-      items.push(
-        { label: "CODE CHANGES", value: reportStats.stats.linesChanged, prefix: "+" },
-        { label: "ACTIVE PROJECTS", value: reportStats.stats.activeRepos },
-      );
-      if (reportStats.stats.netGrowth && reportStats.stats.netGrowth !== "0") {
-        items.push({ label: "NET GROWTH", value: reportStats.stats.netGrowth });
-      }
-    }
-
-    // Fallback if nothing loaded
-    if (items.length === 0) {
-      return [
-        { label: "TON", value: "1.20", prefix: "$" },
-        { label: "MARKET CAP", value: "$70M" },
-        { label: "24H VOLUME", value: "$1.2M" },
-        { label: "CODE CHANGES", value: FALLBACK_REPORT.codeChanges, prefix: "+" },
-        { label: "ACTIVE PROJECTS", value: FALLBACK_REPORT.activeProjects },
-      ];
+    items.push(
+      { label: "CODE CHANGES", value: formatNum(ecoData.codeChanges), prefix: "+" },
+      { label: "ACTIVE PROJECTS", value: String(ecoData.activeProjects) },
+    );
+    if (ecoData.netGrowth && ecoData.netGrowth !== 0) {
+      items.push({ label: "NET GROWTH", value: formatNum(ecoData.netGrowth) });
     }
 
     return items;
@@ -65,8 +49,8 @@ export async function getTickerData(): Promise<TickerItem[]> {
       { label: "TON", value: "1.20", prefix: "$" },
       { label: "MARKET CAP", value: "$70M" },
       { label: "24H VOLUME", value: "$1.2M" },
-      { label: "CODE CHANGES", value: FALLBACK_REPORT.codeChanges, prefix: "+" },
-      { label: "ACTIVE PROJECTS", value: FALLBACK_REPORT.activeProjects },
+      { label: "CODE CHANGES", value: "0", prefix: "+" },
+      { label: "ACTIVE PROJECTS", value: "0" },
     ];
   }
 }

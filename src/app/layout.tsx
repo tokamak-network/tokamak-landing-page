@@ -18,7 +18,24 @@ const orbitron = Orbitron({
 
 export const metadata: Metadata = {
   title: "Tokamak Network",
-  description: "Ethereum-native Layer 2 platform enabling on-demand rollup deployment. Every app deserves its own L2.",
+  description: "Tailored Ethereum Solution",
+  metadataBase: new URL("https://tokamak.network"),
+  openGraph: {
+    title: "Tokamak Network",
+    description:
+      "Tailored Ethereum Solution",
+    url: "https://tokamak.network",
+    siteName: "Tokamak Network",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tokamak Network",
+    description:
+      "Tailored Ethereum Solution",
+    site: "@tokamak_network",
+  },
   icons: {
     icon: [
       {

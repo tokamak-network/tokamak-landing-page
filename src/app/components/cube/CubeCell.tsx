@@ -174,6 +174,16 @@ export default function CubeCell({
     canvasTexRef.current = new CanvasTexture(c);
   }
 
+  // Dispose texture on unmount to free GPU memory
+  useEffect(() => {
+    return () => {
+      if (canvasTexRef.current) {
+        canvasTexRef.current.dispose();
+        canvasTexRef.current = null;
+      }
+    };
+  }, []);
+
   const overlayTransform = useMemo(() => {
     if (!cellMeta) return null;
     return getOverlayTransform(cellMeta.entry.primaryFace);

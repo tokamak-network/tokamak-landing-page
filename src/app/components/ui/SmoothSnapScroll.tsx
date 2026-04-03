@@ -45,20 +45,9 @@ export default function SmoothSnapScroll() {
   }, [isMobile]);
 
   const getSections = useCallback((): HTMLElement[] => {
-    const all: HTMLElement[] = [];
-    const walk = (el: Element) => {
-      if (el instanceof HTMLElement) {
-        const snap = el.style.scrollSnapAlign;
-        if (snap && snap !== "none") {
-          all.push(el);
-        }
-      }
-      for (const child of el.children) {
-        walk(child);
-      }
-    };
-    walk(document.body);
-    return all;
+    return Array.from(
+      document.querySelectorAll<HTMLElement>("[data-snap-section]")
+    );
   }, []);
 
   const findClosestIndex = useCallback((sections: HTMLElement[]): number => {

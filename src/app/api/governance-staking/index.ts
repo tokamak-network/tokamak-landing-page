@@ -6,7 +6,7 @@ import { mainnet } from "viem/chains";
    Uses Alchemy RPC + viem to read Tokamak contracts
    ═══════════════════════════════════════════════ */
 
-const ALCHEMY_RPC = "https://eth-mainnet.g.alchemy.com/v2/PbqCcGx1oHN7yNaFdUJUYqPEN0QSp23S";
+const ALCHEMY_RPC = process.env.ALCHEMY_RPC_URL || "https://eth-mainnet.g.alchemy.com/v2/PbqCcGx1oHN7yNaFdUJUYqPEN0QSp23S";
 
 const client = createPublicClient({
   chain: mainnet,

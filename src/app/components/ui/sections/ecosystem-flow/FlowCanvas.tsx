@@ -87,6 +87,7 @@ export default function FlowCanvas({
   const rafRef = useRef<number | undefined>(undefined);
   const visibleRef = useRef(false);
   const textWidthRef = useRef(0);
+  const mainFontSizeRef = useRef(90);
   const catLabelsRef = useRef<{ catIdx: number; x: number; y: number; w: number; h: number; dotX: number; dotY: number }[]>([]);
   const popupHoverRef = useRef(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -117,6 +118,7 @@ export default function FlowCanvas({
     tmpCtx.font = `900 ${fontSize}px 'Orbitron', sans-serif`;
     const textW = tmpCtx.measureText("TOKAMAK NETWORK").width;
     textWidthRef.current = textW;
+    mainFontSizeRef.current = fontSize;
 
     const textLeft = cx - textW / 2;
     const textBottom = textY + fontSize * 0.35;
@@ -237,11 +239,8 @@ export default function FlowCanvas({
     const cx = w / 2;
     const isMobile = w < MOBILE_BP;
 
-    // ── Font sizing (single line) ──
-    const maxTextWidth = w * 0.92;
-    ctx.font = `900 100px 'Orbitron', sans-serif`;
-    const fullMeasure = ctx.measureText("TOKAMAK NETWORK").width;
-    const mainFontSize = Math.min(90, Math.floor((maxTextWidth / fullMeasure) * 100));
+    // ── Font sizing (cached from buildLayout) ──
+    const mainFontSize = mainFontSizeRef.current;
 
     // Hovered category (nearest strand endpoint)
     const mouse = mouseRef.current;

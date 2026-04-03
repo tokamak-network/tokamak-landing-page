@@ -46,7 +46,7 @@ export default function TowerFoundation() {
   const navColumns = NAV_COLUMNS.filter((c) => c.title !== "Social");
 
   return (
-    <div style={{ height: "100vh", scrollSnapAlign: "start" }} className="flex flex-col w-full">
+    <div data-snap-section style={{ height: "100vh", scrollSnapAlign: "start" }} className="flex flex-col w-full">
       {/* Indicator area — black bg, fills space above footer */}
       <div className="flex-1 flex items-center justify-center bg-black">
         <div className="flex flex-col items-center gap-3">

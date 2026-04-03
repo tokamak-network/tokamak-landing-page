@@ -690,6 +690,7 @@ export default function CarouselClient({ categories }: Props) {
   return (
     <section
       ref={sectionRef}
+      data-snap-section
       style={{
         height: "100vh",
         scrollSnapAlign: "start",

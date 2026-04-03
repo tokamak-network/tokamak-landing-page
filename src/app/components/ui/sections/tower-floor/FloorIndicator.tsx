@@ -33,6 +33,7 @@ export default function FloorIndicator({ floor, label }: FloorIndicatorProps) {
     <div
       ref={ref}
       className="relative w-full flex items-center justify-center overflow-hidden bg-black"
+      data-snap-section
       style={{ height: "100vh", scrollSnapAlign: "start" }}
     >
       {/* Vertical guide lines removed — caused visible border artifacts */}

@@ -43,6 +43,7 @@ export default function TowerFloor({
     <div
       ref={ref}
       className="relative h-screen flex items-center justify-center overflow-hidden bg-black"
+      data-snap-section
       style={{ scrollSnapAlign: "start" }}
     >
       <div

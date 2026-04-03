@@ -6,7 +6,6 @@ import { NextResponse } from "next/server";
 
 // Use Node.js runtime on Vercel (required for axios, cheerio)
 export const runtime = "nodejs";
-// Disable caching for debugging
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 // Set maximum execution time (in seconds)
@@ -52,7 +51,6 @@ function processCategories(categories: string[] | undefined): string[] {
 class MediumFeedParser {
   private parser: Parser<CustomFeed, CustomItem>;
   private baseUrl: string;
-  private username: string;
 
   constructor() {
     this.parser = new Parser<CustomFeed, CustomItem>({
@@ -64,13 +62,10 @@ class MediumFeedParser {
       },
     });
     this.baseUrl = "https://medium.com/feed/tokamak-network";
-    this.username = "@tokamak-network"; // Medium account name
   }
 
   async getPosts(): Promise<MediumPost[]> {
     try {
-      console.log("Fetching Medium RSS feed from:", this.baseUrl);
-
       // Try direct fetch with comprehensive browser-like headers
       const response = await Promise.race([
         axios.get(this.baseUrl, {
@@ -97,15 +92,12 @@ class MediumFeedParser {
         ),
       ]);
 
-      console.log(`RSS feed fetch completed with status: ${response.status}`);
-
       if (response.status !== 200) {
         throw new Error(`Failed to fetch RSS feed: HTTP ${response.status}`);
       }
 
       // Parse the RSS XML string
       const feed = await this.parser.parseString(response.data);
-      console.log(`Successfully parsed ${feed.items.length} posts from RSS`);
 
       const rssPosts = feed.items.map((item) => {
         // Thumbnail extraction logic with proper validation
@@ -128,7 +120,6 @@ class MediumFeedParser {
         };
       });
 
-      console.log(`Returning ${rssPosts.length} total posts`);
       return rssPosts;
     } catch (error) {
       console.error("Error fetching Medium posts:", error);
@@ -151,9 +142,7 @@ async function fetchMediumPosts(): Promise<MediumPost[]> {
 // API Route handler
 export async function GET() {
   try {
-    console.log("Medium API route called");
     const posts = await fetchMediumPosts();
-    console.log(`Returning ${posts.length} posts to client`);
 
     return NextResponse.json(posts, {
       headers: {

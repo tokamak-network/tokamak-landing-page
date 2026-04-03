@@ -41,6 +41,7 @@ const aboutItems = [
 export const NavItem: React.FC<NavItemProps> = ({
   label,
   icon,
+  isAbout = false,
   setIsMobileMenuOpen,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -62,7 +63,7 @@ export const NavItem: React.FC<NavItemProps> = ({
             setIsOpen(!isOpen);
           }}
         >
-          <span className="text-[#1C1C1C] text-[24px] font-[500] transition-colors duration-200">
+          <span className={`${isAbout ? "text-[#1C1C1C]" : "text-white/90"} text-[24px] font-[500] transition-colors duration-200`}>
             {label}
           </span>
           {icon && (
@@ -73,7 +74,7 @@ export const NavItem: React.FC<NavItemProps> = ({
               viewBox="0 0 14 14"
               fill="none"
               className={`transition-all duration-200 ${
-                isOpen ? "rotate-180 text-tokamak-blue" : "text-[#666666]"
+                isOpen ? "rotate-180 text-tokamak-blue" : isAbout ? "text-[#666666]" : "text-white/50"
               } group-hover:text-tokamak-blue`}
             >
               <path
@@ -95,7 +96,7 @@ export const NavItem: React.FC<NavItemProps> = ({
               item.isExternal ? (
                 <a
                   key={index}
-                  className="text-[#1C1C1C] text-[16px] hover:text-[#0078FF] transition-colors duration-200 h-[43px] flex items-center"
+                  className={`${isAbout ? "text-[#1C1C1C]" : "text-white/70"} text-[16px] hover:text-[#0078FF] transition-colors duration-200 h-[43px] flex items-center`}
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -106,7 +107,7 @@ export const NavItem: React.FC<NavItemProps> = ({
                 <Link
                   key={index}
                   href={item.link}
-                  className="text-[#1C1C1C] text-[16px] hover:text-[#0078FF] transition-colors duration-200 h-[43px] flex items-center"
+                  className={`${isAbout ? "text-[#1C1C1C]" : "text-white/70"} text-[16px] hover:text-[#0078FF] transition-colors duration-200 h-[43px] flex items-center`}
                   onClick={() =>
                     setIsMobileMenuOpen && setIsMobileMenuOpen(false)
                   }
@@ -124,7 +125,7 @@ export const NavItem: React.FC<NavItemProps> = ({
   return (
     <div className="group relative h-full flex items-center">
       <div className="flex items-center gap-[6px] cursor-pointer">
-        <span className="text-[#1C1C1C] hover:text-tokamak-blue">{label}</span>
+        <span className={`${isAbout ? "text-[#1C1C1C]" : "text-white/90"} hover:text-tokamak-blue`}>{label}</span>
         {icon && (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -132,12 +133,12 @@ export const NavItem: React.FC<NavItemProps> = ({
             height="14"
             viewBox="0 0 14 14"
             fill="none"
-            className="transition-transform duration-200 group-hover:rotate-180"
+            className={`transition-transform duration-200 group-hover:rotate-180 ${isAbout ? "text-[#666666]" : "text-white/60"}`}
           >
             <path
               d="M2 5.36455L6.11616 9.48071C6.60227 9.96682 7.39773 9.96682 7.88384 9.48071L12 5.36455"
               stroke="currentColor"
-              className="text-[#666666] group-hover:text-[#0078FF] transition-colors duration-200"
+              className={`${isAbout ? "text-[#666666]" : "text-white/50"} group-hover:text-[#0078FF] transition-colors duration-200`}
               strokeWidth="1.5"
               strokeMiterlimit="10"
               strokeLinecap="round"
@@ -153,12 +154,16 @@ export const NavItem: React.FC<NavItemProps> = ({
     w-[146px]"
       >
         <div className="relative mt-[35.5px] before:absolute before:w-full before:h-[35.5px] before:top-[-35.5px] before:left-0">
-          <div className="p-[18px] flex flex-col items-start rounded-[15px] border border-[#DEDEDE] bg-white gap-[12px]">
+          <div className={`p-[18px] flex flex-col items-start rounded-[15px] border gap-[12px] ${
+            isAbout
+              ? "border-[#DEDEDE] bg-white"
+              : "border-white/10 bg-black/70 backdrop-blur-xl"
+          }`}>
             {items?.map((item, index) =>
               item.isExternal ? (
                 <a
                   key={index}
-                  className="overflow-hidden text-ellipsis text-[#1C1C1C] font-['Proxima_Nova'] text-[14px] font-[400] leading-normal hover:text-[#0078FF] cursor-pointer transition-colors duration-200"
+                  className={`overflow-hidden text-ellipsis font-['Proxima_Nova'] text-[14px] font-[400] leading-normal hover:text-[#0078FF] cursor-pointer transition-colors duration-200 ${isAbout ? "text-[#1C1C1C]" : "text-white/80"}`}
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -169,7 +174,7 @@ export const NavItem: React.FC<NavItemProps> = ({
                 <Link
                   key={index}
                   href={item.link}
-                  className="overflow-hidden text-ellipsis text-[#1C1C1C] font-['Proxima_Nova'] text-[14px] font-normal leading-normal hover:text-[#0078FF] cursor-pointer transition-colors duration-200"
+                  className={`overflow-hidden text-ellipsis font-['Proxima_Nova'] text-[14px] font-normal leading-normal hover:text-[#0078FF] cursor-pointer transition-colors duration-200 ${isAbout ? "text-[#1C1C1C]" : "text-white/80"}`}
                 >
                   {item.name}
                 </Link>

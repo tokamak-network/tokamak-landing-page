@@ -2,8 +2,9 @@ import { Dispatch, SetStateAction } from "react";
 
 export interface NavItemProps {
   label: string;
-  icon?: string;
+  icon?: boolean;
   href?: string;
+  isAbout?: boolean;
   setIsMobileMenuOpen?: Dispatch<SetStateAction<boolean>>;
 }
 

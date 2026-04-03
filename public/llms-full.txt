@@ -1,0 +1,310 @@
+# Tokamak Network — Full Reference
+
+> Tokamak Network is an Ethereum-native Layer 2 platform that enables on-demand rollup deployment. Built on the OP Stack, it allows any application to launch its own optimized L2 chain in minutes. The native token TON powers seigniorage staking, DAO governance, and cross-chain bridging across the ecosystem.
+
+---
+
+## Overview
+
+Tokamak Network provides a complete Layer 2 ecosystem on Ethereum. The project's tagline is "Every app deserves its own L2." The core thesis is that applications should be able to deploy dedicated, optimized rollup chains without the overhead of building infrastructure from scratch.
+
+The network is built around these pillars:
+
+1. **Thanos L2** — On-demand rollup deployment using the OP Stack
+2. **Seigniorage Staking** — Economic security through TON staking with seigniorage rewards
+3. **DAO Governance** — Decentralized protocol governance with on-chain voting
+4. **Cross-Chain Bridge** — Trustless asset transfers between L1 and L2
+
+---
+
+## Thanos L2: On-Demand Rollup Infrastructure
+
+Thanos is Tokamak Network's flagship product for launching application-specific L2 chains.
+
+### Architecture
+
+- **Stack**: Built on the OP Stack (Optimism's modular rollup framework)
+- **Block Time**: 1.2 seconds
+- **Deployment**: One-click deployment through the Rollup Hub
+- **Configuration**: Custom chain parameters — gas limits, sequencer settings, bridge configuration
+
+### Three Pillars
+
+1. **STACK — Custom Config**: Each L2 can be configured with its own optimized chain parameters
+2. **SDK — One-Click Deploy**: Launch a production-ready L2 in minutes via the Rollup Hub
+3. **MODULAR — Plug & Extend**: Open modular architecture allowing custom extensions
+
+### Rollup Hub
+
+The Rollup Hub (https://rolluphub.tokamak.network/) is the deployment and management interface for Thanos L2 chains. It provides:
+
+- Chain deployment wizard
+- Configuration management
+- Monitoring and analytics
+- Bridge interface
+
+---
+
+## TON Token
+
+TON is the native utility token of Tokamak Network on Ethereum mainnet.
+
+### Token Details
+
+| Property | Value |
+|----------|-------|
+| Name | Tokamak Network Token |
+| Symbol | TON |
+| Network | Ethereum Mainnet |
+| Contract | `0x2be5e8c109e2197D077D13A82dAead6a9b3433C5` |
+| Standard | ERC-20 |
+
+### Related Contracts
+
+| Contract | Address |
+|----------|---------|
+| WTON (Wrapped TON) | `0xc4A11aaf6ea915Ed7Ac194161d2fC9384F15bff2` |
+| SEIG Manager Proxy | `0x0b55a0f463b6defb81c6063973763951712d0e5f` |
+| Layer2 Registry Proxy | `0x0b3E174A2170083e770D5d4Cf56774D221b7063e` |
+| DAO Agenda Manager | `0xcD4421d082752f363E1687544a09d5112cD4f484` |
+| DAO Committee Proxy | `0xDD9f0cCc044B0781289Ee318e5971b0139602C26` |
+
+### How to Get TON
+
+Guide: https://docs.tokamak.network/home/information/get-ton
+
+### On-Chain Verification
+
+- Total Supply: https://etherscan.io/address/0x0b55a0f463b6defb81c6063973763951712d0e5f#readProxyContract#F64
+- Burned Supply: https://etherscan.io/token/0x2be5e8c109e2197D077D13A82dAead6a9b3433C5?a=0x0000000000000000000000000000000000000001
+- Tokenomics Dashboard: https://dune.com/tokamak-network/tokamak-network-tokenomics-dashboard
+
+---
+
+## Seigniorage Staking
+
+Tokamak Network uses a seigniorage-based staking model where TON holders stake tokens to earn rewards and secure the network.
+
+### How It Works
+
+1. TON holders stake their tokens through the staking contracts
+2. Seigniorage is generated per block as new TON
+3. Stakers receive proportional rewards based on their stake
+4. Staking secures Layer 2 operators on the network
+
+### Key Metrics
+
+- 42M+ TON staked across the network
+- Seigniorage distributed per block via the SEIG Manager contract
+- Both individual staking and DAO-level staking supported
+
+### Contracts
+
+- Staking source code: https://github.com/tokamak-network/TokamakStaking
+- SEIG Manager: `0x0b55a0f463b6defb81c6063973763951712d0e5f`
+
+---
+
+## DAO Governance
+
+Tokamak Network is governed by a DAO with on-chain proposal and voting mechanisms.
+
+### Structure
+
+- **DAO Committee**: Elected members who manage protocol decisions
+- **Agenda System**: Proposals (agendas) are submitted, discussed, and voted on-chain
+- **Voting**: TON stakers participate in governance votes
+
+### Contracts
+
+- DAO source code: https://github.com/tokamak-network/TokamakDAO
+- DAO Agenda Manager: `0xcD4421d082752f363E1687544a09d5112cD4f484`
+- DAO Committee Proxy: `0xDD9f0cCc044B0781289Ee318e5971b0139602C26`
+
+---
+
+## Cross-Chain Bridge
+
+Trustless asset transfers between Ethereum L1 and Tokamak L2 chains.
+
+### Features
+
+- Bridge time under 3 minutes
+- Cross-trade protocol for fast, trustless bridging
+- Supports native ETH and ERC-20 tokens
+- Integrated into the Rollup Hub interface
+
+---
+
+## Ecosystem Projects (48 repos across 10 categories)
+
+Data from biweekly engineering report (Feb 16–28, 2026).
+
+### Platform & Services (10 repos · 1,025,274 code changes)
+
+| Repository | Description | Code Changes |
+|------------|-------------|--------------|
+| [toki](https://github.com/tokamak-network/toki) | Core platform component | +198,190 / -157,082 |
+| [ethrex](https://github.com/tokamak-network/ethrex) | Ethereum execution client | +171,405 / -57,415 |
+| [x402-ton](https://github.com/tokamak-network/x402-ton) | HTTP 402-based micropayment protocol for TON | +205,036 / -4,411 |
+| [sigil-voting](https://github.com/tokamak-network/sigil-voting) | On-chain voting system | +67,941 / -38,143 |
+| [ETH-RPG](https://github.com/tokamak-network/ETH-RPG) | Ethereum RPG game | +54,109 / -16,358 |
+| [nftgame-zk-dex](https://github.com/tokamak-network/nftgame-zk-dex) | NFT gaming with ZK DEX integration | +20,448 / -2,309 |
+| [sheriff](https://github.com/tokamak-network/sheriff) | Security monitoring component | +19,403 / -1,279 |
+| [ECO-notion-migrator](https://github.com/tokamak-network/ECO-notion-migrator) | Ecosystem data migration tool | +6,525 / -13 |
+| [hr-candidate-screening](https://github.com/tokamak-network/hr-candidate-screening) | HR candidate screening | +2,824 / -145 |
+| [trh-sdk](https://github.com/tokamak-network/trh-sdk) | SDK for deploying custom L2 rollups | +2,206 / -32 |
+
+### Core Infrastructure (4 repos · 695,246 code changes)
+
+| Repository | Description | Code Changes |
+|------------|-------------|--------------|
+| [tokamak-thanos](https://github.com/tokamak-network/tokamak-thanos) | Optimistic rollup implementation for Ethereum | +495,190 / -199,937 |
+| [tokamak-thanos-stack](https://github.com/tokamak-network/tokamak-thanos-stack) | Thanos L2 stack configuration | +59 / -1 |
+| [DRB-node](https://github.com/tokamak-network/DRB-node) | Distributed Random Beacon node | +27 / -26 |
+| [Commit-Reveal2](https://github.com/tokamak-network/Commit-Reveal2) | Commit-reveal scheme implementation v2 | +5 / -1 |
+
+### AI & Machine Learning (4 repos · 663,672 code changes)
+
+| Repository | Description | Code Changes |
+|------------|-------------|--------------|
+| [Tokamak-AI-Layer](https://github.com/tokamak-network/Tokamak-AI-Layer) | AI integration layer for Tokamak ecosystem | +343,087 / -11,681 |
+| [tokamak-ai-agent](https://github.com/tokamak-network/tokamak-ai-agent) | AI agent for Tokamak operations | +92,648 / -62,506 |
+| [SentinAI](https://github.com/tokamak-network/SentinAI) | AI-powered smart contract security analysis | +104,662 / -42,493 |
+| [ai-tokamak](https://github.com/tokamak-network/ai-tokamak) | AI applications for Tokamak network | +5,113 / -1,482 |
+
+### Privacy & ZK (4 repos · 299,807 code changes)
+
+| Repository | Description | Code Changes |
+|------------|-------------|--------------|
+| [dust-protocol](https://github.com/tokamak-network/dust-protocol) | Privacy-focused confidential token transfers | +188,863 / -75,628 |
+| [zk-dex-d1-private-voting](https://github.com/tokamak-network/zk-dex-d1-private-voting) | ZK-based private on-chain voting & DEX | +11,812 / -11,685 |
+| [Tokamak-zk-EVM-landing-page](https://github.com/tokamak-network/Tokamak-zk-EVM-landing-page) | ZK-EVM landing page | +7,898 / -2,422 |
+| [Tokamak-zk-EVM](https://github.com/tokamak-network/Tokamak-zk-EVM) | Core ZK-EVM engine for private smart contract execution | +1,321 / -178 |
+
+### Research & Education (5 repos · 239,385 code changes)
+
+| Repository | Description | Code Changes |
+|------------|-------------|--------------|
+| [ECO-documents](https://github.com/tokamak-network/ECO-documents) | Ecosystem documentation | +79,621 / -1 |
+| [tokamak-hr](https://github.com/tokamak-network/tokamak-hr) | Human resources management system | +76,248 / -1,640 |
+| [tokamak-network-pilot](https://github.com/tokamak-network/tokamak-network-pilot) | Pilot program resources | +38,443 / -7,812 |
+| [tokamak-learning](https://github.com/tokamak-network/tokamak-learning) | Educational platform for Tokamak ecosystem | +27,237 / -5,162 |
+| [TokamakL2JS](https://github.com/tokamak-network/TokamakL2JS) | JavaScript library for Tokamak L2 interaction | +2,634 / -587 |
+
+### Automation & Tooling (8 repos · 222,127 code changes)
+
+| Repository | Description | Code Changes |
+|------------|-------------|--------------|
+| [py-ethclient](https://github.com/tokamak-network/py-ethclient) | Python Ethereum client | +94,501 / -6,878 |
+| [24-7-playground](https://github.com/tokamak-network/24-7-playground) | Always-on development sandbox | +39,050 / -14,742 |
+| [auto-research-forum](https://github.com/tokamak-network/auto-research-forum) | Automated research forum | +20,372 / -10,418 |
+| [hr-automation-process](https://github.com/tokamak-network/hr-automation-process) | HR automation process | +13,572 / -1,100 |
+| [agent-skills](https://github.com/tokamak-network/agent-skills) | Agent skill definitions | +8,333 / -9 |
+| [ex-ethclient](https://github.com/tokamak-network/ex-ethclient) | Elixir Ethereum client | +8,029 / -0 |
+| [eth-nanobot](https://github.com/tokamak-network/eth-nanobot) | Ethereum micro-transaction automation | +2,630 / -696 |
+| [secure-vote](https://github.com/tokamak-network/secure-vote) | Secure voting system implementation | +531 / -1,266 |
+
+### DeFi & Staking (5 repos · 164,969 code changes)
+
+| Repository | Description | Code Changes |
+|------------|-------------|--------------|
+| [ton-staking-v2](https://github.com/tokamak-network/ton-staking-v2) | TON token staking platform v2 | +124,227 / -1,060 |
+| [tokamak-landing-page](https://github.com/tokamak-network/tokamak-landing-page) | Main Tokamak Network website | +24,606 / -6,809 |
+| [delegate-staking-mvp](https://github.com/tokamak-network/delegate-staking-mvp) | Delegated staking minimum viable product | +3,457 / -1,344 |
+| [vton-airdrop-simulator](https://github.com/tokamak-network/vton-airdrop-simulator) | vTON airdrop simulation tool | +2,165 / -1,299 |
+| [TokamakStaking](https://github.com/tokamak-network/TokamakStaking) | Seigniorage staking smart contracts | +1 / -1 |
+
+### Gaming & Social (3 repos · 147,681 code changes)
+
+| Repository | Description | Code Changes |
+|------------|-------------|--------------|
+| [tokamon](https://github.com/tokamak-network/tokamon) | Tokamak-themed collectible game | +94,392 / -46,639 |
+| [tokamon-io](https://github.com/tokamak-network/tokamon-io) | Tokamon web interface | +6,265 / -68 |
+| [Zodiac](https://github.com/tokamak-network/Zodiac) | Zodiac-themed game mechanics & contracts | +269 / -48 |
+
+### Governance (2 repos · 72,900 code changes)
+
+| Repository | Description | Code Changes |
+|------------|-------------|--------------|
+| [tokamak-dao-agent](https://github.com/tokamak-network/tokamak-dao-agent) | AI-powered DAO governance agent | +52,614 / -7,413 |
+| [tokamak-dao-v2](https://github.com/tokamak-network/tokamak-dao-v2) | Decentralized governance platform v2 | +10,011 / -2,862 |
+
+### Data & Analytics (3 repos · 72,126 code changes)
+
+| Repository | Description | Code Changes |
+|------------|-------------|--------------|
+| [bi-weekly-quarterly-reports](https://github.com/tokamak-network/bi-weekly-quarterly-reports) | Automated bi-weekly & quarterly report generator | +57,794 / -6,718 |
+| [biweekly-reporter](https://github.com/tokamak-network/biweekly-reporter) | Biweekly report tool | +3,173 / -693 |
+| [all-thing-eye](https://github.com/tokamak-network/all-thing-eye) | Comprehensive monitoring & observation tool | +3,039 / -709 |
+
+---
+
+## Developer Resources
+
+### Documentation
+
+- Official Docs: https://docs.tokamak.network
+- GitHub: https://github.com/tokamak-network
+
+### Programs
+
+- Grant Program: https://tokamak.notion.site/Tokamak-Network-Grant-Program-f2384b458ea341a0987c7e73a909aa21
+- Onboarding: https://tokamak.notion.site/Tokamak-Network-Onboarding-523bc627bd374326b5dfbec3d3b0a8e1
+
+### Engineering Reports
+
+Tokamak Network publishes biweekly engineering reports covering development progress across all repositories. Reports include:
+
+- Active repository count
+- Lines of code changed
+- Net growth metrics
+- Per-category breakdown of development activity
+- Executive summaries of key changes
+
+Reports are available at: https://tokamak.network/about/reports
+
+---
+
+## Community & Social
+
+| Platform | Link |
+|----------|------|
+| Medium | https://medium.com/tokamak-network |
+| X (Twitter) | https://twitter.com/tokamak_network |
+| Discord | https://discord.com/invite/J4chV2zuAK |
+| Telegram | https://t.me/tokamak_network |
+| LinkedIn | https://www.linkedin.com/company/tokamaknetwork/ |
+
+---
+
+## Website Structure
+
+The Tokamak Network website (https://tokamak.network) has the following pages:
+
+| Path | Description |
+|------|-------------|
+| `/` | Main landing page with ecosystem overview, live metrics, and tower showcase |
+| `/about/price` | Live price dashboard — TON price, market cap, supply, staking data |
+| `/about/partners` | Ecosystem partners |
+| `/about/insight` | Medium blog feed with technical articles |
+| `/about/reports` | Biweekly engineering progress reports |
+| `/about/reports/[slug]` | Individual report detail pages |
+
+---
+
+## API Endpoints
+
+The website exposes the following public data endpoints:
+
+| Endpoint | Description |
+|----------|-------------|
+| `/api/price` | TON price, market cap, trading volume, supply data |
+| `/api/medium` | Latest Medium blog posts (RSS feed) |
+| `/api/governance-staking` | On-chain governance and staking metrics |
+| `/api/github-activity` | GitHub repository activity data |
+
+---
+
+*Last updated: April 2026*
+*Source: https://tokamak.network*

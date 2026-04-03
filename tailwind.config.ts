@@ -20,17 +20,26 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        black: "#1C1C1C",
-        "tokamak-blue": "#0078FF",
-        "tokamak-black": "#1C1C1C",
+        black: "#000000",
+        "tokamak-blue": "#0077FF",
+        "tokamak-black": "#000000",
+        primary: "#0077ff",
+        surface: "#1a1a1d",
+        "surface-light": "#222225",
+        "text-muted": "#c5c5ca",
+        "text-weak": "#929298",
       },
       fontFamily: {
         sans: ["Proxima Nova"],
+        display: ["var(--font-space-grotesk)", "Space Grotesk", "sans-serif"],
+        orbitron: ["var(--font-orbitron)", "Orbitron", "sans-serif"],
       },
       animation: {
         "infinite-scroll": "infinite-scroll 15s linear infinite",
         "slide-up": "slide-up 1s ease-out",
         "slide-down": "slide-down 1s ease-out",
+        "live-pulse": "live-pulse 2s ease-in-out infinite",
+        "scroll-vertical": "infinite-scroll-vertical 30s linear infinite",
       },
       keyframes: {
         "infinite-scroll": {
@@ -44,6 +53,14 @@ export default {
         "slide-down": {
           "0%": { transform: "translateY(-100%)", opacity: "0" },
           "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "live-pulse": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.5", transform: "scale(1.5)" },
+        },
+        "infinite-scroll-vertical": {
+          "0%": { transform: "translateY(0)" },
+          "100%": { transform: "translateY(-50%)" },
         },
       },
     },

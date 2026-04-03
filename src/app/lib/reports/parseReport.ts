@@ -63,18 +63,13 @@ export function extractBetweenComments(
   startMarker: string,
   endMarker: string
 ): string {
-  const startRe = new RegExp(`<!--\\s*${startMarker}\\s*-->`);
-  const endRe = new RegExp(`<!--\\s*${endMarker}\\s*-->`);
+  const startIdx = html.indexOf(`<!-- ${startMarker} -->`);
+  const endIdx = html.indexOf(`<!-- ${endMarker} -->`);
 
-  const startMatch = startRe.exec(html);
-  if (!startMatch) return "";
+  if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) return "";
 
-  const afterStart = startMatch.index + startMatch[0].length;
-
-  const endMatch = endRe.exec(html.slice(afterStart));
-  if (!endMatch) return "";
-
-  return html.slice(afterStart, afterStart + endMatch.index).trim();
+  const afterStart = startIdx + `<!-- ${startMarker} -->`.length;
+  return html.slice(afterStart, endIdx).trim();
 }
 
 interface ExtractedSections {
@@ -129,8 +124,8 @@ function findStatValue(
 ): Record<string, string> {
   const entries: Record<string, string> = {};
 
-  // Strategy 1: div > div pairs (flex/grid layout)
-  container.find("div").each((_: number, el: AnyNode) => {
+  // Search both div>div and td>div pairs (some reports use tables for stats)
+  container.find("div, td").each((_: number, el: AnyNode) => {
     const children = $(el).children("div");
     if (children.length < 2) return;
 
@@ -150,27 +145,6 @@ function findStatValue(
       }
     }
   });
-
-  // Strategy 2: table > tr > td > div pairs (table layout)
-  if (Object.keys(entries).length === 0) {
-    container.find("td").each((_: number, el: AnyNode) => {
-      const children = $(el).children("div");
-      if (children.length < 2) return;
-
-      const firstChild = $(children[0]);
-      const lastChild = $(children[children.length - 1]);
-
-      const value = firstChild.text().trim();
-      const label = lastChild.text().trim().toLowerCase();
-
-      for (const [key, field] of Object.entries(labels)) {
-        if (label.includes(key) && !entries[field]) {
-          entries[field] = value;
-          break;
-        }
-      }
-    });
-  }
 
   return entries;
 }

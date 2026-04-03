@@ -9,3 +9,10 @@ export const DEFAULT_STATS: ReportStats = {
   contributors: "0",
   netGrowth: "0",
 };
+
+/** Fallback values used when no report data is available. Single source of truth. */
+export const FALLBACK_REPORT = {
+  activeProjects: "49",
+  codeChanges: "3,603,187",
+  netGrowth: "1,980,785",
+} as const;

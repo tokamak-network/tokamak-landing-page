@@ -12,26 +12,30 @@ import HamburgerMenu from "@/assets/icons/header/hamburger-menu.svg";
 const navItems = [
   {
     label: "Developer",
-    icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/f7ce1d4f0147077e9d34d8dd2ab80245979de09b506cc0b8791cf21c92ca5c01?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
+    icon: true,
     className: "text-blue-600",
   },
   {
     label: "Features",
-    icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/2259f3d2652229c6d4f87a57ad9bb920fe1305578e1c025a330a418af354e054?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
+    icon: true,
   },
   {
     label: "About",
-    icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/2259f3d2652229c6d4f87a57ad9bb920fe1305578e1c025a330a418af354e054?placeholderIfAbsent=true&apiKey=06865df1cc614dd09e17f99455bd22cf",
+    icon: true,
   },
 ];
 
-export default function NavigationBar() {
+export default function NavigationBar({ isAbout = false }: { isAbout?: boolean }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <>
       <div className="fixed top-[24px] w-full flex justify-center px-5 md:px-12 z-50">
-        <div className="max-w-[1360px] w-full h-[72px] flex flex-col justify-center px-4 md:pr-11 md:pl-8 text-base font-medium text-center text-black whitespace-nowrap rounded-2xl border border-solid bg-white bg-opacity-90 border-neutral-200">
+        <div className={`max-w-[1360px] w-full h-[72px] flex flex-col justify-center px-4 md:pr-11 md:pl-8 text-base font-medium text-center whitespace-nowrap rounded-2xl border border-solid ${
+          isAbout
+            ? "text-black bg-white bg-opacity-90 border-neutral-200"
+            : "text-white bg-black/40 backdrop-blur-xl border-white/10"
+        }`}>
           <div className="flex justify-between items-center w-full">
             <Link href="/">
               <figure className="flex items-center gap-2">
@@ -44,6 +48,7 @@ export default function NavigationBar() {
                   loading="lazy"
                   src={TokamakLogoText}
                   alt="Tokamak Network"
+                  className={isAbout ? "invert" : ""}
                 />
               </figure>
             </Link>
@@ -70,7 +75,7 @@ export default function NavigationBar() {
 
       {/* 모바일 메뉴 */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-white z-[60] sm:hidden">
+        <div className={`fixed inset-0 backdrop-blur-xl z-[60] sm:hidden ${isAbout ? "bg-white/95" : "bg-[#0a0e14]/95"}`}>
           <div className="flex justify-end items-center p-6">
             {/* <Link href="/">
               <figure className="flex items-center gap-2">
@@ -97,7 +102,7 @@ export default function NavigationBar() {
                   href="/"
                   className="flex items-center text-[24px] font-bold h-[70px]"
                 >
-                  <span className="text-[#1C1C1C] transition-colors duration-200">
+                  <span className={`${isAbout ? "text-black/90" : "text-white/90"} transition-colors duration-200`}>
                     Home
                   </span>
                 </Link>
@@ -107,6 +112,7 @@ export default function NavigationBar() {
                   <NavItem
                     label={item.label}
                     icon={item.icon}
+                    isAbout={isAbout}
                     setIsMobileMenuOpen={setIsMobileMenuOpen}
                   />
                 </li>

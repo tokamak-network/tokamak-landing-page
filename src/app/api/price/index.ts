@@ -9,8 +9,7 @@ const fetchTONPriceInfo = async () => {
     const data = JSON.parse(text);
     return JSON.parse(JSON.stringify(data).replace(/]|[[]/g, ""));
   } catch (error) {
-    console.error("setPosts error");
-    console.log(error);
+    console.error("setPosts error:", error);
   }
 };
 

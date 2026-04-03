@@ -43,6 +43,86 @@ TON token contract: 0x2be5e8c109e2197D077D13A82dAead6a9b3433C5 (Ethereum Mainnet
 - DAO Agenda Manager: `0xcD4421d082752f363E1687544a09d5112cD4f484`
 - DAO Committee: `0xDD9f0cCc044B0781289Ee318e5971b0139602C26`
 
+## Ecosystem Projects (48 repos across 10 categories)
+
+### Platform & Services (10 repos)
+
+- [toki](https://github.com/tokamak-network/toki): Core platform component
+- [ethrex](https://github.com/tokamak-network/ethrex): Ethereum execution client
+- [x402-ton](https://github.com/tokamak-network/x402-ton): HTTP 402-based micropayment protocol for TON
+- [sigil-voting](https://github.com/tokamak-network/sigil-voting): On-chain voting system
+- [ETH-RPG](https://github.com/tokamak-network/ETH-RPG): Ethereum RPG game
+- [nftgame-zk-dex](https://github.com/tokamak-network/nftgame-zk-dex): NFT gaming with ZK DEX integration
+- [sheriff](https://github.com/tokamak-network/sheriff): Security monitoring component
+- [ECO-notion-migrator](https://github.com/tokamak-network/ECO-notion-migrator): Ecosystem data migration tool
+- [hr-candidate-screening](https://github.com/tokamak-network/hr-candidate-screening): HR candidate screening
+- [trh-sdk](https://github.com/tokamak-network/trh-sdk): SDK for deploying custom L2 rollups
+
+### Core Infrastructure (4 repos)
+
+- [tokamak-thanos](https://github.com/tokamak-network/tokamak-thanos): Optimistic rollup implementation for Ethereum
+- [tokamak-thanos-stack](https://github.com/tokamak-network/tokamak-thanos-stack): Thanos L2 stack configuration
+- [DRB-node](https://github.com/tokamak-network/DRB-node): Distributed Random Beacon node
+- [Commit-Reveal2](https://github.com/tokamak-network/Commit-Reveal2): Commit-reveal scheme implementation v2
+
+### AI & Machine Learning (4 repos)
+
+- [Tokamak-AI-Layer](https://github.com/tokamak-network/Tokamak-AI-Layer): AI integration layer for Tokamak ecosystem
+- [tokamak-ai-agent](https://github.com/tokamak-network/tokamak-ai-agent): AI agent for Tokamak operations
+- [SentinAI](https://github.com/tokamak-network/SentinAI): AI-powered smart contract security analysis
+- [ai-tokamak](https://github.com/tokamak-network/ai-tokamak): AI applications for Tokamak network
+
+### Privacy & ZK (4 repos)
+
+- [dust-protocol](https://github.com/tokamak-network/dust-protocol): Privacy-focused confidential token transfers
+- [zk-dex-d1-private-voting](https://github.com/tokamak-network/zk-dex-d1-private-voting): ZK-based private on-chain voting & DEX
+- [Tokamak-zk-EVM-landing-page](https://github.com/tokamak-network/Tokamak-zk-EVM-landing-page): ZK-EVM landing page
+- [Tokamak-zk-EVM](https://github.com/tokamak-network/Tokamak-zk-EVM): Core ZK-EVM engine for private smart contract execution
+
+### Research & Education (5 repos)
+
+- [ECO-documents](https://github.com/tokamak-network/ECO-documents): Ecosystem documentation
+- [tokamak-hr](https://github.com/tokamak-network/tokamak-hr): Human resources management system
+- [tokamak-network-pilot](https://github.com/tokamak-network/tokamak-network-pilot): Pilot program resources
+- [tokamak-learning](https://github.com/tokamak-network/tokamak-learning): Educational platform for Tokamak ecosystem
+- [TokamakL2JS](https://github.com/tokamak-network/TokamakL2JS): JavaScript library for Tokamak L2 interaction
+
+### Automation & Tooling (8 repos)
+
+- [py-ethclient](https://github.com/tokamak-network/py-ethclient): Python Ethereum client
+- [24-7-playground](https://github.com/tokamak-network/24-7-playground): Always-on development sandbox
+- [auto-research-forum](https://github.com/tokamak-network/auto-research-forum): Automated research forum
+- [hr-automation-process](https://github.com/tokamak-network/hr-automation-process): HR automation process
+- [agent-skills](https://github.com/tokamak-network/agent-skills): Agent skill definitions
+- [ex-ethclient](https://github.com/tokamak-network/ex-ethclient): Elixir Ethereum client
+- [eth-nanobot](https://github.com/tokamak-network/eth-nanobot): Ethereum micro-transaction automation
+- [secure-vote](https://github.com/tokamak-network/secure-vote): Secure voting system implementation
+
+### DeFi & Staking (5 repos)
+
+- [ton-staking-v2](https://github.com/tokamak-network/ton-staking-v2): TON token staking platform v2
+- [tokamak-landing-page](https://github.com/tokamak-network/tokamak-landing-page): Main Tokamak Network website
+- [delegate-staking-mvp](https://github.com/tokamak-network/delegate-staking-mvp): Delegated staking minimum viable product
+- [vton-airdrop-simulator](https://github.com/tokamak-network/vton-airdrop-simulator): vTON airdrop simulation tool
+- [TokamakStaking](https://github.com/tokamak-network/TokamakStaking): Seigniorage staking smart contracts
+
+### Gaming & Social (3 repos)
+
+- [tokamon](https://github.com/tokamak-network/tokamon): Tokamak-themed collectible game
+- [tokamon-io](https://github.com/tokamak-network/tokamon-io): Tokamon web interface
+- [Zodiac](https://github.com/tokamak-network/Zodiac): Zodiac-themed game mechanics & contracts
+
+### Governance (2 repos)
+
+- [tokamak-dao-agent](https://github.com/tokamak-network/tokamak-dao-agent): AI-powered DAO governance agent
+- [tokamak-dao-v2](https://github.com/tokamak-network/tokamak-dao-v2): Decentralized governance platform v2
+
+### Data & Analytics (3 repos)
+
+- [bi-weekly-quarterly-reports](https://github.com/tokamak-network/bi-weekly-quarterly-reports): Automated bi-weekly & quarterly report generator
+- [biweekly-reporter](https://github.com/tokamak-network/biweekly-reporter): Biweekly report tool
+- [all-thing-eye](https://github.com/tokamak-network/all-thing-eye): Comprehensive monitoring & observation tool
+
 ## Community
 
 - [Medium](https://medium.com/tokamak-network): Blog and announcements

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback, useState } from "react";
 
-const SCROLL_DURATION = 1400;
+const SCROLL_DURATION = 800;
 const COOLDOWN = 100;
 const TRACKPAD_THRESHOLD = 5;
 const MOBILE_BREAKPOINT = 768;
@@ -30,6 +30,10 @@ export default function SmoothSnapScroll() {
   const cooldownUntil = useRef(0);
   const animationFrame = useRef<number | null>(null);
   const lastDirection = useRef<1 | -1>(1);
+
+  // Edge glow state
+  const [glowDirection, setGlowDirection] = useState<"top" | "bottom" | null>(null);
+  const glowTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /* ── Mobile: enable CSS scroll-snap on <html> ── */
   useEffect(() => {
@@ -96,6 +100,15 @@ export default function SmoothSnapScroll() {
     animationFrame.current = requestAnimationFrame(step);
   }, []);
 
+  /* ── Trigger edge glow ── */
+  const triggerGlow = useCallback((direction: 1 | -1) => {
+    if (glowTimeout.current) clearTimeout(glowTimeout.current);
+    setGlowDirection(direction === 1 ? "bottom" : "top");
+    glowTimeout.current = setTimeout(() => {
+      setGlowDirection(null);
+    }, SCROLL_DURATION + 100);
+  }, []);
+
   const scrollToSection = useCallback((direction: 1 | -1) => {
     const sections = getSections();
     if (sections.length === 0) return;
@@ -107,14 +120,16 @@ export default function SmoothSnapScroll() {
     isAnimating.current = true;
     cooldownUntil.current = Date.now() + COOLDOWN + SCROLL_DURATION;
     lastDirection.current = direction;
-    // Offset by 50px so content doesn't sit right behind the header
+
+    triggerGlow(direction);
+
     const target = Math.max(0, sections[nextIdx].offsetTop - 50);
     smoothScrollTo(target);
-  }, [getSections, findClosestIndex, smoothScrollTo]);
+  }, [getSections, findClosestIndex, smoothScrollTo, triggerGlow]);
 
   /* ── Desktop only: wheel, keyboard, NO touch ── */
   useEffect(() => {
-    if (isMobile) return; // CSS scroll-snap handles mobile
+    if (isMobile) return;
 
     function handleWheel(e: WheelEvent) {
       e.preventDefault();
@@ -150,5 +165,49 @@ export default function SmoothSnapScroll() {
     };
   }, [isMobile, scrollToSection]);
 
-  return null;
+  /* ── Cleanup glow timeout on unmount ── */
+  useEffect(() => {
+    return () => {
+      if (glowTimeout.current) clearTimeout(glowTimeout.current);
+    };
+  }, []);
+
+  const glowStyle: React.CSSProperties = {
+    position: "fixed",
+    left: 0,
+    right: 0,
+    height: "70px",
+    pointerEvents: "none",
+    zIndex: 9999,
+    transition: `opacity ${glowDirection ? "100ms" : "400ms"} ease`,
+    opacity: glowDirection ? 1 : 0,
+  };
+
+  return (
+    <>
+      {/* Edge glow — bottom */}
+      <div
+        style={{
+          ...glowStyle,
+          bottom: 0,
+          top: "auto",
+          background: "linear-gradient(to top, rgba(0,229,255,0.4) 0%, transparent 100%)",
+          opacity: glowDirection === "bottom" ? 1 : 0,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Edge glow — top */}
+      <div
+        style={{
+          ...glowStyle,
+          top: 0,
+          bottom: "auto",
+          background: "linear-gradient(to bottom, rgba(0,229,255,0.4) 0%, transparent 100%)",
+          opacity: glowDirection === "top" ? 1 : 0,
+        }}
+        aria-hidden="true"
+      />
+    </>
+  );
 }

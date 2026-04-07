@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import s from "./styles.module.css";
 
 import EfgOff from "@/assets/partners/name=efg, Hover=off.svg";
@@ -279,14 +278,9 @@ export default function PartnersV2() {
               Interested in collaborating with Tokamak Network? We&apos;re always
               looking for projects that share our vision.
             </div>
-            <div className={s.viBtnRow}>
-              <a href="mailto:hello@tokamak.network" className={s.btnSolid}>
-                Get in Touch
-              </a>
-              <Link href="/" className={s.btnGhost}>
-                Learn More
-              </Link>
-            </div>
+            <a href="mailto:hello@tokamak.network" className={s.btnSolid}>
+              Get in Touch
+            </a>
           </div>
         </div>
       </div>

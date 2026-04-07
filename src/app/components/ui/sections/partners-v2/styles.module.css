@@ -188,8 +188,8 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 120px;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85), transparent);
+  height: 200px;
+  background: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.6) 40%, transparent 100%);
   pointer-events: none;
   z-index: 3;
 }
@@ -199,8 +199,8 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 120px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  height: 200px;
+  background: linear-gradient(to top, black 0%, rgba(0, 0, 0, 0.6) 40%, transparent 100%);
   pointer-events: none;
   z-index: 3;
 }
@@ -259,7 +259,7 @@
   opacity: 0;
   transform: translateY(30px);
 }
-.partnerCard.visible {
+.partnerCard:global(.visible) {
   opacity: 1;
   transform: translateY(0);
 }
@@ -357,7 +357,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 200px;
+  height: 280px;
   background: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.6) 40%, transparent 100%);
   pointer-events: none;
   z-index: 1;
@@ -367,7 +367,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 200px;
+  height: 280px;
   background: linear-gradient(to top, black 0%, rgba(0, 0, 0, 0.6) 40%, transparent 100%);
   pointer-events: none;
   z-index: 1;
@@ -456,7 +456,7 @@
   transform: translateY(30px);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
-.reveal.visible {
+.reveal:global(.visible) {
   opacity: 1;
   transform: translateY(0);
 }

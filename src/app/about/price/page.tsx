@@ -1,5 +1,5 @@
-import Price from "@/app/components/ui/sections/price";
+import PriceV2 from "@/app/components/ui/sections/price-v2";
 
 export default function PricePage() {
-  return <Price />;
+  return <PriceV2 />;
 }

@@ -343,8 +343,8 @@
   display: grid;
   gap: 20px;
 }
-.c5 { grid-template-columns: repeat(5, 1fr); }
-.c4 { grid-template-columns: repeat(4, 1fr); }
+.c5 { grid-template-columns: repeat(3, 1fr); }
+.c4 { grid-template-columns: repeat(2, 1fr); }
 .c3 { grid-template-columns: repeat(3, 1fr); }
 
 .dataCard {
@@ -384,7 +384,7 @@
 
 .cardLabel {
   font-family: 'Orbitron', sans-serif;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.12em;
   color: rgba(0, 229, 255, 0.6);
@@ -393,7 +393,7 @@
 
 .cardVal {
   font-family: 'Orbitron', sans-serif;
-  font-size: clamp(28px, 3vw, 38px);
+  font-size: clamp(20px, 2.5vw, 34px);
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #fff;
@@ -401,7 +401,7 @@
 
 .cardUnit {
   display: block;
-  font-size: 11px;
+  font-size: 14px;
   color: rgba(0, 229, 255, 0.6);
   font-family: 'Share Tech Mono', monospace;
   margin-top: 4px;
@@ -409,14 +409,14 @@
 
 .cardPct {
   font-family: 'Orbitron', sans-serif;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 600;
   color: rgba(0, 229, 255, 0.7);
   margin-top: 8px;
 }
 
 .cardDesc {
-  font-size: 11px;
+  font-size: 14px;
   color: rgba(255, 255, 255, 0.35);
   margin-top: 8px;
   line-height: 1.5;
@@ -466,7 +466,7 @@
   padding: 80px 24px;
 }
 .viStart video {
-  filter: saturate(0.4) brightness(0.6) sepia(0.3) hue-rotate(160deg);
+  filter: brightness(1.3) saturate(0.5) sepia(0.4) hue-rotate(160deg);
 }
 .viStartContent {
   position: relative;
@@ -526,7 +526,7 @@
   min-height: 400px;
   padding: 80px 24px;
 }
-.viStats video { filter: saturate(0); }
+.viStats video { filter: saturate(0.35) brightness(0.55) sepia(0.3) hue-rotate(160deg); }
 .viStatsContent {
   position: relative;
   z-index: 10;
@@ -638,18 +638,20 @@
 .viCtaHeading {
   font-family: 'Orbitron', sans-serif;
   font-size: clamp(36px, 5vw, 64px);
-  font-weight: 300;
-  color: #fff;
+  font-weight: 700;
+  color: #00e5ff;
   letter-spacing: -0.02em;
   line-height: 1.05;
+  text-shadow: 0 0 30px rgba(0, 229, 255, 0.3), 0 2px 20px rgba(0, 0, 0, 0.8);
 }
 .viCtaDesc {
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(200, 230, 255, 0.85);
   font-weight: 400;
   font-family: 'Space Grotesk', sans-serif;
   font-size: clamp(14px, 1.2vw, 16px);
   max-width: 460px;
   line-height: 1.7;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
 }
 .viBtnRow {
   display: flex;
@@ -707,14 +709,32 @@
    ══════════════════════════════════ */
 @media (max-width: 900px) {
   .chapter { padding-left: 24px; padding-right: 24px; }
-  .c5, .c4 { grid-template-columns: repeat(2, 1fr); }
-  .statsGrid { grid-template-columns: repeat(2, 1fr); }
+  .c5, .c4, .c3 { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 600px) {
   .c5, .c4, .c3 { grid-template-columns: 1fr; }
-  .statsGrid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
-  .statsGlass { padding: 40px 24px; }
   .viBtnRow { flex-direction: column; }
-  .heroContent { padding: 0 24px; }
+  .heroContent { padding: 0 20px; }
+
+  .chapter { padding: 60px 16px; }
+  .chapterLabel { font-size: clamp(32px, 10vw, 48px); margin-bottom: 24px; }
+
+  .dataCard { padding: 24px 16px 20px; min-height: 140px; }
+  .cardVal { font-size: clamp(18px, 5vw, 24px); }
+  .cardLabel { font-size: 12px; margin-bottom: 8px; }
+  .cardUnit { font-size: 13px; }
+  .cardPct { font-size: 15px; }
+  .cardDesc { font-size: 15px; }
+
+  .popStatsColumn { gap: 40px; padding: 10px 16px; }
+  .popStatVal { font-size: clamp(28px, 8vw, 44px); }
+  .popStatLabel { font-size: 10px; }
+  .popStatUnit { font-size: 11px; }
+  .popStatDesc { font-size: 11px; max-width: 300px; }
+
+  .heroH1 { font-size: clamp(28px, 7vw, 40px); }
+  .heroSub { font-size: 13px; }
+  .viHeading { font-size: clamp(24px, 6vw, 36px); }
+  .viCtaHeading { font-size: clamp(28px, 7vw, 40px); }
 }

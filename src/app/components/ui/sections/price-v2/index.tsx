@@ -354,13 +354,6 @@ export default function PriceV2() {
   const c2 = d ? formatInteger(d.liquidity.c2) : "-";
   const c3 = d ? formatInteger(d.liquidity.c3) : "-";
 
-  // Stats interlude derived values
-  const stakedStat = d ? formatInteger(d.stakedVolume) : "-";
-  const daoStat = d ? formatInteger(d.DAOStakedVolume) : "-";
-  const stakingRatio =
-    d && d.totalSupply > 0
-      ? `${((d.stakedVolume / d.totalSupply) * 100).toFixed(1)}%`
-      : "-";
 
   return (
     <div className={styles.wrapper}>
@@ -488,7 +481,12 @@ export default function PriceV2() {
                 generated through seigniorage, distributed across staking,
                 governance, and the open market.
               </p>
-              <button className={`${styles.viBtn} ${styles.liquidGlassStrong}`}>
+              <a
+                href={LINKS.DUNE_DASHBOARD}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.viBtn} ${styles.liquidGlassStrong}`}
+              >
                 Explore Supply
                 <svg
                   viewBox="0 0 24 24"
@@ -498,7 +496,7 @@ export default function PriceV2() {
                 >
                   <path d="M7 17L17 7M17 7H7M17 7V17" />
                 </svg>
-              </button>
+              </a>
             </div>
           </RevealSection>
         </section>
@@ -543,92 +541,27 @@ export default function PriceV2() {
           <div className={styles.gradBottom} />
           <div className={styles.popStatsColumn}>
             <PopStat
-              value={stakedStat}
+              value={daoStaked}
               unit="TON"
-              label="TOTAL STAKED"
-              desc="Locked in staking contracts, securing the network and earning seigniorage rewards"
+              label="DAO VAULT"
+              desc="Held indefinitely in the DAO treasury for governance"
               delay={0}
             />
             <PopStat
-              value={daoStat}
+              value={staked}
               unit="TON"
-              label="DAO VAULT"
-              desc="Held indefinitely in the DAO treasury for governance and ecosystem development"
+              label="STAKED"
+              desc="Locked in staking contracts, earning seigniorage rewards"
               delay={300}
             />
             <PopStat
-              value={stakingRatio}
-              unit="of Total Supply"
-              label="STAKING RATIO"
-              desc="Proportion of total supply currently locked in staking — a key network health metric"
+              value="0"
+              unit="TON"
+              label="VESTED"
+              desc="All vesting concluded on December 26, 2023"
               delay={600}
             />
           </div>
-        </section>
-
-        {/* ══════ LOCKED DATA ══════ */}
-        <div className={styles.chapterWrap}><section className={styles.chapter} id="ch-locked">
-          <div className={styles.chapterLabel}>LOCKED</div>
-          <div className={`${styles.dataRow} ${styles.c3}`}>
-            <DataCard
-              label="DAO VAULT"
-              val={daoStaked}
-              unit="TON"
-              desc="Held indefinitely in the DAO treasury for governance"
-            />
-            <DataCard
-              label="STAKED"
-              val={staked}
-              unit="TON"
-              desc="Locked in staking contracts, earning seigniorage rewards"
-            />
-            <DataCard
-              label="VESTED"
-              val="0"
-              unit="TON"
-              pct="0%"
-              desc="All vesting concluded on December 26, 2023"
-            />
-          </div>
-        </section></div>
-
-        {/* ══════ INTERLUDE 3: Locked → Liquidity ══════ */}
-        <section className={`${styles.videoInterlude} ${styles.viCta}`}>
-          <video autoPlay loop muted playsInline src="/videos/liquidity-flow.mp4" />
-          <div className={styles.gradTop} />
-          <div className={styles.gradBottom} />
-          <RevealSection>
-            <div className={styles.viCtaContent}>
-              <h2 className={styles.viCtaHeading}>
-                Liquidity that
-                <br />
-                never sleeps.
-              </h2>
-              <p className={styles.viCtaDesc}>
-                Three tiers of liquidity measurement — from immediately
-                available to long-term locked. Transparent, verifiable, always
-                on-chain.
-              </p>
-              <div className={styles.viBtnRow}>
-                <a
-                  href={LINKS.DUNE_DASHBOARD}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`${styles.viBtnGlass} ${styles.liquidGlassStrong}`}
-                >
-                  View on Dune
-                </a>
-                <a
-                  href={LINKS.GET_TON}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.viBtnSolid}
-                >
-                  Buy TON
-                </a>
-              </div>
-            </div>
-          </RevealSection>
         </section>
 
         {/* ══════ LIQUIDITY DATA ══════ */}
@@ -657,6 +590,42 @@ export default function PriceV2() {
             />
           </div>
         </section></div>
+
+        {/* ══════ CTA: Bottom (above footer) ══════ */}
+        <section className={`${styles.videoInterlude} ${styles.viCta}`}>
+          <video autoPlay loop muted playsInline src="/videos/liquidity-flow.mp4" />
+          <div className={styles.gradTop} />
+          <div className={styles.gradBottom} />
+          <RevealSection>
+            <div className={styles.viCtaContent}>
+              <h2 className={styles.viCtaHeading}>
+                Explore the full picture.
+              </h2>
+              <p className={styles.viCtaDesc}>
+                Real-time on-chain data, transparent tokenomics, and verifiable
+                metrics — everything you need to understand TON.
+              </p>
+              <div className={styles.viBtnRow}>
+                <a
+                  href={LINKS.DUNE_DASHBOARD}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${styles.viBtnGlass} ${styles.liquidGlassStrong}`}
+                >
+                  View on Dune
+                </a>
+                <a
+                  href={LINKS.GET_TON}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.viBtnSolid}
+                >
+                  Buy TON
+                </a>
+              </div>
+            </div>
+          </RevealSection>
+        </section>
       </div>
     </div>
   );

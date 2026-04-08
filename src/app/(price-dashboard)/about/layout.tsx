@@ -1,0 +1,18 @@
+import Footer from "@/app/components/ui/footer";
+import Header from "@/app/components/ui/header";
+
+export default function PriceDashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <main>
+      <Header />
+      {children}
+      <div className="bg-[#1C1C1C]">
+        <Footer />
+      </div>
+    </main>
+  );
+}

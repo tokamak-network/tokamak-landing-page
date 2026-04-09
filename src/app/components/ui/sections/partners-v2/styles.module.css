@@ -380,6 +380,13 @@
   min-height: 400px;
   padding: 80px 24px;
 }
+.videoInterlude video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .viBg {
   position: absolute;
@@ -488,6 +495,76 @@
   background: rgba(0, 229, 255, 0.08);
   border-color: rgba(0, 229, 255, 0.5);
 }
+
+/* ── CTA section (big heading + buttons, extends behind footer) ── */
+.viCta {
+  min-height: 500px;
+  padding: 100px 24px;
+}
+.viCtaContent {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+}
+.viCtaHeading {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  text-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 2px 24px rgba(0, 0, 0, 0.9), 0 0 80px rgba(0, 0, 0, 0.6);
+}
+.viCtaDesc {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(15px, 1.3vw, 18px);
+  max-width: 500px;
+  line-height: 1.7;
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.9), 0 4px 24px rgba(0, 0, 0, 0.7);
+}
+.viBtnGlass {
+  border-radius: 9999px;
+  padding: 14px 32px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: background 0.3s, border-color 0.3s;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.05em;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+}
+.viBtnGlass:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.5); }
+.viBtnSolid {
+  border-radius: 9999px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #00e5ff, #0062cc);
+  color: #000;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 0.3s, transform 0.3s;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 4px 24px rgba(0, 229, 255, 0.3);
+}
+.viBtnSolid:hover { box-shadow: 0 6px 32px rgba(0, 229, 255, 0.45); transform: translateY(-1px); }
 
 /* ── Scroll reveal ── */
 .reveal {

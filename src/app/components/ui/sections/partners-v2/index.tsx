@@ -298,22 +298,24 @@ export default function PartnersV2() {
           </div>
         </div>
 
-        {/* ═══ CTA ═══ */}
-        <div className={s.videoInterlude} style={{ minHeight: 350 }}>
-          <div className={s.viBg} />
+        {/* ═══ CTA: Bottom (extends behind footer) ═══ */}
+        <section className={`${s.videoInterlude} ${s.viCta}`}>
+          <video autoPlay loop muted playsInline src="/videos/cta-nebula.mp4" />
           <div className={s.gradTop} />
           <div className={s.gradBottom} />
-          <div className={`${s.viContent} ${s.reveal}`}>
-            <div className={s.viHeading}>Become a Partner</div>
-            <div className={s.viDesc}>
+          <div className={`${s.viCtaContent} ${s.reveal}`}>
+            <h2 className={s.viCtaHeading}>Become a Partner</h2>
+            <p className={s.viCtaDesc}>
               Interested in collaborating with Tokamak Network? We&apos;re always
               looking for projects that share our vision.
+            </p>
+            <div className={s.viBtnRow}>
+              <a href="mailto:hello@tokamak.network" className={s.viBtnSolid}>
+                Get in Touch
+              </a>
             </div>
-            <a href="mailto:hello@tokamak.network" className={s.btnSolid}>
-              Get in Touch
-            </a>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );

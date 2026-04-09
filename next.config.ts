@@ -1,14 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: "/about/price-cards",
-        destination: "/price-cards-infographic.html",
-      },
-    ];
-  },
   images: {
     remotePatterns: [
       {

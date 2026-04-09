@@ -627,7 +627,7 @@
 /* ── CTA section (big heading + 2 buttons) ── */
 .viCta {
   min-height: 500px;
-  padding: 100px 24px;
+  padding: 100px 24px 460px;
 }
 .viCtaContent {
   position: relative;

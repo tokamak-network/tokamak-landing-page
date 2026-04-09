@@ -528,7 +528,6 @@ export default function PriceV2() {
               label="BURNED"
               val={burnedSupply}
               unit="TON"
-              pct="<0.01%"
               desc="Permanently removed from total supply"
             />
           </div>
@@ -591,9 +590,9 @@ export default function PriceV2() {
           </div>
         </section></div>
 
-        {/* ══════ CTA: Bottom (above footer) ══════ */}
+        {/* ══════ CTA: Bottom (extends behind footer) ══════ */}
         <section className={`${styles.videoInterlude} ${styles.viCta}`}>
-          <video autoPlay loop muted playsInline src="/videos/liquidity-flow.mp4" />
+          <video autoPlay loop muted playsInline src="/videos/cta-nebula.mp4" />
           <div className={styles.gradTop} />
           <div className={styles.gradBottom} />
           <RevealSection>

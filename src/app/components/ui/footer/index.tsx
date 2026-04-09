@@ -19,7 +19,7 @@ export default function Footer() {
               <Image loading="lazy" src={TokamakLogo} alt="Tokamak Network Logo" className="brightness-0 invert" />
               <Image loading="lazy" src={TokamakLogoText} alt="Tokamak Network" className="brightness-0 invert" />
             </figure>
-            <p className="text-[13px] text-[#929298] leading-relaxed">
+            <p className="text-[13px] text-[#c0c0c6] leading-relaxed drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]">
               Every app deserves its own L2.
             </p>
           </div>

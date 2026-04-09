@@ -195,27 +195,58 @@ export default function PartnersV2() {
       <div className={s.content}>
         {/* ═══ HERO ═══ */}
         <section className={s.hero}>
-          <h1 className={s.heroH1}>
-            Building Together,
-            <span className={s.heroH1Accent}>Scaling Ethereum</span>
-          </h1>
-          <p className={s.heroSub}>
-            Tokamak Network collaborates with leading projects, investors, and
-            research teams to make Ethereum more scalable and deliver a better
-            decentralized experience.
-          </p>
-          <div className={s.heroStats}>
-            <div style={{ textAlign: "center" }}>
-              <div className={s.heroStatVal}>{partners.length + backedBy.length}</div>
-              <div className={s.heroStatLabel}>PARTNERS</div>
+          <video
+            className={s.heroVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            src="/videos/particles-drift.mp4"
+          />
+          <div className={s.heroGradV} />
+          <div className={s.heroContent}>
+            <div className={s.heroTag}>
+              TOKAMAK NETWORK &mdash; PARTNERS
             </div>
-            <div style={{ textAlign: "center" }}>
-              <div className={s.heroStatVal}>{backedBy.length}</div>
-              <div className={s.heroStatLabel}>INVESTORS</div>
+            <h1 className={s.heroH1}>
+              Building Together,
+              <span className={s.heroH1Accent}>Scaling Ethereum</span>
+            </h1>
+            <p className={s.heroSub}>
+              Tokamak Network collaborates with leading projects, investors, and
+              research teams to make Ethereum more scalable and deliver a better
+              decentralized experience.
+            </p>
+            <div className={s.heroStats}>
+              <div style={{ textAlign: "center" }}>
+                <div className={s.heroStatVal}>{partners.length + backedBy.length}</div>
+                <div className={s.heroStatLabel}>PARTNERS</div>
+              </div>
+              <div style={{ textAlign: "center" }}>
+                <div className={s.heroStatVal}>{backedBy.length}</div>
+                <div className={s.heroStatLabel}>INVESTORS</div>
+              </div>
+              <div style={{ textAlign: "center" }}>
+                <div className={s.heroStatVal}>6+</div>
+                <div className={s.heroStatLabel}>YEARS</div>
+              </div>
             </div>
-            <div style={{ textAlign: "center" }}>
-              <div className={s.heroStatVal}>6+</div>
-              <div className={s.heroStatLabel}>YEARS</div>
+            <div className={s.scrollHint}>
+              SCROLL TO EXPLORE
+              <div className={s.scrollHintIcon}>
+                <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
+                  <rect
+                    x="1"
+                    y="1"
+                    width="14"
+                    height="22"
+                    rx="7"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <circle cx="8" cy="8" r="2" fill="currentColor" />
+                </svg>
+              </div>
             </div>
           </div>
         </section>

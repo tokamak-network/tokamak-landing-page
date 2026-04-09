@@ -116,13 +116,53 @@
    ══════════════════════════════════ */
 .hero {
   position: relative;
-  min-height: 60vh;
+  z-index: 2;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.heroVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.heroGradV {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.5) 0%,
+    rgba(0, 0, 0, 0.15) 30%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.5) 75%,
+    rgba(0, 0, 0, 1) 100%
+  );
+}
+
+.heroContent {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 120px 48px 80px;
+  padding: 96px 48px 0;
+}
+
+.heroTag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: rgba(0, 229, 255, 0.8);
+  margin-bottom: 24px;
+  text-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
 }
 
 .heroH1 {
@@ -132,6 +172,7 @@
   letter-spacing: -0.02em;
   line-height: 1.05;
   color: #fff;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.5);
 }
 
 .heroH1Accent {
@@ -151,6 +192,7 @@
   max-width: 540px;
   line-height: 1.7;
   font-weight: 400;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6);
 }
 
 .heroStats {
@@ -188,8 +230,8 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 200px;
-  background: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.6) 40%, transparent 100%);
+  height: 120px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
   pointer-events: none;
   z-index: 3;
 }
@@ -199,8 +241,8 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 200px;
-  background: linear-gradient(to top, black 0%, rgba(0, 0, 0, 0.6) 40%, transparent 100%);
+  height: 120px;
+  background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
   pointer-events: none;
   z-index: 3;
 }
@@ -310,9 +352,6 @@
 }
 
 .partnerCard:hover .logoOff {
-  opacity: 0;
-}
-.partnerCard:hover .logoOn {
   opacity: 1;
 }
 
@@ -326,7 +365,7 @@
   text-align: center;
 }
 .partnerCard:hover .partnerName {
-  color: #00e5ff;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 /* ══════════════════════════════════
@@ -461,6 +500,27 @@
   transform: translateY(0);
 }
 
+/* ── Scroll Hint ── */
+.scrollHint {
+  margin-top: 80px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: rgba(0, 229, 255, 0.5);
+  letter-spacing: 0.15em;
+  animation: pulseHint 2s ease-in-out infinite;
+}
+
+.scrollHintIcon {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+@keyframes pulseHint {
+  0%, 100% { opacity: 0.4; transform: translateY(0); }
+  50% { opacity: 0.8; transform: translateY(4px); }
+}
+
 /* ══════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════ */
@@ -472,11 +532,12 @@
 
 @media (max-width: 600px) {
   .partnersGrid { grid-template-columns: repeat(2, 1fr); }
-  .hero { padding: 100px 20px 60px; }
+  .heroContent { padding: 96px 20px 0; }
   .heroStats { flex-direction: column; gap: 24px; align-items: center; }
   .section { padding: 60px 16px; }
   .viBtnRow { flex-direction: column; }
   .partnerCard { min-height: 110px; padding: 24px 16px; }
   .heroH1 { font-size: clamp(28px, 7vw, 40px); }
+  .heroSub { font-size: 13px; }
   .viHeading { font-size: clamp(24px, 6vw, 36px); }
 }

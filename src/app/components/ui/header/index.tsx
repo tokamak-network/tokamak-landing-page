@@ -28,7 +28,7 @@ const navItems = [
 export default function NavigationBar() {
   const { isMobile } = useIsMobile(640);
   const pathname = usePathname();
-  const isAbout = pathname.startsWith("/about") && !pathname.startsWith("/about/price");
+  const isAbout = pathname.startsWith("/about") && !pathname.startsWith("/about/price") && !pathname.startsWith("/about/partners");
 
   if (isMobile) return <Mobile isAbout={isAbout} />;
 

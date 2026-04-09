@@ -153,7 +153,7 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 0 48px;
+  padding: 96px 48px 0;
 }
 
 .heroTag {
@@ -642,19 +642,19 @@
   font-family: 'Orbitron', sans-serif;
   font-size: clamp(36px, 5vw, 64px);
   font-weight: 700;
-  color: #00e5ff;
+  color: #fff;
   letter-spacing: -0.02em;
   line-height: 1.05;
-  text-shadow: 0 0 30px rgba(0, 229, 255, 0.3), 0 2px 20px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 2px 24px rgba(0, 0, 0, 0.9), 0 0 80px rgba(0, 0, 0, 0.6);
 }
 .viCtaDesc {
-  color: rgba(200, 230, 255, 0.85);
-  font-weight: 400;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(14px, 1.2vw, 16px);
-  max-width: 460px;
+  font-size: clamp(15px, 1.3vw, 18px);
+  max-width: 500px;
   line-height: 1.7;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.9), 0 4px 24px rgba(0, 0, 0, 0.7);
 }
 .viBtnRow {
   display: flex;
@@ -663,38 +663,41 @@
 }
 .viBtnGlass {
   border-radius: 9999px;
-  padding: 12px 28px;
-  color: #00e5ff;
-  font-size: 13px;
-  font-weight: 500;
+  padding: 14px 32px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  border: none;
-  transition: background 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: background 0.3s, border-color 0.3s;
   font-family: 'Orbitron', sans-serif;
   letter-spacing: 0.05em;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
 }
-.viBtnGlass:hover { background: rgba(255, 255, 255, 0.05); }
+.viBtnGlass:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.5); }
 .viBtnSolid {
   border-radius: 9999px;
-  padding: 12px 28px;
+  padding: 14px 32px;
   background: linear-gradient(135deg, #00e5ff, #0062cc);
   color: #000;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   border: none;
   cursor: pointer;
-  transition: opacity 0.3s;
+  transition: box-shadow 0.3s, transform 0.3s;
   font-family: 'Orbitron', sans-serif;
   letter-spacing: 0.05em;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  box-shadow: 0 4px 24px rgba(0, 229, 255, 0.3);
 }
-.viBtnSolid:hover { opacity: 0.9; }
+.viBtnSolid:hover { box-shadow: 0 6px 32px rgba(0, 229, 255, 0.45); transform: translateY(-1px); }
 
 /* ── Scroll reveal ── */
 .reveal {
@@ -718,7 +721,7 @@
 @media (max-width: 600px) {
   .c5, .c4, .c3 { grid-template-columns: 1fr; }
   .viBtnRow { flex-direction: column; }
-  .heroContent { padding: 0 20px; }
+  .heroContent { padding: 96px 20px 0; }
 
   .chapter { padding: 60px 16px; }
   .chapterLabel { font-size: clamp(32px, 10vw, 48px); margin-bottom: 24px; }
@@ -740,4 +743,6 @@
   .heroSub { font-size: 13px; }
   .viHeading { font-size: clamp(24px, 6vw, 36px); }
   .viCtaHeading { font-size: clamp(28px, 7vw, 40px); }
+  .viCtaDesc { font-size: 14px; }
+  .viBtnGlass, .viBtnSolid { font-size: 13px; padding: 12px 24px; }
 }

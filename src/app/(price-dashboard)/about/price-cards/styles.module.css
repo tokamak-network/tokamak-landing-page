@@ -1,13 +1,10 @@
-/* ── CSS Variables ── */
-:root {
+.wrapper {
   --cy: #00e5ff;
   --cy-soft: rgba(0, 229, 255, 0.6);
   --cy-glow: rgba(0, 229, 255, 0.25);
   --up: #00e5a0;
   --down: #ff5078;
-}
 
-.wrapper {
   background: #000;
   color: #fff;
   font-family: 'Space Grotesk', sans-serif;

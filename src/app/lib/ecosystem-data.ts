@@ -42,6 +42,20 @@ const REPO_DESCRIPTIONS: Record<string, string> = {
   "ethrex": "Ethereum execution client implementation in Rust",
   "x402-ton": "HTTP 402 payment protocol integration for TON",
   "sigil-voting": "On-chain governance voting with signature proofs",
+  "zk-X509": "ZK X.509 certificate verification protocol with frontend",
+  "zk-x509-ca-registry": "Certificate Authority registry with validation tooling",
+  "scatter-dex": "Decentralized exchange with contracts, frontend, and relayer",
+  "chainforge-studio": "ZK dApp development environment with build pipeline",
+  "tokasino": "On-chain casino with Reth node and provably fair games",
+  "oracle-sdk": "npm package for interacting with Tokamak oracle contracts",
+  "oracle-client": "Oracle client component for oracle data feed integrations",
+  "tokamak-thanos-geth": "Thanos go-ethereum fork with EIP-1559 and EIP-7702 support",
+  "dao-v1-v2-migration": "Migration tooling for DAO v1 to v2 governance system",
+  "enshrined-vrf": "Enshrined VRF stack for verifiable randomness on OP Stack",
+  "oracle-exchange": "Oracle-driven exchange with Flash binary options markets",
+  "trh-wiki": "Documentation knowledge base for Tokamak engineering",
+  "crossTrade": "Cross-chain trading dApp with contracts and tooling",
+  "tokamak-rollup-hub-v2": "Rollup Hub platform with desktop download experience",
 };
 
 /** Strip placeholder descriptions like "{name} component" */

@@ -331,6 +331,10 @@ const CSS = `
     transition: opacity 0.3s ease;
   }
   .eco-card:hover .eco-card-datagrid { opacity: 1; }
+  /* Off-screen performance: disable costly animations */
+  .eco-card.is-offscreen .eco-card-bg { animation: none; }
+  .eco-card.is-offscreen .eco-particle { animation: none; }
+  .eco-card.is-offscreen .eco-card-activity-dot { animation: none; }
 `;
 
 const PARTICLES = Array.from({ length: 8 }, (_, i) => ({
@@ -442,10 +446,24 @@ function EcoCard({ item, onHover }: { item: CardItem; idx: number; onHover?: (ho
   const vars = colorVars(item.color);
   const bgUrl = `/cards/bg-${item.bgSlug}-a.png`;
   const startPos = useRef({ x: 0, y: 0 });
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isOffscreen, setIsOffscreen] = useState(true);
+
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsOffscreen(!entry.isIntersecting),
+      { rootMargin: "0px 200px 0px 200px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div
-      className="eco-card"
+      ref={cardRef}
+      className={`eco-card${isOffscreen ? " is-offscreen" : ""}`}
       style={vars}
       onMouseEnter={() => onHover?.(true)}
       onMouseLeave={() => onHover?.(false)}

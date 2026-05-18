@@ -56,6 +56,10 @@ const REPO_DESCRIPTIONS: Record<string, string> = {
   "trh-wiki": "Documentation knowledge base for Tokamak engineering",
   "crossTrade": "Cross-chain trading dApp with contracts and tooling",
   "tokamak-rollup-hub-v2": "Rollup Hub platform with desktop download experience",
+  "llm-api-gateway": "LLM provider gateway with auth, billing, and metering",
+  "tokamak-design": "Design app with capture, loading, and deploy improvements",
+  "trust-claim": "Claims verification app with agent tooling and MCP server",
+  "zk-card-wallet": "Card-backed wallet with JCOP signing and ZK circuits",
 };
 
 /** Strip placeholder descriptions like "{name} component" */

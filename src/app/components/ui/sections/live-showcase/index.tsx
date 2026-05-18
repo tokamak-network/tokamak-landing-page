@@ -3,7 +3,11 @@
 import { useState, useEffect } from "react";
 import { SHOWCASE_PRODUCTS, type ShowcaseProduct } from "./products";
 
-const AUTO_CYCLE_MS = 3500;
+const AUTO_CYCLE_MS = 3800;
+const ANGLE_SPAN = 90; // total degrees of arc the cards occupy
+const RADIUS = 720; // px — distance from center (depth of the arc)
+const CARD_WIDTH = 300;
+const CARD_HEIGHT = 460;
 
 export default function LiveShowcase() {
   const [activeIndex, setActiveIndex] = useState(
@@ -14,7 +18,7 @@ export default function LiveShowcase() {
 
   const openIndex = hoveredIndex !== null ? hoveredIndex : activeIndex;
 
-  // Auto-cycle (paused while hovering any card)
+  // Auto-cycle (paused while hovering)
   useEffect(() => {
     if (hoveredIndex !== null) return;
 
@@ -36,12 +40,17 @@ export default function LiveShowcase() {
     return () => clearInterval(interval);
   }, [direction, hoveredIndex]);
 
-  const centerOffset = (SHOWCASE_PRODUCTS.length - 1) / 2;
+  // Each card's angle on the arc
+  const angleStep = ANGLE_SPAN / (SHOWCASE_PRODUCTS.length - 1);
+  const cardAngle = (i: number) => -ANGLE_SPAN / 2 + i * angleStep;
+
+  // Container rotates so active card faces camera
+  const containerRotation = -cardAngle(openIndex);
 
   return (
     <section className="relative w-full min-h-screen bg-black overflow-hidden py-20 sm:py-28">
       {/* Section header */}
-      <div className="text-center mb-16 sm:mb-24 px-6">
+      <div className="text-center mb-12 sm:mb-16 px-6">
         <div className="inline-flex items-center gap-3 mb-5">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#00e5ff] animate-pulse" />
           <span className="text-[10px] sm:text-[11px] tracking-[0.5em] text-cyan-300/85 font-mono uppercase">
@@ -63,30 +72,52 @@ export default function LiveShowcase() {
         </p>
       </div>
 
-      {/* Fan card stage */}
+      {/* 3D cylindrical arc stage */}
       <div
         className="relative mx-auto"
         style={{
-          perspective: "2200px",
-          height: "560px",
-          maxWidth: "1400px",
+          perspective: "1500px",
+          perspectiveOrigin: "center center",
+          height: `${CARD_HEIGHT + 80}px`,
+          maxWidth: "100%",
         }}
       >
-        <div className="absolute inset-0 flex items-end justify-center gap-2 sm:gap-3 px-6 pb-10">
-          {SHOWCASE_PRODUCTS.map((p, i) => {
+        <div
+          className="absolute inset-0"
+          style={{
+            transformStyle: "preserve-3d",
+            transform: `rotateY(${containerRotation}deg) translateZ(-${RADIUS}px)`,
+            transition:
+              "transform 800ms cubic-bezier(0.34, 1.2, 0.64, 1)",
+          }}
+        >
+          {SHOWCASE_PRODUCTS.map((product, i) => {
             const isOpen = i === openIndex;
-            const offsetFromCenter = i - centerOffset;
-            const fanAngle = offsetFromCenter * -10;
+            const angle = cardAngle(i);
+            const distFromActive = Math.abs(i - openIndex);
 
             return (
-              <FanCard
-                key={p.id}
-                product={p}
-                isOpen={isOpen}
-                rotateY={isOpen ? 0 : fanAngle}
+              <div
+                key={product.id}
                 onMouseEnter={() => setHoveredIndex(i)}
                 onMouseLeave={() => setHoveredIndex(null)}
-              />
+                className="absolute cursor-pointer transition-[opacity,filter] duration-700"
+                style={{
+                  width: CARD_WIDTH,
+                  height: CARD_HEIGHT,
+                  left: "50%",
+                  top: "50%",
+                  marginLeft: -CARD_WIDTH / 2,
+                  marginTop: -CARD_HEIGHT / 2,
+                  transform: `rotateY(${angle}deg) translateZ(${RADIUS}px)`,
+                  transformOrigin: "center center",
+                  opacity: isOpen ? 1 : Math.max(0.35, 1 - distFromActive * 0.18),
+                  filter: isOpen ? "none" : `blur(${distFromActive * 0.3}px)`,
+                  zIndex: isOpen ? 50 : 10 - distFromActive,
+                }}
+              >
+                <CardContent product={product} isOpen={isOpen} />
+              </div>
             );
           })}
         </div>
@@ -105,142 +136,102 @@ export default function LiveShowcase() {
   );
 }
 
-function FanCard({
+function CardContent({
   product,
   isOpen,
-  rotateY,
-  onMouseEnter,
-  onMouseLeave,
 }: {
   product: ShowcaseProduct;
   isOpen: boolean;
-  rotateY: number;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
 }) {
   return (
     <div
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      className="transition-all duration-[700ms] ease-out cursor-pointer relative"
+      className="w-full h-full rounded-2xl border overflow-hidden relative"
       style={{
-        width: isOpen ? "360px" : "100px",
-        height: "480px",
-        transform: `rotateY(${rotateY}deg) ${isOpen ? "translateZ(80px)" : ""}`,
-        transformOrigin: "center center",
-        transformStyle: "preserve-3d",
-        zIndex: isOpen ? 50 : 10,
-        flexShrink: 0,
+        borderColor: isOpen
+          ? product.color
+          : "rgba(255, 255, 255, 0.15)",
+        background: `linear-gradient(180deg, ${product.color}26 0%, #06070d 65%)`,
+        boxShadow: isOpen
+          ? `0 0 60px ${product.color}66, inset 0 0 50px ${product.color}22`
+          : `0 0 20px ${product.color}1a`,
+        transition: "all 700ms cubic-bezier(0.4, 0, 0.2, 1)",
       }}
     >
+      {/* Color stripe along left edge */}
       <div
-        className="w-full h-full rounded-2xl border overflow-hidden relative"
+        className="absolute left-0 top-0 bottom-0 w-[3px]"
         style={{
-          borderColor: isOpen
-            ? product.color
-            : "rgba(255, 255, 255, 0.12)",
-          background: isOpen
-            ? `linear-gradient(180deg, ${product.color}26 0%, #06070d 60%)`
-            : `linear-gradient(180deg, ${product.color}18 0%, #04050a 70%)`,
-          boxShadow: isOpen
-            ? `0 0 60px ${product.color}55, inset 0 0 60px ${product.color}22`
-            : `0 0 20px ${product.color}1a`,
-          transition: "all 700ms cubic-bezier(0.4, 0, 0.2, 1)",
+          background: product.color,
+          boxShadow: `0 0 14px ${product.color}`,
         }}
-      >
-        {/* Color stripe along left edge — always visible */}
-        <div
-          className="absolute left-0 top-0 bottom-0 w-[3px]"
-          style={{
-            background: product.color,
-            boxShadow: `0 0 16px ${product.color}`,
-          }}
-        />
+      />
 
-        {isOpen ? (
-          /* OPEN STATE — full content */
-          <div className="h-full flex flex-col p-7">
-            {/* Top row: category + LIVE */}
-            <div className="flex items-center justify-between mb-8">
-              <span
-                className="text-[10px] tracking-[0.35em] font-mono uppercase"
-                style={{ color: product.color }}
-              >
-                {product.category}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span
-                  className="h-1.5 w-1.5 rounded-full animate-pulse"
-                  style={{
-                    background: product.color,
-                    boxShadow: `0 0 8px ${product.color}`,
-                  }}
-                />
-                <span className="text-[9px] tracking-[0.3em] font-mono uppercase text-white/65">
-                  Live
-                </span>
-              </span>
+      <div className="h-full flex flex-col p-6">
+        {/* Top row: category + LIVE */}
+        <div className="flex items-center justify-between mb-7">
+          <span
+            className="text-[10px] tracking-[0.35em] font-mono uppercase"
+            style={{ color: product.color }}
+          >
+            {product.category}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span
+              className="h-1.5 w-1.5 rounded-full animate-pulse"
+              style={{
+                background: product.color,
+                boxShadow: `0 0 8px ${product.color}`,
+              }}
+            />
+            <span className="text-[9px] tracking-[0.3em] font-mono uppercase text-white/65">
+              Live
+            </span>
+          </span>
+        </div>
+
+        {/* Title */}
+        <h3
+          className="text-2xl font-bold text-white mb-3 leading-tight"
+          style={{ fontFamily: "Orbitron, sans-serif" }}
+        >
+          {product.name}
+        </h3>
+
+        {/* Tagline */}
+        <p className="text-sm text-white/65 font-mono leading-relaxed mb-5 flex-grow">
+          {product.tagline}
+        </p>
+
+        {/* Metric */}
+        {product.metric && (
+          <div className="mb-5 pb-5 border-b border-white/10">
+            <div className="text-[9px] tracking-[0.3em] font-mono uppercase text-white/40 mb-1">
+              Status
             </div>
-
-            {/* Title */}
-            <h3
-              className="text-3xl font-bold text-white mb-4 leading-tight"
-              style={{ fontFamily: "Orbitron, sans-serif" }}
-            >
-              {product.name}
-            </h3>
-
-            {/* Tagline */}
-            <p className="text-sm text-white/65 font-mono leading-relaxed mb-6 flex-grow">
-              {product.tagline}
-            </p>
-
-            {/* Metric */}
-            {product.metric && (
-              <div className="mb-6 pb-6 border-b border-white/10">
-                <div className="text-[9px] tracking-[0.3em] font-mono uppercase text-white/40 mb-1">
-                  Status
-                </div>
-                <div
-                  className="text-sm font-mono"
-                  style={{ color: product.color }}
-                >
-                  {product.metric}
-                </div>
-              </div>
-            )}
-
-            {/* CTA */}
-            <a
-              href={product.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-center py-3 border font-mono text-xs tracking-[0.3em] uppercase transition-all"
-              style={{
-                borderColor: product.color,
-                color: product.color,
-                boxShadow: `0 0 20px ${product.color}33`,
-              }}
-            >
-              Try it →
-            </a>
-          </div>
-        ) : (
-          /* CLOSED STATE — vertical label */
-          <div className="h-full flex flex-col items-center justify-center px-2">
             <div
-              className="text-[10px] tracking-[0.4em] font-mono uppercase whitespace-nowrap"
-              style={{
-                writingMode: "vertical-rl",
-                transform: "rotate(180deg)",
-                color: product.color,
-                opacity: 0.85,
-              }}
+              className="text-sm font-mono"
+              style={{ color: product.color }}
             >
-              {product.name}
+              {product.metric}
             </div>
           </div>
         )}
+
+        {/* CTA */}
+        <a
+          href={product.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="block text-center py-3 border font-mono text-xs tracking-[0.3em] uppercase transition-all"
+          style={{
+            borderColor: product.color,
+            color: product.color,
+            boxShadow: isOpen ? `0 0 18px ${product.color}33` : "none",
+          }}
+        >
+          Try it →
+        </a>
       </div>
     </div>
   );

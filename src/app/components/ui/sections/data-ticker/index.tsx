@@ -12,10 +12,15 @@ interface TickerItem {
 
 export { type TickerItem };
 
+/**
+ * Format a number for ticker display:
+ * - Up to 100,000,000 (1억): show the full number with comma separators
+ *   and up to 2 decimal places.
+ * - 100M and above: abbreviate with "M" suffix, 2 decimals.
+ */
 function formatNum(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n.toLocaleString("en-US");
+  if (n >= 100_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
+  return n.toLocaleString("en-US", { maximumFractionDigits: 2 });
 }
 
 export async function getTickerData(): Promise<TickerItem[]> {
@@ -29,9 +34,21 @@ export async function getTickerData(): Promise<TickerItem[]> {
 
     if (priceData) {
       items.push(
-        { label: "TON", value: priceData.tonPrice.current.usd.toFixed(2), prefix: "$" },
-        { label: "MARKET CAP", value: priceData.marketCap >= 1e6 ? `$${(priceData.marketCap / 1e6).toFixed(1)}M` : `$${priceData.marketCap.toLocaleString()}` },
-        { label: "24H VOLUME", value: priceData.tradingVolumeUSD >= 1e6 ? `$${(priceData.tradingVolumeUSD / 1e6).toFixed(1)}M` : `$${priceData.tradingVolumeUSD.toLocaleString()}` },
+        {
+          label: "TON",
+          value: priceData.tonPrice.current.usd.toFixed(2),
+          prefix: "$",
+        },
+        {
+          label: "MARKET CAP",
+          value: formatNum(priceData.marketCap),
+          prefix: "$",
+        },
+        {
+          label: "24H VOLUME",
+          value: formatNum(priceData.tradingVolumeUSD),
+          prefix: "$",
+        },
       );
     }
 
@@ -47,8 +64,8 @@ export async function getTickerData(): Promise<TickerItem[]> {
   } catch {
     return [
       { label: "TON", value: "1.20", prefix: "$" },
-      { label: "MARKET CAP", value: "$70M" },
-      { label: "24H VOLUME", value: "$1.2M" },
+      { label: "MARKET CAP", value: "70,000,000", prefix: "$" },
+      { label: "24H VOLUME", value: "1,200,000", prefix: "$" },
       { label: "CODE CHANGES", value: "0", prefix: "+" },
       { label: "ACTIVE PROJECTS", value: "0" },
     ];

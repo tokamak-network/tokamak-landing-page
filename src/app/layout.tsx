@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Orbitron } from "next/font/google";
+import { Space_Grotesk, Orbitron, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { FocusProvider } from "@/context/FocusContext";
 
@@ -14,6 +14,18 @@ const orbitron = Orbitron({
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "700", "900"],
+});
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -125,7 +137,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${orbitron.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${spaceGrotesk.variable} ${orbitron.variable} ${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/fuc6kbq.css" />
         <script

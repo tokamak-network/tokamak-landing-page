@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { SHOWCASE_CLIPS, type ShowcaseClip } from "./clips";
 
 const AUTO_ROTATE_MS = 9000;
-const CROSSFADE_MS = 800;
+const CROSSFADE_MS = 900;
 
 export default function ProductShowcase() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -13,23 +13,18 @@ export default function ProductShowcase() {
   const clip = SHOWCASE_CLIPS[activeIndex];
 
   const goto = useCallback(
-    (next: number) => {
-      setActiveIndex(((next % total) + total) % total);
-    },
+    (next: number) => setActiveIndex(((next % total) + total) % total),
     [total]
   );
-
   const next = useCallback(() => goto(activeIndex + 1), [activeIndex, goto]);
   const prev = useCallback(() => goto(activeIndex - 1), [activeIndex, goto]);
 
-  // Auto-rotate (paused on hover)
   useEffect(() => {
     if (hovering) return;
     const t = setInterval(next, AUTO_ROTATE_MS);
     return () => clearInterval(t);
   }, [hovering, next]);
 
-  // Keyboard
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") prev();
@@ -42,138 +37,112 @@ export default function ProductShowcase() {
   return (
     <section
       className="relative w-full bg-black overflow-hidden"
+      style={{ height: "min(90vh, 920px)" }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
-      {/* Section eyebrow */}
-      <div className="relative z-20 text-center pt-16 sm:pt-20 px-6">
-        <div className="inline-flex items-center gap-3 mb-4">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#00e5ff] animate-pulse" />
-          <span className="text-[10px] sm:text-[11px] tracking-[0.5em] text-cyan-300/85 font-mono uppercase">
-            Live Production
-          </span>
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#00e5ff] animate-pulse" />
-        </div>
-        <h2
-          className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.05]"
-          style={{ fontFamily: "Orbitron, sans-serif" }}
-        >
-          Built on{" "}
-          <span className="text-cyan-300 drop-shadow-[0_0_24px_rgba(0,229,255,0.35)]">
-            Tokamak
-          </span>
-        </h2>
+      {/* Stacked video layers — crossfade */}
+      {SHOWCASE_CLIPS.map((c, i) => (
+        <ClipLayer key={c.id} clip={c} active={i === activeIndex} />
+      ))}
+
+      {/* Cinematic post-processing stack */}
+      {/* Heavy vignette */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 90% 70% at 50% 45%, transparent 30%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0.9) 100%)",
+        }}
+      />
+      {/* Bottom gradient for text legibility */}
+      <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none" />
+      {/* Top fade — section blends with previous section */}
+      <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
+      {/* Film grain */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.10] mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+          backgroundSize: "180px 180px",
+        }}
+      />
+
+      {/* Glass text card — bottom-left */}
+      <div className="absolute left-6 sm:left-12 lg:left-16 bottom-8 sm:bottom-14 right-6 sm:right-auto sm:max-w-[500px] z-10">
+        <ClipCard clip={clip} />
       </div>
 
-      {/* Cinematic stage */}
-      <div className="relative w-full max-w-[1500px] mx-auto mt-10 sm:mt-14 px-4 sm:px-8 pb-16">
-        <div
-          className="relative w-full rounded-2xl overflow-hidden bg-zinc-950"
-          style={{ aspectRatio: "16 / 9" }}
+      {/* CTA — bottom-right */}
+      <div className="absolute right-6 sm:right-12 lg:right-16 bottom-8 sm:bottom-14 z-10">
+        <a
+          href={clip.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-white text-black text-xs sm:text-[13px] font-medium tracking-wide transition-all shadow-[0_10px_40px_rgba(255,255,255,0.15)] hover:shadow-[0_14px_50px_rgba(255,255,255,0.25)] hover:scale-[1.02]"
         >
-          {/* Stacked clip layers — crossfade between them */}
-          {SHOWCASE_CLIPS.map((c, i) => (
-            <ClipLayer
-              key={c.id}
-              clip={c}
-              active={i === activeIndex}
-            />
-          ))}
-
-          {/* Cinematic post-processing overlays — always on top of video */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(0,0,0,0.55) 100%)",
-            }}
-          />
-          {/* Bottom gradient for text legibility */}
-          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/35 to-transparent pointer-events-none" />
-          {/* Subtle cyan light wash from below */}
-          <div className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(ellipse 60% 80% at 50% 100%, rgba(0,229,255,0.08) 0%, transparent 60%)",
-            }}
-          />
-          {/* Film grain via SVG noise */}
-          <div
-            className="absolute inset-0 pointer-events-none opacity-[0.07] mix-blend-overlay"
-            style={{
-              backgroundImage:
-                "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-              backgroundSize: "256px 256px",
-            }}
-          />
-
-          {/* Text overlay — bottom-left glass card */}
-          <div className="absolute left-4 sm:left-8 bottom-4 sm:bottom-8 right-4 sm:right-auto sm:max-w-[460px] z-10 pointer-events-none">
-            <ClipCard clip={clip} />
-          </div>
-
-          {/* CTA — bottom-right */}
-          <div className="absolute right-4 sm:right-8 bottom-4 sm:bottom-8 z-10">
-            <a
-              href={clip.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/95 hover:bg-white text-black text-[11px] sm:text-xs font-mono tracking-[0.2em] uppercase font-semibold transition-all shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
-              style={{
-                boxShadow: `0 8px 30px ${clip.color}55, 0 0 0 1px ${clip.color}33`,
-              }}
+          Explore more
+          <span
+            className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-black text-white transition-transform group-hover:translate-x-0.5"
+            aria-hidden
+          >
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 12 12"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              Explore more
-              <span className="text-base leading-none" aria-hidden>
-                →
-              </span>
-            </a>
-          </div>
-
-          {/* Dot navigation — bottom center */}
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-3 sm:bottom-4 z-10 flex items-center gap-2">
-            {SHOWCASE_CLIPS.map((c, i) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => goto(i)}
-                aria-label={`Show ${c.name}`}
-                className="group relative h-3 w-3 flex items-center justify-center"
-              >
-                <span
-                  className="block rounded-full transition-all"
-                  style={{
-                    width: i === activeIndex ? "20px" : "6px",
-                    height: "4px",
-                    background:
-                      i === activeIndex ? c.color : "rgba(255,255,255,0.3)",
-                    boxShadow:
-                      i === activeIndex ? `0 0 10px ${c.color}` : "none",
-                  }}
-                />
-              </button>
-            ))}
-          </div>
-
-          {/* Side arrow nav (subtle) */}
-          <button
-            type="button"
-            onClick={prev}
-            aria-label="Previous"
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 hover:bg-black/70 hover:border-white/30 text-white/80 transition-all flex items-center justify-center"
-          >
-            <span className="text-lg leading-none">←</span>
-          </button>
-          <button
-            type="button"
-            onClick={next}
-            aria-label="Next"
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 hover:bg-black/70 hover:border-white/30 text-white/80 transition-all flex items-center justify-center"
-          >
-            <span className="text-lg leading-none">→</span>
-          </button>
-        </div>
+              <path
+                d="M2 6h8m0 0L6 2m4 4l-4 4"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+        </a>
       </div>
+
+      {/* Minimal dot navigation — bottom center, low-key */}
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-4 sm:bottom-6 z-10 flex items-center gap-1.5">
+        {SHOWCASE_CLIPS.map((c, i) => (
+          <button
+            key={c.id}
+            type="button"
+            onClick={() => goto(i)}
+            aria-label={`Show ${c.name}`}
+            className="block h-1 transition-all rounded-full"
+            style={{
+              width: i === activeIndex ? "28px" : "5px",
+              background:
+                i === activeIndex ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.3)",
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Hover-only arrow nav */}
+      <button
+        type="button"
+        onClick={prev}
+        aria-label="Previous"
+        className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-10 h-11 w-11 rounded-full bg-white/10 backdrop-blur-md border border-white/15 hover:bg-white/20 text-white/85 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
+        style={{ opacity: hovering ? 1 : 0 }}
+      >
+        <span className="text-base leading-none">←</span>
+      </button>
+      <button
+        type="button"
+        onClick={next}
+        aria-label="Next"
+        className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-10 h-11 w-11 rounded-full bg-white/10 backdrop-blur-md border border-white/15 hover:bg-white/20 text-white/85 transition-all flex items-center justify-center"
+        style={{ opacity: hovering ? 1 : 0 }}
+      >
+        <span className="text-base leading-none">→</span>
+      </button>
     </section>
   );
 }
@@ -188,15 +157,11 @@ function ClipLayer({
   const ref = useRef<HTMLVideoElement>(null);
   const hasVideo = Boolean(clip.videoMp4 || clip.videoWebm);
 
-  // Pause non-active videos for perf
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    if (active) {
-      v.play().catch(() => {});
-    } else {
-      v.pause();
-    }
+    if (active) v.play().catch(() => {});
+    else v.pause();
   }, [active]);
 
   return (
@@ -217,17 +182,15 @@ function ClipLayer({
           poster={clip.poster}
           className="absolute inset-0 w-full h-full object-cover"
           style={{
+            // Cinematic grade: more contrast, slightly cool, slightly desaturated
             filter:
-              "contrast(1.12) brightness(0.88) saturate(0.92)",
+              "contrast(1.18) brightness(0.82) saturate(0.85) hue-rotate(-4deg)",
           }}
         >
-          {clip.videoWebm && (
-            <source src={clip.videoWebm} type="video/webm" />
-          )}
+          {clip.videoWebm && <source src={clip.videoWebm} type="video/webm" />}
           {clip.videoMp4 && <source src={clip.videoMp4} type="video/mp4" />}
         </video>
       ) : (
-        // Placeholder gradient (until real video is added)
         <div
           className="absolute inset-0"
           style={{
@@ -241,20 +204,14 @@ function ClipLayer({
 
 function ClipCard({ clip }: { clip: ShowcaseClip }) {
   return (
-    <div className="pointer-events-auto rounded-xl border border-white/15 bg-black/45 backdrop-blur-md px-5 py-4 sm:px-6 sm:py-5 shadow-2xl">
-      <div
-        className="text-[10px] sm:text-[11px] tracking-[0.4em] font-mono uppercase mb-2 sm:mb-3"
-        style={{ color: clip.color }}
-      >
+    <div className="rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl px-6 py-5 sm:px-7 sm:py-6 shadow-2xl">
+      <div className="text-[10px] tracking-[0.32em] font-medium uppercase mb-3 text-white/55">
         {clip.category}
       </div>
-      <h3
-        className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-tight mb-2 sm:mb-3"
-        style={{ fontFamily: "Orbitron, sans-serif" }}
-      >
+      <h3 className="text-xl sm:text-2xl lg:text-[28px] font-medium text-white leading-tight mb-2 tracking-tight">
         {clip.name}
       </h3>
-      <p className="text-xs sm:text-sm text-white/70 font-mono leading-relaxed">
+      <p className="text-sm sm:text-[15px] text-white/65 leading-relaxed">
         {clip.description}
       </p>
     </div>

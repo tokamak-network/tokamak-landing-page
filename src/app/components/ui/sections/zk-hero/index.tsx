@@ -10,30 +10,9 @@ export default function ZkHero() {
   }, []);
 
   return (
-    <section className="relative w-full h-screen bg-black overflow-hidden">
-      {/* Background video */}
-      {mounted && (
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          poster="/hero/bg-stage.jpeg"
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/hero/zk-engine.webm" type="video/webm" />
-          <source src="/hero/zk-engine.mp4" type="video/mp4" />
-        </video>
-      )}
-
-      {/* Top dark gradient for header + hero text contrast */}
-      <div className="absolute inset-x-0 top-0 h-[55%] bg-gradient-to-b from-black/90 via-black/55 to-transparent pointer-events-none" />
-
-      {/* Bottom subtle gradient for grounding */}
-      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-
-      {/* Top header bar */}
-      <header className="relative z-20 px-6 sm:px-10 lg:px-16 pt-6 sm:pt-8 flex items-center justify-between">
+    <section className="relative w-full min-h-screen bg-black flex flex-col">
+      {/* Header — top zone, clearly separated */}
+      <header className="relative z-10 px-6 sm:px-10 lg:px-16 pt-6 sm:pt-8 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">
           <span className="inline-block h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_10px_#00e5ff]" />
           <span className="font-mono text-sm tracking-[0.4em] text-white/90">
@@ -59,10 +38,10 @@ export default function ZkHero() {
         </nav>
       </header>
 
-      {/* Hero text — centered, positioned in upper area */}
-      <div className="relative z-10 px-6 sm:px-10 lg:px-16 mt-10 sm:mt-14 lg:mt-16 text-center max-w-5xl mx-auto">
+      {/* Text zone — middle, centered horizontally, distinct from video */}
+      <div className="relative z-10 px-6 sm:px-10 lg:px-16 py-10 sm:py-14 lg:py-16 text-center max-w-6xl mx-auto flex-shrink-0">
         {/* Eyebrow */}
-        <div className="flex items-center justify-center gap-3 mb-6 sm:mb-8">
+        <div className="flex items-center justify-center gap-3 mb-5 sm:mb-7">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#00e5ff] animate-pulse" />
           <span className="text-[10px] sm:text-[11px] tracking-[0.5em] text-cyan-300/85 font-mono uppercase">
             Zero-Knowledge Privacy Layer
@@ -72,20 +51,20 @@ export default function ZkHero() {
 
         {/* Title */}
         <h1
-          className="text-5xl sm:text-7xl lg:text-8xl font-bold text-white leading-[1.02] mb-6 tracking-tight"
+          className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] mb-5 tracking-tight"
           style={{ fontFamily: "Orbitron, sans-serif" }}
         >
           Privacy{" "}
-          <span className="text-cyan-300 drop-shadow-[0_0_32px_rgba(0,229,255,0.45)]">
+          <span className="text-cyan-300 drop-shadow-[0_0_28px_rgba(0,229,255,0.45)]">
             by Proof
           </span>
         </h1>
 
         {/* Tagline */}
-        <p className="text-base sm:text-lg lg:text-xl text-white/75 font-mono max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
+        <p className="text-sm sm:text-base lg:text-lg text-white/70 font-mono max-w-2xl mx-auto mb-7 leading-relaxed">
           Multiple assets in. One verifiable proof out.
           <br className="hidden sm:block" />
-          <span className="text-white/50 text-sm sm:text-base">
+          <span className="text-white/45 text-xs sm:text-sm">
             The future of confidential blockchain transactions.
           </span>
         </p>
@@ -94,25 +73,47 @@ export default function ZkHero() {
         <div className="flex flex-wrap gap-3 justify-center">
           <button
             type="button"
-            className="px-6 sm:px-8 py-3 bg-cyan-500/10 border border-cyan-400/70 text-cyan-300 font-mono text-xs sm:text-sm tracking-[0.25em] uppercase hover:bg-cyan-500/20 hover:border-cyan-400 transition-all shadow-[0_0_24px_rgba(0,229,255,0.15)] hover:shadow-[0_0_40px_rgba(0,229,255,0.3)]"
+            className="px-6 sm:px-7 py-2.5 sm:py-3 bg-cyan-500/10 border border-cyan-400/70 text-cyan-300 font-mono text-[11px] sm:text-xs tracking-[0.25em] uppercase hover:bg-cyan-500/20 hover:border-cyan-400 transition-all shadow-[0_0_24px_rgba(0,229,255,0.15)] hover:shadow-[0_0_40px_rgba(0,229,255,0.3)]"
           >
             Get Started →
           </button>
           <button
             type="button"
-            className="px-6 sm:px-8 py-3 border border-white/20 text-white/70 font-mono text-xs sm:text-sm tracking-[0.25em] uppercase hover:border-white/45 hover:text-white/95 transition-all"
+            className="px-6 sm:px-7 py-2.5 sm:py-3 border border-white/20 text-white/70 font-mono text-[11px] sm:text-xs tracking-[0.25em] uppercase hover:border-white/45 hover:text-white/95 transition-all"
           >
             Documentation
           </button>
         </div>
       </div>
 
-      {/* Scroll hint at bottom */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
-        <span className="text-cyan-400/55 font-mono text-[9px] tracking-[0.4em]">
-          SCROLL
-        </span>
-        <span className="h-6 w-px bg-gradient-to-b from-cyan-400/60 to-transparent" />
+      {/* Video zone — bottom, naturally fading into background */}
+      <div
+        className="relative w-full"
+        style={{ height: "min(60vh, 720px)" }}
+      >
+        <div
+          className="relative w-full h-full overflow-hidden"
+          style={{
+            maskImage:
+              "radial-gradient(ellipse 85% 100% at 50% 45%, black 50%, transparent 100%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse 85% 100% at 50% 45%, black 50%, transparent 100%)",
+          }}
+        >
+          {mounted && (
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster="/hero/bg-stage.jpeg"
+              className="absolute inset-0 w-full h-full object-cover"
+            >
+              <source src="/hero/zk-engine.webm" type="video/webm" />
+              <source src="/hero/zk-engine.mp4" type="video/mp4" />
+            </video>
+          )}
+        </div>
       </div>
     </section>
   );

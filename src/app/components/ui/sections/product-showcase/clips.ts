@@ -21,6 +21,8 @@ export const SHOWCASE_CLIPS: ShowcaseClip[] = [
       "Friendly staking experience with raffle gamification — built on Tokamak governance.",
     url: "https://toki.tokamak.network",
     color: "#a855f7",
+    videoMp4: "/showcase/toki.mp4",
+    videoWebm: "/showcase/toki.webm",
   },
   {
     id: "thanos",

@@ -71,8 +71,8 @@ export default function DioramaShowcase() {
 function Hotspot({ product }: { product: DioramaProduct }) {
   const cardPositionClass =
     product.cardSide === "right"
-      ? "left-8 group-hover:left-10"
-      : "right-8 group-hover:right-10";
+      ? "left-10 group-hover:left-12"
+      : "right-10 group-hover:right-12";
 
   return (
     <div
@@ -82,29 +82,90 @@ function Hotspot({ product }: { product: DioramaProduct }) {
         top: `${product.y}%`,
       }}
     >
-      {/* Pulse marker — always visible */}
+      {/* Always-visible label tag above marker (with connector line) */}
+      <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none">
+        <div
+          className="flex items-center gap-2 px-3 py-1.5 rounded bg-black/80 border backdrop-blur-sm shadow-lg"
+          style={{
+            borderColor: `${product.color}88`,
+            boxShadow: `0 0 18px ${product.color}33`,
+          }}
+        >
+          <span
+            className="h-1.5 w-1.5 rounded-full animate-pulse"
+            style={{
+              background: product.color,
+              boxShadow: `0 0 8px ${product.color}`,
+            }}
+          />
+          <span
+            className="text-[10px] tracking-[0.28em] font-mono uppercase font-semibold"
+            style={{ color: product.color }}
+          >
+            {product.name}
+          </span>
+        </div>
+        {/* Connector line from label down to the hotspot dot */}
+        <div
+          className="absolute left-1/2 -translate-x-1/2 top-full w-px h-3"
+          style={{
+            background: `linear-gradient(to bottom, ${product.color}cc, transparent)`,
+          }}
+        />
+      </div>
+
+      {/* Pulse marker — always visible, more prominent */}
       <div className="relative">
         <span
-          className="block h-3 w-3 rounded-full"
+          className="block h-4 w-4 rounded-full transition-transform group-hover:scale-110"
           style={{
             background: product.color,
-            boxShadow: `0 0 16px ${product.color}, 0 0 32px ${product.color}66`,
+            boxShadow: `0 0 20px ${product.color}, 0 0 40px ${product.color}88`,
           }}
+        />
+        {/* Inner core dot */}
+        <span
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-white"
         />
         {/* Ripple ring */}
         <span
           className="absolute inset-0 rounded-full animate-ping"
           style={{
             background: product.color,
-            opacity: 0.5,
-            animationDuration: "2.5s",
+            opacity: 0.55,
+            animationDuration: "2.2s",
           }}
         />
-        {/* Outer ring marker */}
+        {/* Outer border ring */}
         <span
-          className="absolute -inset-2 rounded-full border opacity-50 group-hover:opacity-100 group-hover:-inset-3 transition-all"
-          style={{ borderColor: product.color }}
+          className="absolute -inset-2 rounded-full border-2 transition-all duration-300 group-hover:-inset-4 group-hover:border-opacity-100"
+          style={{
+            borderColor: product.color,
+            opacity: 0.6,
+          }}
         />
+        {/* Crosshair brackets — sci-fi HUD feel */}
+        <span
+          className="absolute -inset-5 opacity-0 group-hover:opacity-90 transition-opacity"
+          style={{ pointerEvents: "none" }}
+        >
+          <span
+            className="absolute top-0 left-0 h-2 w-2 border-l-2 border-t-2"
+            style={{ borderColor: product.color }}
+          />
+          <span
+            className="absolute top-0 right-0 h-2 w-2 border-r-2 border-t-2"
+            style={{ borderColor: product.color }}
+          />
+          <span
+            className="absolute bottom-0 left-0 h-2 w-2 border-l-2 border-b-2"
+            style={{ borderColor: product.color }}
+          />
+          <span
+            className="absolute bottom-0 right-0 h-2 w-2 border-r-2 border-b-2"
+            style={{ borderColor: product.color }}
+          />
+        </span>
       </div>
 
       {/* Detail card — appears on hover */}

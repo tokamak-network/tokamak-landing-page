@@ -10,7 +10,7 @@ import {
   Html,
   Bounds,
 } from "@react-three/drei";
-import { Group, MathUtils, Mesh } from "three";
+import { Group, MathUtils, Mesh, MeshBasicMaterial } from "three";
 import { CONSOLE_PRODUCTS, type ConsoleProduct } from "../console-showcase/products";
 
 // Set to true to enable OrbitControls + visible clickzone helpers for
@@ -127,6 +127,13 @@ function CameraTilt() {
   return null;
 }
 
+interface RippleEffect {
+  id: number;
+  position: [number, number, number];
+  color: string;
+  startTime: number;
+}
+
 function Console({
   product,
   transitioning,
@@ -148,10 +155,43 @@ function Console({
 }) {
   const { scene } = useGLTF("/3d/console.glb");
   const groupRef = useRef<Group>(null);
+  const [pressed, setPressed] = useState(false);
+  const [ripples, setRipples] = useState<RippleEffect[]>([]);
 
-  // Gentle hover bob
+  const triggerPressEffect = (
+    pos: [number, number, number],
+    color: string,
+    action: () => void
+  ) => {
+    setPressed(true);
+    setTimeout(() => setPressed(false), 200);
+
+    const id = Date.now() + Math.random();
+    setRipples((prev) => [
+      ...prev,
+      { id, position: pos, color, startTime: performance.now() },
+    ]);
+    setTimeout(() => {
+      setRipples((prev) => prev.filter((r) => r.id !== id));
+    }, 1400);
+
+    action();
+  };
+
+  // Console "press" animation + idle bob
   useFrame((state) => {
     if (!groupRef.current) return;
+    const targetZ = pressed ? -0.04 : 0;
+    groupRef.current.position.z = MathUtils.lerp(
+      groupRef.current.position.z,
+      targetZ,
+      0.25
+    );
+    const targetScale = pressed ? 0.985 : 1;
+    const currentScale = groupRef.current.scale.x;
+    const newScale = MathUtils.lerp(currentScale, targetScale, 0.25);
+    groupRef.current.scale.setScalar(newScale);
+
     groupRef.current.position.y =
       Math.sin(state.clock.elapsedTime * 0.7) * 0.015;
   });
@@ -160,7 +200,7 @@ function Console({
     <group ref={groupRef}>
       <primitive object={scene} rotation={[0, -Math.PI / 2, 0]} />
 
-      {/* Display content overlay — positioned over the screen area of the console */}
+      {/* Display content overlay */}
       <Html
         position={[0, 0.18, 0.05]}
         center
@@ -178,32 +218,100 @@ function Console({
         />
       </Html>
 
-      {/* Button clickzones — invisible 3D spheres over the painted buttons */}
+      {/* Button clickzones */}
       <ClickZone
         position={[-0.13, -0.13, 0.06]}
         color="#3b82f6"
-        onClick={onPrev}
+        onClick={() =>
+          triggerPressEffect([-0.13, -0.13, 0.07], "#3b82f6", onPrev)
+        }
         label="PREV"
       />
       <ClickZone
         position={[-0.05, -0.13, 0.06]}
         color="#eab308"
-        onClick={onShuffle}
+        onClick={() =>
+          triggerPressEffect([-0.05, -0.13, 0.07], "#eab308", onShuffle)
+        }
         label="SHUFFLE"
       />
       <ClickZone
         position={[0.03, -0.13, 0.06]}
         color="#ef4444"
-        onClick={onNext}
+        onClick={() =>
+          triggerPressEffect([0.03, -0.13, 0.07], "#ef4444", onNext)
+        }
         label="NEXT"
       />
       <ClickZone
         position={[0.18, -0.13, 0.06]}
         color="#facc15"
-        onClick={onLaunch}
+        onClick={() =>
+          triggerPressEffect([0.18, -0.13, 0.07], "#facc15", onLaunch)
+        }
         label="LAUNCH"
         radius={0.05}
       />
+
+      {/* Ripple effects at click point */}
+      {ripples.map((r) => (
+        <Ripple key={r.id} {...r} />
+      ))}
+    </group>
+  );
+}
+
+function Ripple({
+  position,
+  color,
+  startTime,
+}: RippleEffect) {
+  const ringRef = useRef<Mesh>(null);
+  const flashRef = useRef<Mesh>(null);
+
+  useFrame(() => {
+    if (!ringRef.current || !flashRef.current) return;
+    const age = Math.min((performance.now() - startTime) / 1200, 1);
+
+    // Outer ring: expands outward, fades
+    const ringScale = 1 + age * 5;
+    ringRef.current.scale.setScalar(ringScale);
+    const ringMat = ringRef.current.material as MeshBasicMaterial;
+    ringMat.opacity = Math.max(0, 1 - age) * 0.9;
+
+    // Inner flash: quick brightness pop, fades fast
+    const flashAge = Math.min(age * 2.5, 1);
+    const flashScale = 1 + flashAge * 1.5;
+    flashRef.current.scale.setScalar(flashScale);
+    const flashMat = flashRef.current.material as MeshBasicMaterial;
+    flashMat.opacity = Math.max(0, 1 - flashAge) * 0.75;
+  });
+
+  return (
+    <group position={position}>
+      {/* Inner flash disc */}
+      <mesh ref={flashRef}>
+        <circleGeometry args={[0.025, 32]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0.75}
+          toneMapped={false}
+          depthWrite={false}
+        />
+      </mesh>
+      {/* Outer expanding ring */}
+      <mesh ref={ringRef}>
+        <ringGeometry args={[0.025, 0.034, 48]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0.9}
+          toneMapped={false}
+          side={2}
+          depthWrite={false}
+        />
+      </mesh>
     </group>
   );
 }

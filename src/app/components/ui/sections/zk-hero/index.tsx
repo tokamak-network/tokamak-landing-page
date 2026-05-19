@@ -10,7 +10,17 @@ export default function ZkHero() {
   }, []);
 
   return (
-    <section className="relative w-full min-h-screen bg-black flex flex-col">
+    <section className="relative w-full min-h-screen bg-[#02040a] flex flex-col overflow-hidden">
+      {/* Shared atmosphere — radial glow connecting text area to video below */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 55% at 50% 88%, rgba(0,229,255,0.10) 0%, rgba(0,180,220,0.04) 35%, transparent 70%)",
+        }}
+      />
+
       {/* Header — top zone, clearly separated */}
       <header className="relative z-10 px-6 sm:px-10 lg:px-16 pt-6 sm:pt-8 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">
@@ -86,9 +96,9 @@ export default function ZkHero() {
         </div>
       </div>
 
-      {/* Video zone — bottom, naturally fading into background */}
+      {/* Video zone — bottom, naturally fading into shared background */}
       <div
-        className="relative w-full"
+        className="relative z-10 w-full"
         style={{ height: "min(60vh, 720px)" }}
       >
         <div

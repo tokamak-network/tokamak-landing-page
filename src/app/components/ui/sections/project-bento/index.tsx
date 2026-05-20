@@ -137,6 +137,9 @@ function buildTiles(repos: RepoData[], totalReposCount: number): Tile[] {
         text: STATEMENT_POOL[0],
         palette: 0,
       });
+    } else if (i === 7 && repos.length > 10) {
+      const v = FILLER_VIDEO_POOL[0];
+      tiles.push({ kind: "filler-video", size: "2x2", video: v.src, caption: v.caption });
     } else if (i === 9 && repos.length > 12) {
       tiles.push({
         kind: "metric",
@@ -152,6 +155,9 @@ function buildTiles(repos: RepoData[], totalReposCount: number): Tile[] {
         text: STATEMENT_POOL[1],
         palette: 4,
       });
+    } else if (i === 15 && repos.length > 18) {
+      const v = FILLER_VIDEO_POOL[1];
+      tiles.push({ kind: "filler-video", size: "2x1", video: v.src, caption: v.caption });
     } else if (i === 17 && repos.length > 20) {
       tiles.push({ kind: "cta", size: "2x1", text: CTA_POOL[0] });
     } else if (i === 22 && repos.length > 25) {
@@ -162,6 +168,9 @@ function buildTiles(repos: RepoData[], totalReposCount: number): Tile[] {
         label: "categories",
         palette: 2,
       });
+    } else if (i === 25 && repos.length > 28) {
+      const v = FILLER_VIDEO_POOL[2];
+      tiles.push({ kind: "filler-video", size: "2x2", video: v.src, caption: v.caption });
     }
   });
   return tiles;

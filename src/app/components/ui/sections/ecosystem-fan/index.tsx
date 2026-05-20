@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { type EcosystemCategory } from "@/app/lib/ecosystem-data";
 
 const ROTATE_MS = 4500;
@@ -45,6 +45,15 @@ export default function EcosystemFan({ categories }: Props) {
     if (diff > total / 2) diff -= total;
     return diff;
   }
+
+  // Track previous angles so we can detect a card "wrapping" from one side
+  // of the arc to the other and snap its position (rather than letting CSS
+  // interpolate it across the visible area).
+  const cardAngles = categories.map((_, i) => getOffset(i) * ANGLE_STEP_DEG);
+  const prevCardAngles = useRef<number[]>([]);
+  useEffect(() => {
+    prevCardAngles.current = cardAngles;
+  });
 
   return (
     <section
@@ -119,12 +128,24 @@ export default function EcosystemFan({ categories }: Props) {
         >
           {categories.map((cat, i) => {
             const offset = getOffset(i);
-            const angleDeg = offset * ANGLE_STEP_DEG;
+            const angleDeg = cardAngles[i];
             const angleRad = (angleDeg * Math.PI) / 180;
             const x = RADIUS * Math.sin(angleRad);
             const y = -RADIUS * Math.cos(angleRad);
             const isActive = i === activeIndex;
             const visible = Math.abs(angleDeg) <= 95;
+
+            // If this card just teleported from the opposite side of the
+            // arc (e.g., +100° → -100°), suppress the position transition so
+            // it snaps into place while invisible and only opacity fades.
+            const prevAngle = prevCardAngles.current[i];
+            const isWrap =
+              prevAngle !== undefined &&
+              Math.abs(angleDeg - prevAngle) > 90;
+
+            const transition = isWrap
+              ? "opacity 400ms ease"
+              : "left 750ms cubic-bezier(0.4, 0, 0.2, 1), top 750ms cubic-bezier(0.4, 0, 0.2, 1), transform 750ms cubic-bezier(0.4, 0, 0.2, 1), opacity 500ms ease";
 
             return (
               <button
@@ -138,8 +159,7 @@ export default function EcosystemFan({ categories }: Props) {
                   transform: `translate(-50%, -50%) rotate(${angleDeg}deg)`,
                   transformOrigin: "center center",
                   opacity: visible ? 1 : 0,
-                  transition:
-                    "left 750ms cubic-bezier(0.4, 0, 0.2, 1), top 750ms cubic-bezier(0.4, 0, 0.2, 1), transform 750ms cubic-bezier(0.4, 0, 0.2, 1), opacity 500ms ease",
+                  transition,
                   pointerEvents: visible ? "auto" : "none",
                   zIndex: isActive ? 30 : 20 - Math.abs(offset),
                 }}

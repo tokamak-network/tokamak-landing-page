@@ -5,6 +5,7 @@ import ProductShowcase from "../components/ui/sections/product-showcase";
 import { getTickerData } from "../components/ui/sections/data-ticker";
 import TickerClient from "../components/ui/sections/data-ticker/TickerClient";
 import { getEcosystemData } from "@/app/lib/ecosystem-data";
+import ProjectBento from "../components/ui/sections/project-bento";
 import EcosystemFan from "../components/ui/sections/ecosystem-fan";
 
 export default async function ZkPreviewPage() {
@@ -18,6 +19,7 @@ export default async function ZkPreviewPage() {
       <ZkHero />
       <TickerClient items={tickerItems} />
       <ProductShowcase />
+      <ProjectBento categories={ecosystemData.categories} />
       <EcosystemFan categories={ecosystemData.categories} />
     </main>
   );

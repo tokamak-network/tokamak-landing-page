@@ -30,7 +30,7 @@ export const SHOWCASE_CLIPS: ShowcaseClip[] = [
     category: "AI Agent",
     description:
       "Autonomous AI agents that interact with Tokamak protocols on behalf of users.",
-    url: "https://tokagent.tokamak.network",
+    url: "https://tokagent.network/",
     color: "#00e5ff",
     videoMp4: "/showcase/tokagent.mp4",
     videoWebm: "/showcase/tokagent.webm",

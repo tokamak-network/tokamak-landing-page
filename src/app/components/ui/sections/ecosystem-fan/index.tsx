@@ -62,8 +62,9 @@ export default function EcosystemFan({ categories }: Props) {
       onMouseLeave={() => setHovering(false)}
       style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
     >
-      {/* Ambient background video — reuses the hero ZK Engine clip,
-          heavily darkened + masked so the fan carousel remains primary. */}
+      {/* Ambient background video — reuses the original full-screen intro
+          video from the landing page, heavily darkened + masked so the
+          fan carousel remains primary. */}
       <video
         aria-hidden
         autoPlay
@@ -72,16 +73,15 @@ export default function EcosystemFan({ categories }: Props) {
         playsInline
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         style={{
-          opacity: 0.35,
-          filter: "contrast(1.1) brightness(0.55) saturate(0.85)",
+          opacity: 0.45,
+          filter: "contrast(1.1) brightness(0.6) saturate(0.85)",
           maskImage:
-            "radial-gradient(ellipse 75% 90% at 50% 70%, black 30%, transparent 85%)",
+            "radial-gradient(ellipse 80% 95% at 50% 65%, black 35%, transparent 90%)",
           WebkitMaskImage:
-            "radial-gradient(ellipse 75% 90% at 50% 70%, black 30%, transparent 85%)",
+            "radial-gradient(ellipse 80% 95% at 50% 65%, black 35%, transparent 90%)",
         }}
       >
-        <source src="/hero/zk-engine.webm" type="video/webm" />
-        <source src="/hero/zk-engine.mp4" type="video/mp4" />
+        <source src="/intro-video.mp4" type="video/mp4" />
       </video>
       {/* Dark overlay to keep readability */}
       <div className="absolute inset-0 bg-black/55 pointer-events-none" />

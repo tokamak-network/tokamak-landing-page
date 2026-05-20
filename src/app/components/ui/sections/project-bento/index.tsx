@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect, useMemo } from "react";
 import { type EcosystemCategory } from "@/app/lib/ecosystem-data";
 
 interface Props {
@@ -37,19 +40,51 @@ const CATEGORY_BG: Record<string, string> = {
   Analytics: "/cards/bg-analytics-a.png",
 };
 
-/** A handful of vibrant palettes to cycle through on color-block tiles. */
 const PALETTES = [
-  { bg: "#FFFFFF", fg: "#0A0A14", accent: "#2A72E5" }, // 0 white card
-  { bg: "#2A72E5", fg: "#FFFFFF", accent: "#00E5FF" }, // 1 tokamak blue
-  { bg: "#00E5FF", fg: "#0A0A14", accent: "#2A72E5" }, // 2 cyan pop
-  { bg: "#FACC15", fg: "#0A0A14", accent: "#2A72E5" }, // 3 gold
-  { bg: "#EC4899", fg: "#FFFFFF", accent: "#FACC15" }, // 4 magenta
-  { bg: "#22C55E", fg: "#0A0A14", accent: "#0A0A14" }, // 5 lime
+  { bg: "#FFFFFF", fg: "#0A0A14" },
+  { bg: "#2A72E5", fg: "#FFFFFF" },
+  { bg: "#00E5FF", fg: "#0A0A14" },
+  { bg: "#FACC15", fg: "#0A0A14" },
+  { bg: "#EC4899", fg: "#FFFFFF" },
+  { bg: "#22C55E", fg: "#0A0A14" },
 ];
 
-function aggregateRepos(categories: EcosystemCategory[]): RepoData[] {
+const STATEMENT_POOL = [
+  "Privacy by mathematics, not by trust.",
+  "Multiple assets in. One proof out.",
+  "Zero-knowledge. Infinitely verifiable.",
+  "Compute privately. Verify publicly.",
+  "The proof is in the math.",
+  "Trustless. Verifiable. Private.",
+];
+
+const METRIC_POOL: { value: string; label: string }[] = [
+  { value: "39", label: "active repos" },
+  { value: "9", label: "categories" },
+  { value: "10K+", label: "commits" },
+  { value: "LIVE", label: "mainnet" },
+  { value: "24/7", label: "uptime" },
+  { value: "∞", label: "verifiability" },
+];
+
+const CTA_POOL = ["Explore on GitHub →", "Read the docs →", "Join the network →"];
+
+const VIDEO_MAP: Record<string, string> = {
+  toki: "/showcase/toki.mp4",
+  tokagent: "/showcase/tokagent.mp4",
+};
+
+const CELLS_PER_PAGE = 30; // 6 cols × 5 rows worth of space per page
+const AUTO_ROTATE_MS = 8500;
+
+function sizeCells(s: TileSize): number {
+  return s === "2x2" ? 4 : s === "1x1" ? 1 : 2;
+}
+
+function aggregateRepos(categories: EcosystemCategory[], filter: string): RepoData[] {
   const all: RepoData[] = [];
   for (const cat of categories) {
+    if (filter !== "All" && cat.name !== filter) continue;
     for (const repo of cat.repos) {
       all.push({
         name: repo.name,
@@ -64,71 +99,58 @@ function aggregateRepos(categories: EcosystemCategory[]): RepoData[] {
   return all.sort((a, b) => b.linesAdded - a.linesAdded);
 }
 
-/** Build a hand-rhythmed mix of tile kinds + sizes interleaved with specials. */
-function buildTiles(repos: RepoData[]): Tile[] {
+function buildTiles(repos: RepoData[], totalReposCount: number): Tile[] {
   const tiles: Tile[] = [];
-  const totalRepos = repos.length;
-
-  // Pre-decide which repos get video tiles (top 2)
-  const videoMap: Record<string, string> = {
-    toki: "/showcase/toki.mp4",
-    tokagent: "/showcase/tokagent.mp4",
-  };
-
   repos.forEach((repo, i) => {
+    const video = VIDEO_MAP[repo.name];
     const isTop2 = i < 2;
     const isTop6 = i < 6;
-    let size: TileSize;
-    if (isTop2) size = "2x2";
-    else if (isTop6) size = "2x1";
-    else size = "1x1";
-
-    // Decide tile kind
-    const video = videoMap[repo.name];
+    const size: TileSize = isTop2 ? "2x2" : isTop6 ? "2x1" : "1x1";
     const styleSeed = (i * 13 + repo.name.length) % 6;
 
     let tile: Tile;
     if (video) {
       tile = { kind: "project-video", size: "2x2", project: repo, video };
     } else if (isTop2 || (styleSeed === 0 && !isTop6)) {
-      tile = { kind: "project-text", size, project: repo, palette: i % PALETTES.length };
+      tile = {
+        kind: "project-text",
+        size,
+        project: repo,
+        palette: i % PALETTES.length,
+      };
     } else {
       tile = { kind: "project-image", size, project: repo };
     }
     tiles.push(tile);
 
-    // Insert specials at key positions to break up rhythm
-    if (i === 2) {
+    // Inject specials at certain ranks (only for unfiltered / large sets)
+    if (i === 2 && repos.length > 5) {
       tiles.push({ kind: "wordmark", size: "2x2" });
-    } else if (i === 5) {
+    } else if (i === 5 && repos.length > 8) {
       tiles.push({
         kind: "statement",
         size: "2x1",
-        text: "Privacy by mathematics, not by trust.",
+        text: STATEMENT_POOL[0],
         palette: 0,
       });
-    } else if (i === 9) {
+    } else if (i === 9 && repos.length > 12) {
       tiles.push({
         kind: "metric",
         size: "1x1",
-        value: String(totalRepos),
+        value: String(totalReposCount),
         label: "active repos",
         palette: 1,
       });
-    } else if (i === 13) {
+    } else if (i === 13 && repos.length > 16) {
       tiles.push({
         kind: "statement",
         size: "2x1",
-        text: "Multiple assets in. One proof out.",
+        text: STATEMENT_POOL[1],
         palette: 4,
       });
-    } else if (i === 17) {
-      tiles.push({
-        kind: "cta",
-        size: "2x1",
-        text: "Explore on GitHub →",
-      });
-    } else if (i === 22) {
+    } else if (i === 17 && repos.length > 20) {
+      tiles.push({ kind: "cta", size: "2x1", text: CTA_POOL[0] });
+    } else if (i === 22 && repos.length > 25) {
       tiles.push({
         kind: "metric",
         size: "1x1",
@@ -138,21 +160,130 @@ function buildTiles(repos: RepoData[]): Tile[] {
       });
     }
   });
-
   return tiles;
 }
 
+/** Split flat tile list into pages, each ~CELLS_PER_PAGE cells worth. */
+function paginate(tiles: Tile[]): Tile[][] {
+  if (tiles.length === 0) return [[]];
+  const pages: Tile[][] = [];
+  let cur: Tile[] = [];
+  let cells = 0;
+  for (const t of tiles) {
+    const c = sizeCells(t.size);
+    if (cells + c > CELLS_PER_PAGE && cur.length > 0) {
+      pages.push(cur);
+      cur = [];
+      cells = 0;
+    }
+    cur.push(t);
+    cells += c;
+  }
+  if (cur.length > 0) pages.push(cur);
+  return pages;
+}
+
+/** Pad a short page with dummy specials until it has roughly CELLS_PER_PAGE cells. */
+function padPage(page: Tile[], seedOffset: number): Tile[] {
+  let cells = page.reduce((s, t) => s + sizeCells(t.size), 0);
+  let idx = 0;
+  const out = [...page];
+  while (cells < CELLS_PER_PAGE) {
+    const remaining = CELLS_PER_PAGE - cells;
+    const tile = makeFiller(seedOffset + idx, remaining);
+    out.push(tile);
+    cells += sizeCells(tile.size);
+    idx++;
+    if (idx > 30) break; // safety
+  }
+  return out;
+}
+
+function makeFiller(seed: number, remaining: number): Tile {
+  const variant = seed % 5;
+  if (variant === 0 && remaining >= 2) {
+    return {
+      kind: "statement",
+      size: "2x1",
+      text: STATEMENT_POOL[seed % STATEMENT_POOL.length],
+      palette: seed % PALETTES.length,
+    };
+  }
+  if (variant === 1) {
+    const m = METRIC_POOL[seed % METRIC_POOL.length];
+    return {
+      kind: "metric",
+      size: "1x1",
+      value: m.value,
+      label: m.label,
+      palette: seed % PALETTES.length,
+    };
+  }
+  if (variant === 2 && remaining >= 2) {
+    return { kind: "cta", size: "2x1", text: CTA_POOL[seed % CTA_POOL.length] };
+  }
+  if (variant === 3 && remaining >= 2) {
+    return {
+      kind: "statement",
+      size: "2x1",
+      text: STATEMENT_POOL[(seed + 2) % STATEMENT_POOL.length],
+      palette: (seed + 3) % PALETTES.length,
+    };
+  }
+  return {
+    kind: "metric",
+    size: "1x1",
+    value: METRIC_POOL[(seed + 1) % METRIC_POOL.length].value,
+    label: METRIC_POOL[(seed + 1) % METRIC_POOL.length].label,
+    palette: (seed + 4) % PALETTES.length,
+  };
+}
+
 export default function ProjectBento({ categories }: Props) {
-  const repos = aggregateRepos(categories);
-  const tiles = buildTiles(repos);
+  const [selectedCat, setSelectedCat] = useState<string>("All");
+  const [page, setPage] = useState(0);
+  const [hovering, setHovering] = useState(false);
+
+  const categoryNames = useMemo(
+    () => ["All", ...categories.map((c) => c.name)],
+    [categories]
+  );
+
+  const totalRepos = useMemo(
+    () => categories.reduce((s, c) => s + c.repoCount, 0),
+    [categories]
+  );
+
+  const pages = useMemo(() => {
+    const filtered = aggregateRepos(categories, selectedCat);
+    const tiles = buildTiles(filtered, totalRepos);
+    const raw = paginate(tiles);
+    return raw.map((p, i) => padPage(p, i * 7));
+  }, [categories, selectedCat, totalRepos]);
+
+  const totalPages = pages.length;
+
+  useEffect(() => {
+    setPage(0);
+  }, [selectedCat]);
+
+  useEffect(() => {
+    if (hovering || totalPages <= 1) return;
+    const t = setInterval(() => {
+      setPage((p) => (p + 1) % totalPages);
+    }, AUTO_ROTATE_MS);
+    return () => clearInterval(t);
+  }, [hovering, totalPages]);
 
   return (
     <section
       className="relative w-full bg-black py-20 sm:py-28 px-4 sm:px-6"
       style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
     >
       {/* Header */}
-      <div className="text-center mb-10 sm:mb-14">
+      <div className="text-center mb-8 sm:mb-10">
         <div className="inline-flex items-center gap-3 mb-3">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#4A8EFA] shadow-[0_0_10px_#2A72E5] animate-pulse" />
           <span
@@ -173,21 +304,108 @@ export default function ProjectBento({ categories }: Props) {
         </h2>
       </div>
 
-      {/* Bento grid */}
+      {/* Category filter */}
+      <div className="flex flex-wrap justify-center gap-2 mb-6 sm:mb-8 max-w-4xl mx-auto">
+        {categoryNames.map((cat) => {
+          const active = cat === selectedCat;
+          return (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSelectedCat(cat)}
+              className={`px-3.5 py-1.5 rounded-full text-[10px] sm:text-[11px] tracking-[0.22em] uppercase font-semibold transition-all
+                ${
+                  active
+                    ? "bg-white text-black"
+                    : "bg-white/[0.04] border border-white/15 text-white/70 hover:border-[#4A8EFA]/55 hover:text-white"
+                }`}
+              style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+            >
+              {cat}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Sliding pages */}
       <div className="mx-auto" style={{ maxWidth: "1500px" }}>
-        <div
-          className="grid"
-          style={{
-            gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
-            gridAutoRows: "150px",
-            gridAutoFlow: "dense",
-            gap: "10px",
-          }}
-        >
-          {tiles.map((tile, i) => (
-            <TileRender key={i} tile={tile} />
-          ))}
+        <div className="overflow-hidden">
+          <div
+            className="flex transition-transform duration-700 ease-out"
+            style={{
+              transform: `translateX(-${page * 100}%)`,
+              width: `${totalPages * 100}%`,
+            }}
+          >
+            {pages.map((tiles, pi) => (
+              <div
+                key={pi}
+                className="w-full flex-shrink-0"
+                style={{ width: `${100 / totalPages}%` }}
+              >
+                <div
+                  className="grid"
+                  style={{
+                    gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
+                    gridAutoRows: "150px",
+                    gridAutoFlow: "dense",
+                    gap: "10px",
+                  }}
+                >
+                  {tiles.map((tile, i) => (
+                    <TileRender key={`${pi}-${i}`} tile={tile} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* Pagination controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-4 mt-6 sm:mt-8">
+            <button
+              type="button"
+              onClick={() => setPage((p) => (p - 1 + totalPages) % totalPages)}
+              aria-label="Previous"
+              className="h-9 w-9 rounded-full bg-white/[0.06] border border-white/15 hover:border-[#4A8EFA]/55 text-white/80 transition-all flex items-center justify-center"
+            >
+              <span className="text-base leading-none">←</span>
+            </button>
+            <div className="flex items-center gap-1.5">
+              {pages.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setPage(i)}
+                  aria-label={`Page ${i + 1}`}
+                  className="block h-1 rounded-full transition-all"
+                  style={{
+                    width: i === page ? "28px" : "5px",
+                    background:
+                      i === page
+                        ? "rgba(255,255,255,0.95)"
+                        : "rgba(255,255,255,0.3)",
+                  }}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setPage((p) => (p + 1) % totalPages)}
+              aria-label="Next"
+              className="h-9 w-9 rounded-full bg-white/[0.06] border border-white/15 hover:border-[#4A8EFA]/55 text-white/80 transition-all flex items-center justify-center"
+            >
+              <span className="text-base leading-none">→</span>
+            </button>
+            <span
+              className="ml-3 text-[10px] tracking-[0.25em] uppercase text-white/45"
+              style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+            >
+              {String(page + 1).padStart(2, "0")} / {String(totalPages).padStart(2, "0")}
+            </span>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -227,10 +445,6 @@ function TileRender({ tile }: { tile: Tile }) {
   }
 }
 
-/* ──────────────────────────────────────────────────────────
-   Project tiles
-   ────────────────────────────────────────────────────────── */
-
 function ProjectTextTile({
   tile,
   span,
@@ -256,17 +470,20 @@ function ProjectTextTile({
         </span>
         <ActivityDot activity={tile.project.activity} />
       </div>
-      <div>
-        <h3
-          className="leading-[0.92] tracking-[-0.03em] uppercase break-words"
-          style={{
-            fontWeight: 900,
-            fontSize: tile.size === "2x2" ? "clamp(28px, 3.6vw, 56px)" : tile.size === "2x1" ? "clamp(22px, 2.6vw, 38px)" : "clamp(16px, 1.7vw, 22px)",
-          }}
-        >
-          {tile.project.name}
-        </h3>
-      </div>
+      <h3
+        className="leading-[0.92] tracking-[-0.03em] uppercase break-words"
+        style={{
+          fontWeight: 900,
+          fontSize:
+            tile.size === "2x2"
+              ? "clamp(28px, 3.6vw, 56px)"
+              : tile.size === "2x1"
+              ? "clamp(22px, 2.6vw, 38px)"
+              : "clamp(16px, 1.7vw, 22px)",
+        }}
+      >
+        {tile.project.name}
+      </h3>
     </a>
   );
 }
@@ -308,7 +525,12 @@ function ProjectImageTile({
           className="text-white leading-tight tracking-[-0.02em] uppercase line-clamp-2 group-hover:text-[#7AB0FF] transition-colors"
           style={{
             fontWeight: 800,
-            fontSize: tile.size === "2x2" ? "clamp(20px, 2.4vw, 32px)" : tile.size === "2x1" ? "clamp(16px, 1.8vw, 22px)" : "clamp(13px, 1.2vw, 16px)",
+            fontSize:
+              tile.size === "2x2"
+                ? "clamp(20px, 2.4vw, 32px)"
+                : tile.size === "2x1"
+                ? "clamp(16px, 1.8vw, 22px)"
+                : "clamp(13px, 1.2vw, 16px)",
           }}
         >
           {tile.project.name}
@@ -367,10 +589,6 @@ function ProjectVideoTile({
   );
 }
 
-/* ──────────────────────────────────────────────────────────
-   Special tiles
-   ────────────────────────────────────────────────────────── */
-
 function WordmarkTile({ span }: { span: string }) {
   return (
     <div
@@ -385,10 +603,7 @@ function WordmarkTile({ span }: { span: string }) {
       </div>
       <div
         className="leading-none tracking-[-0.06em] text-center"
-        style={{
-          fontWeight: 900,
-          fontSize: "clamp(40px, 5vw, 88px)",
-        }}
+        style={{ fontWeight: 900, fontSize: "clamp(40px, 5vw, 88px)" }}
       >
         tokamak
       </div>
@@ -417,10 +632,7 @@ function StatementTile({
     >
       <h3
         className="leading-[0.96] tracking-[-0.03em]"
-        style={{
-          fontWeight: 900,
-          fontSize: "clamp(20px, 2.4vw, 36px)",
-        }}
+        style={{ fontWeight: 900, fontSize: "clamp(20px, 2.4vw, 36px)" }}
       >
         {tile.text}
       </h3>
@@ -470,7 +682,11 @@ function CtaTile({
       target="_blank"
       rel="noopener noreferrer"
       className={`${span} relative rounded-2xl overflow-hidden flex items-center justify-between px-6 sm:px-8 transition-all hover:scale-[1.01] group`}
-      style={{ background: "#0A0A14", color: "#FFFFFF", border: "1px solid rgba(255,255,255,0.12)" }}
+      style={{
+        background: "#0A0A14",
+        color: "#FFFFFF",
+        border: "1px solid rgba(255,255,255,0.12)",
+      }}
     >
       <h3
         className="leading-[0.96] tracking-[-0.03em] uppercase"
@@ -478,9 +694,7 @@ function CtaTile({
       >
         {tile.text}
       </h3>
-      <span
-        className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-black transition-transform group-hover:translate-x-1"
-      >
+      <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-black transition-transform group-hover:translate-x-1">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path
             d="M3 7h8m0 0L7 3m4 4l-4 4"
@@ -494,10 +708,6 @@ function CtaTile({
     </a>
   );
 }
-
-/* ──────────────────────────────────────────────────────────
-   Shared bits
-   ────────────────────────────────────────────────────────── */
 
 function ActivityDot({
   activity,

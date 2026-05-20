@@ -62,6 +62,33 @@ export default function EcosystemFan({ categories }: Props) {
       onMouseLeave={() => setHovering(false)}
       style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
     >
+      {/* Ambient background video — reuses the hero ZK Engine clip,
+          heavily darkened + masked so the fan carousel remains primary. */}
+      <video
+        aria-hidden
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        style={{
+          opacity: 0.35,
+          filter: "contrast(1.1) brightness(0.55) saturate(0.85)",
+          maskImage:
+            "radial-gradient(ellipse 75% 90% at 50% 70%, black 30%, transparent 85%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 75% 90% at 50% 70%, black 30%, transparent 85%)",
+        }}
+      >
+        <source src="/hero/zk-engine.webm" type="video/webm" />
+        <source src="/hero/zk-engine.mp4" type="video/mp4" />
+      </video>
+      {/* Dark overlay to keep readability */}
+      <div className="absolute inset-0 bg-black/55 pointer-events-none" />
+
+      {/* All foreground content sits above the video */}
+      <div className="relative z-10">
+
       {/* Header */}
       <div className="text-center mb-8 sm:mb-12">
         <div className="inline-flex items-center gap-3 mb-3">
@@ -169,6 +196,7 @@ export default function EcosystemFan({ categories }: Props) {
             );
           })}
         </div>
+      </div>
       </div>
     </section>
   );

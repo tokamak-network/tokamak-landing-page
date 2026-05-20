@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { type EcosystemCategory } from "@/app/lib/ecosystem-data";
 
 interface Props {
@@ -25,7 +25,8 @@ type Tile =
   | { kind: "wordmark"; size: TileSize }
   | { kind: "statement"; size: TileSize; text: string; palette: number }
   | { kind: "metric"; size: TileSize; value: string; label: string; palette: number }
-  | { kind: "cta"; size: TileSize; text: string };
+  | { kind: "cta"; size: TileSize; text: string }
+  | { kind: "filler-video"; size: TileSize; video: string; caption?: string };
 
 const CATEGORY_BG: Record<string, string> = {
   Platform: "/cards/bg-platform-a.png",
@@ -69,13 +70,16 @@ const METRIC_POOL: { value: string; label: string }[] = [
 
 const CTA_POOL = ["Explore on GitHub →", "Read the docs →", "Join the network →"];
 
+const FILLER_VIDEO_POOL: { src: string; caption: string }[] = [
+  { src: "/showcase/fillers/scatter.mp4", caption: "Particles · Distribution" },
+  { src: "/showcase/fillers/blue-liquid.mp4", caption: "Energy · Flow" },
+  { src: "/showcase/fillers/nebula.mp4", caption: "Cosmos · Network" },
+];
+
 const VIDEO_MAP: Record<string, string> = {
   toki: "/showcase/toki.mp4",
   tokagent: "/showcase/tokagent.mp4",
 };
-
-const CELLS_PER_PAGE = 30; // 6 cols × 5 rows worth of space per page
-const AUTO_ROTATE_MS = 8500;
 
 function sizeCells(s: TileSize): number {
   return s === "2x2" ? 4 : s === "1x1" ? 1 : 2;
@@ -163,44 +167,24 @@ function buildTiles(repos: RepoData[], totalReposCount: number): Tile[] {
   return tiles;
 }
 
-/** Split flat tile list into pages, each ~CELLS_PER_PAGE cells worth. */
-function paginate(tiles: Tile[]): Tile[][] {
-  if (tiles.length === 0) return [[]];
-  const pages: Tile[][] = [];
-  let cur: Tile[] = [];
-  let cells = 0;
-  for (const t of tiles) {
-    const c = sizeCells(t.size);
-    if (cells + c > CELLS_PER_PAGE && cur.length > 0) {
-      pages.push(cur);
-      cur = [];
-      cells = 0;
-    }
-    cur.push(t);
-    cells += c;
-  }
-  if (cur.length > 0) pages.push(cur);
-  return pages;
-}
-
-/** Pad a short page with dummy specials until it has roughly CELLS_PER_PAGE cells. */
-function padPage(page: Tile[], seedOffset: number): Tile[] {
-  let cells = page.reduce((s, t) => s + sizeCells(t.size), 0);
+/** Pad a short tile list with dummy specials until it has at least targetCells cells. */
+function padTiles(tiles: Tile[], targetCells: number): Tile[] {
+  let cells = tiles.reduce((s, t) => s + sizeCells(t.size), 0);
   let idx = 0;
-  const out = [...page];
-  while (cells < CELLS_PER_PAGE) {
-    const remaining = CELLS_PER_PAGE - cells;
-    const tile = makeFiller(seedOffset + idx, remaining);
+  const out = [...tiles];
+  while (cells < targetCells) {
+    const remaining = targetCells - cells;
+    const tile = makeFiller(idx, remaining);
     out.push(tile);
     cells += sizeCells(tile.size);
     idx++;
-    if (idx > 30) break; // safety
+    if (idx > 60) break; // safety
   }
   return out;
 }
 
 function makeFiller(seed: number, remaining: number): Tile {
-  const variant = seed % 5;
+  const variant = seed % 7;
   if (variant === 0 && remaining >= 2) {
     return {
       kind: "statement",
@@ -219,10 +203,18 @@ function makeFiller(seed: number, remaining: number): Tile {
       palette: seed % PALETTES.length,
     };
   }
-  if (variant === 2 && remaining >= 2) {
-    return { kind: "cta", size: "2x1", text: CTA_POOL[seed % CTA_POOL.length] };
+  if (variant === 2 && remaining >= 4) {
+    const v = FILLER_VIDEO_POOL[seed % FILLER_VIDEO_POOL.length];
+    return { kind: "filler-video", size: "2x2", video: v.src, caption: v.caption };
   }
   if (variant === 3 && remaining >= 2) {
+    return { kind: "cta", size: "2x1", text: CTA_POOL[seed % CTA_POOL.length] };
+  }
+  if (variant === 4 && remaining >= 2) {
+    const v = FILLER_VIDEO_POOL[(seed + 1) % FILLER_VIDEO_POOL.length];
+    return { kind: "filler-video", size: "2x1", video: v.src, caption: v.caption };
+  }
+  if (variant === 5 && remaining >= 2) {
     return {
       kind: "statement",
       size: "2x1",
@@ -241,8 +233,6 @@ function makeFiller(seed: number, remaining: number): Tile {
 
 export default function ProjectBento({ categories }: Props) {
   const [selectedCat, setSelectedCat] = useState<string>("All");
-  const [page, setPage] = useState(0);
-  const [hovering, setHovering] = useState(false);
 
   const categoryNames = useMemo(
     () => ["All", ...categories.map((c) => c.name)],
@@ -254,33 +244,18 @@ export default function ProjectBento({ categories }: Props) {
     [categories]
   );
 
-  const pages = useMemo(() => {
+  const tiles = useMemo(() => {
     const filtered = aggregateRepos(categories, selectedCat);
-    const tiles = buildTiles(filtered, totalRepos);
-    const raw = paginate(tiles);
-    return raw.map((p, i) => padPage(p, i * 7));
+    const built = buildTiles(filtered, totalRepos);
+    // Ensure narrow categories still fill a reasonable grid with dummy tiles.
+    // For "All" (lots of projects) padding kicks in only if grid is unusually short.
+    return padTiles(built, 30);
   }, [categories, selectedCat, totalRepos]);
-
-  const totalPages = pages.length;
-
-  useEffect(() => {
-    setPage(0);
-  }, [selectedCat]);
-
-  useEffect(() => {
-    if (hovering || totalPages <= 1) return;
-    const t = setInterval(() => {
-      setPage((p) => (p + 1) % totalPages);
-    }, AUTO_ROTATE_MS);
-    return () => clearInterval(t);
-  }, [hovering, totalPages]);
 
   return (
     <section
       className="relative w-full bg-black py-20 sm:py-28 px-4 sm:px-6"
       style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
     >
       {/* Header */}
       <div className="text-center mb-8 sm:mb-10">
@@ -327,85 +302,21 @@ export default function ProjectBento({ categories }: Props) {
         })}
       </div>
 
-      {/* Sliding pages */}
+      {/* Full bento grid — no pagination, scrolls naturally with page */}
       <div className="mx-auto" style={{ maxWidth: "1500px" }}>
-        <div className="overflow-hidden">
-          <div
-            className="flex transition-transform duration-700 ease-out"
-            style={{
-              transform: `translateX(-${page * 100}%)`,
-              width: `${totalPages * 100}%`,
-            }}
-          >
-            {pages.map((tiles, pi) => (
-              <div
-                key={pi}
-                className="w-full flex-shrink-0"
-                style={{ width: `${100 / totalPages}%` }}
-              >
-                <div
-                  className="grid"
-                  style={{
-                    gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
-                    gridAutoRows: "150px",
-                    gridAutoFlow: "dense",
-                    gap: "10px",
-                  }}
-                >
-                  {tiles.map((tile, i) => (
-                    <TileRender key={`${pi}-${i}`} tile={tile} />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+        <div
+          className="grid"
+          style={{
+            gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
+            gridAutoRows: "150px",
+            gridAutoFlow: "dense",
+            gap: "10px",
+          }}
+        >
+          {tiles.map((tile, i) => (
+            <TileRender key={i} tile={tile} />
+          ))}
         </div>
-
-        {/* Pagination controls */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-4 mt-6 sm:mt-8">
-            <button
-              type="button"
-              onClick={() => setPage((p) => (p - 1 + totalPages) % totalPages)}
-              aria-label="Previous"
-              className="h-9 w-9 rounded-full bg-white/[0.06] border border-white/15 hover:border-[#4A8EFA]/55 text-white/80 transition-all flex items-center justify-center"
-            >
-              <span className="text-base leading-none">←</span>
-            </button>
-            <div className="flex items-center gap-1.5">
-              {pages.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setPage(i)}
-                  aria-label={`Page ${i + 1}`}
-                  className="block h-1 rounded-full transition-all"
-                  style={{
-                    width: i === page ? "28px" : "5px",
-                    background:
-                      i === page
-                        ? "rgba(255,255,255,0.95)"
-                        : "rgba(255,255,255,0.3)",
-                  }}
-                />
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={() => setPage((p) => (p + 1) % totalPages)}
-              aria-label="Next"
-              className="h-9 w-9 rounded-full bg-white/[0.06] border border-white/15 hover:border-[#4A8EFA]/55 text-white/80 transition-all flex items-center justify-center"
-            >
-              <span className="text-base leading-none">→</span>
-            </button>
-            <span
-              className="ml-3 text-[10px] tracking-[0.25em] uppercase text-white/45"
-              style={{ fontFamily: "var(--font-geist-mono), monospace" }}
-            >
-              {String(page + 1).padStart(2, "0")} / {String(totalPages).padStart(2, "0")}
-            </span>
-          </div>
-        )}
       </div>
     </section>
   );
@@ -442,6 +353,8 @@ function TileRender({ tile }: { tile: Tile }) {
       return <MetricTile tile={tile} span={span} />;
     case "cta":
       return <CtaTile tile={tile} span={span} />;
+    case "filler-video":
+      return <FillerVideoTile tile={tile} span={span} />;
   }
 }
 
@@ -706,6 +619,40 @@ function CtaTile({
         </svg>
       </span>
     </a>
+  );
+}
+
+function FillerVideoTile({
+  tile,
+  span,
+}: {
+  tile: Extract<Tile, { kind: "filler-video" }>;
+  span: string;
+}) {
+  return (
+    <div
+      className={`${span} relative rounded-2xl overflow-hidden group border border-white/10`}
+    >
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ filter: "contrast(1.08) brightness(0.78) saturate(0.95)" }}
+      >
+        <source src={tile.video} type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent pointer-events-none" />
+      {tile.caption && (
+        <div
+          className="absolute left-4 bottom-4 text-[9px] tracking-[0.32em] uppercase text-white/70 font-semibold pointer-events-none"
+          style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+        >
+          {tile.caption}
+        </div>
+      )}
+    </div>
   );
 }
 

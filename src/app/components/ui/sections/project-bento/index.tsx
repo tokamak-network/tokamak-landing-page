@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { type EcosystemCategory } from "@/app/lib/ecosystem-data";
+import { SHOWCASE_CLIPS, type ShowcaseClip } from "../product-showcase/clips";
 
 interface Props {
   categories: EcosystemCategory[];
+  latestReportHref?: string;
 }
 
 interface RepoData {
@@ -22,11 +24,21 @@ type Tile =
   | { kind: "project-text"; size: TileSize; project: RepoData; palette: number }
   | { kind: "project-image"; size: TileSize; project: RepoData }
   | { kind: "project-video"; size: TileSize; project: RepoData; video: string }
+  | { kind: "production"; size: TileSize; clip: ShowcaseClip }
   | { kind: "wordmark"; size: TileSize }
-  | { kind: "statement"; size: TileSize; text: string; palette: number }
+  | { kind: "statement"; size: TileSize; text: string; palette: number; href?: string; eyebrow?: string }
   | { kind: "metric"; size: TileSize; value: string; label: string; palette: number }
-  | { kind: "cta"; size: TileSize; text: string }
-  | { kind: "filler-video"; size: TileSize; video: string; caption?: string };
+  | { kind: "cta"; size: TileSize; text: string; href?: string; eyebrow?: string }
+  | {
+      kind: "filler-video";
+      size: TileSize;
+      video: string;
+      caption?: string;
+      /** Optional big overlay (mutually exclusive with caption usage). */
+      overlayTitle?: string;
+      overlaySubtitle?: string;
+      href?: string;
+    };
 
 const CATEGORY_BG: Record<string, string> = {
   Platform: "/cards/bg-platform-a.png",
@@ -71,7 +83,7 @@ const METRIC_POOL: { value: string; label: string }[] = [
 const CTA_POOL = ["Explore on GitHub →", "Read the docs →", "Join the network →"];
 
 const FILLER_VIDEO_POOL: { src: string; caption: string }[] = [
-  { src: "/showcase/fillers/scatter.mp4", caption: "Particles · Distribution" },
+  { src: "/intro-video.mp4", caption: "Particles · Distribution" },
   { src: "/showcase/fillers/blue-liquid.mp4", caption: "Energy · Flow" },
   { src: "/showcase/fillers/nebula.mp4", caption: "Cosmos · Network" },
 ];
@@ -85,11 +97,17 @@ function sizeCells(s: TileSize): number {
   return s === "2x2" ? 4 : s === "1x1" ? 1 : 2;
 }
 
+const PRODUCTION_REPO_NAMES = new Set(
+  SHOWCASE_CLIPS.map((c) => c.id.toLowerCase())
+);
+
 function aggregateRepos(categories: EcosystemCategory[], filter: string): RepoData[] {
   const all: RepoData[] = [];
   for (const cat of categories) {
     if (filter !== "All" && cat.name !== filter) continue;
     for (const repo of cat.repos) {
+      // Skip repos that are already represented as production showcase tiles
+      if (PRODUCTION_REPO_NAMES.has(repo.name.toLowerCase())) continue;
       all.push({
         name: repo.name,
         description: repo.description,
@@ -103,77 +121,76 @@ function aggregateRepos(categories: EcosystemCategory[], filter: string): RepoDa
   return all.sort((a, b) => b.linesAdded - a.linesAdded);
 }
 
-function buildTiles(repos: RepoData[], totalReposCount: number): Tile[] {
-  const tiles: Tile[] = [];
-  repos.forEach((repo, i) => {
+function buildTiles(repos: RepoData[]): Tile[] {
+  // Pure repo tiles — specials are woven in by the caller so the same set
+  // of special cards (wordmark, statements, filler videos, CTAs) shows up
+  // for both "All" and individual category filters.
+  return repos.map((repo, i) => {
     const video = VIDEO_MAP[repo.name];
-    const isTop2 = i < 2;
-    const isTop6 = i < 6;
-    const size: TileSize = isTop2 ? "2x2" : isTop6 ? "2x1" : "1x1";
+    const isWide = i < 8;
+    const size: TileSize = isWide ? "2x1" : "1x1";
     const styleSeed = (i * 13 + repo.name.length) % 6;
 
-    let tile: Tile;
     if (video) {
-      tile = { kind: "project-video", size: "2x2", project: repo, video };
-    } else if (isTop2 || (styleSeed === 0 && !isTop6)) {
-      tile = {
+      return { kind: "project-video", size: "2x2", project: repo, video };
+    }
+    if (styleSeed === 0) {
+      return {
         kind: "project-text",
         size,
         project: repo,
         palette: i % PALETTES.length,
       };
-    } else {
-      tile = { kind: "project-image", size, project: repo };
     }
-    tiles.push(tile);
-
-    // Inject specials at certain ranks (only for unfiltered / large sets)
-    if (i === 2 && repos.length > 5) {
-      tiles.push({ kind: "wordmark", size: "2x2" });
-    } else if (i === 5 && repos.length > 8) {
-      tiles.push({
-        kind: "statement",
-        size: "2x1",
-        text: STATEMENT_POOL[0],
-        palette: 0,
-      });
-    } else if (i === 7 && repos.length > 10) {
-      const v = FILLER_VIDEO_POOL[0];
-      tiles.push({ kind: "filler-video", size: "2x2", video: v.src, caption: v.caption });
-    } else if (i === 9 && repos.length > 12) {
-      tiles.push({
-        kind: "metric",
-        size: "1x1",
-        value: String(totalReposCount),
-        label: "active repos",
-        palette: 1,
-      });
-    } else if (i === 13 && repos.length > 16) {
-      tiles.push({
-        kind: "statement",
-        size: "2x1",
-        text: STATEMENT_POOL[1],
-        palette: 4,
-      });
-    } else if (i === 15 && repos.length > 18) {
-      const v = FILLER_VIDEO_POOL[1];
-      tiles.push({ kind: "filler-video", size: "2x1", video: v.src, caption: v.caption });
-    } else if (i === 17 && repos.length > 20) {
-      tiles.push({ kind: "cta", size: "2x1", text: CTA_POOL[0] });
-    } else if (i === 22 && repos.length > 25) {
-      tiles.push({
-        kind: "metric",
-        size: "1x1",
-        value: "9",
-        label: "categories",
-        palette: 2,
-      });
-    } else if (i === 25 && repos.length > 28) {
-      const v = FILLER_VIDEO_POOL[2];
-      tiles.push({ kind: "filler-video", size: "2x2", video: v.src, caption: v.caption });
-    }
+    return { kind: "project-image", size, project: repo };
   });
-  return tiles;
+}
+
+/** Specials shown across every view (All + each category filter). */
+function buildSpecials(
+  totalReposCount: number,
+  totalCategoriesCount: number,
+  latestReportHref?: string
+): Tile[] {
+  return [
+    { kind: "wordmark", size: "2x2" },
+    {
+      kind: "statement",
+      size: "2x1",
+      text: STATEMENT_POOL[0],
+      palette: 0,
+    },
+    { kind: "filler-video", size: "2x2", video: FILLER_VIDEO_POOL[0].src },
+    {
+      kind: "statement",
+      size: "2x1",
+      text: "Sourced from the latest biweekly report.",
+      palette: 4,
+      eyebrow: "Live data",
+      href: latestReportHref,
+    },
+    {
+      kind: "filler-video",
+      size: "2x1",
+      video: FILLER_VIDEO_POOL[1].src,
+      overlayTitle: String(totalReposCount),
+      overlaySubtitle: "active projects",
+    },
+    {
+      kind: "metric",
+      size: "1x1",
+      value: String(totalCategoriesCount),
+      label: "categories",
+      palette: 2,
+    },
+    {
+      kind: "filler-video",
+      size: "2x2",
+      video: FILLER_VIDEO_POOL[2].src,
+      overlayTitle: "Explore on GitHub",
+      href: "https://github.com/tokamak-network",
+    },
+  ];
 }
 
 /** Pad a short tile list with dummy specials until it has at least targetCells cells. */
@@ -240,8 +257,20 @@ function makeFiller(seed: number, remaining: number): Tile {
   };
 }
 
-export default function ProjectBento({ categories }: Props) {
+export default function ProjectBento({ categories, latestReportHref }: Props) {
   const [selectedCat, setSelectedCat] = useState<string>("All");
+  // SSR-safe: start with original order, then shuffle after mount so the
+  // featured production card varies between page loads.
+  const [shuffledClips, setShuffledClips] = useState<ShowcaseClip[]>(SHOWCASE_CLIPS);
+
+  useEffect(() => {
+    const arr = [...SHOWCASE_CLIPS];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    setShuffledClips(arr);
+  }, []);
 
   const categoryNames = useMemo(
     () => ["All", ...categories.map((c) => c.name)],
@@ -255,11 +284,46 @@ export default function ProjectBento({ categories }: Props) {
 
   const tiles = useMemo(() => {
     const filtered = aggregateRepos(categories, selectedCat);
-    const built = buildTiles(filtered, totalRepos);
-    // Ensure narrow categories still fill a reasonable grid with dummy tiles.
-    // For "All" (lots of projects) padding kicks in only if grid is unusually short.
-    return padTiles(built, 30);
-  }, [categories, selectedCat, totalRepos]);
+    const built = buildTiles(filtered);
+    const specials = buildSpecials(totalRepos, categories.length, latestReportHref);
+    const [first, second, third] = shuffledClips;
+    const prodTile = (clip: ShowcaseClip): Tile => ({
+      kind: "production" as const,
+      size: "2x2" as const,
+      clip,
+    });
+    const [wordmark, statement0, fillerScatter, biweeklyCta, fillerActive, metric9, fillerNebula] = specials;
+
+    // Weave production cards + specials across the repo tile list. The
+    // splice points are deliberate so the same set of special cards appears
+    // in every view (All + each category) but distributed across the grid.
+    // If `built` is short (small category), trailing slices come back empty
+    // and the specials simply collapse together — still uniform across views.
+    const woven: Tile[] = [
+      ...(first ? [prodTile(first)] : []),
+      ...built.slice(0, 3),
+      wordmark,
+      ...built.slice(3, 5),
+      statement0,
+      ...built.slice(5, 7),
+      fillerScatter,
+      ...built.slice(7, 9),
+      ...(second ? [prodTile(second)] : []),
+      ...built.slice(9, 11),
+      biweeklyCta,
+      ...built.slice(11, 13),
+      fillerActive,
+      ...built.slice(13, 15),
+      metric9,
+      ...built.slice(15, 18),
+      ...(third ? [prodTile(third)] : []),
+      ...built.slice(18, 20),
+      fillerNebula,
+      ...built.slice(20),
+    ];
+
+    return padTiles(woven, 30);
+  }, [categories, selectedCat, totalRepos, shuffledClips, latestReportHref]);
 
   return (
     <section
@@ -354,6 +418,8 @@ function TileRender({ tile }: { tile: Tile }) {
       return <ProjectImageTile tile={tile} span={span} />;
     case "project-video":
       return <ProjectVideoTile tile={tile} span={span} />;
+    case "production":
+      return <ProductionTile tile={tile} span={span} />;
     case "wordmark":
       return <WordmarkTile span={span} />;
     case "statement":
@@ -392,20 +458,34 @@ function ProjectTextTile({
         </span>
         <ActivityDot activity={tile.project.activity} />
       </div>
-      <h3
-        className="leading-[0.92] tracking-[-0.03em] uppercase break-words"
-        style={{
-          fontWeight: 900,
-          fontSize:
-            tile.size === "2x2"
-              ? "clamp(28px, 3.6vw, 56px)"
-              : tile.size === "2x1"
-              ? "clamp(22px, 2.6vw, 38px)"
-              : "clamp(16px, 1.7vw, 22px)",
-        }}
-      >
-        {tile.project.name}
-      </h3>
+      <div>
+        <h3
+          className="leading-[0.92] tracking-[-0.03em] uppercase break-words"
+          style={{
+            fontWeight: 900,
+            fontSize:
+              tile.size === "2x2"
+                ? "clamp(28px, 3.6vw, 56px)"
+                : tile.size === "2x1"
+                ? "clamp(22px, 2.6vw, 38px)"
+                : "clamp(16px, 1.7vw, 22px)",
+          }}
+        >
+          {tile.project.name}
+        </h3>
+        {tile.project.description && tile.size !== "1x1" && (
+          <p
+            className="mt-2 line-clamp-2"
+            style={{
+              fontSize: tile.size === "2x2" ? "13px" : "12px",
+              opacity: 0.72,
+              lineHeight: 1.35,
+            }}
+          >
+            {tile.project.description}
+          </p>
+        )}
+      </div>
     </a>
   );
 }
@@ -457,6 +537,17 @@ function ProjectImageTile({
         >
           {tile.project.name}
         </h3>
+        {tile.project.description && tile.size !== "1x1" && (
+          <p
+            className="mt-1.5 text-white/70 line-clamp-2"
+            style={{
+              fontSize: tile.size === "2x2" ? "13px" : "12px",
+              lineHeight: 1.35,
+            }}
+          >
+            {tile.project.description}
+          </p>
+        )}
       </div>
     </a>
   );
@@ -511,6 +602,84 @@ function ProjectVideoTile({
   );
 }
 
+function ProductionTile({
+  tile,
+  span,
+}: {
+  tile: Extract<Tile, { kind: "production" }>;
+  span: string;
+}) {
+  const { clip } = tile;
+  const hasVideo = Boolean(clip.videoMp4 || clip.videoWebm);
+  return (
+    <a
+      href={clip.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`${span} relative rounded-2xl overflow-hidden group cursor-pointer border border-[#4A8EFA]/30 hover:border-[#4A8EFA]/70 transition-all`}
+    >
+      {hasVideo ? (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={clip.poster}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ filter: "contrast(1.1) brightness(0.65) saturate(0.95)" }}
+        >
+          {clip.videoWebm && <source src={clip.videoWebm} type="video/webm" />}
+          {clip.videoMp4 && <source src={clip.videoMp4} type="video/mp4" />}
+        </video>
+      ) : (
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(ellipse 80% 90% at 50% 40%, ${clip.color}55 0%, ${clip.color}22 40%, #0A0A14 80%)`,
+          }}
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+
+      {/* "Live" indicator pill */}
+      <div
+        className="absolute top-4 right-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/55 backdrop-blur-sm border border-white/15"
+        style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+      >
+        <span
+          className="inline-block h-1.5 w-1.5 rounded-full animate-pulse"
+          style={{ background: clip.color, boxShadow: `0 0 8px ${clip.color}` }}
+        />
+        <span className="text-[9px] tracking-[0.32em] uppercase text-white/85 font-semibold">
+          Live
+        </span>
+      </div>
+
+      <div className="absolute inset-0 p-5 sm:p-6 flex flex-col justify-end z-10">
+        <div
+          className="text-[9px] tracking-[0.3em] uppercase mb-2"
+          style={{
+            color: clip.color,
+            fontFamily: "var(--font-geist-mono), monospace",
+            textShadow: `0 0 10px ${clip.color}88`,
+          }}
+        >
+          {clip.category}
+        </div>
+        <h3
+          className="text-white leading-[0.92] tracking-[-0.03em] uppercase"
+          style={{ fontWeight: 900, fontSize: "clamp(28px, 3.4vw, 52px)" }}
+        >
+          {clip.name}
+        </h3>
+        <p className="text-xs sm:text-sm text-white/70 mt-2 line-clamp-2 max-w-md">
+          {clip.description}
+        </p>
+      </div>
+    </a>
+  );
+}
+
 function WordmarkTile({ span }: { span: string }) {
   return (
     <div
@@ -547,18 +716,60 @@ function StatementTile({
   span: string;
 }) {
   const p = PALETTES[tile.palette];
+  const Wrapper = tile.href ? "a" : "div";
+  const wrapperProps = tile.href
+    ? {
+        href: tile.href,
+        target: "_blank" as const,
+        rel: "noopener noreferrer",
+      }
+    : {};
+  const arrowBg = p.fg;
+  const arrowFg = p.bg;
   return (
-    <div
-      className={`${span} relative rounded-2xl overflow-hidden flex items-center px-6 sm:px-8`}
+    <Wrapper
+      {...wrapperProps}
+      className={`${span} relative rounded-2xl overflow-hidden flex items-center justify-between gap-4 px-6 sm:px-8 ${tile.href ? "transition-transform hover:scale-[1.01] group" : ""}`}
       style={{ background: p.bg, color: p.fg }}
     >
-      <h3
-        className="leading-[0.96] tracking-[-0.03em]"
-        style={{ fontWeight: 900, fontSize: "clamp(20px, 2.4vw, 36px)" }}
-      >
-        {tile.text}
-      </h3>
-    </div>
+      <div className="min-w-0 flex-1">
+        {tile.eyebrow && (
+          <div
+            className="text-[9px] sm:text-[10px] tracking-[0.42em] uppercase font-semibold mb-2 opacity-70"
+            style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+          >
+            {tile.eyebrow}
+          </div>
+        )}
+        <h3
+          className="leading-[0.96] tracking-[-0.03em]"
+          style={{
+            fontWeight: 900,
+            fontSize: tile.eyebrow
+              ? "clamp(18px, 2vw, 30px)"
+              : "clamp(20px, 2.4vw, 36px)",
+          }}
+        >
+          {tile.text}
+        </h3>
+      </div>
+      {tile.href && (
+        <span
+          className="inline-flex items-center justify-center w-10 h-10 rounded-full transition-transform group-hover:translate-x-1 flex-shrink-0"
+          style={{ background: arrowBg, color: arrowFg }}
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path
+              d="M3 7h8m0 0L7 3m4 4l-4 4"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+      )}
+    </Wrapper>
   );
 }
 
@@ -598,25 +809,42 @@ function CtaTile({
   tile: Extract<Tile, { kind: "cta" }>;
   span: string;
 }) {
+  const href = tile.href || "https://github.com/tokamak-network";
   return (
     <a
-      href="https://github.com/tokamak-network"
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`${span} relative rounded-2xl overflow-hidden flex items-center justify-between px-6 sm:px-8 transition-all hover:scale-[1.01] group`}
+      className={`${span} relative rounded-2xl overflow-hidden flex items-center justify-between gap-4 px-6 sm:px-7 transition-all hover:scale-[1.01] group`}
       style={{
         background: "#0A0A14",
         color: "#FFFFFF",
         border: "1px solid rgba(255,255,255,0.12)",
       }}
     >
-      <h3
-        className="leading-[0.96] tracking-[-0.03em] uppercase"
-        style={{ fontWeight: 900, fontSize: "clamp(22px, 2.6vw, 38px)" }}
-      >
-        {tile.text}
-      </h3>
-      <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-black transition-transform group-hover:translate-x-1">
+      <div className="min-w-0 flex-1">
+        {tile.eyebrow && (
+          <div
+            className="text-[9px] sm:text-[10px] tracking-[0.42em] uppercase text-[#7AB0FF]/85 font-semibold mb-1.5"
+            style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+          >
+            {tile.eyebrow}
+          </div>
+        )}
+        <h3
+          className="leading-[1.02] tracking-[-0.02em]"
+          style={{
+            fontWeight: 800,
+            fontSize: tile.eyebrow
+              ? "clamp(15px, 1.6vw, 22px)"
+              : "clamp(22px, 2.6vw, 38px)",
+            textTransform: tile.eyebrow ? "none" : "uppercase",
+          }}
+        >
+          {tile.text}
+        </h3>
+      </div>
+      <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-black transition-transform group-hover:translate-x-1 flex-shrink-0">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path
             d="M3 7h8m0 0L7 3m4 4l-4 4"
@@ -638,9 +866,20 @@ function FillerVideoTile({
   tile: Extract<Tile, { kind: "filler-video" }>;
   span: string;
 }) {
+  const hasOverlay = Boolean(tile.overlayTitle || tile.overlaySubtitle);
+  const Wrapper = tile.href ? "a" : "div";
+  const wrapperProps = tile.href
+    ? {
+        href: tile.href,
+        target: "_blank" as const,
+        rel: "noopener noreferrer",
+      }
+    : {};
+
   return (
-    <div
-      className={`${span} relative rounded-2xl overflow-hidden group border border-white/10`}
+    <Wrapper
+      {...wrapperProps}
+      className={`${span} relative rounded-2xl overflow-hidden group border border-white/10 ${tile.href ? "hover:border-[#4A8EFA]/55 transition-all" : ""}`}
     >
       <video
         autoPlay
@@ -648,20 +887,104 @@ function FillerVideoTile({
         muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: "contrast(1.08) brightness(0.78) saturate(0.95)" }}
+        style={{
+          filter: hasOverlay
+            ? "contrast(1.1) brightness(0.55) saturate(0.95)"
+            : "contrast(1.08) brightness(0.78) saturate(0.95)",
+        }}
       >
         <source src={tile.video} type="video/mp4" />
       </video>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent pointer-events-none" />
+
+      {/* Gradient for readability — heavier when there's an overlay */}
+      <div
+        className={`absolute inset-0 pointer-events-none ${
+          hasOverlay
+            ? "bg-gradient-to-t from-black/75 via-black/30 to-black/15"
+            : "bg-gradient-to-t from-black/55 via-transparent to-transparent"
+        }`}
+      />
+
+      {/* Caption — small label */}
       {tile.caption && (
         <div
-          className="absolute left-4 bottom-4 text-[9px] tracking-[0.32em] uppercase text-white/70 font-semibold pointer-events-none"
+          className="absolute right-4 top-4 text-[9px] tracking-[0.32em] uppercase text-white/65 font-semibold pointer-events-none"
           style={{ fontFamily: "var(--font-geist-mono), monospace" }}
         >
           {tile.caption}
         </div>
       )}
-    </div>
+
+      {/* Big overlay content — layout differs for CTA (vertical) vs metric (horizontal) */}
+      {hasOverlay && !tile.href && (
+        // METRIC variant: horizontal layout — subtitle left, huge number right.
+        // Works for 2x1 cards (~150px tall) where vertical stacking overflows.
+        <div className="absolute inset-0 flex items-center justify-between gap-4 px-5 sm:px-7 z-10 pointer-events-none">
+          {tile.overlaySubtitle && (
+            <div
+              className="text-[11px] sm:text-[13px] tracking-[0.42em] uppercase text-white/85 font-semibold max-w-[40%] leading-tight"
+              style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+            >
+              {tile.overlaySubtitle}
+            </div>
+          )}
+          {tile.overlayTitle && (
+            <div
+              className="text-white leading-[0.85] tracking-[-0.05em] uppercase text-right"
+              style={{
+                fontWeight: 900,
+                fontSize:
+                  tile.size === "2x2"
+                    ? "clamp(56px, 8vw, 120px)"
+                    : "clamp(52px, 6.5vw, 96px)",
+              }}
+            >
+              {tile.overlayTitle}
+            </div>
+          )}
+        </div>
+      )}
+      {hasOverlay && tile.href && (
+        // CTA variant: vertical layout — subtitle top, title bottom-left, arrow bottom-right
+        <div className="absolute inset-0 flex flex-col justify-between p-5 sm:p-7 z-10 pointer-events-none">
+          {tile.overlaySubtitle && (
+            <div
+              className="text-[11px] sm:text-[13px] tracking-[0.42em] uppercase text-white/85 font-semibold"
+              style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+            >
+              {tile.overlaySubtitle}
+            </div>
+          )}
+          <div className="flex items-end justify-between gap-3">
+            {tile.overlayTitle && (
+              <div
+                className="text-white leading-[0.92] tracking-[-0.03em] uppercase"
+                style={{
+                  fontWeight: 900,
+                  fontSize:
+                    tile.size === "2x2"
+                      ? "clamp(32px, 4vw, 60px)"
+                      : "clamp(40px, 5vw, 72px)",
+                }}
+              >
+                {tile.overlayTitle}
+              </div>
+            )}
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-black transition-transform group-hover:translate-x-1 flex-shrink-0">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path
+                  d="M3 7h8m0 0L7 3m4 4l-4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+          </div>
+        </div>
+      )}
+    </Wrapper>
   );
 }
 

@@ -7,6 +7,7 @@ import TickerClient from "../components/ui/sections/data-ticker/TickerClient";
 import { getEcosystemData } from "@/app/lib/ecosystem-data";
 import ProjectBento from "../components/ui/sections/project-bento";
 import EcosystemFan from "../components/ui/sections/ecosystem-fan";
+import { listReports } from "@/app/lib/reports/listReports";
 
 export default async function ZkPreviewPage() {
   const [tickerItems, ecosystemData] = await Promise.all([
@@ -14,12 +15,20 @@ export default async function ZkPreviewPage() {
     getEcosystemData(),
   ]);
 
+  const reports = listReports();
+  const latestReportHref = reports.length > 0
+    ? `/reports/${reports[0].slug}.html`
+    : undefined;
+
   return (
     <main className="bg-black min-h-screen text-white">
       <ZkHero />
       <TickerClient items={tickerItems} />
       <ProductShowcase />
-      <ProjectBento categories={ecosystemData.categories} />
+      <ProjectBento
+        categories={ecosystemData.categories}
+        latestReportHref={latestReportHref}
+      />
       <EcosystemFan categories={ecosystemData.categories} />
     </main>
   );

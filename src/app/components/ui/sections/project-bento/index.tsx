@@ -101,6 +101,17 @@ const PRODUCTION_REPO_NAMES = new Set(
   SHOWCASE_CLIPS.map((c) => c.id.toLowerCase())
 );
 
+/**
+ * Maps each production showcase clip to its corresponding ecosystem category.
+ * Used to filter production cards when a category chip is selected — e.g.,
+ * selecting "AI / ML" shows tokagent but hides toki/tonnel.
+ */
+const PRODUCTION_ECOSYSTEM_CATEGORY: Record<string, string> = {
+  toki: "Platform",
+  tokagent: "AI / ML",
+  tonnel: "Infra",
+};
+
 function aggregateRepos(categories: EcosystemCategory[], filter: string): RepoData[] {
   const all: RepoData[] = [];
   for (const cat of categories) {
@@ -147,11 +158,7 @@ function buildTiles(repos: RepoData[]): Tile[] {
 }
 
 /** Specials shown across every view (All + each category filter). */
-function buildSpecials(
-  totalReposCount: number,
-  totalCategoriesCount: number,
-  latestReportHref?: string
-): Tile[] {
+function buildSpecials(latestReportHref?: string): Tile[] {
   return [
     { kind: "wordmark", size: "2x2" },
     {
@@ -170,18 +177,17 @@ function buildSpecials(
       href: latestReportHref,
     },
     {
-      kind: "filler-video",
+      kind: "statement",
       size: "2x1",
-      video: FILLER_VIDEO_POOL[1].src,
-      overlayTitle: String(totalReposCount),
-      overlaySubtitle: "active projects",
+      text: "Built in the open.",
+      palette: 1,
     },
     {
       kind: "metric",
       size: "1x1",
-      value: String(totalCategoriesCount),
-      label: "categories",
-      palette: 2,
+      value: "2017",
+      label: "EST.",
+      palette: 0,
     },
     {
       kind: "filler-video",
@@ -193,20 +199,49 @@ function buildSpecials(
   ];
 }
 
-/** Pad a short tile list with dummy specials until it has at least targetCells cells. */
-function padTiles(tiles: Tile[], targetCells: number): Tile[] {
+const GRID_COLS = 6;
+
+/**
+ * Pad a tile list so the final grid is a complete rectangle:
+ *   1. Reach at least minCells with a mix of filler tiles.
+ *   2. Round the total cell count up to a multiple of GRID_COLS using
+ *      1x1 fillers so the final row is fully filled.
+ */
+function padTiles(tiles: Tile[], minCells: number): Tile[] {
   let cells = tiles.reduce((s, t) => s + sizeCells(t.size), 0);
   let idx = 0;
   const out = [...tiles];
-  while (cells < targetCells) {
-    const remaining = targetCells - cells;
+
+  while (cells < minCells) {
+    const remaining = minCells - cells;
     const tile = makeFiller(idx, remaining);
     out.push(tile);
     cells += sizeCells(tile.size);
     idx++;
-    if (idx > 60) break; // safety
+    if (idx > 60) break;
   }
+
+  // Round up to a perfect row of GRID_COLS cells using only 1x1 fillers,
+  // so we never leave an unfinished last row.
+  while (cells % GRID_COLS !== 0) {
+    out.push(makeSmallFiller(idx));
+    cells += 1;
+    idx++;
+    if (idx > 200) break;
+  }
+
   return out;
+}
+
+function makeSmallFiller(seed: number): Tile {
+  const m = METRIC_POOL[seed % METRIC_POOL.length];
+  return {
+    kind: "metric",
+    size: "1x1",
+    value: m.value,
+    label: m.label,
+    palette: (seed + 2) % PALETTES.length,
+  };
 }
 
 function makeFiller(seed: number, remaining: number): Tile {
@@ -277,16 +312,20 @@ export default function ProjectBento({ categories, latestReportHref }: Props) {
     [categories]
   );
 
-  const totalRepos = useMemo(
-    () => categories.reduce((s, c) => s + c.repoCount, 0),
-    [categories]
-  );
-
   const tiles = useMemo(() => {
     const filtered = aggregateRepos(categories, selectedCat);
     const built = buildTiles(filtered);
-    const specials = buildSpecials(totalRepos, categories.length, latestReportHref);
-    const [first, second, third] = shuffledClips;
+    const specials = buildSpecials(latestReportHref);
+
+    // Filter production clips by selected category (when not "All"), then
+    // pad with undefined so the woven layout slots remain stable.
+    const visibleClips =
+      selectedCat === "All"
+        ? shuffledClips
+        : shuffledClips.filter(
+            (c) => PRODUCTION_ECOSYSTEM_CATEGORY[c.id] === selectedCat
+          );
+    const [first, second, third] = visibleClips;
     const prodTile = (clip: ShowcaseClip): Tile => ({
       kind: "production" as const,
       size: "2x2" as const,
@@ -323,7 +362,7 @@ export default function ProjectBento({ categories, latestReportHref }: Props) {
     ];
 
     return padTiles(woven, 30);
-  }, [categories, selectedCat, totalRepos, shuffledClips, latestReportHref]);
+  }, [categories, selectedCat, shuffledClips, latestReportHref]);
 
   return (
     <section
@@ -456,7 +495,10 @@ function ProjectTextTile({
         >
           {tile.project.category}
         </span>
-        <ActivityDot activity={tile.project.activity} />
+        <div className="flex items-center gap-2">
+          <ExternalLinkIcon className="opacity-50 group-hover:opacity-100 transition-opacity" />
+          <ActivityDot activity={tile.project.activity} />
+        </div>
       </div>
       <div>
         <h3
@@ -473,11 +515,12 @@ function ProjectTextTile({
         >
           {tile.project.name}
         </h3>
-        {tile.project.description && tile.size !== "1x1" && (
+        {tile.project.description && (
           <p
-            className="mt-2 line-clamp-2"
+            className={tile.size === "1x1" ? "mt-1 line-clamp-1" : "mt-2 line-clamp-2"}
             style={{
-              fontSize: tile.size === "2x2" ? "13px" : "12px",
+              fontSize:
+                tile.size === "2x2" ? "13px" : tile.size === "1x1" ? "10px" : "12px",
               opacity: 0.72,
               lineHeight: 1.35,
             }}
@@ -515,7 +558,10 @@ function ProjectImageTile({
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 group-hover:from-black/75 transition-all" />
-      <ActivityDot activity={tile.project.activity} className="absolute top-3 right-3 z-10" />
+      <div className="absolute top-3 right-3 z-10 flex items-center gap-2 text-white">
+        <ExternalLinkIcon className="opacity-55 group-hover:opacity-100 transition-opacity" />
+        <ActivityDot activity={tile.project.activity} />
+      </div>
       <div className="absolute inset-0 p-4 sm:p-5 flex flex-col justify-end z-10">
         <div
           className="text-[9px] tracking-[0.3em] uppercase text-[#7AB0FF]/80 mb-1"
@@ -537,11 +583,12 @@ function ProjectImageTile({
         >
           {tile.project.name}
         </h3>
-        {tile.project.description && tile.size !== "1x1" && (
+        {tile.project.description && (
           <p
-            className="mt-1.5 text-white/70 line-clamp-2"
+            className={`text-white/70 ${tile.size === "1x1" ? "mt-1 line-clamp-1" : "mt-1.5 line-clamp-2"}`}
             style={{
-              fontSize: tile.size === "2x2" ? "13px" : "12px",
+              fontSize:
+                tile.size === "2x2" ? "13px" : tile.size === "1x1" ? "10px" : "12px",
               lineHeight: 1.35,
             }}
           >
@@ -578,7 +625,10 @@ function ProjectVideoTile({
         <source src={tile.video} type="video/mp4" />
       </video>
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-      <ActivityDot activity={tile.project.activity} className="absolute top-3 right-3 z-10" />
+      <div className="absolute top-3 right-3 z-10 flex items-center gap-2 text-white">
+        <ExternalLinkIcon className="opacity-55 group-hover:opacity-100 transition-opacity" />
+        <ActivityDot activity={tile.project.activity} />
+      </div>
       <div className="absolute inset-0 p-5 sm:p-6 flex flex-col justify-end z-10">
         <div
           className="text-[9px] tracking-[0.3em] uppercase text-[#7AB0FF] mb-2"
@@ -619,7 +669,12 @@ function ProductionTile({
       className={`${span} relative rounded-2xl overflow-hidden group cursor-pointer border border-[#4A8EFA]/30 hover:border-[#4A8EFA]/70 transition-all`}
     >
       {hasVideo ? (
+        // key={clip.id} forces React to remount the video element when the
+        // production card at this grid slot changes (e.g., after the mount-
+        // time shuffle), so the <source> children are re-evaluated instead
+        // of the previous clip's video continuing to play.
         <video
+          key={clip.id}
           autoPlay
           loop
           muted
@@ -683,26 +738,26 @@ function ProductionTile({
 function WordmarkTile({ span }: { span: string }) {
   return (
     <div
-      className={`${span} relative rounded-2xl overflow-hidden flex flex-col items-center justify-center p-4`}
+      className={`${span} relative rounded-2xl overflow-hidden flex flex-col items-center justify-center text-center p-6`}
       style={{ background: "#FFFFFF", color: "#0A0A14" }}
     >
+      <h3
+        className="leading-[0.9] tracking-[-0.04em] uppercase"
+        style={{ fontWeight: 900, fontSize: "clamp(32px, 4vw, 60px)" }}
+      >
+        Tokamak
+        <br />
+        Network
+      </h3>
       <div
-        className="text-[9px] tracking-[0.5em] uppercase mb-2"
+        className="mt-5 flex items-center justify-center gap-2 text-[10px] sm:text-[11px] tracking-[0.32em] uppercase font-semibold"
         style={{ fontFamily: "var(--font-geist-mono), monospace", color: "#2A72E5" }}
       >
-        Tokamak Network
-      </div>
-      <div
-        className="leading-none tracking-[-0.06em] text-center"
-        style={{ fontWeight: 900, fontSize: "clamp(40px, 5vw, 88px)" }}
-      >
-        tokamak
-      </div>
-      <div
-        className="mt-3 text-[10px] tracking-[0.4em] uppercase"
-        style={{ fontFamily: "var(--font-geist-mono), monospace", color: "rgba(0,0,0,0.45)" }}
-      >
-        zk · l2 · privacy
+        <span>privacy</span>
+        <span style={{ opacity: 0.3 }}>·</span>
+        <span>zk</span>
+        <span style={{ opacity: 0.3 }}>·</span>
+        <span>custom L2</span>
       </div>
     </div>
   );
@@ -945,46 +1000,69 @@ function FillerVideoTile({
         </div>
       )}
       {hasOverlay && tile.href && (
-        // CTA variant: vertical layout — subtitle top, title bottom-left, arrow bottom-right
-        <div className="absolute inset-0 flex flex-col justify-between p-5 sm:p-7 z-10 pointer-events-none">
+        // CTA variant: each word on its own line stacked at the bottom-left;
+        // arrow pinned to the bottom-right corner.
+        <div className="absolute inset-0 z-10 pointer-events-none">
           {tile.overlaySubtitle && (
             <div
-              className="text-[11px] sm:text-[13px] tracking-[0.42em] uppercase text-white/85 font-semibold"
+              className="absolute top-5 sm:top-7 left-5 sm:left-7 right-5 sm:right-7 text-[11px] sm:text-[13px] tracking-[0.42em] uppercase text-white/85 font-semibold"
               style={{ fontFamily: "var(--font-geist-mono), monospace" }}
             >
               {tile.overlaySubtitle}
             </div>
           )}
-          <div className="flex items-end justify-between gap-3">
-            {tile.overlayTitle && (
-              <div
-                className="text-white leading-[0.92] tracking-[-0.03em] uppercase"
-                style={{
-                  fontWeight: 900,
-                  fontSize:
-                    tile.size === "2x2"
-                      ? "clamp(32px, 4vw, 60px)"
-                      : "clamp(40px, 5vw, 72px)",
-                }}
-              >
-                {tile.overlayTitle}
-              </div>
-            )}
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-black transition-transform group-hover:translate-x-1 flex-shrink-0">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path
-                  d="M3 7h8m0 0L7 3m4 4l-4 4"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-          </div>
+          {tile.overlayTitle && (
+            <div
+              className="absolute left-5 sm:left-7 bottom-5 sm:bottom-7 text-white leading-[0.88] tracking-[-0.03em] uppercase"
+              style={{
+                fontWeight: 900,
+                fontSize:
+                  tile.size === "2x2"
+                    ? "clamp(40px, 5.2vw, 84px)"
+                    : "clamp(40px, 5vw, 72px)",
+              }}
+            >
+              {tile.overlayTitle.split(/\s+/).map((word, i) => (
+                <div key={i}>{word}</div>
+              ))}
+            </div>
+          )}
+          <span className="absolute right-5 sm:right-7 bottom-5 sm:bottom-7 inline-flex items-center justify-center w-11 h-11 rounded-full bg-white text-black transition-transform group-hover:translate-x-1">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path
+                d="M3 7h8m0 0L7 3m4 4l-4 4"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
         </div>
       )}
     </Wrapper>
+  );
+}
+
+/** Diagonal "external link" arrow — small click-affordance for repo tiles. */
+function ExternalLinkIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      width="11"
+      height="11"
+      viewBox="0 0 12 12"
+      fill="none"
+      aria-hidden
+      className={className}
+    >
+      <path
+        d="M4 8L8 4M8 4H5M8 4V7"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 

@@ -1,11 +1,11 @@
 import fs from "fs";
 import path from "path";
-import type { ReportMeta } from "@/app/components/ui/sections/reports/types";
+import type { ReportMeta } from "./types";
 import { SLUG_PATTERN } from "./constants";
 
 const REPORTS_DIR = path.join(process.cwd(), "public", "reports");
 
-const TITLE_NUMBER_RE = /Biweekly\s+Report\s+#(\d+)/i;
+const TITLE_NUMBER_RE = /Biweekly(?:\s+Report)?\s*#(\d+)/i;
 
 function readReportNumber(slug: string): number | undefined {
   const filePath = path.join(REPORTS_DIR, `${slug}.html`);

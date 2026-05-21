@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { SHOWCASE_CLIPS, type ShowcaseClip } from "./clips";
 
@@ -48,6 +48,39 @@ export default function ProductShowcase() {
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
+      {/* Background — blueprint grid framed by radial mask */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none opacity-[0.13]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, rgba(74,142,250,0.22) 1px, transparent 1px), linear-gradient(to bottom, rgba(74,142,250,0.22) 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
+          maskImage:
+            "radial-gradient(ellipse 85% 75% at 50% 50%, black 35%, transparent 100%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 85% 75% at 50% 50%, black 35%, transparent 100%)",
+        }}
+      />
+      {/* Background — cyan glow bottom-left */}
+      <div
+        aria-hidden
+        className="absolute -bottom-48 -left-40 w-[680px] h-[680px] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(42,114,229,0.22) 0%, transparent 65%)",
+        }}
+      />
+      {/* Background — subtle counter glow top-right */}
+      <div
+        aria-hidden
+        className="absolute -top-32 -right-32 w-[520px] h-[520px] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(122,176,255,0.10) 0%, transparent 65%)",
+        }}
+      />
+
       <div className="relative w-full max-w-[1500px] mx-auto px-4 sm:px-8 lg:px-12 py-14 sm:py-20 grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,0.75fr)] gap-10 lg:gap-14 items-center">
         {/* Left — Cinematic stage */}
         <div className="relative w-full order-2 lg:order-1">
@@ -112,30 +145,6 @@ export default function ProductShowcase() {
               backgroundSize: "256px 256px",
             }}
           />
-
-          {/* Text overlay — bottom-left glass card */}
-          <div className="absolute left-4 sm:left-8 bottom-4 sm:bottom-8 right-4 sm:right-auto sm:max-w-[460px] z-10 pointer-events-none">
-            <ClipCard clip={clip} />
-          </div>
-
-          {/* CTA — bottom-right */}
-          <div className="absolute right-4 sm:right-8 bottom-4 sm:bottom-8 z-10">
-            <a
-              href={clip.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/95 hover:bg-white text-black text-[11px] sm:text-xs tracking-[0.2em] uppercase font-semibold transition-all shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
-              style={{
-                fontFamily: "var(--font-geist-mono), monospace",
-                boxShadow: `0 8px 30px ${clip.color}55, 0 0 0 1px ${clip.color}33`,
-              }}
-            >
-              Explore more
-              <span className="text-base leading-none" aria-hidden>
-                →
-              </span>
-            </a>
-          </div>
 
           {/* Dot navigation — bottom center */}
           <div className="absolute left-1/2 -translate-x-1/2 bottom-3 sm:bottom-4 z-10 flex items-center gap-2">
@@ -207,29 +216,39 @@ export default function ProductShowcase() {
           </div>
         </div>
 
-        {/* Right — Title block */}
-        <div className="relative z-20 max-w-md lg:max-w-none order-1 lg:order-2">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#4A8EFA] shadow-[0_0_10px_#2A72E5] animate-pulse" />
-            <span
-              className="text-[10px] sm:text-[11px] tracking-[0.5em] text-[#7AB0FF]/90 uppercase"
+        {/* Right — Title + synced meta panel + roster */}
+        <div className="relative z-20 max-w-md lg:max-w-none order-1 lg:order-2 flex flex-col gap-6">
+          <div>
+            <div className="inline-flex items-center gap-3 mb-4">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#4A8EFA] shadow-[0_0_10px_#2A72E5] animate-pulse" />
+              <span
+                className="text-[10px] sm:text-[11px] tracking-[0.5em] text-[#7AB0FF]/90 uppercase"
+                style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+              >
+                Live Production
+              </span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-white leading-[1.05] tracking-tight">
+              Built on{" "}
+              <span className="text-[#7AB0FF] drop-shadow-[0_0_24px_rgba(42,114,229,0.55)]">
+                Tokamak
+              </span>
+            </h2>
+            <p
+              className="mt-4 text-sm text-white/55 leading-relaxed max-w-md"
               style={{ fontFamily: "var(--font-geist-mono), monospace" }}
             >
-              Live Production
-            </span>
+              Real products shipping on the network.
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-white leading-[1.05] tracking-tight">
-            Built on{" "}
-            <span className="text-[#7AB0FF] drop-shadow-[0_0_24px_rgba(42,114,229,0.55)]">
-              Tokamak
-            </span>
-          </h2>
-          <p
-            className="mt-5 text-sm sm:text-base text-white/55 leading-relaxed max-w-md"
-            style={{ fontFamily: "var(--font-geist-mono), monospace" }}
-          >
-            Real products shipping on the network.
-          </p>
+
+          <MetaPanel clip={clip} index={activeIndex} total={total} />
+
+          <Roster
+            clips={SHOWCASE_CLIPS}
+            activeIndex={activeIndex}
+            onSelect={goto}
+          />
         </div>
       </div>
     </section>
@@ -248,15 +267,26 @@ function ClipLayer({
   const ref = useRef<HTMLVideoElement>(null);
   const hasVideo = Boolean(clip.videoMp4 || clip.videoWebm);
 
-  // Pause non-active videos for perf and sync mute state
+  // Restart from the beginning whenever this clip becomes active, and
+  // pause non-active videos for perf. Mute state is mirrored both ways.
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
     v.muted = muted;
     if (active) {
+      try {
+        v.currentTime = 0;
+      } catch {
+        /* some browsers reject seek before metadata is ready */
+      }
       v.play().catch(() => {});
     } else {
       v.pause();
+      try {
+        v.currentTime = 0;
+      } catch {
+        /* ignore */
+      }
     }
   }, [active, muted]);
 
@@ -300,24 +330,207 @@ function ClipLayer({
   );
 }
 
-function ClipCard({ clip }: { clip: ShowcaseClip }) {
+function MetaPanel({
+  clip,
+  index,
+  total,
+}: {
+  clip: ShowcaseClip;
+  index: number;
+  total: number;
+}) {
+  const domain = useMemo(() => {
+    try {
+      return new URL(clip.url).hostname.replace(/^www\./, "");
+    } catch {
+      return clip.url;
+    }
+  }, [clip.url]);
+
   return (
-    <div className="pointer-events-auto rounded-xl border border-white/15 bg-black/45 backdrop-blur-md px-5 py-4 sm:px-6 sm:py-5 shadow-2xl">
+    <div
+      className="relative rounded-xl border border-[#4A8EFA]/25 bg-[#040814]/70 backdrop-blur-sm p-4 sm:p-5 overflow-hidden transition-[box-shadow] duration-500"
+      style={{
+        boxShadow: `0 0 30px ${clip.color}1f, inset 0 1px 0 rgba(255,255,255,0.05)`,
+      }}
+    >
+      {/* Left color spine — bound to active clip */}
       <div
-        className="text-[10px] sm:text-[11px] tracking-[0.4em] uppercase mb-2 sm:mb-3"
-        style={{ color: clip.color, fontFamily: "var(--font-geist-mono), monospace" }}
-      >
-        {clip.category}
+        className="absolute left-0 top-0 bottom-0 w-[3px] transition-colors duration-500"
+        style={{
+          background: clip.color,
+          boxShadow: `0 0 14px ${clip.color}, 0 0 28px ${clip.color}55`,
+        }}
+      />
+      {/* Top row: category + status */}
+      <div className="flex items-center justify-between mb-3 pl-2">
+        <span
+          className="text-[10px] tracking-[0.35em] uppercase transition-colors duration-500"
+          style={{
+            color: clip.color,
+            fontFamily: "var(--font-geist-mono), monospace",
+          }}
+        >
+          {clip.category}
+        </span>
+        <span
+          className="flex items-center gap-1.5 text-[9px] tracking-[0.3em] uppercase text-white/55"
+          style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+        >
+          <span
+            className="h-1.5 w-1.5 rounded-full animate-pulse"
+            style={{
+              background: clip.color,
+              boxShadow: `0 0 8px ${clip.color}`,
+            }}
+          />
+          Live · 0{index + 1}/0{total}
+        </span>
       </div>
-      <h3 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-white leading-tight mb-2 sm:mb-3 tracking-tight">
+
+      <h3 className="pl-2 text-lg sm:text-xl font-semibold text-white leading-tight mb-1.5 tracking-tight">
         {clip.name}
       </h3>
       <p
-        className="text-xs sm:text-sm text-white/70 leading-relaxed"
+        className="pl-2 text-xs sm:text-[13px] text-white/65 leading-relaxed"
         style={{ fontFamily: "var(--font-geist-mono), monospace" }}
       >
         {clip.description}
       </p>
+
+      {clip.tags && clip.tags.length > 0 && (
+        <div className="mt-3 pl-2 flex flex-wrap gap-1.5">
+          {clip.tags.map((t) => (
+            <span
+              key={t}
+              className="px-2 py-0.5 rounded border border-white/15 bg-white/[0.04] text-[9.5px] tracking-[0.18em] uppercase text-white/65"
+              style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <a
+        href={clip.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group/cta mt-5 ml-2 inline-flex items-center gap-3 px-5 py-3 rounded-full border text-[11px] sm:text-xs tracking-[0.28em] uppercase font-semibold transition-all"
+        style={{
+          fontFamily: "var(--font-geist-mono), monospace",
+          color: clip.color,
+          borderColor: `${clip.color}80`,
+          background: `${clip.color}14`,
+          boxShadow: `0 0 28px ${clip.color}33, inset 0 1px 0 rgba(255,255,255,0.06)`,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = `${clip.color}26`;
+          e.currentTarget.style.borderColor = clip.color;
+          e.currentTarget.style.boxShadow = `0 0 44px ${clip.color}55, inset 0 1px 0 rgba(255,255,255,0.08)`;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = `${clip.color}14`;
+          e.currentTarget.style.borderColor = `${clip.color}80`;
+          e.currentTarget.style.boxShadow = `0 0 28px ${clip.color}33, inset 0 1px 0 rgba(255,255,255,0.06)`;
+        }}
+      >
+        Visit {domain}
+        <span
+          aria-hidden
+          className="inline-flex items-center justify-center w-6 h-6 rounded-full text-black text-[13px] font-bold transition-transform group-hover/cta:translate-x-0.5"
+          style={{ background: clip.color }}
+        >
+          →
+        </span>
+      </a>
     </div>
   );
 }
+
+function Roster({
+  clips,
+  activeIndex,
+  onSelect,
+}: {
+  clips: ShowcaseClip[];
+  activeIndex: number;
+  onSelect: (i: number) => void;
+}) {
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2.5 px-1">
+        <span
+          className="text-[9px] tracking-[0.4em] text-white/40 uppercase"
+          style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+        >
+          Roster · 0{clips.length}
+        </span>
+        <span
+          className="text-[9px] tracking-[0.4em] text-white/30 uppercase"
+          style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+        >
+          Tap to jump
+        </span>
+      </div>
+      <ul className="space-y-1.5">
+        {clips.map((c, i) => {
+          const isActive = i === activeIndex;
+          return (
+            <li key={c.id}>
+              <button
+                type="button"
+                onClick={() => onSelect(i)}
+                aria-current={isActive ? "true" : undefined}
+                className="group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border text-left transition-all"
+                style={{
+                  borderColor: isActive
+                    ? `${c.color}66`
+                    : "rgba(255,255,255,0.08)",
+                  background: isActive
+                    ? `linear-gradient(90deg, ${c.color}1f 0%, rgba(255,255,255,0.02) 70%)`
+                    : "rgba(255,255,255,0.02)",
+                  boxShadow: isActive
+                    ? `inset 0 0 0 1px ${c.color}33, 0 0 18px ${c.color}22`
+                    : "none",
+                }}
+              >
+                <span
+                  className="text-[10px] tracking-[0.3em] uppercase w-7 transition-colors"
+                  style={{
+                    color: isActive ? c.color : "rgba(255,255,255,0.35)",
+                    fontFamily: "var(--font-geist-mono), monospace",
+                  }}
+                >
+                  0{i + 1}
+                </span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-[13px] font-semibold text-white truncate">
+                    {c.name}
+                  </span>
+                  <span
+                    className="block text-[9.5px] tracking-[0.28em] uppercase mt-0.5 truncate transition-colors"
+                    style={{
+                      color: isActive ? c.color : "rgba(255,255,255,0.4)",
+                      fontFamily: "var(--font-geist-mono), monospace",
+                    }}
+                  >
+                    {c.category}
+                  </span>
+                </span>
+                <span
+                  className="h-1.5 w-1.5 rounded-full transition-all"
+                  style={{
+                    background: isActive ? c.color : "rgba(255,255,255,0.2)",
+                    boxShadow: isActive ? `0 0 10px ${c.color}` : "none",
+                  }}
+                />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+

@@ -6,7 +6,7 @@ import type {
   LandscapeCategory,
   LandscapeRepo,
   CategoryFocusItem,
-} from "@/app/components/ui/sections/reports/types";
+} from "./types";
 import { sanitizeUrl } from "./parseReport";
 
 // ── Ecosystem Landscape ──

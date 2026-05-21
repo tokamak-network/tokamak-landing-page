@@ -16,6 +16,8 @@ interface RepoData {
   activity: string;
   category: string;
   linesAdded: number;
+  /** 0-based index within the repo's ecosystem category (assigned at aggregate time). */
+  categoryIndex: number;
 }
 
 type TileSize = "1x1" | "2x1" | "1x2" | "2x2";
@@ -40,18 +42,39 @@ type Tile =
       href?: string;
     };
 
-const CATEGORY_BG: Record<string, string> = {
-  Platform: "/cards/bg-platform-a.png",
-  Infra: "/cards/bg-infra-a.png",
-  "AI / ML": "/cards/bg-ai-a.png",
-  ZK: "/cards/bg-zk-a.png",
-  Lab: "/cards/bg-lab-a.png",
-  Tool: "/cards/bg-tool-a.png",
-  DeFi: "/cards/bg-defi-a.png",
-  Social: "/cards/bg-social-a.png",
-  Governance: "/cards/bg-governance-a.png",
-  Analytics: "/cards/bg-analytics-a.png",
+/**
+ * Background image pool per ecosystem category. When a category has more
+ * than one image, `pickCategoryBg` hashes the repo name to deterministically
+ * pick one — so the same repo always renders with the same background.
+ */
+const CATEGORY_BG_POOL: Record<string, string[]> = {
+  Platform: [
+    "/cards/bg-platform-a.png",
+    "/cards/bg-platform-b.jpeg",
+    "/cards/bg-platform-c.jpeg",
+    "/cards/bg-platform-d.jpeg",
+  ],
+  Infra: ["/cards/bg-infra-a.png", "/cards/bg-infra-b.jpeg"],
+  "AI / ML": ["/cards/bg-ai-a.png"],
+  ZK: ["/cards/bg-zk-a.png"],
+  Lab: ["/cards/bg-lab-a.png"],
+  Tool: ["/cards/bg-tool-a.png"],
+  DeFi: ["/cards/bg-defi-a.png", "/cards/bg-defi-b.jpeg"],
+  Social: ["/cards/bg-social-a.png"],
+  Governance: ["/cards/bg-governance-a.png"],
+  Analytics: ["/cards/bg-analytics-a.png"],
 };
+
+const CATEGORY_BG_FALLBACK = "/cards/bg-tool-a.png";
+
+function pickCategoryBg(category: string, categoryIndex: number): string {
+  const pool = CATEGORY_BG_POOL[category];
+  if (!pool || pool.length === 0) return CATEGORY_BG_FALLBACK;
+  if (pool.length === 1) return pool[0];
+  // Round-robin across the pool by the repo's category-local index so that
+  // every image in the pool is used as soon as the category has enough repos.
+  return pool[categoryIndex % pool.length];
+}
 
 const PALETTES = [
   { bg: "#FFFFFF", fg: "#0A0A14" },
@@ -72,10 +95,9 @@ const STATEMENT_POOL = [
 ];
 
 const METRIC_POOL: { value: string; label: string }[] = [
-  { value: "39", label: "active repos" },
+  { value: "39", label: "active projects" },
   { value: "9", label: "categories" },
   { value: "10K+", label: "commits" },
-  { value: "LIVE", label: "mainnet" },
   { value: "24/7", label: "uptime" },
   { value: "∞", label: "verifiability" },
 ];
@@ -97,9 +119,15 @@ function sizeCells(s: TileSize): number {
   return s === "2x2" ? 4 : s === "1x1" ? 1 : 2;
 }
 
-const PRODUCTION_REPO_NAMES = new Set(
-  SHOWCASE_CLIPS.map((c) => c.id.toLowerCase())
-);
+/**
+ * Repo names (from ecosystem-data) that should be hidden from the regular
+ * grid because they're already represented as a production showcase tile.
+ * Includes both the showcase id and any divergent ecosystem-data repo name.
+ */
+const PRODUCTION_REPO_NAMES = new Set<string>([
+  ...SHOWCASE_CLIPS.map((c) => c.id.toLowerCase()),
+  "tokamak-rollup-hub-v2", // rolluphub showcase ↔ ecosystem repo
+]);
 
 /**
  * Maps each production showcase clip to its corresponding ecosystem category.
@@ -110,15 +138,19 @@ const PRODUCTION_ECOSYSTEM_CATEGORY: Record<string, string> = {
   toki: "Platform",
   tokagent: "AI / ML",
   tonnel: "Infra",
+  rolluphub: "Infra",
 };
 
 function aggregateRepos(categories: EcosystemCategory[], filter: string): RepoData[] {
   const all: RepoData[] = [];
+  const categoryCounter: Record<string, number> = {};
   for (const cat of categories) {
     if (filter !== "All" && cat.name !== filter) continue;
     for (const repo of cat.repos) {
       // Skip repos that are already represented as production showcase tiles
       if (PRODUCTION_REPO_NAMES.has(repo.name.toLowerCase())) continue;
+      const idx = categoryCounter[cat.name] ?? 0;
+      categoryCounter[cat.name] = idx + 1;
       all.push({
         name: repo.name,
         description: repo.description,
@@ -126,6 +158,7 @@ function aggregateRepos(categories: EcosystemCategory[], filter: string): RepoDa
         activity: repo.activity,
         category: cat.name,
         linesAdded: repo.linesAdded ?? 0,
+        categoryIndex: idx,
       });
     }
   }
@@ -183,6 +216,14 @@ function buildSpecials(latestReportHref?: string): Tile[] {
       palette: 1,
     },
     {
+      kind: "statement",
+      size: "2x1",
+      text: "Launch your own L2.",
+      palette: 3,
+      eyebrow: "Build",
+      href: "https://rolluphub.tokamak.network/",
+    },
+    {
       kind: "metric",
       size: "1x1",
       value: "2017",
@@ -221,8 +262,9 @@ function padTiles(tiles: Tile[], minCells: number): Tile[] {
     if (idx > 60) break;
   }
 
-  // Round up to a perfect row of GRID_COLS cells using only 1x1 fillers,
-  // so we never leave an unfinished last row.
+  // Round up to a perfect multiple of GRID_COLS with 1x1 fillers so the
+  // final row is always completely filled. Dense auto-flow then backfills
+  // any gaps left by 2x2/2x1 tiles at row edges.
   while (cells % GRID_COLS !== 0) {
     out.push(makeSmallFiller(idx));
     cells += 1;
@@ -230,6 +272,58 @@ function padTiles(tiles: Tile[], minCells: number): Tile[] {
     if (idx > 200) break;
   }
 
+  return out;
+}
+
+/**
+ * Style fingerprint used to detect visually similar adjacent tiles.
+ * Tiles with the same key (e.g., two Platform background images side by
+ * side, or two yellow palette statements) should be spaced apart.
+ */
+function tileStyleKey(tile: Tile): string {
+  switch (tile.kind) {
+    case "project-text":
+      return `text-${tile.palette}`;
+    case "project-image":
+      return `image-${tile.project.category}`;
+    case "project-video":
+      return `video`;
+    case "production":
+      return `prod-${tile.clip.id}`;
+    case "wordmark":
+      return `wordmark`;
+    case "statement":
+      return `statement-${tile.palette}`;
+    case "metric":
+      return `metric-${tile.palette}`;
+    case "cta":
+      return `cta`;
+    case "filler-video":
+      return `filler`;
+  }
+}
+
+/**
+ * Greedy pass: when two adjacent tiles share the same style fingerprint,
+ * swap the second one with the next equally-sized tile that breaks the
+ * sequence. Same-size constraint keeps the grid layout stable.
+ */
+function avoidAdjacentDupes(tiles: Tile[]): Tile[] {
+  const out = [...tiles];
+  for (let i = 1; i < out.length; i++) {
+    const prevKey = tileStyleKey(out[i - 1]);
+    if (tileStyleKey(out[i]) !== prevKey) continue;
+    for (let j = i + 1; j < out.length; j++) {
+      if (out[j].size !== out[i].size) continue;
+      const swapKey = tileStyleKey(out[j]);
+      if (swapKey === prevKey) continue;
+      // Also avoid creating a new dup at position j with its new neighbors.
+      const nextKey = i + 1 < out.length ? tileStyleKey(out[i + 1]) : null;
+      if (swapKey === nextKey) continue;
+      [out[i], out[j]] = [out[j], out[i]];
+      break;
+    }
+  }
   return out;
 }
 
@@ -325,13 +419,22 @@ export default function ProjectBento({ categories, latestReportHref }: Props) {
         : shuffledClips.filter(
             (c) => PRODUCTION_ECOSYSTEM_CATEGORY[c.id] === selectedCat
           );
-    const [first, second, third] = visibleClips;
+    const [first, second, third, fourth] = visibleClips;
     const prodTile = (clip: ShowcaseClip): Tile => ({
       kind: "production" as const,
       size: "2x2" as const,
       clip,
     });
-    const [wordmark, statement0, fillerScatter, biweeklyCta, fillerActive, metric9, fillerNebula] = specials;
+    const [
+      wordmark,
+      statementPrivacy,
+      fillerIntro,
+      biweeklyCta,
+      statementOpen,
+      launchL2,
+      estMetric,
+      fillerNebula,
+    ] = specials;
 
     // Weave production cards + specials across the repo tile list. The
     // splice points are deliberate so the same set of special cards appears
@@ -343,25 +446,29 @@ export default function ProjectBento({ categories, latestReportHref }: Props) {
       ...built.slice(0, 3),
       wordmark,
       ...built.slice(3, 5),
-      statement0,
+      statementPrivacy,
       ...built.slice(5, 7),
-      fillerScatter,
+      fillerIntro,
       ...built.slice(7, 9),
       ...(second ? [prodTile(second)] : []),
       ...built.slice(9, 11),
       biweeklyCta,
       ...built.slice(11, 13),
-      fillerActive,
+      statementOpen,
       ...built.slice(13, 15),
-      metric9,
-      ...built.slice(15, 18),
+      launchL2,
+      ...built.slice(15, 17),
+      estMetric,
+      ...built.slice(17, 19),
       ...(third ? [prodTile(third)] : []),
-      ...built.slice(18, 20),
+      ...built.slice(19, 21),
       fillerNebula,
-      ...built.slice(20),
+      ...built.slice(21, 24),
+      ...(fourth ? [prodTile(fourth)] : []),
+      ...built.slice(24),
     ];
 
-    return padTiles(woven, 30);
+    return avoidAdjacentDupes(padTiles(woven, 30));
   }, [categories, selectedCat, shuffledClips, latestReportHref]);
 
   return (
@@ -540,7 +647,7 @@ function ProjectImageTile({
   tile: Extract<Tile, { kind: "project-image" }>;
   span: string;
 }) {
-  const bg = CATEGORY_BG[tile.project.category] ?? "/cards/bg-tool-a.png";
+  const bg = pickCategoryBg(tile.project.category, tile.project.categoryIndex);
   return (
     <a
       href={tile.project.githubUrl || "#"}
@@ -741,16 +848,23 @@ function WordmarkTile({ span }: { span: string }) {
       className={`${span} relative rounded-2xl overflow-hidden flex flex-col items-center justify-center text-center p-6`}
       style={{ background: "#FFFFFF", color: "#0A0A14" }}
     >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/tokamak-symbol.svg"
+        alt="Tokamak Network"
+        className="mb-4"
+        style={{ width: "clamp(38px, 4.2vw, 64px)", height: "auto" }}
+      />
       <h3
         className="leading-[0.9] tracking-[-0.04em] uppercase"
-        style={{ fontWeight: 900, fontSize: "clamp(32px, 4vw, 60px)" }}
+        style={{ fontWeight: 900, fontSize: "clamp(28px, 3.4vw, 52px)" }}
       >
         Tokamak
         <br />
         Network
       </h3>
       <div
-        className="mt-5 flex items-center justify-center gap-2 text-[10px] sm:text-[11px] tracking-[0.32em] uppercase font-semibold"
+        className="mt-4 flex items-center justify-center gap-2 text-[10px] sm:text-[11px] tracking-[0.32em] uppercase font-semibold"
         style={{ fontFamily: "var(--font-geist-mono), monospace", color: "#2A72E5" }}
       >
         <span>privacy</span>
@@ -1013,13 +1127,11 @@ function FillerVideoTile({
           )}
           {tile.overlayTitle && (
             <div
-              className="absolute left-5 sm:left-7 bottom-5 sm:bottom-7 text-white leading-[0.88] tracking-[-0.03em] uppercase"
+              className="absolute left-5 sm:left-7 bottom-5 sm:bottom-7 text-white tracking-[-0.03em] uppercase"
               style={{
                 fontWeight: 900,
-                fontSize:
-                  tile.size === "2x2"
-                    ? "clamp(40px, 5.2vw, 84px)"
-                    : "clamp(40px, 5vw, 72px)",
+                fontSize: tile.size === "2x2" ? "50px" : "clamp(40px, 5vw, 72px)",
+                lineHeight: tile.size === "2x2" ? 1.05 : 0.88,
               }}
             >
               {tile.overlayTitle.split(/\s+/).map((word, i) => (

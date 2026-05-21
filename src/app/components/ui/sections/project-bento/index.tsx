@@ -148,6 +148,22 @@ const PRODUCTION_ECOSYSTEM_CATEGORY: Record<string, string> = {
   rolluphub: "Infra",
 };
 
+/**
+ * Repo-name → live product URL overrides. When set, the regular grid card
+ * for the repo links to the production site instead of the repo's GitHub
+ * page. Keys are matched case-insensitively against ecosystem-data names.
+ */
+const PROJECT_LIVE_URL: Record<string, string> = {
+  "tokamon-io": "https://tokamon.io/",
+  tokamon: "https://tokamon-go.web.app/",
+};
+
+function projectLinkFor(repo: RepoData): string {
+  return (
+    PROJECT_LIVE_URL[repo.name.toLowerCase()] || repo.githubUrl || "#"
+  );
+}
+
 function aggregateRepos(categories: EcosystemCategory[], filter: string): RepoData[] {
   const all: RepoData[] = [];
   const categoryCounter: Record<string, number> = {};
@@ -596,7 +612,7 @@ function ProjectTextTile({
   const p = PALETTES[tile.palette];
   return (
     <a
-      href={tile.project.githubUrl || "#"}
+      href={projectLinkFor(tile.project)}
       target="_blank"
       rel="noopener noreferrer"
       className={`${span} relative rounded-2xl overflow-hidden group flex flex-col justify-between p-5 sm:p-6 transition-transform hover:scale-[1.01]`}
@@ -657,7 +673,7 @@ function ProjectImageTile({
   const bg = pickCategoryBg(tile.project.category, tile.project.categoryIndex);
   return (
     <a
-      href={tile.project.githubUrl || "#"}
+      href={projectLinkFor(tile.project)}
       target="_blank"
       rel="noopener noreferrer"
       className={`${span} relative rounded-2xl overflow-hidden group cursor-pointer border border-white/10 hover:border-[#4A8EFA]/55 transition-all`}
@@ -723,7 +739,7 @@ function ProjectVideoTile({
 }) {
   return (
     <a
-      href={tile.project.githubUrl || "#"}
+      href={projectLinkFor(tile.project)}
       target="_blank"
       rel="noopener noreferrer"
       className={`${span} relative rounded-2xl overflow-hidden group cursor-pointer border border-[#4A8EFA]/30 hover:border-[#4A8EFA]/70 transition-all`}

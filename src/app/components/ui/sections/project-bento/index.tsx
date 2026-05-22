@@ -547,13 +547,7 @@ export default function ProjectBento({ categories, latestReportHref }: Props) {
       {/* Full bento grid — no pagination, scrolls naturally with page */}
       <div className="mx-auto" style={{ maxWidth: "1500px" }}>
         <div
-          className="grid"
-          style={{
-            gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
-            gridAutoRows: "150px",
-            gridAutoFlow: "dense",
-            gap: "10px",
-          }}
+          className="grid grid-cols-3 sm:grid-cols-6 [grid-auto-rows:120px] sm:[grid-auto-rows:140px] lg:[grid-auto-rows:150px] [grid-auto-flow:dense] gap-2 sm:gap-2.5"
         >
           {tiles.map((tile, i) => (
             <TileRender key={i} tile={tile} />
@@ -565,6 +559,12 @@ export default function ProjectBento({ categories, latestReportHref }: Props) {
 }
 
 function spanClass(size: TileSize): string {
+  // Mobile (grid-cols-3) ladder of sizes:
+  //   1x1 → 1 col (small)
+  //   2x1 → 2 cols (mid — pairs with a 1x1 on its right)
+  //   2x2 → full row (hero, takes all 3 cols)
+  //   1x2 → 1 col tall
+  // On sm+ (grid-cols-6) they revert to their natural spans.
   switch (size) {
     case "1x1":
       return "col-span-1 row-span-1";
@@ -573,7 +573,7 @@ function spanClass(size: TileSize): string {
     case "1x2":
       return "col-span-1 row-span-2";
     case "2x2":
-      return "col-span-2 row-span-2";
+      return "col-span-3 row-span-2 sm:col-span-2";
   }
 }
 
@@ -975,18 +975,18 @@ function MetricTile({
   const p = PALETTES[tile.palette];
   return (
     <div
-      className={`${span} relative rounded-2xl overflow-hidden flex flex-col justify-between p-5`}
+      className={`${span} relative rounded-2xl overflow-hidden flex flex-col justify-between p-3 sm:p-5`}
       style={{ background: p.bg, color: p.fg }}
     >
       <div
-        className="text-[9px] tracking-[0.32em] uppercase font-semibold opacity-65"
+        className="text-[8px] sm:text-[9px] tracking-[0.28em] sm:tracking-[0.32em] uppercase font-semibold opacity-65"
         style={{ fontFamily: "var(--font-geist-mono), monospace" }}
       >
         {tile.label}
       </div>
       <div
-        className="leading-none tracking-[-0.06em]"
-        style={{ fontWeight: 900, fontSize: "clamp(48px, 5.5vw, 84px)" }}
+        className="leading-none tracking-[-0.06em] break-all"
+        style={{ fontWeight: 900, fontSize: "clamp(26px, 6.5vw, 84px)" }}
       >
         {tile.value}
       </div>

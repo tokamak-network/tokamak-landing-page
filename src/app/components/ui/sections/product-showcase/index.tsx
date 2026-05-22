@@ -43,7 +43,7 @@ export default function ProductShowcase() {
 
   return (
     <section
-      className="relative w-full min-h-screen bg-black overflow-hidden flex items-center"
+      className="relative w-full lg:min-h-screen bg-black overflow-hidden flex items-start lg:items-center"
       style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
@@ -81,7 +81,7 @@ export default function ProductShowcase() {
         }}
       />
 
-      <div className="relative w-full max-w-[1500px] mx-auto px-4 sm:px-8 lg:px-12 py-14 sm:py-20 grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,0.75fr)] gap-10 lg:gap-14 items-center">
+      <div className="relative w-full max-w-[1500px] mx-auto px-4 sm:px-8 lg:px-12 py-10 sm:py-16 lg:py-20 grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,0.75fr)] gap-6 lg:gap-14 items-center">
         {/* Left — Cinematic stage */}
         <div className="relative w-full order-2 lg:order-1">
           {/* Frame wrapper — FUI-style bezel */}
@@ -470,14 +470,21 @@ function Roster({
           className="text-[9px] tracking-[0.4em] text-white/30 uppercase"
           style={{ fontFamily: "var(--font-geist-mono), monospace" }}
         >
-          Tap to jump
+          <span className="sm:hidden">Swipe to jump</span>
+          <span className="hidden sm:inline">Tap to jump</span>
         </span>
       </div>
-      <ul className="space-y-1.5">
+      <ul
+        className="flex gap-2 sm:gap-0 sm:block sm:space-y-1.5 overflow-x-auto sm:overflow-visible -mx-4 sm:mx-0 px-4 sm:px-0 snap-x snap-mandatory"
+        style={{ scrollbarWidth: "none" }}
+      >
         {clips.map((c, i) => {
           const isActive = i === activeIndex;
           return (
-            <li key={c.id}>
+            <li
+              key={c.id}
+              className="flex-shrink-0 w-[68%] xs:w-[58%] sm:w-auto snap-start"
+            >
               <button
                 type="button"
                 onClick={() => onSelect(i)}

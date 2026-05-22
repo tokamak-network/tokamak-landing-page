@@ -157,7 +157,7 @@ export default function StakingGovernance() {
 
   return (
     <section
-      className="relative w-full min-h-screen bg-black overflow-hidden flex items-center"
+      className="relative w-full lg:min-h-screen bg-black overflow-hidden flex items-start lg:items-center"
       style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
     >
       {/* Background video — large, centered, slightly overflowing the cards */}
@@ -273,7 +273,7 @@ function ChannelCardShell({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative flex flex-col overflow-hidden bg-[#040814]/85 border border-[#4A8EFA]/25 hover:border-[#4A8EFA]/55 transition-all aspect-[5/4] sm:aspect-[1/1] hover:shadow-[0_0_40px_rgba(42,114,229,0.18)]"
+      className="group relative flex flex-col overflow-hidden bg-[#040814]/85 border border-[#4A8EFA]/25 hover:border-[#4A8EFA]/55 transition-all min-h-[560px] sm:min-h-0 sm:aspect-[5/4] lg:aspect-[1/1] hover:shadow-[0_0_40px_rgba(42,114,229,0.18)]"
     >
       {/* Corner brackets */}
       <span className="absolute top-2 left-2 w-4 h-4 border-l border-t border-[#4A8EFA]/65 pointer-events-none z-10" />

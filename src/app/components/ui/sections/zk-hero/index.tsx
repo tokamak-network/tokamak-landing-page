@@ -12,7 +12,7 @@ export default function ZkHero() {
 
   return (
     <section
-      className="relative w-full min-h-screen bg-[#02040a] overflow-hidden"
+      className="relative w-full min-h-[88vh] lg:min-h-screen bg-[#02040a] overflow-hidden"
       style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
     >
       {/* Shared atmosphere — Tokamak blue glow blooming from bottom-right toward the title */}
@@ -26,7 +26,7 @@ export default function ZkHero() {
       />
 
       {/* Title — moderate left padding, wide max-width so right edge overlaps the video */}
-      <div className="relative z-20 px-6 sm:px-12 lg:pl-[8%] xl:pl-[10%] lg:pr-0 pt-[214px] sm:pt-[246px] lg:pt-[310px] xl:pt-[342px] max-w-[860px] lg:max-w-[920px] xl:max-w-[1000px] text-left">
+      <div className="relative z-20 px-6 sm:px-12 lg:pl-[8%] xl:pl-[10%] lg:pr-0 pt-28 sm:pt-36 lg:pt-[310px] xl:pt-[342px] max-w-[860px] lg:max-w-[920px] xl:max-w-[1000px] text-left">
         {/* Eyebrow */}
         <div className="flex items-center gap-3 mb-5 sm:mb-7">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#4A8EFA] shadow-[0_0_10px_#2A72E5] animate-pulse" />
@@ -76,10 +76,7 @@ export default function ZkHero() {
       </div>
 
       {/* Video — large, anchored bottom-right; left edge dissolves under the title for shared-canvas feel */}
-      <div
-        className="relative z-10 w-full mt-10 sm:mt-14 lg:mt-0 lg:absolute lg:bottom-0 lg:right-0 lg:w-[82%] xl:w-[78%]"
-        style={{ height: "min(82vh, 900px)" }}
-      >
+      <div className="relative z-10 w-full mt-8 sm:mt-12 lg:mt-0 lg:absolute lg:bottom-0 lg:right-0 lg:w-[82%] xl:w-[78%] h-[42vh] sm:h-[55vh] lg:h-[82vh] lg:max-h-[900px]">
         <div
           className="relative w-full h-full overflow-hidden"
           style={{

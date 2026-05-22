@@ -126,7 +126,7 @@ export default function LatestFeedClient({
     <div className="w-full flex flex-col gap-10 sm:gap-14">
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,0.75fr)] gap-5 lg:gap-6 items-stretch lg:h-[564px]">
         {/* ── Left — article feed for the active channel ── */}
-        <div className="order-2 lg:order-1 min-h-[520px] lg:min-h-0 lg:h-full">
+        <div className="order-2 lg:order-1 min-h-[360px] lg:min-h-0 lg:h-full">
           {activeChannel === "biweekly" && (
             <BiweeklyFeed items={reportItems.slice(0, 4)} />
           )}
@@ -182,9 +182,8 @@ function ChannelTab({
         type="button"
         onClick={onSelect}
         aria-pressed={active}
-        className="group relative w-full text-left overflow-hidden bg-[#040814] border transition-all lg:h-full"
+        className="group relative w-full text-left overflow-hidden bg-[#040814] border transition-all min-h-[110px] sm:min-h-[170px] lg:h-full"
         style={{
-          minHeight: 170,
           borderColor: active ? `${tagColor}88` : "rgba(74,142,250,0.22)",
           boxShadow: active
             ? `0 0 28px ${tagColor}33, inset 0 0 0 1px ${tagColor}22`
@@ -645,7 +644,7 @@ function BiweeklyFeed({ items }: { items: readonly FeedItem[] }) {
     return <EmptyState label="No reports yet" />;
   }
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-5 lg:h-full lg:grid-rows-2">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-5 lg:h-full lg:grid-rows-2">
       {items.map((item) => {
         const num = getReportNumber(item);
         const periodTitle = item.dateLabel?.toUpperCase() ?? formatDateShort(item.date);
@@ -713,7 +712,7 @@ function MediumFeed({
     return <EmptyState label="No articles available" />;
   }
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-5 lg:h-full lg:grid-rows-2">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-5 lg:h-full lg:grid-rows-2">
       {posts.map((post) => {
         const hasThumb = Boolean(post.thumbnail && post.thumbnail.trim() !== "");
         return (
@@ -763,7 +762,7 @@ function XPromoCard() {
       href={LINKS.X}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative block overflow-hidden bg-[#040814] border border-[#4A8EFA]/25 hover:border-[#4A8EFA]/55 transition-colors h-full min-h-[520px] lg:min-h-0"
+      className="group relative block overflow-hidden bg-[#040814] border border-[#4A8EFA]/25 hover:border-[#4A8EFA]/55 transition-colors h-full min-h-[340px] sm:min-h-[420px] lg:min-h-0"
     >
       {/* Dot grid */}
       <div

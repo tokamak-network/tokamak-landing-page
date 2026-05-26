@@ -28,6 +28,7 @@
     "puppeteer": "^24.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "recharts": "^3.8.1",
     "rss-parser": "^3.13.0",
     "three": "^0.183.2",
     "viem": "^2.47.6"

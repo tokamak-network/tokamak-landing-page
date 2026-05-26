@@ -1,5 +1,7 @@
-import PriceV2 from "@/app/components/ui/sections/price-v2";
+import PriceOverview from "@/app/components/ui/sections/price-overview";
+
+export const dynamic = "force-dynamic";
 
 export default function PricePage() {
-  return <PriceV2 />;
+  return <PriceOverview />;
 }

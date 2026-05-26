@@ -84,13 +84,35 @@ const getSuuplyInfo = async (): Promise<{
   }
 };
 
+/**
+ * 24x 60-minute candles from Upbit (KRW-TOKAMAK). Returned chronologically
+ * (oldest → newest) so we can render a sparkline directly. Each entry is
+ * the candle's close price in KRW; convert to USD at the caller.
+ */
+const get24hKrwCandles = async (): Promise<number[]> => {
+  try {
+    const res = await fetch(
+      "https://api.upbit.com/v1/candles/minutes/60?market=KRW-tokamak&count=24",
+      { cache: "no-store" }
+    );
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    const data = (await res.json()) as Array<{ trade_price: number }>;
+    // Upbit returns newest first — reverse for chronological order.
+    return data.map((c) => c.trade_price).reverse();
+  } catch (error) {
+    console.error("Error fetching Upbit candles:", error);
+    return [];
+  }
+};
+
 export const fetchPriceDatas = async () => {
-  const [priceInfo, krwToUsdRate, stakingVolume, suuplyInfo] =
+  const [priceInfo, krwToUsdRate, stakingVolume, suuplyInfo, krwCandles] =
     await Promise.all([
       fetchTONPriceInfo(),
       getUSDPrice(),
       getStakingVolume(),
       getSuuplyInfo(),
+      get24hKrwCandles(),
     ]);
 
   const usdCurrentPrice =
@@ -103,6 +125,9 @@ export const fetchPriceDatas = async () => {
   const fullyDilutedValuation = Math.floor(
     usdCurrentPrice * suuplyInfo.totalSupply
   );
+
+  // 24h sparkline in USD — derived from Upbit KRW candles × current FX rate.
+  const priceHistoryUSD = krwCandles.map((krw) => krw * krwToUsdRate);
 
   return {
     tonPrice: {
@@ -119,6 +144,7 @@ export const fetchPriceDatas = async () => {
         krw: priceInfo.prev_closing_price,
       },
     },
+    priceHistoryUSD,
     marketCap,
     tradingVolumeUSD,
     fullyDilutedValuation,

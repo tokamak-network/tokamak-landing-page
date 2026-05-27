@@ -38,21 +38,23 @@ export default function ZkHero() {
           </span>
         </div>
 
-        {/* Title */}
+        {/* Title — two-line manifesto */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-semibold text-white leading-[1.05] mb-5 tracking-tight">
-          Privacy you{" "}
+          Own the layer.
+          <br />
+          Own your{" "}
           <span className="text-[#7AB0FF] drop-shadow-[0_0_28px_rgba(42,114,229,0.55)]">
-            own
+            privacy
           </span>
           .
         </h1>
 
         {/* Tagline */}
         <p className="text-sm sm:text-base lg:text-lg text-white/70 max-w-xl mb-7 leading-relaxed">
-          Real privacy starts with the layer beneath it.
+          Real privacy lives in the infrastructure —
           <br className="hidden sm:block" />
           <span className="text-white/45 text-xs sm:text-sm">
-            Own the infrastructure — not a service that rents it to you.
+            not in a service you rent.
           </span>
         </p>
 

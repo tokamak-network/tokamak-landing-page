@@ -23,6 +23,8 @@ interface PriceData {
   stakedVolumeUSD: number;
   DAOStakedVolume: number;
   DAOStakedVolumeUSD: number;
+  vestedSupply: number;
+  vestedSupplyUSD: number;
   /** Liquidity tier supplies — cumulative. C1 < C2 ≤ C3. */
   liquidity: { c1: number; c2: number; c3: number };
   liquidityUSD: { c1: number; c2: number; c3: number };
@@ -56,8 +58,8 @@ const METRIC_TOOLTIPS: Record<string, string> = {
     "TON locked in the seigniorage staking contract — earns block rewards and secures the network. * Contract value ÷ 10^18.",
   "Vested **":
     "TON locked in vesting contracts (team, contributors, investors). ** Contract value ÷ 10^27.",
-  "Stake / Circulating":
-    "Share of circulating TON actively staked. A higher ratio means the network is more secured.",
+  "Staked / Total Supply":
+    "Share of the total TON supply actively staked in the seigniorage contract. A higher ratio means the network is more secured.",
   C1: "Free-float liquidity — TON immediately tradable on the open market.",
   C2: "C1 + tokens unlocking from staking within the seigniorage period.",
   C3: "Maximum liquid envelope — broadest near-term liquidity (C1 + C2 + scheduled unlocks).",
@@ -87,7 +89,8 @@ function fmtCompactUSD(n: number): string {
 }
 
 function fmtCompactToken(n: number): string {
-  if (!Number.isFinite(n) || n <= 0) return "—";
+  if (!Number.isFinite(n) || n < 0) return "—";
+  if (n === 0) return "0";
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
@@ -118,8 +121,8 @@ export default async function PriceOverview() {
     data.tonPrice.closing.usd
   );
   const changePositive = change24h >= 0;
-  const stakeRatio = data.circulatingSupply
-    ? (data.stakedVolume / data.circulatingSupply) * 100
+  const stakeRatio = data.totalSupply
+    ? (data.stakedVolume / data.totalSupply) * 100
     : 0;
 
   return (
@@ -133,7 +136,6 @@ export default async function PriceOverview() {
         change24h={change24h}
         positive={changePositive}
       />
-      <PriceTicker data={data} change24h={change24h} positive={changePositive} />
       <PriceSection
         data={data}
         change24h={change24h}
@@ -180,15 +182,21 @@ function PriceHero({
           via a radial mask so the video reads as part of the canvas. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute z-[1] bottom-0 right-0 w-full lg:w-[58%] xl:w-[52%] h-[42vh] sm:h-[55vh] lg:h-[72vh] lg:max-h-[720px]"
+        className="pointer-events-none absolute z-[1] bottom-0 right-0 w-full lg:w-[70%] xl:w-[68%] h-[42vh] sm:h-[55vh] lg:h-[72vh] lg:max-h-[720px]"
       >
         <div
           className="relative w-full h-full overflow-hidden"
           style={{
+            // Three-layer mask intersect:
+            //   1. radial focus — keep the video sharp toward the right
+            //   2. vertical fade — soften top/bottom edges
+            //   3. horizontal fade — dissolve the left edge so the video
+            //      melts into the text column instead of showing a hard
+            //      bounding box
             maskImage:
-              "radial-gradient(ellipse 90% 100% at 70% 60%, black 25%, rgba(0,0,0,0.55) 55%, transparent 95%), linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 8%, black 18%, black 70%, rgba(0,0,0,0.3) 90%, transparent 100%)",
+              "radial-gradient(ellipse 95% 110% at 78% 55%, black 18%, rgba(0,0,0,0.5) 55%, transparent 100%), linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 8%, black 18%, black 72%, rgba(0,0,0,0.3) 92%, transparent 100%), linear-gradient(to right, transparent 0%, rgba(0,0,0,0.35) 14%, black 36%, black 100%)",
             WebkitMaskImage:
-              "radial-gradient(ellipse 90% 100% at 70% 60%, black 25%, rgba(0,0,0,0.55) 55%, transparent 95%), linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 8%, black 18%, black 70%, rgba(0,0,0,0.3) 90%, transparent 100%)",
+              "radial-gradient(ellipse 95% 110% at 78% 55%, black 18%, rgba(0,0,0,0.5) 55%, transparent 100%), linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 8%, black 18%, black 72%, rgba(0,0,0,0.3) 92%, transparent 100%), linear-gradient(to right, transparent 0%, rgba(0,0,0,0.35) 14%, black 36%, black 100%)",
             maskComposite: "intersect",
             WebkitMaskComposite: "source-in",
           }}
@@ -204,6 +212,17 @@ function PriceHero({
             <source src="/videos/price-hero.webm" type="video/webm" />
             <source src="/videos/price-hero.mp4" type="video/mp4" />
           </video>
+
+          {/* Section-color wash on the left edge — fades the video into the
+              page background where text sits, eliminating any visible seam. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-0 w-1/2 lg:w-2/5"
+            style={{
+              background:
+                "linear-gradient(to right, #02040a 0%, rgba(2,4,10,0.85) 25%, rgba(2,4,10,0.45) 55%, transparent 100%)",
+            }}
+          />
         </div>
       </div>
 
@@ -274,7 +293,7 @@ function PriceHero({
           </span>
         </div>
 
-        {/* Data sources — terminal-style metadata strip (key / value rows) */}
+        {/* Data sources — terminal-style metadata strip */}
         <dl
           className="mb-9 grid grid-cols-[auto_1fr] gap-x-5 sm:gap-x-7 gap-y-2 max-w-xl"
           style={{ fontFamily: "var(--font-geist-mono), monospace" }}
@@ -283,43 +302,21 @@ function PriceHero({
             Sources
           </dt>
           <dd className="text-[12.5px] sm:text-[13.5px] text-white/85 leading-snug">
-            Upbit feed
-            <span className="text-white/25 mx-2">·</span>
             Etherscan
             <span className="text-white/25 mx-2">·</span>
             Tokamak supply API
-          </dd>
-
-          <dt className="text-[10px] sm:text-[11px] tracking-[0.32em] uppercase text-white/40 font-semibold pt-px">
-            Coverage
-          </dt>
-          <dd className="text-[12.5px] sm:text-[13.5px] text-white/85 leading-snug">
-            Price
             <span className="text-white/25 mx-2">·</span>
-            Supply
-            <span className="text-white/25 mx-2">·</span>
-            Staking
-            <span className="text-white/25 mx-2">·</span>
-            DAO Treasury
-          </dd>
-
-          <dt className="text-[10px] sm:text-[11px] tracking-[0.32em] uppercase text-white/40 font-semibold pt-px">
-            Latency
-          </dt>
-          <dd className="text-[12.5px] sm:text-[13.5px] text-white/85 leading-snug inline-flex items-center gap-2">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#4ade80] shadow-[0_0_8px_#4ade80] animate-pulse" />
-            Real-time
-            <span className="text-white/40">· 60s refresh</span>
+            Upbit feed
           </dd>
         </dl>
 
-        {/* CTAs — two primary, Etherscan demoted to a text link */}
-        <div className="flex flex-wrap items-center gap-3 mb-2">
+        {/* CTAs — stacked vertically, equal-width, uniform pill style */}
+        <div className="flex flex-col items-start gap-3 mb-2 max-w-[260px]">
           <a
-            href="https://upbit.com/exchange?code=CRIX.UPBIT.KRW-TOKAMAK"
+            href={LINKS.GET_TON}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 sm:px-7 py-2.5 sm:py-3 bg-[#2A72E5]/15 border border-[#4A8EFA]/70 text-[#7AB0FF] text-[11px] sm:text-xs tracking-[0.25em] uppercase hover:bg-[#2A72E5]/25 hover:border-[#4A8EFA] transition-all shadow-[0_0_24px_rgba(42,114,229,0.18)] hover:shadow-[0_0_40px_rgba(42,114,229,0.35)]"
+            className="w-full px-6 sm:px-7 py-2.5 sm:py-3 bg-[#2A72E5]/15 border border-[#4A8EFA]/70 text-[#7AB0FF] text-[11px] sm:text-xs tracking-[0.25em] uppercase text-center hover:bg-[#2A72E5]/25 hover:border-[#4A8EFA] transition-all shadow-[0_0_24px_rgba(42,114,229,0.18)] hover:shadow-[0_0_40px_rgba(42,114,229,0.35)]"
             style={{ fontFamily: "var(--font-geist-mono), monospace" }}
           >
             Buy TON(Tokamak) →
@@ -328,7 +325,7 @@ function PriceHero({
             href={LINKS.DUNE_DASHBOARD}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 sm:px-7 py-2.5 sm:py-3 border border-[#FF744F]/60 text-[#FF8E6B] text-[11px] sm:text-xs tracking-[0.25em] uppercase hover:bg-[#FF744F]/10 hover:border-[#FF744F] hover:text-[#FFB99E] transition-all"
+            className="w-full px-6 sm:px-7 py-2.5 sm:py-3 border border-[#FF744F]/60 text-[#FF8E6B] text-[11px] sm:text-xs tracking-[0.25em] uppercase text-center hover:bg-[#FF744F]/10 hover:border-[#FF744F] hover:text-[#FFB99E] transition-all"
             style={{ fontFamily: "var(--font-geist-mono), monospace" }}
           >
             Dune Dashboard →
@@ -337,79 +334,12 @@ function PriceHero({
             href={`https://etherscan.io/token/${TON_CONTRACT}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[11px] sm:text-xs tracking-[0.25em] uppercase text-white/45 hover:text-white/85 transition-colors underline-offset-4 hover:underline"
+            className="w-full px-6 sm:px-7 py-2.5 sm:py-3 border border-white/25 text-white/75 text-[11px] sm:text-xs tracking-[0.25em] uppercase text-center hover:bg-white/[0.06] hover:border-white/55 hover:text-white transition-all"
             style={{ fontFamily: "var(--font-geist-mono), monospace" }}
           >
             Etherscan ↗
           </a>
         </div>
-      </div>
-    </section>
-  );
-}
-
-/* ============================================================
-   TICKER — HUD-style horizontal data strip (mirrors TickerClient)
-   ============================================================ */
-function PriceTicker({
-  data,
-  change24h,
-  positive,
-}: {
-  data: PriceData;
-  change24h: number;
-  positive: boolean;
-}) {
-  const items: { label: string; value: string; accent?: string }[] = [
-    { label: "Price", value: fmtMoney(data.tonPrice.current.usd) },
-    {
-      label: "24h",
-      value: `${positive ? "▲" : "▼"} ${Math.abs(change24h).toFixed(2)}%`,
-      accent: positive ? "#4ade80" : "#f87171",
-    },
-    { label: "Market Cap", value: fmtCompactUSD(data.marketCap) },
-    { label: "24h Volume", value: fmtCompactUSD(data.tradingVolumeUSD) },
-    { label: "FDV", value: fmtCompactUSD(data.fullyDilutedValuation) },
-    {
-      label: "Circulating",
-      value: `${fmtCompactToken(data.circulatingSupply)} TON`,
-    },
-  ];
-
-  return (
-    <section
-      className="relative w-full bg-[#040814] border-y border-[#4A8EFA]/22"
-      style={{ fontFamily: "var(--font-geist-mono), monospace" }}
-    >
-      {/* hairlines + radial glow */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#4A8EFA]/40 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#4A8EFA]/40 to-transparent" />
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 200% at 50% 50%, rgba(42,114,229,0.10) 0%, transparent 65%)",
-        }}
-      />
-
-      <div className="relative max-w-[1500px] mx-auto px-4 sm:px-8 py-4 overflow-x-auto">
-        <ul className="flex items-center gap-6 sm:gap-10 min-w-max">
-          {items.map((it) => (
-            <li key={it.label} className="flex items-center gap-2.5">
-              <span className="inline-block h-1 w-1 rounded-full bg-[#4A8EFA] shadow-[0_0_6px_#2A72E5]" />
-              <span className="text-[9px] sm:text-[10px] tracking-[0.32em] uppercase text-white/45">
-                {it.label}
-              </span>
-              <span
-                className="text-sm sm:text-base font-semibold"
-                style={{ color: it.accent ?? "#e5e7eb" }}
-              >
-                {it.value}
-              </span>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );
@@ -636,7 +566,7 @@ function SupplySection({ data }: { data: PriceData }) {
       titleAccent="TON"
       titleEnd="."
       sub="Raw on-chain data — total / circulating / burned"
-      videoSrc="/videos/cta-footer.mp4"
+      videoSrc="/videos/stats.mp4"
     >
       <div className="flex flex-col gap-3 sm:gap-4">
         <SupplyBar slices={slices} total={total} span="" />
@@ -686,10 +616,10 @@ function LockedSection({
   data: PriceData;
   stakeRatio: number;
 }) {
-  // Vested data isn't exposed by the price API yet — render as placeholder.
-  const vested = 0;
-  const lockedTotal = data.DAOStakedVolume + data.stakedVolume + vested;
-  const ceiling = Math.max(lockedTotal, data.circulatingSupply, 1);
+  // All percentages use Total Supply as the denominator (same basis as the
+  // Supply section above), so a chamber's fill height is directly readable
+  // as "share of total TON locked here".
+  const total = data.totalSupply > 0 ? data.totalSupply : 1;
 
   const vaults = [
     {
@@ -709,8 +639,8 @@ function LockedSection({
     {
       id: "vested",
       label: "Vested **",
-      value: vested,
-      usd: 0,
+      value: data.vestedSupply,
+      usd: data.vestedSupplyUSD,
       color: "#7AB0FF",
     },
   ];
@@ -727,15 +657,15 @@ function LockedSection({
         {/* Vault pillars */}
         <div className="grid grid-cols-3 gap-3 sm:gap-4">
           {vaults.map((v) => (
-            <VaultPillar key={v.id} {...v} ceiling={ceiling} />
+            <VaultPillar key={v.id} {...v} ceiling={total} />
           ))}
         </div>
 
         {/* Stake-ratio gauge */}
         <GaugeWidget
-          label="Stake / Circulating"
+          label="Staked / Total Supply"
           value={Math.min(100, stakeRatio)}
-          sub={`${fmtCompactToken(data.stakedVolume)} TON of ${fmtCompactToken(data.circulatingSupply)}`}
+          sub={`${fmtCompactToken(data.stakedVolume)} TON of ${fmtCompactToken(data.totalSupply)}`}
           color="#22C55E"
           span="min-h-[320px] lg:min-h-0"
         />
@@ -764,7 +694,7 @@ function LiquiditySection({ data }: { data: PriceData }) {
       caption: "Free-float + short-term unlocks",
       ton: data.liquidity.c2,
       usd: data.liquidityUSD.c2,
-      widthPct: 78,
+      widthPct: 100,
       color: "#22C55E",
     },
     {
@@ -773,7 +703,7 @@ function LiquiditySection({ data }: { data: PriceData }) {
       caption: "Maximum liquid envelope",
       ton: data.liquidity.c3,
       usd: data.liquidityUSD.c3,
-      widthPct: 56,
+      widthPct: 100,
       color: "#FACC15",
     },
   ];
@@ -942,7 +872,7 @@ function VaultPillar({
           className="text-white leading-none tracking-tight tabular-nums break-all"
           style={{ fontWeight: 900, fontSize: "clamp(24px, 3vw, 44px)" }}
         >
-          {value > 0 ? fmtCompactToken(value) : "—"}
+          {fmtCompactToken(value)}
         </div>
         <div
           className="mt-1.5 text-[9px] sm:text-[10px] tracking-[0.22em] uppercase text-white/45"

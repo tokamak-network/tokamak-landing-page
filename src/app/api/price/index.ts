@@ -54,6 +54,7 @@ const getSuuplyInfo = async (): Promise<{
   C3: number;
   totalSupply: number;
   burned: number;
+  vested: number;
 }> => {
   try {
     const [circulationSupply, totalSupplyData] = await Promise.all([
@@ -77,6 +78,7 @@ const getSuuplyInfo = async (): Promise<{
       ...circulationSupply,
       totalSupply: totalSupplyData.totalSupply,
       burned: totalSupplyData.burnedValue,
+      vested: totalSupplyData.vestingAmount ?? 0,
     };
   } catch (error) {
     console.error("Error fetching supply data:", error);
@@ -160,6 +162,8 @@ export const fetchPriceDatas = async () => {
     stakedVolumeUSD: Math.floor(stakingVolume.currentStaked * usdCurrentPrice),
     DAOStakedVolume: stakingVolume.DAOStaked,
     DAOStakedVolumeUSD: Math.floor(stakingVolume.DAOStaked * usdCurrentPrice),
+    vestedSupply: suuplyInfo.vested,
+    vestedSupplyUSD: Math.floor(suuplyInfo.vested * usdCurrentPrice),
     liquidity: {
       c1: suuplyInfo.C1,
       c2: suuplyInfo.C1 + suuplyInfo.C2,

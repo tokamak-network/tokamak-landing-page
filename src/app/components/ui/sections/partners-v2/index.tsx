@@ -1,319 +1,268 @@
-"use client";
-
-import { useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
-import s from "./styles.module.css";
 
 import EfgOff from "@/assets/partners/name=efg, Hover=off.svg";
-import EfgOn from "@/assets/partners/name=efg, Hover=on.svg";
 import SKYOff from "@/assets/partners/name=SKY, Hover=off.svg";
-import SKYOn from "@/assets/partners/name=SKY, Hover=on.svg";
 import PolygonOff from "@/assets/partners/name=Polygon, Hover=off.svg";
-import PolygonOn from "@/assets/partners/name=Polygon, Hover=on.svg";
 import METEROff from "@/assets/partners/name=METER, Hover=off.svg";
-import METEROn from "@/assets/partners/name=METER, Hover=on.svg";
 import DSRVOff from "@/assets/partners/name=DSRV, Hover=off.svg";
-import DSRVOn from "@/assets/partners/name=DSRV, Hover=on.svg";
 import BounceOff from "@/assets/partners/name=Bounce, Hover=off.svg";
-import BounceOn from "@/assets/partners/name=Bounce, Hover=on.svg";
 import PaycoinOff from "@/assets/partners/name=paycoin, Hover=off.svg";
-import PaycoinOn from "@/assets/partners/name=paycoin, Hover=on.svg";
 import BifROSTOff from "@/assets/partners/name=BIFROST, Hover=off.svg";
-import BifROSTOn from "@/assets/partners/name=BIFROST, Hover=on.svg";
 import KdacOff from "@/assets/partners/name=kdac, Hover=off.svg";
-import KdacOn from "@/assets/partners/name=kdac, Hover=on.svg";
 import DcentOff from "@/assets/partners/name=dcent, Hover=off.svg";
-import DcentOn from "@/assets/partners/name=dcent, Hover=on.svg";
 import OzysOff from "@/assets/partners/name=ozys, Hover=off.svg";
-import OzysOn from "@/assets/partners/name=ozys, Hover=on.svg";
 import PanonyOff from "@/assets/partners/name=panony, Hover=off.svg";
-import PanonyOn from "@/assets/partners/name=panony, Hover=on.svg";
 import StakedOff from "@/assets/partners/name=Staked, Hover=off.svg";
-import StakedOn from "@/assets/partners/name=Staked, Hover=on.svg";
 import ChainlinkOff from "@/assets/partners/name=chainlink, Hover=off.svg";
-import ChainlinkOn from "@/assets/partners/name=chainlink, Hover=on.svg";
 import DespreadOff from "@/assets/partners/name=despread, Hover=off.svg";
-import DespreadOn from "@/assets/partners/name=despread, Hover=on.svg";
 import DecipherOff from "@/assets/partners/name=decipher, Hover=off.svg";
-import DecipherOn from "@/assets/partners/name=decipher, Hover=on.svg";
 import CiphersOff from "@/assets/partners/name=ciphers, Hover=off.svg";
-import CiphersOn from "@/assets/partners/name=ciphers, Hover=on.svg";
 import OneHundredOff from "@/assets/partners/name=100n100, Hover=off.svg";
-import OneHundredOn from "@/assets/partners/name=100n100, Hover=on.svg";
 import BLOCOREOff from "@/assets/partners/name=BLOCORE, Hover=off.svg";
-import BLOCOREOn from "@/assets/partners/name=BLOCORE, Hover=on.svg";
 import AlphainOff from "@/assets/partners/name=Alphain Ventures, Hover=off.svg";
-import AlphainOn from "@/assets/partners/name=Alphain Ventures, Hover=on.svg";
 import SkytaleOff from "@/assets/partners/name=Skytale Capital, Hover=off.svg";
-import SkytaleOn from "@/assets/partners/name=Skytale Capital, Hover=on.svg";
 
 type Partner = {
   name: string;
-  logoOff: string;
-  logoOn: string;
+  logo: string;
   link?: string;
 };
 
 const partners: Partner[] = [
-  { name: "EFG", logoOff: EfgOff, logoOn: EfgOn, link: "https://medium.com/tokamak-network/vitalik-buterins-big-announcements-about-plasma-evm-tokamak-network-636dc11ea257" },
-  { name: "SKY", logoOff: SKYOff, logoOn: SKYOn, link: "https://sky.money" },
-  { name: "Polygon", logoOff: PolygonOff, logoOn: PolygonOn, link: "https://polygon.technology" },
-  { name: "METER", logoOff: METEROff, logoOn: METEROn, link: "https://meter.io" },
-  { name: "DSRV", logoOff: DSRVOff, logoOn: DSRVOn, link: "https://www.dsrvlabs.com" },
-  { name: "Bounce", logoOff: BounceOff, logoOn: BounceOn, link: "https://bounce.finance" },
-  { name: "Paycoin", logoOff: PaycoinOff, logoOn: PaycoinOn, link: "https://payprotocol.io" },
-  { name: "BiFROST", logoOff: BifROSTOff, logoOn: BifROSTOn, link: "https://thebifrost.io" },
-  { name: "KDAC", logoOff: KdacOff, logoOn: KdacOn, link: "https://www.kdac.io/" },
-  { name: "D'CENT", logoOff: DcentOff, logoOn: DcentOn, link: "https://dcentwallet.com" },
-  { name: "Ozys", logoOff: OzysOff, logoOn: OzysOn, link: "https://orbitchain.io" },
-  { name: "Panony", logoOff: PanonyOff, logoOn: PanonyOn, link: "https://www.panony.com" },
-  { name: "Staked", logoOff: StakedOff, logoOn: StakedOn, link: "https://staked.us" },
-  { name: "Chainlink", logoOff: ChainlinkOff, logoOn: ChainlinkOn, link: "https://chain.link" },
-  { name: "Despread", logoOff: DespreadOff, logoOn: DespreadOn, link: "https://www.despread.io" },
-  { name: "Decipher", logoOff: DecipherOff, logoOn: DecipherOn, link: "https://medium.com/decipher-media" },
-  { name: "Ciphers", logoOff: CiphersOff, logoOn: CiphersOn },
+  { name: "EFG", logo: EfgOff, link: "https://medium.com/tokamak-network/vitalik-buterins-big-announcements-about-plasma-evm-tokamak-network-636dc11ea257" },
+  { name: "SKY", logo: SKYOff, link: "https://sky.money" },
+  { name: "Polygon", logo: PolygonOff, link: "https://polygon.technology" },
+  { name: "METER", logo: METEROff, link: "https://meter.io" },
+  { name: "DSRV", logo: DSRVOff, link: "https://www.dsrvlabs.com" },
+  { name: "Bounce", logo: BounceOff, link: "https://bounce.finance" },
+  { name: "Paycoin", logo: PaycoinOff, link: "https://payprotocol.io" },
+  { name: "BiFROST", logo: BifROSTOff, link: "https://thebifrost.io" },
+  { name: "KDAC", logo: KdacOff, link: "https://www.kdac.io/" },
+  { name: "D'CENT", logo: DcentOff, link: "https://dcentwallet.com" },
+  { name: "Ozys", logo: OzysOff, link: "https://orbitchain.io" },
+  { name: "Panony", logo: PanonyOff, link: "https://www.panony.com" },
+  { name: "Staked", logo: StakedOff, link: "https://staked.us" },
+  { name: "Chainlink", logo: ChainlinkOff, link: "https://chain.link" },
+  { name: "Despread", logo: DespreadOff, link: "https://www.despread.io" },
+  { name: "Decipher", logo: DecipherOff, link: "https://medium.com/decipher-media" },
+  { name: "Ciphers", logo: CiphersOff },
 ];
 
 const backedBy: Partner[] = [
-  { name: "100N100", logoOff: OneHundredOff, logoOn: OneHundredOn, link: "http://100and100capital.com" },
-  { name: "BLOCORE", logoOff: BLOCOREOff, logoOn: BLOCOREOn, link: "https://www.blocore.com" },
-  { name: "Alphain Ventures", logoOff: AlphainOff, logoOn: AlphainOn },
-  { name: "Skytale Capital", logoOff: SkytaleOff, logoOn: SkytaleOn },
+  { name: "100N100", logo: OneHundredOff, link: "http://100and100capital.com" },
+  { name: "BLOCORE", logo: BLOCOREOff, link: "https://www.blocore.com" },
+  { name: "Alphain Ventures", logo: AlphainOff },
+  { name: "Skytale Capital", logo: SkytaleOff },
 ];
 
-/* ── Floating particles ── */
-function useParticles(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+const GRADIENTS: Array<[string, string]> = [
+  ["#7C3AED", "#EC4899"], // purple → pink
+  ["#06B6D4", "#14B8A6"], // cyan → teal
+  ["#F97316", "#FBBF24"], // orange → yellow
+  ["#84CC16", "#10B981"], // lime → emerald
+  ["#3B82F6", "#6366F1"], // blue → indigo
+  ["#D946EF", "#8B5CF6"], // magenta → violet
+  ["#F43F5E", "#EF4444"], // rose → red
+  ["#38BDF8", "#0EA5E9"], // sky → sapphire
+];
 
-    let W = 0, H = 0, raf = 0;
-    const COUNT = 40;
-    const ps: { x: number; y: number; r: number; vx: number; vy: number; a: number }[] = [];
+const NOISE_DATA_URL =
+  "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E\")";
 
-    function resize() {
-      W = canvas!.width = window.innerWidth;
-      H = canvas!.height = window.innerHeight;
-    }
-    window.addEventListener("resize", resize);
-    resize();
+const MONO_STYLE = { fontFamily: "var(--font-geist-mono), monospace" } as const;
 
-    for (let i = 0; i < COUNT; i++) {
-      ps.push({
-        x: Math.random() * W, y: Math.random() * H,
-        r: Math.random() * 2 + 0.5,
-        vy: -(Math.random() * 0.3 + 0.1),
-        vx: (Math.random() - 0.5) * 0.15,
-        a: Math.random() * 0.4 + 0.1,
-      });
-    }
-
-    function draw() {
-      ctx!.clearRect(0, 0, W, H);
-      for (const p of ps) {
-        p.x += p.vx; p.y += p.vy;
-        if (p.y < -10) { p.y = H + 10; p.x = Math.random() * W; }
-        if (p.x < -10) p.x = W + 10;
-        if (p.x > W + 10) p.x = -10;
-        const g = ctx!.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
-        g.addColorStop(0, `rgba(0,180,220,${p.a})`);
-        g.addColorStop(1, "rgba(0,180,220,0)");
-        ctx!.beginPath();
-        ctx!.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
-        ctx!.fillStyle = g;
-        ctx!.fill();
-      }
-      raf = requestAnimationFrame(draw);
-    }
-    draw();
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
-  }, [canvasRef]);
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 mb-6">
+      <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#4A8EFA] shadow-[0_0_10px_#2A72E5] animate-pulse" />
+      <span
+        className="text-[10px] sm:text-[11px] tracking-[0.4em] text-[#7AB0FF]/90 uppercase"
+        style={MONO_STYLE}
+      >
+        {children}
+      </span>
+    </div>
+  );
 }
 
-/* ── Scroll reveal observer ── */
-function useScrollReveal() {
-  const observe = useCallback((el: HTMLElement | null) => {
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("visible");
-            observer.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    // observe all partner-cards and reveal elements inside
-    el.querySelectorAll(`.${s.partnerCard}, .${s.reveal}`).forEach((child, i) => {
-      if (child.classList.contains(s.partnerCard)) {
-        (child as HTMLElement).style.transitionDelay = `${(i % 4) * 100}ms`;
-      }
-      observer.observe(child);
-    });
-  }, []);
-  return observe;
-}
+function AuroraTile({ p, idx }: { p: Partner; idx: number }) {
+  const [c1, c2] = GRADIENTS[idx % GRADIENTS.length];
 
-/* ── Partner card component ── */
-function PartnerCard({ p }: { p: Partner }) {
-  const inner = (
-    <>
-      <div className={s.logoWrap}>
-        <Image src={p.logoOff} alt={p.name} className={s.logoOff} />
-        <Image src={p.logoOn} alt={p.name} className={s.logoOn} />
+  const body = (
+    <div
+      className="group relative aspect-square overflow-hidden rounded-sm border border-white/10 hover:border-white/30 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_25px_70px_-25px_rgba(0,0,0,0.7)]"
+      style={{
+        background: `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`,
+      }}
+    >
+      {/* Aurora glow overlay (radial highlights) */}
+      <div
+        aria-hidden
+        className="absolute inset-0 mix-blend-screen opacity-60 transition-opacity duration-500 group-hover:opacity-90"
+        style={{
+          background: `radial-gradient(circle at 28% 22%, ${c2}66 0%, transparent 55%), radial-gradient(circle at 78% 82%, ${c1}66 0%, transparent 55%)`,
+        }}
+      />
+
+      {/* Inner glass highlight */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          boxShadow:
+            "inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(0,0,0,0.18)",
+        }}
+      />
+
+      {/* Grain */}
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-[0.05] mix-blend-overlay pointer-events-none"
+        style={{ backgroundImage: NOISE_DATA_URL }}
+      />
+
+      {/* Content */}
+      <div className="relative h-full flex flex-col items-center justify-center px-4 py-5">
+        <div className="relative w-3/5 h-[36%] mb-4">
+          <Image
+            src={p.logo}
+            alt={p.name}
+            fill
+            sizes="(min-width: 1024px) 18vw, (min-width: 640px) 25vw, 40vw"
+            className="object-contain transition-transform duration-500 group-hover:scale-[1.06]"
+            style={{
+              filter:
+                "brightness(0) invert(1) drop-shadow(0 2px 10px rgba(0,0,0,0.35))",
+            }}
+          />
+        </div>
+        <span
+          className="text-[10px] sm:text-[11px] tracking-[0.32em] uppercase text-white/95 text-center"
+          style={MONO_STYLE}
+        >
+          {p.name}
+        </span>
       </div>
-      <span className={s.partnerName}>{p.name.toUpperCase()}</span>
-    </>
+    </div>
   );
 
   if (p.link) {
     return (
-      <a href={p.link} target="_blank" rel="noopener noreferrer" className={s.partnerCard}>
-        {inner}
+      <a
+        href={p.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+        aria-label={p.name}
+      >
+        {body}
       </a>
     );
   }
-  return <div className={s.partnerCard}>{inner}</div>;
+  return body;
 }
 
-/* ── Main component ── */
-export default function PartnersV2() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  useParticles(canvasRef);
-  const scrollRef = useScrollReveal();
-
+function SectionLabel({ tag, count }: { tag: string; count: number }) {
   return (
-    <div className={s.wrapper} ref={scrollRef}>
-      <div className={s.bgAmbient} />
-      <canvas ref={canvasRef} className={s.bgParticles} />
-      <div className={s.grain} />
+    <div className="flex items-center gap-4 mb-6 lg:mb-8">
+      <span aria-hidden className="block h-px w-8 bg-white/20" />
+      <span
+        className="text-[10px] tracking-[0.4em] uppercase text-white/55"
+        style={MONO_STYLE}
+      >
+        {tag} · {String(count).padStart(2, "0")}
+      </span>
+      <span aria-hidden className="block h-px flex-1 bg-white/8" />
+    </div>
+  );
+}
 
-      <div className={s.content}>
-        {/* ═══ HERO ═══ */}
-        <section className={s.hero}>
+export default function PartnersV2() {
+  return (
+    <div
+      className="relative w-full bg-[#02040a] text-white overflow-hidden"
+      style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
+    >
+      {/* Ambient blue glow — top right (matches main page tone) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[80vh] z-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 50% at 75% 18%, rgba(42,114,229,0.18) 0%, rgba(42,114,229,0.06) 35%, transparent 70%)",
+        }}
+      />
+
+      <div className="relative z-10">
+        {/* ─── HEADER ─── */}
+        <header className="px-6 sm:px-12 lg:pl-[8%] xl:pl-[10%] lg:pr-[8%] xl:pr-[10%] pt-24 lg:pt-32 pb-12 lg:pb-16">
+          <Eyebrow>PARTNERS · INDEX</Eyebrow>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[1.05] tracking-tight max-w-[20ch]">
+            Partners &amp;{" "}
+            <span className="text-[#7AB0FF] drop-shadow-[0_0_28px_rgba(42,114,229,0.55)]">
+              Backers
+            </span>
+          </h1>
+          <p className="mt-5 text-base sm:text-lg text-white/55 max-w-md leading-relaxed">
+            The projects, researchers, and capital partners who share our bet on a more
+            scalable Ethereum.
+          </p>
+        </header>
+
+        {/* ─── LOGO WALL ─── */}
+        <section className="px-6 sm:px-12 lg:pl-[8%] xl:pl-[10%] lg:pr-[8%] xl:pr-[10%] pb-24 lg:pb-32">
+          {/* Partners */}
+          <SectionLabel tag="PARTNERS" count={partners.length} />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4 mb-16 lg:mb-24">
+            {partners.map((p, i) => (
+              <AuroraTile key={p.name} p={p} idx={i} />
+            ))}
+          </div>
+
+          {/* Backed by */}
+          <SectionLabel tag="BACKED BY" count={backedBy.length} />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4 max-w-[1100px]">
+            {backedBy.map((p, i) => (
+              <AuroraTile key={p.name} p={p} idx={i + partners.length} />
+            ))}
+          </div>
+        </section>
+
+        {/* ─── CTA: Become a Partner ─── */}
+        <section className="relative overflow-hidden">
           <video
-            className={s.heroVideo}
+            className="absolute inset-0 w-full h-full object-cover opacity-60"
             autoPlay
             loop
             muted
             playsInline
-            src="/videos/particles-drift.mp4"
+            src="/videos/stats.mp4"
           />
-          <div className={s.heroGradV} />
-          <div className={s.heroContent}>
-            <div className={s.heroTag}>
-              TOKAMAK NETWORK &mdash; PARTNERS
-            </div>
-            <h1 className={s.heroH1}>
-              Building Together,
-              <span className={s.heroH1Accent}>Scaling Ethereum</span>
-            </h1>
-            <p className={s.heroSub}>
-              Tokamak Network collaborates with leading projects, investors, and
-              research teams to make Ethereum more scalable and deliver a better
-              decentralized experience.
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(2,4,10,0.88) 0%, rgba(2,4,10,0.55) 40%, rgba(2,4,10,0.88) 100%)",
+            }}
+          />
+          <div className="relative z-10 px-6 sm:px-12 py-32 lg:py-40 max-w-[900px] mx-auto text-center">
+            <Eyebrow>PARTNERSHIP · OPEN</Eyebrow>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[1.05] mb-6">
+              Become a Partner.
+            </h2>
+            <p className="text-base lg:text-lg text-white/65 max-w-md mx-auto mb-10 leading-relaxed">
+              Working on something that shares the bet on a sovereign, scalable Ethereum?
+              We&apos;re always open.
             </p>
-            <div className={s.heroStats}>
-              <div style={{ textAlign: "center" }}>
-                <div className={s.heroStatVal}>{partners.length + backedBy.length}</div>
-                <div className={s.heroStatLabel}>PARTNERS</div>
-              </div>
-              <div style={{ textAlign: "center" }}>
-                <div className={s.heroStatVal}>{backedBy.length}</div>
-                <div className={s.heroStatLabel}>INVESTORS</div>
-              </div>
-              <div style={{ textAlign: "center" }}>
-                <div className={s.heroStatVal}>6+</div>
-                <div className={s.heroStatLabel}>YEARS</div>
-              </div>
-            </div>
-            <div className={s.scrollHint}>
-              SCROLL TO EXPLORE
-              <div className={s.scrollHintIcon}>
-                <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
-                  <rect
-                    x="1"
-                    y="1"
-                    width="14"
-                    height="22"
-                    rx="7"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                  <circle cx="8" cy="8" r="2" fill="currentColor" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ═══ PARTNERS & GRANTS ═══ */}
-        <div className={s.sectionWrap}>
-          <div className={s.section}>
-            <div className={s.sectionLabel}>Partners & Grants</div>
-            <div className={s.sectionDesc}>
-              Strategic partnerships and grant collaborations driving the Tokamak
-              Network ecosystem forward.
-            </div>
-            <div className={s.partnersGrid}>
-              {partners.map((p) => (
-                <PartnerCard key={p.name} p={p} />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* ═══ INTERLUDE ═══ */}
-        <div className={s.videoInterlude}>
-          <div className={s.viBg} />
-          <div className={s.gradTop} />
-          <div className={s.gradBottom} />
-          <div className={`${s.viContent} ${s.reveal}`}>
-            <div className={s.viHeading}>
-              Supported by<br />Leading Investors
-            </div>
-            <div className={s.viDesc}>
-              Tokamak Network is backed by experienced investors who share our
-              vision for a more scalable and accessible Ethereum ecosystem.
-            </div>
-          </div>
-        </div>
-
-        {/* ═══ BACKED BY ═══ */}
-        <div className={s.sectionWrap}>
-          <div className={s.section}>
-            <div className={s.sectionLabel}>Backed by</div>
-            <div className={s.sectionDesc}>
-              Investors and funds supporting Tokamak Network&apos;s mission.
-            </div>
-            <div className={s.partnersGrid}>
-              {backedBy.map((p) => (
-                <PartnerCard key={p.name} p={p} />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* ═══ CTA: Bottom (extends behind footer) ═══ */}
-        <section className={`${s.videoInterlude} ${s.viCta}`}>
-          <video autoPlay loop muted playsInline src="/videos/cta-nebula.mp4" />
-          <div className={s.gradTop} />
-          <div className={s.gradBottom} />
-          <div className={`${s.viCtaContent} ${s.reveal}`}>
-            <h2 className={s.viCtaHeading}>Become a Partner</h2>
-            <p className={s.viCtaDesc}>
-              Interested in collaborating with Tokamak Network? We&apos;re always
-              looking for projects that share our vision.
-            </p>
-            <div className={s.viBtnRow}>
-              <a href="mailto:hello@tokamak.network" className={s.viBtnSolid}>
-                Get in Touch
-              </a>
-            </div>
+            <a
+              href="mailto:hello@tokamak.network"
+              className="inline-flex items-center gap-3 px-7 py-3 border border-[#4A8EFA]/70 text-[#7AB0FF] text-[11px] tracking-[0.25em] uppercase hover:bg-[#2A72E5]/15 hover:border-[#4A8EFA] transition-all shadow-[0_0_24px_rgba(42,114,229,0.18)] hover:shadow-[0_0_40px_rgba(42,114,229,0.35)]"
+              style={MONO_STYLE}
+            >
+              Get in touch
+              <span aria-hidden>→</span>
+            </a>
           </div>
         </section>
       </div>

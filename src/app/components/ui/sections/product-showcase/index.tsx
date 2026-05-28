@@ -126,12 +126,16 @@ export default function ProductShowcase() {
             className="relative w-full rounded-[16px] overflow-hidden bg-zinc-950"
             style={{ aspectRatio: "16 / 9" }}
           >
-          {/* Stacked clip layers — crossfade between them */}
+          {/* Stacked clip layers — crossfade between them. The next clip
+              in the rotation is hinted as "prefetch" so its <source> tags
+              attach early and the browser starts pulling it before it
+              becomes the active one. */}
           {SHOWCASE_CLIPS.map((c, i) => (
             <ClipLayer
               key={c.id}
               clip={c}
               active={i === activeIndex}
+              prefetch={i === (activeIndex + 1) % total}
               muted={muted}
               inView={inView}
             />
@@ -276,25 +280,44 @@ export default function ProductShowcase() {
 function ClipLayer({
   clip,
   active,
+  prefetch,
   muted,
   inView,
 }: {
   clip: ShowcaseClip;
   active: boolean;
+  /** Next-in-rotation clip — start downloading early to hide swap latency. */
+  prefetch?: boolean;
   muted: boolean;
   /** Whether the showcase section is currently on-screen. */
   inView: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const hasVideo = Boolean(clip.videoMp4 || clip.videoWebm);
-  // Has this clip ever been the active one? Source tags are only rendered
-  // after this becomes true so the browser doesn't fetch every clip on
-  // first page load — saving 3x the network on mobile.
+  // Has this clip ever been the active one? Sources stay attached after
+  // first use so the next time it's active we hit cache instead of a
+  // fresh download.
   const [hasBeenActive, setHasBeenActive] = useState(false);
+  // Whether <source> tags should be rendered: active, prefetch target,
+  // or previously seen. While inView is false we hold prefetch off so
+  // off-screen sections don't trigger background downloads.
+  const shouldAttachSource =
+    inView && (active || prefetch || hasBeenActive);
 
   useEffect(() => {
     if (active) setHasBeenActive(true);
   }, [active]);
+
+  // When this clip is the next-in-rotation, attach sources eagerly and
+  // call .load() so the browser starts downloading before the carousel
+  // swaps to it. No play() — just buffer.
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || active) return;
+    if (prefetch && inView && v.readyState === 0) {
+      v.load();
+    }
+  }, [prefetch, inView, active]);
 
   // Play only when this clip is active AND its section is on screen.
   // Pause without resetting time when scrolled out so playback resumes
@@ -353,10 +376,10 @@ function ClipLayer({
               "contrast(1.12) brightness(0.88) saturate(0.92)",
           }}
         >
-          {hasBeenActive && clip.videoWebm && (
+          {shouldAttachSource && clip.videoWebm && (
             <source src={clip.videoWebm} type="video/webm" />
           )}
-          {hasBeenActive && clip.videoMp4 && (
+          {shouldAttachSource && clip.videoMp4 && (
             <source src={clip.videoMp4} type="video/mp4" />
           )}
         </video>

@@ -11,6 +11,8 @@ export default function ProductShowcase() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [hovering, setHovering] = useState(false);
   const [muted, setMuted] = useState(true);
+  const [inView, setInView] = useState(true);
+  const sectionRef = useRef<HTMLElement | null>(null);
   const total = SHOWCASE_CLIPS.length;
   const clip = SHOWCASE_CLIPS[activeIndex];
 
@@ -41,8 +43,23 @@ export default function ProductShowcase() {
     return () => window.removeEventListener("keydown", onKey);
   }, [prev, next]);
 
+  // Pause every video (and its audio) while the section is scrolled off screen.
+  // `rootMargin: -10%` keeps a tiny grace zone so a barely-peeking edge still
+  // counts as visible.
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0, rootMargin: "-10% 0px" }
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       className="relative w-full lg:min-h-screen bg-black overflow-hidden flex items-start lg:items-center"
       style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
       onMouseEnter={() => setHovering(true)}
@@ -116,6 +133,7 @@ export default function ProductShowcase() {
               clip={c}
               active={i === activeIndex}
               muted={muted}
+              inView={inView}
             />
           ))}
 
@@ -259,36 +277,49 @@ function ClipLayer({
   clip,
   active,
   muted,
+  inView,
 }: {
   clip: ShowcaseClip;
   active: boolean;
   muted: boolean;
+  /** Whether the showcase section is currently on-screen. */
+  inView: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const hasVideo = Boolean(clip.videoMp4 || clip.videoWebm);
 
-  // Restart from the beginning whenever this clip becomes active, and
-  // pause non-active videos for perf. Mute state is mirrored both ways.
+  // Play only when this clip is active AND its section is on screen.
+  // Restart from the beginning whenever the clip becomes the active one,
+  // pause (but don't reset) when scrolled out of view so the position
+  // resumes seamlessly when the user scrolls back.
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
     v.muted = muted;
-    if (active) {
-      try {
-        v.currentTime = 0;
-      } catch {
-        /* some browsers reject seek before metadata is ready */
-      }
+    if (active && inView) {
       v.play().catch(() => {});
     } else {
       v.pause();
-      try {
-        v.currentTime = 0;
-      } catch {
-        /* ignore */
+      if (!active) {
+        try {
+          v.currentTime = 0;
+        } catch {
+          /* ignore */
+        }
       }
     }
-  }, [active, muted]);
+  }, [active, muted, inView]);
+
+  // When this clip becomes the active one, restart playback from frame 0.
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || !active) return;
+    try {
+      v.currentTime = 0;
+    } catch {
+      /* some browsers reject seek before metadata is ready */
+    }
+  }, [active]);
 
   return (
     <div

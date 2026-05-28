@@ -35,6 +35,8 @@ export const SHOWCASE_CLIPS: ShowcaseClip[] = [
       "Cross-chain tunnel connecting Tokamak to external ecosystems with ZK-secured transfers.",
     url: "https://tonnel.tokamak.network",
     color: "#3b82f6",
+    videoMp4: "/showcase/tonnel.mp4",
+    videoWebm: "/showcase/tonnel.webm",
     tags: ["Bridge", "ZK-secured", "Cross-chain"],
   },
   {

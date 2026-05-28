@@ -287,16 +287,25 @@ function ClipLayer({
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const hasVideo = Boolean(clip.videoMp4 || clip.videoWebm);
+  // Has this clip ever been the active one? Source tags are only rendered
+  // after this becomes true so the browser doesn't fetch every clip on
+  // first page load — saving 3x the network on mobile.
+  const [hasBeenActive, setHasBeenActive] = useState(false);
+
+  useEffect(() => {
+    if (active) setHasBeenActive(true);
+  }, [active]);
 
   // Play only when this clip is active AND its section is on screen.
-  // Restart from the beginning whenever the clip becomes the active one,
-  // pause (but don't reset) when scrolled out of view so the position
-  // resumes seamlessly when the user scrolls back.
+  // Pause without resetting time when scrolled out so playback resumes
+  // seamlessly when the user scrolls back.
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
     v.muted = muted;
     if (active && inView) {
+      // If sources were just attached, kick off the download.
+      if (v.readyState === 0) v.load();
       v.play().catch(() => {});
     } else {
       v.pause();
@@ -336,6 +345,7 @@ function ClipLayer({
           loop
           muted={muted}
           playsInline
+          preload="none"
           poster={clip.poster}
           className="absolute inset-0 w-full h-full object-cover"
           style={{
@@ -343,10 +353,12 @@ function ClipLayer({
               "contrast(1.12) brightness(0.88) saturate(0.92)",
           }}
         >
-          {clip.videoWebm && (
+          {hasBeenActive && clip.videoWebm && (
             <source src={clip.videoWebm} type="video/webm" />
           )}
-          {clip.videoMp4 && <source src={clip.videoMp4} type="video/mp4" />}
+          {hasBeenActive && clip.videoMp4 && (
+            <source src={clip.videoMp4} type="video/mp4" />
+          )}
         </video>
       ) : (
         // Placeholder gradient (until real video is added)

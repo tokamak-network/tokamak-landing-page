@@ -299,10 +299,12 @@ function ClipLayer({
   // fresh download.
   const [hasBeenActive, setHasBeenActive] = useState(false);
   // Whether <source> tags should be rendered: active, prefetch target,
-  // or previously seen. While inView is false we hold prefetch off so
-  // off-screen sections don't trigger background downloads.
-  const shouldAttachSource =
-    inView && (active || prefetch || hasBeenActive);
+  // or previously seen. We deliberately don't gate this on `inView` —
+  // the network savings come from `preload="none"`, not from withholding
+  // source tags. Keeping sources off-screen-but-attached avoids race
+  // conditions where IntersectionObserver hasn't fired yet on mobile
+  // and the video would otherwise render as a blank black box.
+  const shouldAttachSource = active || prefetch || hasBeenActive;
 
   useEffect(() => {
     if (active) setHasBeenActive(true);
@@ -368,7 +370,7 @@ function ClipLayer({
           loop
           muted={muted}
           playsInline
-          preload="none"
+          preload="metadata"
           poster={clip.poster}
           className="absolute inset-0 w-full h-full object-cover"
           style={{

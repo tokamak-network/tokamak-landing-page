@@ -2,6 +2,8 @@
 
 > Tokamak Network is an Ethereum-native Layer 2 platform that enables on-demand rollup deployment. Built on the OP Stack, it allows any application to launch its own optimized L2 chain in minutes. The native token TON powers seigniorage staking, DAO governance, and cross-chain bridging across the ecosystem.
 
+**Disambiguation:** This is the *blockchain* project "Tokamak Network" (an Ethereum Layer 2), not the tokamak fusion-energy device of the same name.
+
 Tokamak Network's core product, Thanos, provides modular rollup infrastructure with custom chain configuration, one-click deployment, and an open plug-and-extend architecture. The protocol features seigniorage-based staking where TON holders earn rewards while securing the network, and a DAO governance system for protocol decisions.
 
 TON token contract: 0x2be5e8c109e2197D077D13A82dAead6a9b3433C5 (Ethereum Mainnet)
@@ -42,6 +44,17 @@ TON token contract: 0x2be5e8c109e2197D077D13A82dAead6a9b3433C5 (Ethereum Mainnet
 - Layer2 Registry: `0x0b3E174A2170083e770D5d4Cf56774D221b7063e`
 - DAO Agenda Manager: `0xcD4421d082752f363E1687544a09d5112cD4f484`
 - DAO Committee: `0xDD9f0cCc044B0781289Ee318e5971b0139602C26`
+
+## Networks
+
+- **Settlement layer (L1)**: Ethereum Mainnet — the TON token, staking, and DAO contracts above all live on L1.
+- **Thanos L2**: Thanos is a rollup *framework* — each application deploys its own L2 with its own chain ID via the Rollup Hub. There is no single "Thanos mainnet" chain ID.
+- **Thanos Sepolia (public testnet)**: OP Stack optimistic rollup, batches to L1 via blobs.
+  - Chain ID: `111551119090`
+  - RPC (HTTP): `https://rpc.thanos-sepolia.tokamak.network`
+  - RPC (WSS): `wss://rpc.thanos-sepolia.tokamak.network`
+  - Explorer: https://explorer.thanos-sepolia.tokamak.network (Blockscout)
+  - L1: Ethereum Sepolia · Native gas token: TON
 
 ## Ecosystem Projects (48 repos across 10 categories)
 

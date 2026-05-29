@@ -64,10 +64,14 @@ const jsonLd = {
     {
       "@type": "Organization",
       name: "Tokamak Network",
+      alternateName: "Tokamak",
       url: "https://tokamak.network",
       logo: "https://tokamak.network/tokamak_favicon.ico",
       description:
         "Ethereum-native Layer 2 platform enabling on-demand rollup deployment. Built on the OP Stack, Tokamak Network allows any application to launch its own optimized L2 chain.",
+      // Prevent LLM/search confusion with the fusion-reactor "tokamak".
+      disambiguatingDescription:
+        "Tokamak Network is a blockchain Layer 2 project on Ethereum — not the fusion energy device of the same name.",
       sameAs: [
         "https://github.com/tokamak-network",
         "https://twitter.com/tokamak_network",

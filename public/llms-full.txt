@@ -2,6 +2,8 @@
 
 > Tokamak Network is an Ethereum-native Layer 2 platform that enables on-demand rollup deployment. Built on the OP Stack, it allows any application to launch its own optimized L2 chain in minutes. The native token TON powers seigniorage staking, DAO governance, and cross-chain bridging across the ecosystem.
 
+**Disambiguation:** This document is about the *blockchain* project "Tokamak Network" (an Ethereum Layer 2), not the tokamak fusion-energy device of the same name.
+
 ---
 
 ## Overview
@@ -42,6 +44,22 @@ The Rollup Hub (https://rolluphub.tokamak.network/) is the deployment and manage
 - Configuration management
 - Monitoring and analytics
 - Bridge interface
+
+### Network Parameters
+
+Thanos is a rollup framework — each deployed L2 has its own chain ID; mainnet rollups settle to Ethereum Mainnet. There is no single "Thanos mainnet" chain ID.
+
+**Thanos Sepolia (public testnet):**
+
+| Parameter | Value |
+|-----------|-------|
+| Chain ID | 111551119090 |
+| RPC (HTTP) | https://rpc.thanos-sepolia.tokamak.network |
+| RPC (WSS) | wss://rpc.thanos-sepolia.tokamak.network |
+| Block Explorer | https://explorer.thanos-sepolia.tokamak.network (Blockscout) |
+| L1 (settlement) | Ethereum Sepolia |
+| Native gas token | TON |
+| Rollup type | OP Stack optimistic rollup (batches to L1 via blobs) |
 
 ---
 
@@ -289,21 +307,52 @@ The Tokamak Network website (https://tokamak.network) has the following pages:
 | `/about/partners` | Ecosystem partners |
 | `/about/insight` | Medium blog feed with technical articles |
 | `/about/reports` | Biweekly engineering progress reports |
-| `/about/reports/[slug]` | Individual report detail pages |
+| `/reports/{slug}.html` | Individual biweekly report, static HTML (e.g. `/reports/report-2026-04-16-30.html`) |
 
 ---
 
 ## API Endpoints
 
-The website exposes the following public data endpoints:
+Public JSON endpoints. Base URL: `https://tokamak.network`.
 
-| Endpoint | Description |
-|----------|-------------|
-| `/api/price` | TON price, market cap, trading volume, supply data |
-| `/api/price/candles` | Hourly TON price candles per range (sparkline series) |
-| `/api/medium` | Latest Medium blog posts (RSS feed) |
-| `/api/governance-staking` | On-chain governance and staking metrics |
-| `/api/news-letter` | Newsletter email subscription (POST) |
+### GET /api/price
+
+TON market data. No parameters.
+
+Response (numbers are USD unless noted):
+```
+{
+  tonPrice: { current: { usd, krw }, opening: { usd, krw }, closing: { usd, krw } },
+  priceHistoryUSD: number[],        // 24h sparkline
+  marketCap, tradingVolumeUSD, fullyDilutedValuation,
+  totalSupply, circulatingSupply,
+  stakedVolume, DAOStakedVolume, burnedSupply, vestedSupply
+}
+```
+
+### GET /api/price/candles?range={24h|7d|30d|90d|1y}
+
+TON close-price series in USD, chronological (oldest → newest). `range` defaults to `24h`.
+
+Response: `{ range: string, series: number[] }` · on upstream error: `{ range, series: [], error: string }`.
+
+### GET /api/medium
+
+Latest Tokamak Medium posts (RSS). No parameters.
+
+Response: `Array<{ title: string, link: string, pubDate: string, thumbnail?: string }>`.
+
+### GET /api/governance-staking
+
+On-chain staking + DAO metrics, read from Ethereum mainnet.
+
+Response: `{ staking: { totalStaked, stakedRatio, apr, ... }, governance: { maxMember, ... }, committee: [...], recentProposals: [...] }`.
+
+### POST /api/news-letter
+
+Newsletter subscription. Request body: `{ "email": string }`.
+
+Response: `{ success: true, message }` (200) · `{ success: false, error: "Email is required" }` (400).
 
 ---
 

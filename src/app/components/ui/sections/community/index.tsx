@@ -1,4 +1,5 @@
 import { LINKS } from "@/app/constants/links";
+import LazyVideo from "@/app/components/shared/LazyVideo";
 
 interface Channel {
   id: "telegram" | "discord";
@@ -91,23 +92,14 @@ function CommunityCard({ channel }: { channel: Channel }) {
         boxShadow: `inset 0 1px 0 rgba(255,255,255,0.04)`,
       }}
     >
-      {/* Ambient background video (optional, per channel) */}
+      {/* Ambient background video (optional, per channel) — viewport-gated. */}
       {channel.videoSrc && (
-        <video
-          aria-hidden
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="metadata"
+        <LazyVideo
+          src={channel.videoSrc}
           poster={channel.videoPoster}
           className="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-60 transition-opacity duration-500 group-hover:opacity-85"
-          style={{
-            filter: "saturate(0.9) contrast(1.05)",
-          }}
-        >
-          <source src={channel.videoSrc} type="video/mp4" />
-        </video>
+          style={{ filter: "saturate(0.9) contrast(1.05)" }}
+        />
       )}
       {/* Dark wash for legibility on top of video */}
       {channel.videoSrc && (

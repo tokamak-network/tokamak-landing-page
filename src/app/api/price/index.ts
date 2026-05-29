@@ -2,7 +2,7 @@ const fetchTONPriceInfo = async () => {
   try {
     const response = await fetch(
       "https://api.upbit.com/v1/ticker?markets=KRW-tokamak",
-      { cache: "no-store" }
+      { next: { revalidate: 120 } }
     );
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const text = await response.text();
@@ -15,7 +15,7 @@ const fetchTONPriceInfo = async () => {
 
 const getUSDPrice = async () => {
   const response = await fetch("https://open.er-api.com/v6/latest/KRW", {
-    cache: "no-store",
+    next: { revalidate: 120 },
   });
   if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
   const text = await response.text();
@@ -26,14 +26,14 @@ const getUSDPrice = async () => {
 const getStakingVolume = async () => {
   const [currentStaked, DAOStaked] = await Promise.all([
     fetch("https://price.api.tokamak.network/staking/current", {
-      cache: "no-store",
+      next: { revalidate: 120 },
     }).then(async (res) => {
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const text = await res.text();
       return JSON.parse(text);
     }),
     fetch("https://price.api.tokamak.network/supply", {
-      cache: "no-store",
+      next: { revalidate: 120 },
     }).then(async (res) => {
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const text = await res.text();
@@ -59,14 +59,14 @@ const getSuuplyInfo = async (): Promise<{
   try {
     const [circulationSupply, totalSupplyData] = await Promise.all([
       fetch("https://price.api.tokamak.network/circulationSupply", {
-        cache: "no-store",
+        next: { revalidate: 120 },
       }).then(async (res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const text = await res.text();
         return JSON.parse(text);
       }),
       fetch("https://price.api.tokamak.network/supply", {
-        cache: "no-store",
+        next: { revalidate: 120 },
       }).then(async (res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const text = await res.text();
@@ -95,7 +95,7 @@ const get24hKrwCandles = async (): Promise<number[]> => {
   try {
     const res = await fetch(
       "https://api.upbit.com/v1/candles/minutes/60?market=KRW-tokamak&count=24",
-      { cache: "no-store" }
+      { next: { revalidate: 120 } }
     );
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const data = (await res.json()) as Array<{ trade_price: number }>;

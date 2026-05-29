@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
+import LazyVideo from "@/app/components/shared/LazyVideo";
 
 interface Metric {
   label: string;
@@ -147,52 +148,41 @@ function useGovernanceStakingMetrics(): LiveData {
 }
 
 export default function StakingGovernance() {
-  const [mounted, setMounted] = useState(false);
   const { staking, governance, stakeRatio, totalSupply, recentProposals, committeeSize } =
     useGovernanceStakingMetrics();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
     <section
       className="relative w-full lg:min-h-screen bg-black overflow-hidden flex items-start lg:items-center"
       style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
     >
-      {/* Background video — large, centered, slightly overflowing the cards */}
-      {mounted && (
+      {/* Background video — large, centered, slightly overflowing the cards.
+          Viewport-gated via LazyVideo so it only loads when scrolled near. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+      >
         <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+          className="relative w-[min(1280px,95vw)] aspect-square sm:aspect-[16/10] max-h-[min(820px,80vh)]"
+          style={{
+            maskImage:
+              "radial-gradient(ellipse 75% 80% at 50% 50%, black 20%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.18) 78%, transparent 95%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse 75% 80% at 50% 50%, black 20%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.18) 78%, transparent 95%)",
+          }}
         >
-          <div
-            className="relative w-[min(1280px,95vw)] aspect-square sm:aspect-[16/10] max-h-[min(820px,80vh)]"
+          <LazyVideo
+            src="/governance/voting-cascade.mp4"
+            poster="/governance/voting-cascade-poster.jpg"
+            className="absolute inset-0 w-full h-full object-cover"
             style={{
-              maskImage:
-                "radial-gradient(ellipse 75% 80% at 50% 50%, black 20%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.18) 78%, transparent 95%)",
-              WebkitMaskImage:
-                "radial-gradient(ellipse 75% 80% at 50% 50%, black 20%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.18) 78%, transparent 95%)",
+              mixBlendMode: "lighten",
+              filter: "contrast(1.1) brightness(0.78) saturate(1.05)",
+              opacity: 0.9,
             }}
-          >
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{
-                mixBlendMode: "lighten",
-                filter: "contrast(1.1) brightness(0.78) saturate(1.05)",
-                opacity: 0.9,
-              }}
-            >
-              <source src="/governance/voting-cascade.webm" type="video/webm" />
-              <source src="/governance/voting-cascade.mp4" type="video/mp4" />
-            </video>
-          </div>
+          />
         </div>
-      )}
+      </div>
 
       {/* Dot grid — sits above the video so the blue light tints the dots */}
       <div

@@ -1,4 +1,7 @@
-export const dynamic = "force-dynamic";
+// ISR: serve cached HTML and regenerate at most every 2 min, instead of
+// blocking every request on 4 external price API calls (was force-dynamic).
+// Price data is therefore up to ~120s stale — fine for a landing page ticker.
+export const revalidate = 120;
 
 import Header from "./components/ui/header";
 import ZkHero from "./components/ui/sections/zk-hero";

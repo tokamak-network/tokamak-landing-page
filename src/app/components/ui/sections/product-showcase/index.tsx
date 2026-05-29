@@ -11,7 +11,11 @@ export default function ProductShowcase() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [hovering, setHovering] = useState(false);
   const [muted, setMuted] = useState(true);
-  const [inView, setInView] = useState(true);
+  // Start false: the showcase sits below the hero, so on initial load we do NOT
+  // want its clips fetching and competing with the above-the-fold hero video.
+  // The IntersectionObserver flips this on (with a head-start margin) once the
+  // section nears the viewport.
+  const [inView, setInView] = useState(false);
   const sectionRef = useRef<HTMLElement | null>(null);
   const total = SHOWCASE_CLIPS.length;
   const clip = SHOWCASE_CLIPS[activeIndex];
@@ -51,7 +55,7 @@ export default function ProductShowcase() {
     if (!node) return;
     const io = new IntersectionObserver(
       ([entry]) => setInView(entry.isIntersecting),
-      { threshold: 0, rootMargin: "-10% 0px" }
+      { threshold: 0, rootMargin: "300px 0px" }
     );
     io.observe(node);
     return () => io.disconnect();
@@ -370,7 +374,7 @@ function ClipLayer({
           loop
           muted={muted}
           playsInline
-          preload="metadata"
+          preload="none"
           poster={clip.poster}
           className="absolute inset-0 w-full h-full object-cover"
           style={{
@@ -378,9 +382,6 @@ function ClipLayer({
               "contrast(1.12) brightness(0.88) saturate(0.92)",
           }}
         >
-          {shouldAttachSource && clip.videoWebm && (
-            <source src={clip.videoWebm} type="video/webm" />
-          )}
           {shouldAttachSource && clip.videoMp4 && (
             <source src={clip.videoMp4} type="video/mp4" />
           )}

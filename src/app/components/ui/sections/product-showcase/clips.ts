@@ -24,7 +24,7 @@ export const SHOWCASE_CLIPS: ShowcaseClip[] = [
     url: "https://rolluphub.tokamak.network/",
     color: "#2A72E5",
     videoMp4: "/showcase/rolluphub.mp4",
-    videoWebm: "/showcase/rolluphub.webm",
+    poster: "/showcase/rolluphub-poster.jpg",
     tags: ["L2", "Rollups", "Launchpad"],
   },
   {
@@ -36,7 +36,7 @@ export const SHOWCASE_CLIPS: ShowcaseClip[] = [
     url: "https://tonnel.tokamak.network",
     color: "#3b82f6",
     videoMp4: "/showcase/tonnel.mp4",
-    videoWebm: "/showcase/tonnel.webm",
+    poster: "/showcase/tonnel-poster.jpg",
     tags: ["Bridge", "ZK-secured", "Cross-chain"],
   },
   {
@@ -48,7 +48,7 @@ export const SHOWCASE_CLIPS: ShowcaseClip[] = [
     url: "https://tokagent.network/",
     color: "#00e5ff",
     videoMp4: "/showcase/tokagent.mp4",
-    videoWebm: "/showcase/tokagent.webm",
+    poster: "/showcase/tokagent-poster.jpg",
     tags: ["AI Agent", "Autonomous", "Onchain"],
   },
   {
@@ -60,7 +60,7 @@ export const SHOWCASE_CLIPS: ShowcaseClip[] = [
     url: "https://toki.tokamak.network",
     color: "#a855f7",
     videoMp4: "/showcase/toki.mp4",
-    videoWebm: "/showcase/toki.webm",
+    poster: "/showcase/toki-poster.jpg",
     tags: ["Staking", "Gamified", "Mainnet"],
   },
 ];

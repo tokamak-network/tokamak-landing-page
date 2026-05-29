@@ -3,6 +3,10 @@
 import { useState, useMemo, useEffect } from "react";
 import { type EcosystemCategory } from "@/app/lib/ecosystem-data";
 import { SHOWCASE_CLIPS, type ShowcaseClip } from "../product-showcase/clips";
+import LazyVideo from "@/app/components/shared/LazyVideo";
+
+/** Every bento video ships a sibling `<name>-poster.jpg` next to the .mp4. */
+const posterFor = (src: string) => src.replace(/\.mp4$/, "-poster.jpg");
 
 interface Props {
   categories: EcosystemCategory[];
@@ -49,7 +53,7 @@ type Tile =
  */
 const CATEGORY_BG_POOL: Record<string, string[]> = {
   Platform: [
-    "/cards/bg-platform-a.png",
+    "/cards/bg-platform-a.jpeg",
     "/cards/bg-platform-b.jpeg",
     "/cards/bg-platform-c.jpeg",
     "/cards/bg-platform-d.jpeg",
@@ -58,21 +62,21 @@ const CATEGORY_BG_POOL: Record<string, string[]> = {
     "/cards/bg-platform-g.jpeg",
   ],
   Infra: [
-    "/cards/bg-infra-a.png",
+    "/cards/bg-infra-a.jpeg",
     "/cards/bg-infra-b.jpeg",
     "/cards/bg-infra-c.jpeg",
   ],
-  "AI / ML": ["/cards/bg-ai-a.png"],
-  ZK: ["/cards/bg-zk-a.png"],
-  Lab: ["/cards/bg-lab-a.png"],
-  Tool: ["/cards/bg-tool-a.png"],
-  DeFi: ["/cards/bg-defi-a.png", "/cards/bg-defi-b.jpeg"],
-  Social: ["/cards/bg-social-a.png"],
-  Governance: ["/cards/bg-governance-a.png"],
-  Analytics: ["/cards/bg-analytics-a.png"],
+  "AI / ML": ["/cards/bg-ai-a.jpeg"],
+  ZK: ["/cards/bg-zk-a.jpeg"],
+  Lab: ["/cards/bg-lab-a.jpeg"],
+  Tool: ["/cards/bg-tool-a.jpeg"],
+  DeFi: ["/cards/bg-defi-a.jpeg", "/cards/bg-defi-b.jpeg"],
+  Social: ["/cards/bg-social-a.jpeg"],
+  Governance: ["/cards/bg-governance-a.jpeg"],
+  Analytics: ["/cards/bg-analytics-a.jpeg"],
 };
 
-const CATEGORY_BG_FALLBACK = "/cards/bg-tool-a.png";
+const CATEGORY_BG_FALLBACK = "/cards/bg-tool-a.jpeg";
 
 function pickCategoryBg(category: string, categoryIndex: number): string {
   const pool = CATEGORY_BG_POOL[category];
@@ -678,14 +682,17 @@ function ProjectImageTile({
       rel="noopener noreferrer"
       className={`${span} relative rounded-2xl overflow-hidden group cursor-pointer border border-white/10 hover:border-[#4A8EFA]/55 transition-all`}
     >
-      <div
-        className="absolute inset-0 transition-all duration-500 group-hover:scale-105"
-        style={{
-          backgroundImage: `url(${bg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          opacity: 0.55,
-        }}
+      {/* Native lazy-loading: off-screen card backgrounds (a few MB each) are
+          not fetched until the tile nears the viewport, so they don't compete
+          with the hero on initial load. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={bg}
+        alt=""
+        aria-hidden
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 w-full h-full object-cover object-center opacity-55 transition-transform duration-500 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 group-hover:from-black/75 transition-all" />
       <div className="absolute top-3 right-3 z-10 flex items-center gap-2 text-white">
@@ -744,16 +751,12 @@ function ProjectVideoTile({
       rel="noopener noreferrer"
       className={`${span} relative rounded-2xl overflow-hidden group cursor-pointer border border-[#4A8EFA]/30 hover:border-[#4A8EFA]/70 transition-all`}
     >
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
+      <LazyVideo
+        src={tile.video}
+        poster={posterFor(tile.video)}
         className="absolute inset-0 w-full h-full object-cover"
         style={{ filter: "contrast(1.1) brightness(0.65) saturate(0.95)" }}
-      >
-        <source src={tile.video} type="video/mp4" />
-      </video>
+      />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
       <div className="absolute top-3 right-3 z-10 flex items-center gap-2 text-white">
         <ExternalLinkIcon className="opacity-55 group-hover:opacity-100 transition-opacity" />
@@ -790,7 +793,7 @@ function ProductionTile({
   span: string;
 }) {
   const { clip } = tile;
-  const hasVideo = Boolean(clip.videoMp4 || clip.videoWebm);
+  const hasVideo = Boolean(clip.videoMp4);
   return (
     <a
       href={clip.url}
@@ -799,23 +802,16 @@ function ProductionTile({
       className={`${span} relative rounded-2xl overflow-hidden group cursor-pointer border border-[#4A8EFA]/30 hover:border-[#4A8EFA]/70 transition-all`}
     >
       {hasVideo ? (
-        // key={clip.id} forces React to remount the video element when the
-        // production card at this grid slot changes (e.g., after the mount-
-        // time shuffle), so the <source> children are re-evaluated instead
-        // of the previous clip's video continuing to play.
-        <video
+        // key={clip.id} remounts LazyVideo when the production card at this grid
+        // slot changes (e.g., after the mount-time shuffle), so the new clip's
+        // source is picked up instead of the previous one continuing to play.
+        <LazyVideo
           key={clip.id}
-          autoPlay
-          loop
-          muted
-          playsInline
+          src={clip.videoMp4 as string}
           poster={clip.poster}
           className="absolute inset-0 w-full h-full object-cover"
           style={{ filter: "contrast(1.1) brightness(0.65) saturate(0.95)" }}
-        >
-          {clip.videoWebm && <source src={clip.videoWebm} type="video/webm" />}
-          {clip.videoMp4 && <source src={clip.videoMp4} type="video/mp4" />}
-        </video>
+        />
       ) : (
         <div
           className="absolute inset-0"
@@ -1073,20 +1069,16 @@ function FillerVideoTile({
       {...wrapperProps}
       className={`${span} relative rounded-2xl overflow-hidden group border border-white/10 ${tile.href ? "hover:border-[#4A8EFA]/55 transition-all" : ""}`}
     >
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
+      <LazyVideo
+        src={tile.video}
+        poster={posterFor(tile.video)}
         className="absolute inset-0 w-full h-full object-cover"
         style={{
           filter: hasOverlay
             ? "contrast(1.1) brightness(0.55) saturate(0.95)"
             : "contrast(1.08) brightness(0.78) saturate(0.95)",
         }}
-      >
-        <source src={tile.video} type="video/mp4" />
-      </video>
+      />
 
       {/* Gradient for readability — heavier when there's an overlay */}
       <div

@@ -1,14 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function ZkHero() {
-  const [mounted, setMounted] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
     <section
@@ -90,30 +85,32 @@ export default function ZkHero() {
             WebkitMaskComposite: "source-in",
           }}
         >
-          {mounted && (
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              onCanPlay={() => setVideoReady(true)}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
-                videoReady ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <source src="/hero/zk-engine.webm" type="video/webm" />
-              <source src="/hero/zk-engine.mp4" type="video/mp4" />
-            </video>
-          )}
-          {/* Loading spinner — shown while the hero video is fetching */}
-          {!videoReady && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div
-                className="h-9 w-9 rounded-full border-2 border-white/15 border-t-[#4A8EFA] animate-spin"
-                aria-label="Loading"
-              />
-            </div>
-          )}
+          {/* Poster — paints at FCP so the hero is never blank. It is the only
+              above-the-fold media that loads up front; the video fades in on
+              top once it can play. All other section videos are viewport-gated
+              so they don't steal bandwidth from this load. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/hero/zk-engine-poster.jpg"
+            alt=""
+            aria-hidden
+            fetchPriority="high"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            poster="/hero/zk-engine-poster.jpg"
+            onCanPlay={() => setVideoReady(true)}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+              videoReady ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <source src="/hero/zk-engine.mp4" type="video/mp4" />
+          </video>
         </div>
       </div>
     </section>

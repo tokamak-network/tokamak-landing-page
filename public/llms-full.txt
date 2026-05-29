@@ -284,7 +284,7 @@ The Tokamak Network website (https://tokamak.network) has the following pages:
 
 | Path | Description |
 |------|-------------|
-| `/` | Main landing page with ecosystem overview, live metrics, and tower showcase |
+| `/` | Main landing page — ZK/privacy hero, live data ticker, product showcase, ecosystem grid, staking & governance metrics, latest feed, and community |
 | `/about/price` | Live price dashboard — TON price, market cap, supply, staking data |
 | `/about/partners` | Ecosystem partners |
 | `/about/insight` | Medium blog feed with technical articles |
@@ -300,11 +300,12 @@ The website exposes the following public data endpoints:
 | Endpoint | Description |
 |----------|-------------|
 | `/api/price` | TON price, market cap, trading volume, supply data |
+| `/api/price/candles` | Hourly TON price candles per range (sparkline series) |
 | `/api/medium` | Latest Medium blog posts (RSS feed) |
 | `/api/governance-staking` | On-chain governance and staking metrics |
-| `/api/github-activity` | GitHub repository activity data |
+| `/api/news-letter` | Newsletter email subscription (POST) |
 
 ---
 
-*Last updated: April 2026*
+*Last updated: May 2026*
 *Source: https://tokamak.network*

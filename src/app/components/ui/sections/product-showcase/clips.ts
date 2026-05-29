@@ -32,7 +32,7 @@ export const SHOWCASE_CLIPS: ShowcaseClip[] = [
     name: "Tonnel",
     category: "ZK Privacy",
     description:
-      "Private-state transfers on Tokamak — send confidential private-state notes secured by the Tokamak zk-EVM.",
+      "Private-state transfers — send confidential private-state notes secured by the Tokamak zk-EVM.",
     url: "https://airdrop.tonnel.io/",
     color: "#3b82f6",
     videoMp4: "/showcase/tonnel.mp4",

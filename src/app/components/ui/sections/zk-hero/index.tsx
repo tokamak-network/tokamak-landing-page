@@ -55,20 +55,24 @@ export default function ZkHero() {
 
         {/* CTAs */}
         <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            className="px-6 sm:px-7 py-2.5 sm:py-3 bg-[#2A72E5]/12 border border-[#4A8EFA]/70 text-[#7AB0FF] text-[11px] sm:text-xs tracking-[0.25em] uppercase hover:bg-[#2A72E5]/25 hover:border-[#4A8EFA] transition-all shadow-[0_0_24px_rgba(42,114,229,0.18)] hover:shadow-[0_0_40px_rgba(42,114,229,0.35)]"
+          <a
+            href="https://rolluphub.tokamak.network/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-6 sm:px-7 py-2.5 sm:py-3 bg-[#2A72E5]/12 border border-[#4A8EFA]/70 text-[#7AB0FF] text-[11px] sm:text-xs tracking-[0.25em] uppercase hover:bg-[#2A72E5]/25 hover:border-[#4A8EFA] transition-all shadow-[0_0_24px_rgba(42,114,229,0.18)] hover:shadow-[0_0_40px_rgba(42,114,229,0.35)]"
             style={{ fontFamily: "var(--font-geist-mono), monospace" }}
           >
             Get Started →
-          </button>
-          <button
-            type="button"
-            className="px-6 sm:px-7 py-2.5 sm:py-3 border border-white/20 text-white/70 text-[11px] sm:text-xs tracking-[0.25em] uppercase hover:border-white/45 hover:text-white/95 transition-all"
+          </a>
+          <a
+            href="https://docs.tokamak.network/home"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-6 sm:px-7 py-2.5 sm:py-3 border border-white/20 text-white/70 text-[11px] sm:text-xs tracking-[0.25em] uppercase hover:border-white/45 hover:text-white/95 transition-all"
             style={{ fontFamily: "var(--font-geist-mono), monospace" }}
           >
             Documentation
-          </button>
+          </a>
         </div>
       </div>
 

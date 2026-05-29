@@ -1,7 +1,8 @@
 import { fetchPriceDatas } from "@/app/api/price";
 import { LINKS } from "@/app/constants/links";
+import LazyVideo from "@/app/components/shared/LazyVideo";
 import InfoBadgeClient from "./InfoBadge";
-import SparklineChart from "./SparklineChart";
+import SparklineChart from "./SparklineChartLazy";
 
 interface PriceData {
   tonPrice: {
@@ -201,17 +202,12 @@ function PriceHero({
             WebkitMaskComposite: "source-in",
           }}
         >
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
+          <LazyVideo
+            src="/videos/price-hero.mp4"
+            poster="/videos/price-hero-poster.jpg"
             className="absolute inset-0 w-full h-full object-cover"
             style={{ filter: "saturate(1.05) brightness(0.95)" }}
-          >
-            <source src="/videos/price-hero.webm" type="video/webm" />
-            <source src="/videos/price-hero.mp4" type="video/mp4" />
-          </video>
+          />
 
           {/* Section-color wash on the left edge — fades the video into the
               page background where text sits, eliminating any visible seam. */}
@@ -404,12 +400,9 @@ function SectionShell({
       style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
     >
       {videoSrc && (
-        <video
-          aria-hidden
-          autoPlay
-          loop
-          muted
-          playsInline
+        <LazyVideo
+          src={videoSrc}
+          poster={videoSrc.replace(/\.mp4$/, "-poster.jpg")}
           className="pointer-events-none absolute inset-0 w-full h-full object-cover z-0"
           style={{
             opacity: videoOpacity,
@@ -420,9 +413,7 @@ function SectionShell({
             WebkitMaskImage:
               "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 12%, black 28%, black 72%, rgba(0,0,0,0.4) 92%, transparent 100%)",
           }}
-        >
-          <source src={videoSrc} type="video/mp4" />
-        </video>
+        />
       )}
 
       <div className="relative z-10 max-w-[1400px] mx-auto">

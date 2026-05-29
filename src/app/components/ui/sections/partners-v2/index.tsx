@@ -1,4 +1,5 @@
 import Image from "next/image";
+import LazyVideo from "@/app/components/shared/LazyVideo";
 
 import EfgOff from "@/assets/partners/name=efg, Hover=off.svg";
 import SKYOff from "@/assets/partners/name=SKY, Hover=off.svg";
@@ -230,13 +231,10 @@ export default function PartnersV2() {
 
         {/* ─── CTA: Become a Partner ─── */}
         <section className="relative overflow-hidden">
-          <video
-            className="absolute inset-0 w-full h-full object-cover opacity-60"
-            autoPlay
-            loop
-            muted
-            playsInline
+          <LazyVideo
             src="/videos/stats.mp4"
+            poster="/videos/stats-poster.jpg"
+            className="absolute inset-0 w-full h-full object-cover opacity-60"
           />
           <div
             aria-hidden

@@ -3,7 +3,9 @@ import { parseReportSummary } from "@/app/lib/reports/parseReport";
 import type { ReportSummary } from "@/app/lib/reports/types";
 import ReportsArchive from "@/app/components/ui/sections/reports-archive";
 
-export const dynamic = "force-dynamic";
+// Reports are local files resolved at build — prerender statically (re-deploy
+// adds new ones, per the biweekly workflow). Refresh hourly just in case.
+export const revalidate = 3600;
 
 export default function ReportsPage() {
   const metas = listReports();

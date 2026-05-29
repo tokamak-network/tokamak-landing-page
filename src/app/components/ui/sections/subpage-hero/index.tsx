@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import LazyVideo from "@/app/components/shared/LazyVideo";
 
 const MONO_STYLE = { fontFamily: "var(--font-geist-mono), monospace" } as const;
 
@@ -11,9 +12,10 @@ interface Props {
   titleAccent: string;
   /** Optional trailing punctuation rendered inline after the accent. */
   titleEnd?: string;
-  /** Optional ambient video, anchored bottom-right with soft masks (mirrors PriceHero). */
-  videoWebm?: string;
+  /** Optional ambient video (mp4), anchored bottom-right with soft masks (mirrors PriceHero). */
   videoMp4?: string;
+  /** Poster shown before the ambient video loads. Defaults to the mp4's sibling `-poster.jpg`. */
+  videoPoster?: string;
   /** One-line subhead paragraph below the H1. */
   subhead?: string;
   /** Slot for extra elements (CTAs, metadata strips, stat rows, etc.). */
@@ -31,12 +33,13 @@ export default function SubpageHero({
   titleStart,
   titleAccent,
   titleEnd = "",
-  videoWebm,
   videoMp4,
+  videoPoster,
   subhead,
   children,
 }: Props) {
-  const hasVideo = Boolean(videoWebm || videoMp4);
+  const hasVideo = Boolean(videoMp4);
+  const poster = videoPoster ?? videoMp4?.replace(/\.mp4$/, "-poster.jpg");
 
   return (
     <section className="relative w-full lg:min-h-[88vh] bg-[#02040a] overflow-hidden">
@@ -67,17 +70,12 @@ export default function SubpageHero({
               WebkitMaskComposite: "source-in",
             }}
           >
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
+            <LazyVideo
+              src={videoMp4 as string}
+              poster={poster}
               className="absolute inset-0 w-full h-full object-cover"
               style={{ filter: "saturate(1.05) brightness(0.95)" }}
-            >
-              {videoWebm && <source src={videoWebm} type="video/webm" />}
-              {videoMp4 && <source src={videoMp4} type="video/mp4" />}
-            </video>
+            />
             {/* Section-color wash on the left edge — fades the video into the
                 page background where text sits. */}
             <div

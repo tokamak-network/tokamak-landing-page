@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX, ChevronRight } from "lucide-react";
 import { SHOWCASE_CLIPS, type ShowcaseClip } from "./clips";
 
 const AUTO_ROTATE_MS = 9000;
@@ -543,8 +543,9 @@ function Roster({
           <span className="hidden sm:inline">Tap to jump</span>
         </span>
       </div>
+      <div className="relative">
       <ul
-        className="flex gap-2 sm:grid sm:gap-2 overflow-x-auto sm:overflow-visible -mx-4 sm:mx-0 px-4 sm:px-0 snap-x snap-mandatory"
+        className="flex gap-2 sm:grid sm:gap-2 overflow-x-auto sm:overflow-visible snap-x snap-mandatory"
         style={{
           scrollbarWidth: "none",
           // sm+ only (inert under display:flex on mobile). auto-fit packs as many
@@ -614,6 +615,15 @@ function Roster({
           );
         })}
       </ul>
+        {/* Mobile-only swipe affordance: right-edge fade + pulsing chevron so
+            the roster reads as a horizontally scrollable strip. */}
+        <div
+          aria-hidden
+          className="sm:hidden pointer-events-none absolute inset-y-0 right-0 flex items-center justify-end pl-10 pr-0.5 bg-gradient-to-l from-black via-black/85 to-transparent"
+        >
+          <ChevronRight className="h-5 w-5 text-[#7AB0FF]/90 animate-pulse" />
+        </div>
+      </div>
     </div>
   );
 }

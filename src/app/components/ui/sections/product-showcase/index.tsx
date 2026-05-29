@@ -526,6 +526,27 @@ function Roster({
   activeIndex: number;
   onSelect: (i: number) => void;
 }) {
+  const scrollRef = useRef<HTMLUListElement>(null);
+  const [atEnd, setAtEnd] = useState(false);
+
+  // Hide the mobile swipe chevron once the roster is scrolled to the end
+  // (or when it isn't horizontally scrollable at all).
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const update = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      setAtEnd(max <= 1 || el.scrollLeft >= max - 4);
+    };
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      el.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-2.5 px-1">
@@ -545,6 +566,7 @@ function Roster({
       </div>
       <div className="relative">
       <ul
+        ref={scrollRef}
         className="flex gap-2 sm:grid sm:gap-2 overflow-x-auto sm:overflow-visible snap-x snap-mandatory"
         style={{
           scrollbarWidth: "none",
@@ -619,7 +641,9 @@ function Roster({
             the roster reads as a horizontally scrollable strip. */}
         <div
           aria-hidden
-          className="sm:hidden pointer-events-none absolute inset-y-0 right-0 flex items-center justify-end pl-10 pr-0.5 bg-gradient-to-l from-black via-black/85 to-transparent"
+          className={`sm:hidden pointer-events-none absolute inset-y-0 right-0 flex items-center justify-end pl-10 pr-0.5 bg-gradient-to-l from-black via-black/85 to-transparent transition-opacity duration-200 ${
+            atEnd ? "opacity-0" : "opacity-100"
+          }`}
         >
           <ChevronRight className="h-5 w-5 text-[#7AB0FF]/90 animate-pulse" />
         </div>

@@ -148,7 +148,7 @@ const PRODUCTION_REPO_NAMES = new Set<string>([
 const PRODUCTION_ECOSYSTEM_CATEGORY: Record<string, string> = {
   toki: "Platform",
   tokagent: "AI / ML",
-  tonnel: "Infra",
+  tonnel: "ZK",
   rolluphub: "Infra",
 };
 

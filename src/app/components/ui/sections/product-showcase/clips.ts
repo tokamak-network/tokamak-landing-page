@@ -30,14 +30,14 @@ export const SHOWCASE_CLIPS: ShowcaseClip[] = [
   {
     id: "tonnel",
     name: "Tonnel",
-    category: "Bridge",
+    category: "ZK Privacy",
     description:
-      "Cross-chain tunnel connecting Tokamak to external ecosystems with ZK-secured transfers.",
-    url: "https://tonnel.tokamak.network",
+      "Private-state transfers on Tokamak — send confidential private-state notes secured by the Tokamak zk-EVM.",
+    url: "https://airdrop.tonnel.io/",
     color: "#3b82f6",
     videoMp4: "/showcase/tonnel.mp4",
     poster: "/showcase/tonnel-poster.jpg",
-    tags: ["Bridge", "ZK-secured", "Cross-chain"],
+    tags: ["ZK", "Private State", "Confidential"],
   },
   {
     id: "tokagent",

@@ -243,7 +243,7 @@ export default function ProductShowcase() {
         </div>
 
         {/* Right — Title + synced meta panel + roster */}
-        <div className="relative z-20 max-w-md lg:max-w-none order-1 lg:order-2 flex flex-col gap-6">
+        <div className="relative z-20 max-w-md sm:max-w-none order-1 lg:order-2 flex flex-col gap-6">
           <div>
             <div className="inline-flex items-center gap-3 mb-4">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#4A8EFA] shadow-[0_0_10px_#2A72E5] animate-pulse" />
@@ -544,8 +544,16 @@ function Roster({
         </span>
       </div>
       <ul
-        className="flex gap-2 sm:gap-0 sm:block sm:space-y-1.5 overflow-x-auto sm:overflow-visible -mx-4 sm:mx-0 px-4 sm:px-0 snap-x snap-mandatory"
-        style={{ scrollbarWidth: "none" }}
+        className="flex gap-2 sm:grid sm:gap-2 overflow-x-auto sm:overflow-visible -mx-4 sm:mx-0 px-4 sm:px-0 snap-x snap-mandatory"
+        style={{
+          scrollbarWidth: "none",
+          // sm+ only (inert under display:flex on mobile). auto-fit packs as many
+          // tracks as fit; the `max(12rem, 50% - gap)` floor caps it at 2 columns
+          // when the row is ≥ ~2 buttons wide, and drops to a single full-width
+          // column when it isn't.
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(max(12rem, calc(50% - 0.5rem)), 1fr))",
+        }}
       >
         {clips.map((c, i) => {
           const isActive = i === activeIndex;

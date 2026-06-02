@@ -30,12 +30,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Tokamak Network",
-  description: "Tailored Ethereum Solution",
+  description: "Own the layer. Own your privacy. Launch your own privacy-focused custom L2 on Tokamak Network — real privacy lives in the infrastructure, not a service you rent.",
   metadataBase: new URL("https://tokamak.network"),
   openGraph: {
     title: "Tokamak Network",
     description:
-      "Tailored Ethereum Solution",
+      "Own the layer. Own your privacy. Launch your own privacy-focused custom L2 on Tokamak Network — real privacy lives in the infrastructure, not a service you rent.",
     url: "https://tokamak.network",
     siteName: "Tokamak Network",
     locale: "en_US",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Tokamak Network",
     description:
-      "Tailored Ethereum Solution",
+      "Own the layer. Own your privacy. Launch your own privacy-focused custom L2 on Tokamak Network — real privacy lives in the infrastructure, not a service you rent.",
     site: "@tokamak_network",
   },
   icons: {

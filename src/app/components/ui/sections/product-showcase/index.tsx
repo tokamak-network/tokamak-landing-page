@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { Volume2, VolumeX, ChevronRight } from "lucide-react";
+import { Volume2, VolumeX, ChevronRight, Play } from "lucide-react";
 import { SHOWCASE_CLIPS, type ShowcaseClip } from "./clips";
 
-const AUTO_ROTATE_MS = 9000;
 const CROSSFADE_MS = 800;
 
 export default function ProductShowcase() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [hovering, setHovering] = useState(false);
   const [muted, setMuted] = useState(true);
+  // The active clip has played through to its end. Playback no longer
+  // auto-advances, so this drives a "next" affordance hint that nudges the
+  // viewer toward the arrow once a clip finishes.
+  const [ended, setEnded] = useState(false);
   // Start false: the showcase sits below the hero, so on initial load we do NOT
   // want its clips fetching and competing with the above-the-fold hero video.
   // The IntersectionObserver flips this on (with a head-start margin) once the
@@ -30,12 +32,12 @@ export default function ProductShowcase() {
   const next = useCallback(() => goto(activeIndex + 1), [activeIndex, goto]);
   const prev = useCallback(() => goto(activeIndex - 1), [activeIndex, goto]);
 
-  // Auto-rotate (paused on hover)
+  // Clips no longer rotate on a timer — each one plays to its full length and
+  // then holds. Reset the "ended" hint whenever the active clip changes so the
+  // new clip (which restarts from frame 0) doesn't inherit it.
   useEffect(() => {
-    if (hovering) return;
-    const t = setInterval(next, AUTO_ROTATE_MS);
-    return () => clearInterval(t);
-  }, [hovering, next]);
+    setEnded(false);
+  }, [activeIndex]);
 
   // Keyboard
   useEffect(() => {
@@ -66,8 +68,6 @@ export default function ProductShowcase() {
       ref={sectionRef}
       className="relative w-full lg:min-h-screen bg-black overflow-hidden flex items-start lg:items-center"
       style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
     >
       {/* Background — blueprint grid framed by radial mask */}
       <div
@@ -142,6 +142,8 @@ export default function ProductShowcase() {
               prefetch={i === (activeIndex + 1) % total}
               muted={muted}
               inView={inView}
+              onEnded={() => setEnded(true)}
+              onReplay={() => setEnded(false)}
             />
           ))}
 
@@ -210,7 +212,11 @@ export default function ProductShowcase() {
             type="button"
             onClick={next}
             aria-label="Next"
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 hover:bg-black/70 hover:border-white/30 text-white/80 transition-all flex items-center justify-center"
+            className={`absolute right-4 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full backdrop-blur-sm border transition-all flex items-center justify-center ${
+              ended
+                ? "bg-[#4A8EFA]/25 border-[#4A8EFA] text-white animate-pulse shadow-[0_0_18px_rgba(74,142,250,0.6)]"
+                : "bg-black/40 border-white/15 hover:bg-black/70 hover:border-white/30 text-white/80"
+            }`}
           >
             <span className="text-lg leading-none">→</span>
           </button>
@@ -287,6 +293,8 @@ function ClipLayer({
   prefetch,
   muted,
   inView,
+  onEnded,
+  onReplay,
 }: {
   clip: ShowcaseClip;
   active: boolean;
@@ -295,6 +303,10 @@ function ClipLayer({
   muted: boolean;
   /** Whether the showcase section is currently on-screen. */
   inView: boolean;
+  /** Fired when the active clip plays through to its end. */
+  onEnded?: () => void;
+  /** Fired when the viewer replays a clip that had finished. */
+  onReplay?: () => void;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const hasVideo = Boolean(clip.videoMp4 || clip.videoWebm);
@@ -302,6 +314,12 @@ function ClipLayer({
   // first use so the next time it's active we hit cache instead of a
   // fresh download.
   const [hasBeenActive, setHasBeenActive] = useState(false);
+  // Manual playback state. With auto-advance gone, the viewer drives
+  // play / pause / replay by clicking the stage.
+  const [paused, setPaused] = useState(false);
+  // The clip has played through to its end and is holding on its last frame,
+  // waiting for the viewer to replay it or advance to the next clip.
+  const [finished, setFinished] = useState(false);
   // Whether <source> tags should be rendered: active, prefetch target,
   // or previously seen. We deliberately don't gate this on `inView` —
   // the network savings come from `preload="none"`, not from withholding
@@ -332,7 +350,8 @@ function ClipLayer({
     const v = ref.current;
     if (!v) return;
     v.muted = muted;
-    if (active && inView) {
+    // `paused` is the viewer's explicit pause; don't fight it by auto-resuming.
+    if (active && inView && !paused) {
       // If sources were just attached, kick off the download.
       if (v.readyState === 0) v.load();
       v.play().catch(() => {});
@@ -346,12 +365,16 @@ function ClipLayer({
         }
       }
     }
-  }, [active, muted, inView]);
+  }, [active, muted, inView, paused]);
 
-  // When this clip becomes the active one, restart playback from frame 0.
+  // When this clip becomes the active one, restart playback from frame 0 and
+  // clear any paused/finished state left over from a previous viewing.
   useEffect(() => {
+    if (!active) return;
+    setPaused(false);
+    setFinished(false);
     const v = ref.current;
-    if (!v || !active) return;
+    if (!v) return;
     try {
       v.currentTime = 0;
     } catch {
@@ -359,23 +382,58 @@ function ClipLayer({
     }
   }, [active]);
 
+  // Click the stage to pause, resume, or replay a finished clip.
+  const handleStageClick = useCallback(() => {
+    const v = ref.current;
+    if (!v) return;
+    if (v.ended || finished) {
+      setFinished(false);
+      setPaused(false);
+      onReplay?.();
+      try {
+        v.currentTime = 0;
+      } catch {
+        /* ignore */
+      }
+      v.play().catch(() => {});
+    } else if (v.paused) {
+      setPaused(false);
+      v.play().catch(() => {});
+    } else {
+      setPaused(true);
+      v.pause();
+    }
+  }, [finished, onReplay]);
+
+  // Clip reached its end — hold on the last frame and surface the hint.
+  const handleEnded = useCallback(() => {
+    setFinished(true);
+    setPaused(false);
+    onEnded?.();
+  }, [onEnded]);
+
   return (
     <div
       className="absolute inset-0 transition-opacity ease-in-out"
       style={{
         opacity: active ? 1 : 0,
         transitionDuration: `${CROSSFADE_MS}ms`,
+        // Only the active layer is interactive; the stacked inactive layers
+        // must let clicks fall through to the controls above them.
+        pointerEvents: active && hasVideo ? "auto" : "none",
+        cursor: active && hasVideo ? "pointer" : "default",
       }}
+      onClick={active && hasVideo ? handleStageClick : undefined}
     >
       {hasVideo ? (
         <video
           ref={ref}
           autoPlay={active}
-          loop
           muted={muted}
           playsInline
           preload="none"
           poster={clip.poster}
+          onEnded={handleEnded}
           className="absolute inset-0 w-full h-full object-cover"
           style={{
             filter:
@@ -394,6 +452,19 @@ function ClipLayer({
             background: `radial-gradient(ellipse at 30% 40%, ${clip.color}55 0%, transparent 50%), radial-gradient(ellipse at 80% 70%, ${clip.color}33 0%, transparent 55%), linear-gradient(135deg, #0a0a14 0%, #06070d 100%)`,
           }}
         />
+      )}
+
+      {/* Play / replay affordance — shown while paused or after the clip ends. */}
+      {active && hasVideo && (paused || finished) && (
+        <div className="absolute inset-0 z-[5] flex items-center justify-center pointer-events-none">
+          <span className="flex items-center justify-center h-16 w-16 rounded-full bg-black/55 backdrop-blur-sm border border-white/25 shadow-[0_0_24px_rgba(0,0,0,0.5)]">
+            <Play
+              size={26}
+              className="text-white/90 translate-x-0.5"
+              fill="currentColor"
+            />
+          </span>
+        </div>
       )}
     </div>
   );

@@ -1,9 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function ZkHero() {
   const [videoReady, setVideoReady] = useState(false);
+  // Defer attaching the hero clip until after first paint. The poster
+  // (fetchPriority="high") covers the hero instantly; the clip then fades in.
+  // On a cold cache, mobile waits for an idle gap so the heavy download doesn't
+  // throttle the first paint; desktop attaches as soon as it hydrates (no
+  // regression there — desktop bandwidth handles the eager load fine).
+  const [attachVideo, setAttachVideo] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    if (!isMobile) {
+      setAttachVideo(true);
+      return;
+    }
+    const ric = window.requestIdleCallback?.bind(window);
+    if (ric) {
+      const id = ric(() => setAttachVideo(true), { timeout: 2500 });
+      return () => window.cancelIdleCallback?.(id);
+    }
+    const t = setTimeout(() => setAttachVideo(true), 1500);
+    return () => clearTimeout(t);
+  }, []);
+
+  // autoPlay only fires for a <source> present at mount, so once the source
+  // attaches later we kick off the download + playback ourselves.
+  useEffect(() => {
+    if (!attachVideo) return;
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.readyState === 0) v.load();
+    v.play?.().catch(() => {});
+  }, [attachVideo]);
 
   return (
     <section
@@ -102,18 +134,19 @@ export default function ZkHero() {
             className="absolute inset-0 w-full h-full object-cover"
           />
           <video
+            ref={videoRef}
             autoPlay
             loop
             muted
             playsInline
-            preload="auto"
+            preload={attachVideo ? "auto" : "none"}
             poster="/hero/zk-engine-poster.jpg"
             onCanPlay={() => setVideoReady(true)}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
               videoReady ? "opacity-100" : "opacity-0"
             }`}
           >
-            <source src="/hero/zk-engine.mp4" type="video/mp4" />
+            {attachVideo && <source src="/hero/zk-engine.mp4" type="video/mp4" />}
           </video>
         </div>
       </div>

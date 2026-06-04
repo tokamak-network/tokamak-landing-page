@@ -51,8 +51,14 @@ export async function GET(req: NextRequest) {
     }
 
     const candles = (await candleRes.json()) as UpbitCandle[];
-    const fx = (await fxRes.json()) as { rates: { USD: number } };
-    const krwToUsd = fx.rates.USD;
+    const fx = (await fxRes.json()) as { rates?: { USD?: number } };
+    const krwToUsd = fx.rates?.USD;
+    if (typeof krwToUsd !== "number" || !Number.isFinite(krwToUsd)) {
+      return NextResponse.json(
+        { series: [], range, error: "invalid FX rate" },
+        { status: 502 }
+      );
+    }
 
     // Upbit returns newest → oldest; reverse for chronological series.
     const series = candles

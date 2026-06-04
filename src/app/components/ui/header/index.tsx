@@ -28,7 +28,14 @@ const navItems = [
 export default function NavigationBar() {
   const { isMobile } = useIsMobile(640);
   const pathname = usePathname();
-  const isAbout = pathname.startsWith("/about");
+  // Dark header on the main page, price, and partners — insight & reports now
+  // share that same dark style instead of the light "about" variant.
+  const isAbout =
+    pathname.startsWith("/about") &&
+    !pathname.startsWith("/about/price") &&
+    !pathname.startsWith("/about/partners") &&
+    !pathname.startsWith("/about/insight") &&
+    !pathname.startsWith("/about/reports");
 
   if (isMobile) return <Mobile isAbout={isAbout} />;
 

@@ -8,49 +8,98 @@ interface TickerItem {
   change?: string;
 }
 
-function TickerItemDisplay({ item }: { item: TickerItem }) {
+function TickerItemDisplay({ item, idx }: { item: TickerItem; idx: number }) {
+  const isUp = item.change?.startsWith("+");
+  const isDown = item.change?.startsWith("-");
+
   return (
-    <span className="inline-flex items-center gap-2 px-6 whitespace-nowrap">
-      <span className="text-[11px] font-[700] text-[#929298] uppercase tracking-[0.08em]">
+    <span className="inline-flex items-center gap-3 px-7 whitespace-nowrap">
+      {/* Small pulsing cyan node */}
+      <span
+        className="h-1 w-1 rounded-full bg-cyan-400 animate-pulse"
+        style={{
+          boxShadow: "0 0 6px #00e5ff, 0 0 12px rgba(0,229,255,0.5)",
+          animationDelay: `${(idx % 7) * 0.18}s`,
+        }}
+      />
+
+      {/* Label */}
+      <span className="text-[10px] tracking-[0.4em] font-mono text-cyan-300/75 uppercase">
         {item.label}
       </span>
-      <span className="text-[13px] font-[700] text-white font-orbitron tracking-wider">
-        {item.prefix}{item.value}{item.suffix ? ` ${item.suffix}` : ""}
+
+      {/* Value */}
+      <span
+        className="text-[14px] font-mono font-medium text-white tracking-wide"
+        style={{ textShadow: "0 0 8px rgba(255,255,255,0.18)" }}
+      >
+        {item.prefix}
+        {item.value}
+        {item.suffix ? ` ${item.suffix}` : ""}
       </span>
+
+      {/* Change indicator */}
       {item.change && (
-        <span className={`text-[11px] font-[700] ${
-          item.change.startsWith("+") ? "text-[#22c55e]" : "text-[#ef4444]"
-        }`}>
-          {item.change}
+        <span
+          className={`text-[11px] font-mono font-semibold tracking-wide inline-flex items-center gap-0.5 ${
+            isUp ? "text-emerald-400" : isDown ? "text-rose-400" : "text-white/60"
+          }`}
+          style={{
+            textShadow: isUp
+              ? "0 0 8px rgba(52,211,153,0.55)"
+              : isDown
+              ? "0 0 8px rgba(251,113,133,0.55)"
+              : "none",
+          }}
+        >
+          {isUp ? "▲" : isDown ? "▼" : ""}
+          {item.change.replace(/^[+-]/, "")}
         </span>
       )}
-      <span className="text-[#333] mx-2">│</span>
+
+      {/* Vertical hairline separator */}
+      <span className="ml-4 w-px h-4 bg-cyan-400/15" />
     </span>
   );
 }
 
 export default function TickerClient({ items }: { items: TickerItem[] }) {
   return (
-    <div className="relative z-20 w-full h-10 bg-[#0a0a0a] border-b border-[#1a1a1d] overflow-hidden flex items-center">
-      {/* Live indicator */}
-      <div className="absolute left-4 z-10 flex items-center gap-2 bg-[#0a0a0a] pr-4">
-        <span className="w-2 h-2 rounded-full bg-[#22c55e] animate-live-pulse" />
-        <span className="text-[10px] font-[700] text-[#22c55e] uppercase tracking-[0.12em] font-orbitron">
-          LIVE
-        </span>
-      </div>
+    <div className="relative z-20 w-full bg-black overflow-hidden">
+      {/* Top hairline — fades from transparent → cyan → transparent */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-400/45 to-transparent" />
+      {/* Bottom hairline */}
+      <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-400/45 to-transparent" />
 
-      {/* Scrolling ticker */}
-      <div className="flex animate-infinite-scroll pl-24">
-        {/* Duplicate items for seamless loop */}
-        {[...items, ...items].map((item, i) => (
-          <TickerItemDisplay key={`${item.label}-${i}`} item={item} />
-        ))}
-      </div>
-      <div className="flex animate-infinite-scroll pl-0" aria-hidden="true">
-        {[...items, ...items].map((item, i) => (
-          <TickerItemDisplay key={`dup-${item.label}-${i}`} item={item} />
-        ))}
+      {/* Subtle radial cyan glow behind the strip */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 40% 200% at 50% 50%, rgba(0,229,255,0.07) 0%, transparent 65%)",
+        }}
+      />
+
+      {/* Ticker scrolling content */}
+      <div className="relative h-14 flex items-center">
+        <div className="flex animate-infinite-scroll">
+          {[...items, ...items].map((item, i) => (
+            <TickerItemDisplay
+              key={`${item.label}-${i}`}
+              item={item}
+              idx={i}
+            />
+          ))}
+        </div>
+        <div className="flex animate-infinite-scroll" aria-hidden="true">
+          {[...items, ...items].map((item, i) => (
+            <TickerItemDisplay
+              key={`dup-${item.label}-${i}`}
+              item={item}
+              idx={i}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

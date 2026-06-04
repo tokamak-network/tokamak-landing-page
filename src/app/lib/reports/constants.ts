@@ -1,4 +1,4 @@
-import type { ReportStats } from "@/app/components/ui/sections/reports/types";
+import type { ReportStats } from "./types";
 
 export const SLUG_PATTERN = /^report-(\d{4})-(\d{2})-(\d{2})-(\d{2})$/;
 

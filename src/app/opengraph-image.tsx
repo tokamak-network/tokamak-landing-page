@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Tokamak Network — Tailored Ethereum Solution";
+export const alt = "Tokamak Network — own the layer, own your privacy. A privacy-focused custom L2 on Ethereum.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -71,15 +71,28 @@ export default async function Image() {
           Tokamak Network
         </div>
 
-        {/* Subtitle */}
+        {/* Subtitle — privacy manifesto (matches the hero) */}
         <div
           style={{
-            fontSize: 24,
-            color: "rgba(140,200,255,0.6)",
-            letterSpacing: "0.08em",
+            fontSize: 32,
+            fontWeight: 600,
+            color: "#ffffff",
+            letterSpacing: "0.04em",
+            marginBottom: 12,
           }}
         >
-          Tailored Ethereum Solution
+          Own the layer. Own your privacy.
+        </div>
+
+        {/* Sub-subtitle — product positioning */}
+        <div
+          style={{
+            fontSize: 22,
+            color: "rgba(140,200,255,0.6)",
+            letterSpacing: "0.06em",
+          }}
+        >
+          Your own privacy-focused custom L2 on Ethereum
         </div>
 
         {/* Bottom accent line */}

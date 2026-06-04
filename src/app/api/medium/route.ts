@@ -1,8 +1,17 @@
 import Parser from "rss-parser";
 import * as cheerio from "cheerio";
 import axios from "axios";
-import { MediumPost } from "@/app/components/ui/sections/insight/types";
 import { NextResponse } from "next/server";
+
+interface MediumPost {
+  title: string;
+  pubDate: string;
+  link: string;
+  author: string;
+  thumbnail: string | undefined;
+  content: string | undefined;
+  categories: string[];
+}
 
 // Use Node.js runtime on Vercel (required for axios, cheerio)
 export const runtime = "nodejs";

@@ -10,7 +10,7 @@ import type {
   Contributor,
   EcosystemLandscape,
   CategoryFocusItem,
-} from "@/app/components/ui/sections/reports/types";
+} from "./types";
 import {
   parseLandscapeFragment,
   parseCategoryFocusFragment,

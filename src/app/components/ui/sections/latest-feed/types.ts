@@ -7,4 +7,6 @@ export interface FeedItem {
   readonly thumbnail?: string;
   readonly statsSummary?: string;
   readonly excerpt?: string;
+  /** Human-readable date range, e.g. "April 16 — 30, 2026" (reports only). */
+  readonly dateLabel?: string;
 }

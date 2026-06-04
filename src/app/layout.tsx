@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Orbitron } from "next/font/google";
+import { Space_Grotesk, Orbitron, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { FocusProvider } from "@/context/FocusContext";
 
@@ -16,14 +16,26 @@ const orbitron = Orbitron({
   weight: ["400", "700", "900"],
 });
 
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Tokamak Network",
-  description: "Tailored Ethereum Solution",
+  description: "Own the layer. Own your privacy. Launch your own privacy-focused custom L2 on Tokamak Network — real privacy lives in the infrastructure, not a service you rent.",
   metadataBase: new URL("https://tokamak.network"),
   openGraph: {
     title: "Tokamak Network",
     description:
-      "Tailored Ethereum Solution",
+      "Own the layer. Own your privacy. Launch your own privacy-focused custom L2 on Tokamak Network — real privacy lives in the infrastructure, not a service you rent.",
     url: "https://tokamak.network",
     siteName: "Tokamak Network",
     locale: "en_US",
@@ -33,7 +45,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Tokamak Network",
     description:
-      "Tailored Ethereum Solution",
+      "Own the layer. Own your privacy. Launch your own privacy-focused custom L2 on Tokamak Network — real privacy lives in the infrastructure, not a service you rent.",
     site: "@tokamak_network",
   },
   icons: {
@@ -52,10 +64,14 @@ const jsonLd = {
     {
       "@type": "Organization",
       name: "Tokamak Network",
+      alternateName: "Tokamak",
       url: "https://tokamak.network",
       logo: "https://tokamak.network/tokamak_favicon.ico",
       description:
         "Ethereum-native Layer 2 platform enabling on-demand rollup deployment. Built on the OP Stack, Tokamak Network allows any application to launch its own optimized L2 chain.",
+      // Prevent LLM/search confusion with the fusion-reactor "tokamak".
+      disambiguatingDescription:
+        "Tokamak Network is a blockchain Layer 2 project on Ethereum — not the fusion energy device of the same name.",
       sameAs: [
         "https://github.com/tokamak-network",
         "https://twitter.com/tokamak_network",
@@ -125,7 +141,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${orbitron.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${spaceGrotesk.variable} ${orbitron.variable} ${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/fuc6kbq.css" />
         <script

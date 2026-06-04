@@ -1,0 +1,66 @@
+export interface ShowcaseClip {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  url: string;
+  /** Optional local video sources (mp4 + webm). When absent, falls back to gradient placeholder. */
+  videoMp4?: string;
+  videoWebm?: string;
+  poster?: string;
+  /** Brand accent color used for placeholder gradient + CTA. */
+  color: string;
+  /** Short tags surfaced in the synced meta panel. */
+  tags?: string[];
+}
+
+export const SHOWCASE_CLIPS: ShowcaseClip[] = [
+  {
+    id: "rolluphub",
+    name: "Rollup Hub",
+    category: "L2 Platform",
+    description:
+      "Launch and manage Tokamak L2 rollups from one platform.",
+    url: "https://rolluphub.tokamak.network/",
+    color: "#2A72E5",
+    videoMp4: "/showcase/rolluphub.mp4",
+    poster: "/showcase/rolluphub-poster.jpg",
+    tags: ["L2", "Rollups", "Launchpad"],
+  },
+  {
+    id: "tonnel",
+    name: "Tonnel",
+    category: "ZK Privacy",
+    description:
+      "Private-state transfers — send confidential private-state notes secured by the Tokamak zk-EVM.",
+    url: "https://airdrop.tonnel.io/",
+    color: "#3b82f6",
+    videoMp4: "/showcase/tonnel.mp4",
+    poster: "/showcase/tonnel-poster.jpg",
+    tags: ["ZK", "Private State", "Confidential"],
+  },
+  {
+    id: "tokagent",
+    name: "Tokagent",
+    category: "AI Agent",
+    description:
+      "Autonomous AI agents that interact with Tokamak protocols on behalf of users.",
+    url: "https://tokagent.network/",
+    color: "#00e5ff",
+    videoMp4: "/showcase/tokagent.mp4",
+    poster: "/showcase/tokagent-poster.jpg",
+    tags: ["AI Agent", "Autonomous", "Onchain"],
+  },
+  {
+    id: "toki",
+    name: "Toki",
+    category: "Staking UX",
+    description:
+      "Friendly staking experience with raffle gamification — built on Tokamak governance.",
+    url: "https://toki.tokamak.network",
+    color: "#a855f7",
+    videoMp4: "/showcase/toki.mp4",
+    poster: "/showcase/toki-poster.jpg",
+    tags: ["Staking", "Gamified", "Mainnet"],
+  },
+];

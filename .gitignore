@@ -43,3 +43,6 @@ next-env.d.ts
 # claude code
 .omc/
 **/CLAUDE.md
+
+# local video re-encode backups (not deployed)
+_video_originals_backup/

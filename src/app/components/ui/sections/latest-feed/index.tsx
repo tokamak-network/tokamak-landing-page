@@ -2,7 +2,7 @@ import { listReports, getReportPath } from "@/app/lib/reports/listReports";
 import { parseReportSummary } from "@/app/lib/reports/parseReport";
 import LatestFeedClient from "./LatestFeedClient";
 import type { FeedItem } from "./types";
-import type { ReportSummary } from "@/app/components/ui/sections/reports/types";
+import type { ReportSummary } from "@/app/lib/reports/types";
 
 function formatNum(n: string): string {
   const num = parseFloat(n.replace(/,/g, ""));
@@ -31,9 +31,10 @@ function reportToFeedItem(report: ReportSummary): FeedItem {
       : `Biweekly Report: ${report.dateLabel}`,
     date: dateStr,
     type: "report",
-    href: `/about/reports/${report.slug}`,
+    href: `/reports/${report.slug}.html`,
     thumbnail: "/images/biweekly-report-thumbnail.png",
     statsSummary: statsPreview || undefined,
+    dateLabel: report.dateLabel,
   };
 }
 
@@ -55,113 +56,33 @@ export default function LatestFeed() {
 
   return (
     <section
-      className="relative z-10 w-full flex justify-center px-6 pt-[110px] pb-[160px] [@media(max-width:640px)]:py-[80px] overflow-hidden bg-black"
-      data-snap-section
-      style={{ minHeight: "100vh", scrollSnapAlign: "start" }}
+      className="relative w-full bg-black py-20 sm:py-28 px-4 sm:px-6"
+      style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
     >
-      {/* ── Background layers ── */}
-
-      {/* Subtle grid — same density as tower floors */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px)
-          `,
-          backgroundSize: "60px 60px",
-        }}
-      />
-
-      {/* Scan lines */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,229,255,0.008) 3px, rgba(0,229,255,0.008) 4px)",
-        }}
-      />
-
-      {/* Center radial glow — soft, does not compete with cards */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `
-            radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0,229,255,0.035) 0%, transparent 55%),
-            radial-gradient(ellipse 40% 30% at 50% 45%, rgba(0,229,255,0.02) 0%, transparent 40%)
-          `,
-        }}
-      />
-
-      {/* ── Edge fades — left/right only, no top/bottom to keep buttons visible ── */}
-      <div
-        className="absolute top-0 bottom-0 left-0 pointer-events-none"
-        style={{
-          width: "18%",
-          background: "linear-gradient(90deg, black 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.4) 65%, transparent 100%)",
-        }}
-      />
-      <div
-        className="absolute top-0 bottom-0 right-0 pointer-events-none"
-        style={{
-          width: "18%",
-          background: "linear-gradient(270deg, black 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.4) 65%, transparent 100%)",
-        }}
-      />
-
-      <div className="w-full max-w-[1280px] flex flex-col items-center">
-        {/* Section label */}
-        <span
-          className="text-[11px] uppercase tracking-[0.2em] mb-4 block"
-          style={{
-            fontFamily: "'Share Tech Mono', monospace",
-            color: "rgba(0,229,255,0.6)",
-          }}
-        >
-          INTEL FEED // LIVE
-        </span>
-
-        <h2
-          className="text-[38px] md:text-[48px] font-[900] uppercase tracking-[0.06em] mb-4 text-center"
-          style={{
-            fontFamily: "'Orbitron', sans-serif",
-            color: "#ffffff",
-            textShadow: "0 0 30px rgba(0,229,255,0.5), 0 0 60px rgba(0,229,255,0.2)",
-          }}
-        >
-          Latest Updates
-        </h2>
-
-        {/* Scan-line separator */}
-        <div className="relative w-40 h-[2px] mx-auto mb-5">
-          <div
-            className="absolute inset-0"
-            style={{
-              background: "linear-gradient(90deg, transparent, #00e5ff, transparent)",
-              boxShadow: "0 0 8px rgba(0,229,255,0.8)",
-            }}
-          />
+      {/* Header — matches ProjectBento / EcosystemFan eyebrow + title style */}
+      <div className="text-center mb-12 sm:mb-16">
+        <div className="inline-flex items-center gap-3 mb-3">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#4A8EFA] shadow-[0_0_10px_#2A72E5] animate-pulse" />
+          <span
+            className="text-[10px] sm:text-[11px] tracking-[0.5em] text-[#7AB0FF]/85 uppercase"
+            style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+          >
+            Latest Updates
+          </span>
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#4A8EFA] shadow-[0_0_10px_#2A72E5] animate-pulse" />
         </div>
-
-        <p
-          className="text-[14px] mb-[80px] text-center tracking-[0.06em]"
-          style={{
-            fontFamily: "'Share Tech Mono', monospace",
-            color: "rgba(140,200,255,0.55)",
-          }}
+        <h2
+          className="text-4xl sm:text-6xl lg:text-7xl text-white tracking-[-0.04em] leading-[0.95]"
+          style={{ fontWeight: 900 }}
         >
-          News, research, and development updates from Tokamak Network
-        </p>
-
-        <LatestFeedClient reportItems={reportItems} />
+          News, research, and{" "}
+          <em className="not-italic text-[#7AB0FF]">development</em>.
+        </h2>
       </div>
 
-      {/* Bottom border line */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-[1px]"
-        style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(0,229,255,0.4) 30%, rgba(0,229,255,0.6) 50%, rgba(0,229,255,0.4) 70%, transparent 100%)",
-        }}
-      />
+      <div className="mx-auto w-full max-w-[1280px]">
+        <LatestFeedClient reportItems={reportItems} />
+      </div>
     </section>
   );
 }

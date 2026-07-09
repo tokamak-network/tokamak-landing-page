@@ -1,5 +1,13 @@
 # Tokamak Landing Page — Project Instructions
 
+> **⚠️ PROJECT ARCHIVED (2026-07-09).** Active development is discontinued.
+> Full handover documentation lives on the **`archive/handover-2026-07`**
+> branch (see `ARCHIVE.md` in this repo root for how to read it). Start there
+> — `HANDOVER.md` + `docs/handover/*` — before making changes. The
+> instructions below are the original contributor guide and are kept for
+> reference; note that `KNOWN-ISSUES.md` on the archive branch documents where
+> parts of this file are now stale (e.g. the QA harness command).
+
 ## Harness Evaluation (Visual QA)
 
 UI 컴포넌트(src/app/components/ui/sections/, src/app/components/ui/header/, src/app/components/ui/footer/)를 수정한 후, 커밋 전에 반드시 하네스 평가를 실행하라:
